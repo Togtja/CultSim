@@ -5,3 +5,8 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/ulfeyes.cpp
 )
 
+target_include_directories(
+        ${BP_RENDERER_NAME}
+        PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}
+)
