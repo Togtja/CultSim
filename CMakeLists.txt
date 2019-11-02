@@ -7,5 +7,4 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 # Add rendering library
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}renderer)
-
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/renderer)
