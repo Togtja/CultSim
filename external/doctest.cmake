@@ -1,3 +1,8 @@
+# Doctest options
+set(DOCTEST_NO_INSTALL TRUE)
+set(DOCTEST_WITH_MAIN_IN_STATIC_LIB TRUE)
+set(DOCTEST_WITH_TESTS FALSE)
+
 # Set up doctest, by fetching it from GitHub
 include(FetchContent)
 message(STATUS "Fetching doctest from GitHub using FetchContent.")
