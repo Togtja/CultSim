@@ -18,10 +18,16 @@ namespace ulf
 struct RenderContextSettings
 {
     /** Required instance extensions */
-    std::vector<vk::ExtensionProperties> instance_ext{};
+    std::vector<const char*> instance_ext{};
+
+    /** Required instance extensions */
+    std::vector<const char*> instance_layers{};
 
     /** Required device extensions */
-    std::vector<vk::ExtensionProperties> device_ext{};
+    std::vector<const char*> device_ext{};
+
+    /** Required device extensions */
+    std::vector<const char*> device_layers{};
 
     /** Do we prefer using a discrete GPU */
     bool prefer_discrete = true;
@@ -55,18 +61,13 @@ public:
 
 private:
     /**
-     * @brief init_instance
-     * @param appname
-     * @param ext_names
-     * @return
+     * @brief initialize the Vulkan instance
+     * @param appname is the internal name of the application to identify the Instance
+     * @param layer_names contain a vector of desired validation layers to enable
+     * @param ext_names contain a vector of desired instance extensions to enable
      */
-    vk::Result init_instance(std::string_view appname, const std::vector<std::string_view>& ext_names);
-
-    /**
-     * @brief handle_result
-     * @param res
-     */
-    void handle_result(vk::Result res);
+    void init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
+                       const std::vector<const char*>& ext_names);
 };
 
 }  // namespace ulf

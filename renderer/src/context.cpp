@@ -14,16 +14,26 @@ RenderContext::RenderContext(const RenderContextSettings& settings) {}
 
 RenderContext::RenderContext(std::string_view appname, const RenderContextSettings& settings) {}
 
-vk::Result RenderContext::init_instance(std::string_view appname, const std::vector<std::string_view>& ext_names)
+vk::Result RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
+                                        const std::vector<const char*>& ext_names)
 {
-    auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr);
-
+    /* Check available version and require that we have Vulkan 1.1 available */
     uint32_t version_avail = 0u;
-    auto result = vk::enumerateInstanceVersion(&version_avail);
+    vk::enumerateInstanceVersion(&version_avail);
+    REQUIRE(version_avail >= VK_API_VERSION_1_1);
+
+    auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr, 0u, version_avail);
+
+    auto instance_info =
+        vk::InstanceCreateInfo({}, &appinfo, layer_names.size(), layer_names.data(), ext_names.size(), ext_names.data());
+
+    m_instance = vk::createInstance(instance_info);
 }
 
 /** --- TESTS --- */
 
-TEST_CASE("RenderContext - Initialization") { auto context = RenderContext{}; }
+TEST_CASE("RenderContext") {
+    auto context = RenderContext{};
+}
 
 }  // namespace ulf
