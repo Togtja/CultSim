@@ -55,7 +55,7 @@ public:
     /** Constructors */
     ULFEYE_NO_COPY(RenderContext);
     ULFEYE_NO_MOVE(RenderContext);
-    ~RenderContext() noexcept = default;
+    ~RenderContext() noexcept;
     explicit RenderContext(const RenderContextSettings& settings = {});
     explicit RenderContext(std::string_view appname, const RenderContextSettings& settings);
 
