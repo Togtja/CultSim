@@ -6,6 +6,14 @@ project(bachelor_project)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
+# Enable using CTest if we are the root project
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(CTest)
+endif()
+
+# Include doctest CTest integration utility function
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/doctest.cmake)
+
 # Find dependencies in subfolder and include their scripts
 file(GLOB BP_DEPENDENCIES LIST_DIRECTORIES false ${CMAKE_CURRENT_LIST_DIR}/external/*.cmake)
 foreach(DEP IN LISTS BP_DEPENDENCIES)

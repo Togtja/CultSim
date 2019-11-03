@@ -19,6 +19,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/include/CMakeLists.txt)
 add_executable(${BP_RENDERER_TEST_NAME})
 target_compile_features(${BP_RENDERER_TEST_NAME} PRIVATE cxx_std_17)
 include(${CMAKE_CURRENT_LIST_DIR}/test/CMakeLists.txt)
+doctest_discover_tests(${BP_RENDERER_TEST_NAME})
 
 # Find libraries that are non-buildable, downloadable or otherwise should be accessible as a package
 find_package(Vulkan REQUIRED)
