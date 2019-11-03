@@ -10,13 +10,16 @@
 
 namespace ulf
 {
-RenderContext::RenderContext() { init_instance("Vulkan Renderer"); }
+RenderContext::RenderContext(const RenderContextSettings& settings) {}
 
-RenderContext::RenderContext(std::string_view appname) { init_instance(appname); }
+RenderContext::RenderContext(std::string_view appname, const RenderContextSettings& settings) {}
 
-vk::Result RenderContext::init_instance(std::string_view appname) {
-    const auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr, 0, VK_API_VERSION_1_1);
-//    vk::createInstance()
+vk::Result RenderContext::init_instance(std::string_view appname, const std::vector<std::string_view>& ext_names)
+{
+    auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr);
+
+    uint32_t version_avail = 0u;
+    auto result = vk::enumerateInstanceVersion(&version_avail);
 }
 
 /** --- TESTS --- */

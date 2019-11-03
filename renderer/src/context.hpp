@@ -1,5 +1,7 @@
 #pragma once
 
+#include "helpers.hpp"
+
 #include <array>
 #include <vector>
 
@@ -44,11 +46,27 @@ private:
     vk::Device m_device{};
 
 public:
-    RenderContext();
-    RenderContext(std::string_view appname);
+    /** Constructors */
+    ULFEYE_NO_COPY(RenderContext);
+    ULFEYE_NO_MOVE(RenderContext);
+    ~RenderContext() noexcept = default;
+    explicit RenderContext(const RenderContextSettings& settings = {});
+    explicit RenderContext(std::string_view appname, const RenderContextSettings& settings);
 
 private:
-    vk::Result init_instance(std::string_view appname);
+    /**
+     * @brief init_instance
+     * @param appname
+     * @param ext_names
+     * @return
+     */
+    vk::Result init_instance(std::string_view appname, const std::vector<std::string_view>& ext_names);
+
+    /**
+     * @brief handle_result
+     * @param res
+     */
+    void handle_result(vk::Result res);
 };
 
 }  // namespace ulf
