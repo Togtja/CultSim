@@ -28,7 +28,6 @@ RenderContext::RenderContext(std::string_view appname, const RenderContextSettin
 void RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
                                   const std::vector<const char*>& ext_names)
 {
-    /* Test Pre-Conditions */
     CHECK_MESSAGE(appname != "", "The appname should not be empty.");
 
     /* Check available version and require that we have Vulkan 1.1 available */
@@ -93,6 +92,11 @@ vk::PhysicalDevice RenderContext::choose_physical_device(const std::vector<vk::P
     return *best;
 }
 
+void RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
+                                const std::vector<const char*>& ext_names)
+{
+}
+
 /** --- TESTS --- */
 
 TEST_CASE("RenderContext")
@@ -107,10 +111,7 @@ TEST_CASE("RenderContext")
         auto context = RenderContext{settings};
     }
 
-    SUBCASE("With Validation Layers and Presentation Extensions") {
-
-        auto context = RenderContext{};
-    }
+    SUBCASE("With Validation Layers and Presentation Extensions") { auto context = RenderContext{}; }
 }
 
 }  // namespace ulf

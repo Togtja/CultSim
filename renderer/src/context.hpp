@@ -75,6 +75,15 @@ private:
      * @return The physical device that is the most suitable
      */
     vk::PhysicalDevice choose_physical_device(const std::vector<vk::PhysicalDevice>& devices);
+
+    /**
+     * @brief initialize a logical device
+     * @param features are desired features of the device
+     * @param layer_names contain a vector of desired validation layers to enable
+     * @param ext_names contain a vector of desired instance extensions to enable
+     */
+    void init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
+                     const std::vector<const char*>& ext_names);
 };
 
 }  // namespace ulf
