@@ -29,8 +29,8 @@ struct RenderContextSettings
     /** Required device extensions */
     std::vector<const char*> device_layers{};
 
-    /** Do we prefer using a discrete GPU */
-    bool prefer_discrete = true;
+    /** Required device features */
+    vk::PhysicalDeviceFeatures device_features{};
 };
 
 /**
@@ -68,6 +68,13 @@ private:
      */
     void init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
                        const std::vector<const char*>& ext_names);
+
+    /**
+     * @brief choose_physical_device selects the best physical device for this application based on the available ones provided
+     * @param devices is a vector of the available devices to choose from
+     * @return The physical device that is the most suitable
+     */
+    vk::PhysicalDevice choose_physical_device(const std::vector<vk::PhysicalDevice>& devices);
 };
 
 }  // namespace ulf

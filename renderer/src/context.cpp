@@ -5,6 +5,10 @@
  */
 
 #include "context.hpp"
+#include "helpers.hpp"
+
+#include <cstring>
+#include <algorithm>
 
 #include <doctest/doctest.h>
 
@@ -17,6 +21,8 @@ RenderContext::RenderContext(const RenderContextSettings& settings) : RenderCont
 RenderContext::RenderContext(std::string_view appname, const RenderContextSettings& settings)
 {
     init_instance(appname, settings.instance_layers, settings.instance_ext);
+    const auto& physical_devices = m_instance.enumeratePhysicalDevices();
+    const auto chosen_device = choose_physical_device(physical_devices);
 }
 
 void RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
@@ -66,6 +72,25 @@ void RenderContext::init_instance(std::string_view appname, const std::vector<co
     REQUIRE_FALSE(m_instance);
     m_instance = vk::createInstance(info);
     REQUIRE(m_instance);
+}
+
+vk::PhysicalDevice RenderContext::choose_physical_device(const std::vector<vk::PhysicalDevice>& devices)
+{
+    REQUIRE_FALSE(devices.empty());
+
+    /* With only one device, it has to be the best one */
+    if (devices.size() == 1u)
+    {
+        return devices.front();
+    }
+
+    /* Otherwise rate them */
+    auto best = std::max(devices.cbegin(), devices.cend(),
+                         [](const auto& a, const auto& b) { return rate_physical_device(*a) > rate_physical_device(*b); });
+
+    /* There has to be at least one that is "the best" */
+    REQUIRE(best != devices.end());
+    return *best;
 }
 
 /** --- TESTS --- */
