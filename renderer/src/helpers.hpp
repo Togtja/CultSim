@@ -19,4 +19,14 @@ namespace ulf
  */
 uint32_t rate_physical_device(const vk::PhysicalDevice& device);
 
+template<typename T, template<typename> typename Container>
+std::ostream& print_container(std::ostream& os, const Container<T>& container, char sep = '\n')
+{
+    for (const auto& elem : container)
+    {
+        os << elem << sep;
+    }
+    return os;
+}
+
 }  // namespace ulf
