@@ -30,12 +30,40 @@ void RenderContext::init_instance(std::string_view appname, const std::vector<co
     vk::enumerateInstanceVersion(&version_avail);
     REQUIRE(version_avail >= VK_API_VERSION_1_1);
 
-    /* Provide information and create instance */
-    auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr, 0u, version_avail);
-    auto info = vk::InstanceCreateInfo({}, &appinfo, layer_names.size(), layer_names.data(), ext_names.size(), ext_names.data());
+    /* Application Info Struct */
+    const auto appinfo = vk::ApplicationInfo(appname.data(), 1u, nullptr, 0u, version_avail);
+
+    /* Get Available Layers */
+    const auto layers_avail = vk::enumerateInstanceLayerProperties();
+
+    /* Store the avail and desiredlayers to use here */
+    std::vector<const char*> layers = {};
+
+    /* Look for layers */
+    std::copy_if(layer_names.cbegin(), layer_names.cend(), std::back_inserter(layers), [&layers_avail](const char* elem) {
+        return std::any_of(layers_avail.cbegin(), layers_avail.cend(),
+                           [&elem](const auto& layer) { return !strcmp(layer.layerName, elem); });
+    });
+    CHECK(layers.size() >= layer_names.size());
+
+    /* Get available Extensions */
+    auto ext_avail = vk::enumerateInstanceExtensionProperties();
+
+    /* Store the avail and desired extensions to use here */
+    std::vector<const char*> extensions = {};
+
+    /* Look for extensions */
+    std::copy_if(ext_names.cbegin(), ext_names.cend(), std::back_inserter(extensions), [&ext_avail](const char* elem) {
+        return std::any_of(ext_avail.cbegin(), ext_avail.cend(),
+                           [&elem](const auto& ext) { return !strcmp(ext.extensionName, elem); });
+    });
+    CHECK(extensions.size() >= ext_names.size());
+
+    /* Fill inn creation info */
+    const auto info = vk::InstanceCreateInfo({}, &appinfo, layers.size(), layers.data(), extensions.size(), extensions.data());
 
     /* We must not have an instance before creation, but must after */
-    REQUIRE(!m_instance);
+    REQUIRE_FALSE(m_instance);
     m_instance = vk::createInstance(info);
     REQUIRE(m_instance);
 }
