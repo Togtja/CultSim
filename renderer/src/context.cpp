@@ -95,6 +95,22 @@ vk::PhysicalDevice RenderContext::choose_physical_device(const std::vector<vk::P
 
 /** --- TESTS --- */
 
-TEST_CASE("RenderContext") { auto context = RenderContext{}; }
+TEST_CASE("RenderContext")
+{
+    RenderContextSettings settings{};
+
+    SUBCASE("Default Construction") { auto context = RenderContext{}; }
+
+    SUBCASE("With Validation Layers Only")
+    {
+        settings.instance_layers = {"VK_LAYER_LUNARG_standard_validation"};
+        auto context = RenderContext{settings};
+    }
+
+    SUBCASE("With Validation Layers and Presentation Extensions") {
+
+        auto context = RenderContext{};
+    }
+}
 
 }  // namespace ulf
