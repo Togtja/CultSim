@@ -92,13 +92,13 @@ std::vector<const char*> filter_desired_to_available_extensions(const std::vecto
 uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required_flags)
 {
     /* Get the queues of the device and identify a graphics and present queue */
-    const auto queueInfo = pdev.getQueueFamilyProperties();
+    const auto queue_info = pdev.getQueueFamilyProperties();
 
     /* Identify all queue families */
     uint32_t idx = 0u;
 
     /* Look for dedicated queue that supports flag */
-    for (const auto& queue : queueInfo)
+    for (const auto& queue : queue_info)
     {
         if ((queue.queueFlags & required_flags) == required_flags && !(queue.queueFlags & ~required_flags))
         {
@@ -109,7 +109,7 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
 
     /* Look for generic queue that supports flag */
     idx = 0u;
-    for (const auto& queue : queueInfo)
+    for (const auto& queue : queue_info)
     {
         if ((queue.queueFlags & required_flags))
         {
