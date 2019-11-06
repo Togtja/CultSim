@@ -59,4 +59,34 @@ uint32_t rate_physical_device(const vk::PhysicalDevice& device)
     return score;
 }
 
+std::vector<const char*> filter_desired_to_available_layers(const std::vector<const char*>& desired,
+                                                            const std::vector<vk::LayerProperties>& available)
+{
+    /* Store the avail and desiredlayers to use here */
+    std::vector<const char*> out = {};
+
+    /* Look for layers */
+    std::copy_if(desired.cbegin(), desired.cend(), std::back_inserter(out), [&available](const char* elem) {
+        return std::any_of(available.cbegin(), available.cend(),
+                           [&elem](const auto& layer) { return !strcmp(layer.layerName, elem); });
+    });
+
+    return out;
+}
+
+std::vector<const char*> filter_desired_to_available_extensions(const std::vector<const char*>& desired,
+                                                                const std::vector<vk::ExtensionProperties>& aviailable)
+{
+    /* Store the avail and desired extensions to use here */
+    std::vector<const char*> out = {};
+
+    /* Look for extensions */
+    std::copy_if(desired.cbegin(), desired.cend(), std::back_inserter(out), [&aviailable](const char* elem) {
+        return std::any_of(aviailable.cbegin(), aviailable.cend(),
+                           [&elem](const auto& ext) { return !strcmp(ext.extensionName, elem); });
+    });
+
+    return out;
+}
+
 }  // namespace ulf

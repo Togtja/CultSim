@@ -19,14 +19,22 @@ namespace ulf
  */
 uint32_t rate_physical_device(const vk::PhysicalDevice& device);
 
-template<typename T, template<typename> typename Container>
-std::ostream& print_container(std::ostream& os, const Container<T>& container, char sep = '\n')
-{
-    for (const auto& elem : container)
-    {
-        os << elem << sep;
-    }
-    return os;
-}
+/**
+ * @brief given a list of desired layer names for either the instance or device, filter based on the avilable ones
+ * @param desired_layers are the layers we want to have enabled
+ * @param avail_layers contain the layers we can choose from
+ * @return a vector of the layers we want and are available
+ */
+std::vector<const char*> filter_desired_to_available_layers(const std::vector<const char*>& desired_layers,
+                                                            const std::vector<vk::LayerProperties>& avail_layers);
+
+/**
+ * @brief given a list of desired extensions names for either the instance or device, filter based on the avilable ones
+ * @param desired_extensions are the extensions we want to have enabled
+ * @param avail_extensions contain the extensions we can choose from
+ * @return a vector of the layers we want and are available
+ */
+std::vector<const char*> filter_desired_to_available_extensions(const std::vector<const char*>& desired_extensions,
+                                                                const std::vector<vk::ExtensionProperties>& aviail_extensions);
 
 }  // namespace ulf
