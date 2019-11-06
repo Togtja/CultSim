@@ -20,18 +20,25 @@ RenderContext::~RenderContext() noexcept
     m_instance.destroy();
 }
 
-RenderContext::RenderContext(const RenderContextSettings& settings) : RenderContext("Vulkan Application", settings) {}
-
-RenderContext::RenderContext(std::string_view appname, const RenderContextSettings& settings)
+vk::Result RenderContext::initialize(std::string_view appname, const RenderContextSettings& settings)
 {
-    init_instance(appname, settings.instance_layers, settings.instance_ext);
+    /* Initialize the instance */
+    if (const auto res = init_instance(appname, settings.instance_layers, settings.instance_ext); res != vk::Result::eSuccess)
+    {
+        return res;
+    }
+
+    /* Choose a physical device */
     const auto& physical_devices = m_instance.enumeratePhysicalDevices();
     m_pdevice = choose_physical_device(physical_devices);
-    init_device(settings.device_features, settings.device_layers, settings.device_ext);
+
+    /* Initialize the logical device */
+    const auto res = init_device(settings.device_features, settings.device_layers, settings.device_ext);
+    return res;
 }
 
-void RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
-                                  const std::vector<const char*>& ext_names)
+vk::Result RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
+                                        const std::vector<const char*>& ext_names)
 {
     CHECK_MESSAGE(appname != "", "The appname should not be empty.");
 
@@ -60,6 +67,9 @@ void RenderContext::init_instance(std::string_view appname, const std::vector<co
     REQUIRE_FALSE(m_instance);
     m_instance = vk::createInstance(info);
     REQUIRE(m_instance);
+
+    /* TODO : Not always success */
+    return vk::Result::eSuccess;
 }
 
 vk::PhysicalDevice RenderContext::choose_physical_device(const std::vector<vk::PhysicalDevice>& devices)
@@ -81,8 +91,8 @@ vk::PhysicalDevice RenderContext::choose_physical_device(const std::vector<vk::P
     return *best;
 }
 
-void RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
-                                const std::vector<const char*>& ext_names)
+vk::Result RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
+                                      const std::vector<const char*>& ext_names)
 {
     /* Get Available Layers */
     const auto layers_avail = m_pdevice.enumerateDeviceLayerProperties();
@@ -96,7 +106,7 @@ void RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, cons
 
     /* Get queue indices for the two queues that we will support */
     const auto compute_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eCompute);
-    const auto gfx_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics);
+    const auto gfx_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
 
     /* All queues have equal priority */
     const auto priorities = 1.f;
@@ -117,6 +127,9 @@ void RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, cons
     m_compute_queue = m_device.getQueue(compute_queue_index, 0u);
     REQUIRE(m_gfx_queue);
     REQUIRE(m_compute_queue);
+
+    /* TODO : Not always success */
+    return vk::Result::eSuccess;
 }
 
 /** --- TESTS --- */
@@ -125,15 +138,11 @@ TEST_CASE("RenderContext")
 {
     RenderContextSettings settings{};
 
-    SUBCASE("Default Construction") { auto context = RenderContext{}; }
-
-    SUBCASE("With Validation Layers Only")
+    SUBCASE("Default Construction")
     {
-        settings.instance_layers = {"VK_LAYER_LUNARG_standard_validation"};
-        auto context = RenderContext{settings};
-    }
-
-    // SUBCASE("With Validation Layers and Presentation Extensions") { auto context = RenderContext{}; }
+        auto context = RenderContext{};
+        context.initialize("Test App", settings);
+    };
 }
 
 }  // namespace ulf

@@ -59,11 +59,18 @@ private:
 
 public:
     /** Constructors */
+    RenderContext() = default;
     ULFEYE_NO_COPY(RenderContext);
     ULFEYE_NO_MOVE(RenderContext);
     ~RenderContext() noexcept;
-    explicit RenderContext(const RenderContextSettings& settings = {});
-    explicit RenderContext(std::string_view appname, const RenderContextSettings& settings);
+
+    /**
+     * @brief initialize the render context using the provided information
+     * @param appname is the internal name of the application, has no effect except it names the app
+     * @param settings contain layers and extensions that we want to have enabled
+     * @return result of initialization, do NOT use the Context unless this is vk::Result::eSuccess, otherwise handle it
+     */
+    vk::Result initialize(std::string_view appname, const RenderContextSettings& settings);
 
 private:
     /**
@@ -72,8 +79,8 @@ private:
      * @param layer_names contain a vector of desired validation layers to enable
      * @param ext_names contain a vector of desired instance extensions to enable
      */
-    void init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
-                       const std::vector<const char*>& ext_names);
+    vk::Result init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
+                             const std::vector<const char*>& ext_names);
 
     /**
      * @brief choose_physical_device selects the best physical device for this application based on the available ones provided
@@ -88,8 +95,8 @@ private:
      * @param layer_names contain a vector of desired validation layers to enable
      * @param ext_names contain a vector of desired instance extensions to enable
      */
-    void init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
-                     const std::vector<const char*>& ext_names);
+    vk::Result init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
+                           const std::vector<const char*>& ext_names);
 };
 
 }  // namespace ulf
