@@ -39,11 +39,13 @@ vk::Result RenderContext::initialize(std::string_view appname, const RenderConte
 
 vk::Device RenderContext::device() const
 {
+    REQUIRE(m_device);
     return m_device;
 }
 
 vk::Queue RenderContext::gfx_queue() const
 {
+    REQUIRE(m_gfx_queue);
     return m_gfx_queue;
 }
 
@@ -54,6 +56,7 @@ uint32_t RenderContext::gfx_idx() const
 
 vk::Queue RenderContext::compute_queue() const
 {
+    REQUIRE(m_compute_queue);
     return m_compute_queue;
 }
 
@@ -163,6 +166,7 @@ TEST_CASE("RenderContext")
 {
     RenderContextSettings settings{};
 
+    /* Asserts are executed within the internals */
     SUBCASE("Default Construction")
     {
         auto context = RenderContext{};
