@@ -72,6 +72,31 @@ public:
      */
     vk::Result initialize(std::string_view appname, const RenderContextSettings& settings);
 
+    /**
+     * @brief returns the logical device to the caller
+     */
+    vk::Device device() const;
+
+    /**
+     * @brief returns the graphics queue to the caller
+     */
+    vk::Queue gfx_queue() const;
+
+    /**
+     * @brief returns the queue family index of the graphics queue
+     */
+    uint32_t gfx_idx() const;
+
+    /**
+     * @brief returns the compute queue to the caller
+     */
+    vk::Queue compute_queue() const;
+
+    /**
+     * @brief returns the queue family index of the compute queue
+     */
+    uint32_t compute_idx() const;
+
 private:
     /**
      * @brief initialize the Vulkan instance

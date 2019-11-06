@@ -37,6 +37,31 @@ vk::Result RenderContext::initialize(std::string_view appname, const RenderConte
     return res;
 }
 
+vk::Device RenderContext::device() const
+{
+    return m_device;
+}
+
+vk::Queue RenderContext::gfx_queue() const
+{
+    return m_gfx_queue;
+}
+
+uint32_t RenderContext::gfx_idx() const
+{
+    return get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
+}
+
+vk::Queue RenderContext::compute_queue() const
+{
+    return m_compute_queue;
+}
+
+uint32_t RenderContext::compute_idx() const
+{
+    return get_queue_index(m_pdevice, vk::QueueFlagBits::eCompute);
+}
+
 vk::Result RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
                                         const std::vector<const char*>& ext_names)
 {
@@ -105,8 +130,8 @@ vk::Result RenderContext::init_device(const vk::PhysicalDeviceFeatures& features
     CHECK(extensions.size() >= ext_names.size());
 
     /* Get queue indices for the two queues that we will support */
-    const auto compute_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eCompute);
-    const auto gfx_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
+    const auto compute_queue_index = compute_idx();
+    const auto gfx_queue_index = gfx_idx();
 
     /* All queues have equal priority */
     const auto priorities = 1.f;
