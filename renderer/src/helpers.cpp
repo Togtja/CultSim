@@ -121,4 +121,57 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
     return idx;
 }
 
+/** --- TESTS --- */
+
+TEST_CASE("Filtering Helpers")
+{
+    /* Avail Extensions */
+    const auto ext_1 = VkExtensionProperties{"Hello", 0u};
+    const auto ext_2 = VkExtensionProperties{"World", 0u};
+    const auto ext_3 = VkExtensionProperties{"Extension", 0u};
+    const std::vector<vk::ExtensionProperties> ext_avail{ext_1, ext_2, ext_3};
+
+    /* Avail Layers */
+    const auto lay_1 = VkLayerProperties{"Validation", 0u, 0u, ""};
+    const auto lay_2 = VkLayerProperties{"Renderdoc", 0u, 0u, ""};
+    const auto lay_3 = VkLayerProperties{"Debug", 0u, 0u, ""};
+    const std::vector<vk::LayerProperties> layer_avail{lay_1, lay_2, lay_3};
+
+    SUBCASE("Filter Extensions")
+    {
+        /* Test Cases */
+        const auto desired_a = std::vector<const char*>{"Hello", "World"};
+        const auto desired_b = std::vector<const char*>{"Hello", "Norway"};
+        const auto desired_c = std::vector<const char*>{};
+
+        /* Results */
+        const auto chosen_a = filter_desired_to_available_extensions(desired_a, ext_avail);
+        const auto chosen_b = filter_desired_to_available_extensions(desired_b, ext_avail);
+        const auto chosen_c = filter_desired_to_available_extensions(desired_c, ext_avail);
+
+        /* Asserts */
+        REQUIRE(chosen_a.size() == desired_a.size());
+        REQUIRE(chosen_b.size() == 1u);
+        REQUIRE(chosen_c.empty());
+    }
+
+    SUBCASE("Filter Layers")
+    {
+        /* Test Cases */
+        const auto desired_a = std::vector<const char*>{"Validation", "Debug"};
+        const auto desired_b = std::vector<const char*>{"Renderdoc", "Google"};
+        const auto desired_c = std::vector<const char*>{};
+
+        /* Results */
+        const auto chosen_a = filter_desired_to_available_layers(desired_a, layer_avail);
+        const auto chosen_b = filter_desired_to_available_layers(desired_b, layer_avail);
+        const auto chosen_c = filter_desired_to_available_layers(desired_c, layer_avail);
+
+        /* Asserts */
+        REQUIRE(chosen_a.size() == desired_a.size());
+        REQUIRE(chosen_b.size() == 1u);
+        REQUIRE(chosen_c.empty());
+    }
+}
+
 }  // namespace ulf
