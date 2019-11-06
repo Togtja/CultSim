@@ -37,4 +37,13 @@ std::vector<const char*> filter_desired_to_available_layers(const std::vector<co
 std::vector<const char*> filter_desired_to_available_extensions(const std::vector<const char*>& desired_extensions,
                                                                 const std::vector<vk::ExtensionProperties>& aviail_extensions);
 
+/**
+ * @brief get_queue_index gets the index of the first queue that supports all of the required_flags. It will prefer any queue that
+ * supports ONLY the given flags, but fall back on a queue family that supports at least the given flags otherwise.
+ * @param pdev is the physical device to query
+ * @param required_flags are the flags we need the queue to support
+ * @return index of the queue that was found
+ */
+uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required_flags);
+
 }  // namespace ulf
