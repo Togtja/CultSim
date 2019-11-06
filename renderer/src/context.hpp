@@ -51,6 +51,12 @@ private:
     /** The Logical Device that we operate on */
     vk::Device m_device{};
 
+    /** Queue for graphics, transfer and present operations */
+    vk::Queue m_gfx_queue{};
+
+    /** Queue for compute shaders and operations */
+    vk::Queue m_compute_queue{};
+
 public:
     /** Constructors */
     ULFEYE_NO_COPY(RenderContext);

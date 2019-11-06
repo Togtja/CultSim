@@ -14,7 +14,11 @@
 
 namespace ulf
 {
-RenderContext::~RenderContext() noexcept { m_instance.destroy(); }
+RenderContext::~RenderContext() noexcept
+{
+    m_device.destroy();
+    m_instance.destroy();
+}
 
 RenderContext::RenderContext(const RenderContextSettings& settings) : RenderContext("Vulkan Application", settings) {}
 
@@ -22,7 +26,8 @@ RenderContext::RenderContext(std::string_view appname, const RenderContextSettin
 {
     init_instance(appname, settings.instance_layers, settings.instance_ext);
     const auto& physical_devices = m_instance.enumeratePhysicalDevices();
-    const auto chosen_device = choose_physical_device(physical_devices);
+    m_pdevice = choose_physical_device(physical_devices);
+    init_device(settings.device_features, settings.device_layers, settings.device_ext);
 }
 
 void RenderContext::init_instance(std::string_view appname, const std::vector<const char*>& layer_names,
@@ -88,6 +93,30 @@ void RenderContext::init_device(const vk::PhysicalDeviceFeatures& features, cons
     auto ext_avail = m_pdevice.enumerateDeviceExtensionProperties();
     std::vector<const char*> extensions = filter_desired_to_available_extensions(ext_names, ext_avail);
     CHECK(extensions.size() >= ext_names.size());
+
+    /* Get queue indices for the two queues that we will support */
+    const auto compute_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eCompute);
+    const auto gfx_queue_index = get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics);
+
+    /* All queues have equal priority */
+    const auto priorities = 1.f;
+    const auto queue_info = std::array{vk::DeviceQueueCreateInfo{{}, compute_queue_index, 1u, &priorities},
+                                       vk::DeviceQueueCreateInfo{{}, gfx_queue_index, 1u, &priorities}};
+
+    /* Device Create Info */
+    const auto info = vk::DeviceCreateInfo({}, queue_info.size(), queue_info.data(), layers.size(), layers.data(),
+                                           extensions.size(), extensions.data(), &features);
+
+    /* Create Device */
+    REQUIRE_FALSE(m_device);
+    m_device = m_pdevice.createDevice(info);
+    REQUIRE(m_device);
+
+    /* Extract queues from device */
+    m_gfx_queue = m_device.getQueue(gfx_queue_index, 0u);
+    m_compute_queue = m_device.getQueue(compute_queue_index, 0u);
+    REQUIRE(m_gfx_queue);
+    REQUIRE(m_compute_queue);
 }
 
 /** --- TESTS --- */
