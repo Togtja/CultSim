@@ -52,6 +52,6 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
  * @param avail is a vector of available present modes
  * @return the selected present mode
  */
-vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, const std::vector<vk::PresentModeKHR> avail);
+vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, std::vector<vk::PresentModeKHR> &avail);
 
 }  // namespace ulf

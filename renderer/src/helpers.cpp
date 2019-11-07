@@ -1,5 +1,7 @@
 #include "helpers.hpp"
 
+#include <unordered_map>
+
 #include <doctest/doctest.h>
 
 namespace ulf
@@ -121,20 +123,24 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
     return idx;
 }
 
-vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, const std::vector<vk::PresentModeKHR> avail)
+vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, std::vector<vk::PresentModeKHR>& avail)
 {
-    /* Simple case is that we immediately find the one we were asked for */
-    const auto found = std::find_if(avail.cbegin(), avail.cend(), [desired](auto mode) { return desired == mode; });
-    if (found != avail.end())
-    {
-        return *found;
-    }
+    /* Map of priorities for each present mode when we must fall back */
+    auto priorities = std::unordered_map<vk::PresentModeKHR, int>{{vk::PresentModeKHR::eFifo, 10},
+                                                                  {vk::PresentModeKHR::eFifoRelaxed, 8},
+                                                                  {vk::PresentModeKHR::eMailbox, 9},
+                                                                  {vk::PresentModeKHR::eImmediate, 5},
+                                                                  {vk::PresentModeKHR::eSharedDemandRefresh, 3},
+                                                                  {vk::PresentModeKHR::eSharedContinuousRefresh, 2}};
 
-    /* Otherwise let us fall back to FIFO */
-    const auto fifo = std::find_if(avail.cbegin(), avail.cend(), [](auto mode) { return vk::PresentModeKHR::eFifo == mode; });
-    REQUIRE(fifo != avail.end());
+    /* Ensure the desired mode has highest priority */
+    priorities[desired] = 11;
 
-    return *fifo;
+    /* Sort enough so we know what mode is the best one, then that is the one we should use */
+    std::nth_element(avail.begin(), avail.begin(), avail.end(),
+                     [&priorities](auto a, auto b) { return priorities[a] > priorities[b]; });
+
+    return avail.front();
 }
 
 /** --- TESTS --- */
@@ -192,8 +198,9 @@ TEST_CASE("Filtering Helpers")
 
 TEST_CASE("Present Mode Selection")
 {
-    const auto avail_1 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eImmediate};
-    const auto avail_2 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eImmediate};
+    auto avail_1 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eImmediate};
+    auto avail_2 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eImmediate};
+    auto avail_3 = std::vector{vk::PresentModeKHR::eSharedDemandRefresh, vk::PresentModeKHR::eImmediate};
 
     /* Conduct tests - also define requirements */
     const auto chosen_a = select_present_mode(vk::PresentModeKHR::eFifoRelaxed, avail_1);
@@ -201,5 +208,8 @@ TEST_CASE("Present Mode Selection")
 
     const auto chosen_b = select_present_mode(vk::PresentModeKHR::eFifoRelaxed, avail_2);
     REQUIRE(chosen_b == vk::PresentModeKHR::eFifo);
+
+    const auto chosen_c = select_present_mode(vk::PresentModeKHR::eFifo, avail_3);
+    REQUIRE(chosen_c == vk::PresentModeKHR::eImmediate);
 }
 }  // namespace ulf
