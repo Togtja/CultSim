@@ -75,12 +75,12 @@ public:
     /**
      * @brief returns the logical device to the caller
      */
-    vk::Device device() const;
+    vk::Device& device() const;
 
     /**
      * @brief returns the graphics queue to the caller
      */
-    vk::Queue gfx_queue() const;
+    vk::Queue& gfx_queue() const;
 
     /**
      * @brief returns the queue family index of the graphics queue
@@ -90,7 +90,7 @@ public:
     /**
      * @brief returns the compute queue to the caller
      */
-    vk::Queue compute_queue() const;
+    vk::Queue& compute_queue() const;
 
     /**
      * @brief returns the queue family index of the compute queue
