@@ -9,7 +9,19 @@
 
 namespace ulf
 {
-Swapchain::~Swapchain()
+Swapchain::Swapchain(vk::Device& device, vk::SurfaceKHR surface) : m_device(device), m_surface(surface)
+{
+}
+
+Swapchain::~Swapchain() noexcept
+{
+}
+
+void Swapchain::initialize(vk::PhysicalDevice& pdev, const SwapchainSettings& settings)
+{
+}
+
+vk::PresentModeKHR Swapchain::select_present_mode(vk::PresentModeKHR desired)
 {
 }
 
