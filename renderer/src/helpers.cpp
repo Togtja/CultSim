@@ -189,4 +189,17 @@ TEST_CASE("Filtering Helpers")
         REQUIRE(chosen_c.empty());
     }
 }
+
+TEST_CASE("Present Mode Selection")
+{
+    const auto avail_1 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eFifoRelaxed, vk::PresentModeKHR::eImmediate};
+    const auto avail_2 = std::vector{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eImmediate};
+
+    /* Conduct tests - also define requirements */
+    const auto chosen_a = select_present_mode(vk::PresentModeKHR::eFifoRelaxed, avail_1);
+    REQUIRE(chosen_a == vk::PresentModeKHR::eFifoRelaxed);
+
+    const auto chosen_b = select_present_mode(vk::PresentModeKHR::eFifoRelaxed, avail_2);
+    REQUIRE(chosen_b == vk::PresentModeKHR::eFifo);
+}
 }  // namespace ulf
