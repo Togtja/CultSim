@@ -143,6 +143,16 @@ vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, std::vector<v
     return avail.front();
 }
 
+vk::SurfaceFormatKHR select_surface_format(const std::vector<vk::SurfaceFormatKHR>& avail)
+{
+    const vk::SurfaceFormatKHR fmt_a = VkSurfaceFormatKHR{VK_FORMAT_R8G8B8A8_SRGB, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    //    const vk::SurfaceFormatKHR fmt_b = VkSurfaceFormatKHR{VK_FORMAT_B8G8R8A8_SRGB, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    //    const vk::SurfaceFormatKHR fmt_c = VkSurfaceFormatKHR{VK_FORMAT_R8G8B8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    //    const vk::SurfaceFormatKHR fmt_d = VkSurfaceFormatKHR{VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    // # TODO
+    return fmt_a;
+}
+
 /** --- TESTS --- */
 
 TEST_CASE("Filtering Helpers")
@@ -212,4 +222,19 @@ TEST_CASE("Present Mode Selection")
     const auto chosen_c = select_present_mode(vk::PresentModeKHR::eFifo, avail_3);
     REQUIRE(chosen_c == vk::PresentModeKHR::eImmediate);
 }
+
+TEST_CASE("Surface Mode Selection")
+{
+    /* Create available */
+    const vk::SurfaceFormatKHR fmt_a = VkSurfaceFormatKHR{VK_FORMAT_R8G8B8A8_SRGB, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    const vk::SurfaceFormatKHR fmt_b = VkSurfaceFormatKHR{VK_FORMAT_B8G8R8A8_SRGB, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    const vk::SurfaceFormatKHR fmt_c = VkSurfaceFormatKHR{VK_FORMAT_R8G8B8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    const vk::SurfaceFormatKHR fmt_d = VkSurfaceFormatKHR{VK_FORMAT_B8G8R8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    const auto avail = std::vector{fmt_a, fmt_b, fmt_c, fmt_d};
+
+    /* Perform checks */
+    const auto chosen = select_surface_format(avail);
+    REQUIRE(chosen == VkSurfaceFormatKHR{VK_FORMAT_R8G8B8A8_SRGB, VK_COLORSPACE_SRGB_NONLINEAR_KHR});
+}
+
 }  // namespace ulf

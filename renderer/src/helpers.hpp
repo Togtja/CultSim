@@ -52,6 +52,13 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
  * @param avail is a vector of available present modes
  * @return the selected present mode
  */
-vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, std::vector<vk::PresentModeKHR> &avail);
+vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, std::vector<vk::PresentModeKHR>& avail);
+
+/**
+ * @brief select a supported surface format
+ * @param avail are the surface formats to choose from
+ * @return the selected surface format
+ */
+vk::SurfaceFormatKHR select_surface_format(const std::vector<vk::SurfaceFormatKHR>& avail);
 
 }  // namespace ulf
