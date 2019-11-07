@@ -46,4 +46,12 @@ std::vector<const char*> filter_desired_to_available_extensions(const std::vecto
  */
 uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required_flags);
 
+/**
+ * @brief select a supported present mode, but prefer the desired one
+ * @param desired is the present mode you want to use
+ * @param avail is a vector of available present modes
+ * @return the selected present mode
+ */
+vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, const std::vector<vk::PresentModeKHR> avail);
+
 }  // namespace ulf

@@ -121,6 +121,22 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
     return idx;
 }
 
+vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired, const std::vector<vk::PresentModeKHR> avail)
+{
+    /* Simple case is that we immediately find the one we were asked for */
+    const auto found = std::find_if(avail.cbegin(), avail.cend(), [desired](auto mode) { return desired == mode; });
+    if (found != avail.end())
+    {
+        return *found;
+    }
+
+    /* Otherwise let us fall back to FIFO */
+    const auto fifo = std::find_if(avail.cbegin(), avail.cend(), [](auto mode) { return vk::PresentModeKHR::eFifo == mode; });
+    REQUIRE(fifo != avail.end());
+
+    return *fifo;
+}
+
 /** --- TESTS --- */
 
 TEST_CASE("Filtering Helpers")
@@ -173,5 +189,4 @@ TEST_CASE("Filtering Helpers")
         REQUIRE(chosen_c.empty());
     }
 }
-
 }  // namespace ulf
