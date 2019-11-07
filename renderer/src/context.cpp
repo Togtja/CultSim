@@ -37,13 +37,13 @@ vk::Result RenderContext::initialize(std::string_view appname, const RenderConte
     return res;
 }
 
-vk::Device &RenderContext::device() const
+vk::Device& RenderContext::device()
 {
     REQUIRE(m_device);
     return m_device;
 }
 
-vk::Queue &RenderContext::gfx_queue() const
+vk::Queue& RenderContext::gfx_queue()
 {
     REQUIRE(m_gfx_queue);
     return m_gfx_queue;
@@ -54,7 +54,7 @@ uint32_t RenderContext::gfx_idx() const
     return get_queue_index(m_pdevice, vk::QueueFlagBits::eGraphics | vk::QueueFlagBits::eTransfer);
 }
 
-vk::Queue &RenderContext::compute_queue() const
+vk::Queue& RenderContext::compute_queue()
 {
     REQUIRE(m_compute_queue);
     return m_compute_queue;
