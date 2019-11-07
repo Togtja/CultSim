@@ -97,7 +97,7 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
     /* Identify all queue families */
     uint32_t idx = 0u;
 
-    /* Look for dedicated queue that supports flag */
+    /* Look for dedicated queue that support flag(s) */
     for (const auto& queue : queue_info)
     {
         if ((queue.queueFlags & required_flags) == required_flags && !(queue.queueFlags & ~required_flags))
@@ -107,7 +107,7 @@ uint32_t get_queue_index(const vk::PhysicalDevice& pdev, vk::QueueFlags required
         ++idx;
     }
 
-    /* Look for generic queue that supports flag */
+    /* Look for generic queue that support flag(s) */
     idx = 0u;
     for (const auto& queue : queue_info)
     {
