@@ -7,6 +7,8 @@
 
 #include <vulkan/vulkan.hpp>
 
+typedef struct SDL_Window SDL_Window;
+
 namespace ulf
 {
 /**
@@ -31,6 +33,9 @@ struct RenderContextSettings
 
     /** Required device features */
     vk::PhysicalDeviceFeatures device_features{};
+
+    /** Window for context */
+    SDL_Window* window{nullptr};
 };
 
 /**
@@ -56,6 +61,9 @@ private:
 
     /** Queue for compute shaders and operations */
     vk::Queue m_compute_queue{};
+
+    /** Context surface, created from the window */
+    vk::SurfaceKHR m_surface{};
 
 public:
     /** Constructors */
@@ -97,6 +105,11 @@ public:
      */
     uint32_t compute_idx() const;
 
+    /**
+     * @brief returns the surface that this rendercontext contains
+     */
+    vk::SurfaceKHR& surface();
+
 private:
     /**
      * @brief initialize the Vulkan instance
@@ -122,6 +135,12 @@ private:
      */
     vk::Result init_device(const vk::PhysicalDeviceFeatures& features, const std::vector<const char*>& layer_names,
                            const std::vector<const char*>& ext_names);
+
+    /**
+     * @brief initialize a surface from the given window
+     * @param window is the window to create a surface in
+     */
+    vk::Result init_surface(SDL_Window* window);
 };
 
 }  // namespace ulf

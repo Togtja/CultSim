@@ -11,19 +11,22 @@
 #include <algorithm>
 
 #include <doctest/doctest.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_vulkan.h>
 
 namespace ulf
 {
 RenderContext::~RenderContext() noexcept
 {
+    m_instance.destroySurfaceKHR(m_surface);
     m_device.destroy();
     m_instance.destroy();
 }
 
-vk::Result RenderContext::initialize(std::string_view appname, const RenderContextSettings& settings)
+vk::Result RenderContext::initialize(std::string_view appname, const RenderContextSettings& s)
 {
     /* Initialize the instance */
-    if (const auto res = init_instance(appname, settings.instance_layers, settings.instance_ext); res != vk::Result::eSuccess)
+    if (const auto res = init_instance(appname, s.instance_layers, s.instance_ext); res != vk::Result::eSuccess)
     {
         return res;
     }
@@ -33,7 +36,13 @@ vk::Result RenderContext::initialize(std::string_view appname, const RenderConte
     m_pdevice = choose_physical_device(physical_devices);
 
     /* Initialize the logical device */
-    const auto res = init_device(settings.device_features, settings.device_layers, settings.device_ext);
+    if (const auto res = init_device(s.device_features, s.device_layers, s.device_ext); res != vk::Result::eSuccess)
+    {
+        return res;
+    }
+
+    /* Finally the surface */
+    const auto res = init_surface(s.window);
     return res;
 }
 
@@ -158,6 +167,20 @@ vk::Result RenderContext::init_device(const vk::PhysicalDeviceFeatures& features
 
     /* TODO : Not always success */
     return vk::Result::eSuccess;
+}
+
+vk::Result RenderContext::init_surface(SDL_Window* window)
+{
+    /* Create a surface using SDL */
+    VkSurfaceKHR tmp_surface = VK_NULL_HANDLE;
+    if (SDL_Vulkan_CreateSurface(window, m_instance, &tmp_surface))
+    {
+        m_surface = tmp_surface;
+        return vk::Result::eSuccess;
+    }
+
+    /* Sensible error code */
+    return vk::Result::eErrorSurfaceLostKHR;
 }
 
 /** --- TESTS --- */
