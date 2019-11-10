@@ -52,6 +52,12 @@ vk::Device& RenderContext::device()
     return m_device;
 }
 
+vk::PhysicalDevice& RenderContext::physical_device()
+{
+    REQUIRE(m_pdevice);
+    return m_pdevice;
+}
+
 vk::Queue& RenderContext::gfx_queue()
 {
     REQUIRE(m_gfx_queue);

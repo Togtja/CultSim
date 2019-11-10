@@ -86,6 +86,11 @@ public:
     vk::Device& device();
 
     /**
+     * @brief returns the physical device to the caller
+     */
+    vk::PhysicalDevice& physical_device();
+
+    /**
      * @brief returns the graphics queue to the caller
      */
     vk::Queue& gfx_queue();
