@@ -23,6 +23,7 @@ doctest_discover_tests(${BP_RENDERER_TEST_NAME})
 
 # Find libraries that are non-buildable, downloadable or otherwise should be accessible as a package
 find_package(Vulkan REQUIRED)
+find_package(SDL2 REQUIRED)
 
 # Link libraries required by this library
 target_link_libraries(
@@ -32,4 +33,12 @@ target_link_libraries(
 
     PRIVATE
     doctest::doctest
+    ${SDL2_LIBRARIES}
+)
+
+# Add include directories
+target_include_directories(
+    ${BP_RENDERER_NAME}
+    PRIVATE
+    ${SDL2_INCLUDE_DIRS}
 )
