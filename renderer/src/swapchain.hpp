@@ -19,18 +19,21 @@ struct SwapchainSettings
     vk::ImageUsageFlags image_usage{};
     vk::CompositeAlphaFlagBitsKHR composite_alpha{};
     vk::PresentModeKHR present_mode{};
-    VkSurfaceTransformFlagBitsKHR pre_transform;
+    vk::SurfaceTransformFlagBitsKHR pre_transform;
     uint32_t image_count{3u};
     uint32_t array_layers{0u};
 };
 
+/**
+ * Contain the images we are presenting to and the swapchain.
+ */
 class Swapchain
 {
 private:
     /** Vulkan device that own the swapchain */
     vk::Device& m_device;
 
-    /** Surface */
+    /** Surface (does not own it, other party will destroy it) */
     vk::SurfaceKHR m_surface{};
 
     /** The handle to the managed swapchain */
@@ -42,14 +45,16 @@ private:
     /** Contain swapchain settings */
     SwapchainSettings m_settings;
 
-    /** Present Mode Priorities - Static for Class */
-    inline static auto present_mode_priorities =
-        std::array{vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eMailbox, vk::PresentModeKHR::eImmediate};
-
 public:
     Swapchain(vk::Device& device, vk::SurfaceKHR surface);
     ULFEYE_NO_COPY(Swapchain);
     ~Swapchain() noexcept;
+
+    /**
+     * @brief default initialize the swapchain with the given physical device using sensible settings
+     * @param pdev is the physical device to use for getting information about surface formats and color spaces
+     */
+    void initialize(vk::PhysicalDevice& pdev);
 
     /**
      * @brief initialize the swapchain with the given physical device and swap chain settings
@@ -59,12 +64,6 @@ public:
     void initialize(vk::PhysicalDevice& pdev, const SwapchainSettings& settings);
 
 private:
-    /**
-     * @brief select a supported present mode, but prefer the desired one
-     * @param desired is the present mode you want to use
-     * @return the selected present mode
-     */
-    vk::PresentModeKHR select_present_mode(vk::PresentModeKHR desired);
 };
 
 }  // namespace ulf
