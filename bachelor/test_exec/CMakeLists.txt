@@ -8,7 +8,7 @@ find_package(SDL2 REQUIRED)
 set(EXEC_NAME test_gl)
 add_executable(${EXEC_NAME})
 
-# Add Source Files 
+# Add Source Files
 target_sources(
     ${EXEC_NAME}
     PRIVATE
@@ -31,4 +31,5 @@ target_link_libraries(
     $<$<PLATFORM_ID:Linux>:dl>
     glad::glad
     ${SDL2_LIBRARY}
+    physfs
 )
