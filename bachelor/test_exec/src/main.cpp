@@ -231,7 +231,7 @@ void terminateGL()
  * and the glNamedBufferStroage functions that allow for data transfer without binding buffers,
  * and the functionality to assosciate an element buffer with the vertex array.
  */
-int main()
+int main(int argc, char* argv[])
 {
     struct vec2i winSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
     initGL(&winSize);
@@ -298,9 +298,9 @@ int main()
 
         // Dynamically change color of quad based on sin and cos of the frame number
         glUniform3f(1,
-                    (sinf(gfxContext.frameCount / 1000.f) + 1.f) / 2.f,
+                    (sinf(gfxContext.frameCount / 10.f) + 1.f) / 2.f,
                     0.8f,
-                    (cosf(gfxContext.frameCount / 2000.f) + 1.f) / 2.f);
+                    (cosf(gfxContext.frameCount / 20.f) + 1.f) / 2.f);
 
         // Draw as Triangles, N indices of type Unsigned Byte
         glDrawElements(GL_TRIANGLES, sizeof indices / sizeof indices[0], GL_UNSIGNED_BYTE, NULL);
