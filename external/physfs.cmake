@@ -6,6 +6,7 @@ message(STATUS "Could not find PhysFS package so we are downloading it.")
 FetchContent_Declare(
     physfs_external
     URL http://icculus.org/physfs/downloads/physfs-3.0.2.tar.bz2
+    URL_HASH SHA256=304df76206d633df5360e738b138c94e82ccf086e50ba84f456d3f8432f9f863
 )
 
 # Populate it for building
