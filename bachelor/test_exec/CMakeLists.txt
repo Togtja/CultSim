@@ -28,5 +28,7 @@ target_link_libraries(
     ${EXEC_NAME}
     PRIVATE
     OpenGL::GL
+    $<$<PLATFORM_ID:Linux>:dl>
+    glad::glad
     ${SDL2_LIBRARY}
 )
