@@ -1,8 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
+project(bachelor VERSION 0.0.0)
 
-project(bachelor)
-
-add_executable(
-    format-test
-    clang-format-test.cpp
-)
+add_subdirectory(external)
