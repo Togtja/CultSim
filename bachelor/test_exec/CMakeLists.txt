@@ -29,5 +29,6 @@ target_link_libraries(
     $<$<PLATFORM_ID:Linux>:dl>
     glad::glad
     physfs
-    SDL2
+    SDL2main
+    SDL2-static
 )

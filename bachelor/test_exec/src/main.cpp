@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include <glad/glad.h>
 
 #define WINDOW_WIDTH 800
@@ -297,16 +297,14 @@ int main(int argc, char* argv[])
         glUniform1f(0, SDL_GetTicks() / 500.f);
 
         // Dynamically change color of quad based on sin and cos of the frame number
-        glUniform3f(1,
-                    (sinf(gfxContext.frameCount / 10.f) + 1.f) / 2.f,
-                    0.8f,
-                    (cosf(gfxContext.frameCount / 20.f) + 1.f) / 2.f);
+        glUniform3f(1, (sinf(gfxContext.frameCount / 10.f) + 1.f) / 2.f, 0.8f, (cosf(gfxContext.frameCount / 20.f) + 1.f) / 2.f);
 
         // Draw as Triangles, N indices of type Unsigned Byte
         glDrawElements(GL_TRIANGLES, sizeof indices / sizeof indices[0], GL_UNSIGNED_BYTE, NULL);
 
         // Swap back and front buffer to make image visible
         SDL_GL_SwapWindow(gfxContext.window);
+        SDL_Delay(16);
     }
 
     // Clean up buffers
