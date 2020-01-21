@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<project name="Bachelor Project" company="" manager="" phase="" project-start="20200113T000000Z" mrproject-version="2" calendar="1">
+  <properties/>
+  <phases/>
+  <calendars>
+    <day-types>
+      <day-type id="0" name="Working" description="A default working day"/>
+      <day-type id="1" name="Nonworking" description="A default non working day"/>
+      <day-type id="2" name="Use base" description="Use day from base calendar"/>
+    </day-types>
+    <calendar id="1" name="Default">
+      <default-week mon="0" tue="0" wed="0" thu="0" fri="0" sat="1" sun="1"/>
+      <overridden-day-types>
+        <overridden-day-type id="0">
+          <interval start="0800" end="1200"/>
+          <interval start="1300" end="1700"/>
+        </overridden-day-type>
+      </overridden-day-types>
+      <days/>
+    </calendar>
+  </calendars>
+  <tasks>
+    <task id="1" name="Project Planning" note="" work="1900800" start="20200113T000000Z" end="20200131T170000Z" work-start="20200113T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="2" name="Finalize Gantt Chart" note="" work="172800" start="20200113T000000Z" end="20200120T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200113T000000Z"/>
+      </task>
+      <task id="3" name="Choose Development Model" note="" work="172800" start="20200113T000000Z" end="20200120T170000Z" work-start="20200113T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="4" name="Choose Initial Model" note="" work="86400" start="20200113T000000Z" end="20200115T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work"/>
+        <task id="5" name="Adapt Model to Project" note="" work="86400" start="20200115T170000Z" end="20200120T170000Z" work-start="20200116T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="4" type="FS"/>
+          </predecessors>
+        </task>
+      </task>
+      <task id="6" name="Finalize Group Rules" note="" work="28800" start="20200114T000000Z" end="20200114T170000Z" work-start="20200114T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="must-start-on" time="20200114T000000Z"/>
+      </task>
+      <task id="7" name="Create Requirements" note="" work="201600" start="20200114T000000Z" end="20200122T170000Z" work-start="20200114T080000Z" percent-complete="66" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
+      </task>
+      <task id="8" name="Do Risk Analysis" note="" work="144000" start="20200122T170000Z" end="20200129T170000Z" work-start="20200123T080000Z" percent-complete="70" priority="0" type="normal" scheduling="fixed-work">
+        <predecessors>
+          <predecessor id="1" predecessor-id="7" type="FS"/>
+        </predecessors>
+      </task>
+      <task id="9" name="Schedule Regular Mentor Meetings" note="" work="28800" start="20200113T000000Z" end="20200113T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work"/>
+      <task id="10" name="Designate Roles and Responsibilities" note="" work="86400" start="20200120T000000Z" end="20200122T170000Z" work-start="20200120T080000Z" percent-complete="25" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200120T000000Z"/>
+      </task>
+      <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="55" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200113T000000Z"/>
+      </task>
+      <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200116T000000Z"/>
+      </task>
+      <task id="13" name="Set up Development Environments" note="" work="144000" start="20200115T000000Z" end="20200121T170000Z" work-start="20200115T080000Z" percent-complete="66" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200115T000000Z"/>
+      </task>
+      <task id="14" name="Write the Deliverable" note="" work="403200" start="20200114T000000Z" end="20200131T170000Z" work-start="20200114T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
+      </task>
+    </task>
+    <task id="15" name="Write Report" note="" work="1260000" start="20200317T000000Z" end="20200515T150000Z" work-start="20200317T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="16" name="Write First Draft" note="" work="604800" start="20200317T000000Z" end="20200414T170000Z" work-start="20200317T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200317T000000Z"/>
+      </task>
+      <task id="17" name="Write Final Report" note="" work="655200" start="20200414T170000Z" end="20200515T150000Z" work-start="20200415T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <predecessors>
+          <predecessor id="1" predecessor-id="16" type="FS"/>
+        </predecessors>
+      </task>
+    </task>
+    <task id="18" name="Implement Code" note="" work="2160000" start="20200127T000000Z" end="20200508T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="19" name="Create Initital Prototype" note="" work="720000" start="20200127T000000Z" end="20200228T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <constraint type="start-no-earlier-than" time="20200122T000000Z"/>
+        <task id="20" name="Sprint 01" note="" work="144000" start="20200127T000000Z" end="20200131T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <constraint type="start-no-earlier-than" time="20200127T000000Z"/>
+        </task>
+        <task id="21" name="Sprint 02" note="" work="144000" start="20200131T170000Z" end="20200207T170000Z" work-start="20200203T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <constraint type="start-no-earlier-than" time="20200121T000000Z"/>
+          <predecessors>
+            <predecessor id="1" predecessor-id="20" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="22" name="Sprint 03" note="" work="144000" start="20200207T170000Z" end="20200214T170000Z" work-start="20200210T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="21" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="23" name="Sprint 04" note="" work="144000" start="20200214T170000Z" end="20200221T170000Z" work-start="20200217T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="22" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="24" name="Sprint 05" note="" work="144000" start="20200221T170000Z" end="20200228T170000Z" work-start="20200224T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="23" type="FS"/>
+          </predecessors>
+        </task>
+      </task>
+      <task id="25" name="Finalize Code" note="" work="1296000" start="20200228T170000Z" end="20200501T170000Z" work-start="20200302T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <predecessors>
+          <predecessor id="1" predecessor-id="19" type="FS"/>
+        </predecessors>
+        <task id="26" name="Sprint 06" note="" work="144000" start="20200228T170000Z" end="20200306T170000Z" work-start="20200302T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+        <task id="27" name="Sprint 07" note="" work="144000" start="20200306T170000Z" end="20200313T170000Z" work-start="20200309T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="26" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="28" name="Sprint 08" note="" work="144000" start="20200313T170000Z" end="20200320T170000Z" work-start="20200316T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="27" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="29" name="Sprint 09" note="" work="144000" start="20200320T170000Z" end="20200327T170000Z" work-start="20200323T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="28" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="30" name="Sprint 10" note="" work="144000" start="20200327T170000Z" end="20200403T170000Z" work-start="20200330T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="29" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="31" name="Sprint 11" note="" work="144000" start="20200403T170000Z" end="20200410T170000Z" work-start="20200406T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="30" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="32" name="Sprint 12" note="" work="144000" start="20200410T170000Z" end="20200417T170000Z" work-start="20200413T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="31" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="33" name="Sprint 13" note="" work="144000" start="20200417T170000Z" end="20200424T170000Z" work-start="20200420T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="32" type="FS"/>
+          </predecessors>
+        </task>
+        <task id="34" name="Sprint 14" note="" work="144000" start="20200424T170000Z" end="20200501T170000Z" work-start="20200427T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+          <predecessors>
+            <predecessor id="1" predecessor-id="33" type="FS"/>
+          </predecessors>
+        </task>
+      </task>
+      <task id="35" name="Bugfixing and Polish" note="" work="144000" start="20200501T170000Z" end="20200508T170000Z" work-start="20200504T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <predecessors>
+          <predecessor id="1" predecessor-id="25" type="FS"/>
+        </predecessors>
+        <task id="36" name="Sprint 15" note="" work="144000" start="20200501T170000Z" end="20200508T170000Z" work-start="20200504T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
+      </task>
+    </task>
+  </tasks>
+  <resource-groups default_group="1">
+    <group id="1" name="Team All" admin-name="" admin-phone="" admin-email=""/>
+  </resource-groups>
+  <resources>
+    <resource group="1" id="1" name="Leon" short-name="LNC" type="1" units="0" email="leonnc@stud.ntnu.no" note="" std-rate="150"/>
+    <resource group="1" id="2" name="Carl" short-name="CHF" type="1" units="0" email="carlhf@stud.ntnu.no" note="" std-rate="150"/>
+    <resource group="1" id="3" name="Tomas" short-name="THB" type="1" units="0" email="tomashb@stud.ntnu.no" note="" std-rate="150"/>
+  </resources>
+  <allocations/>
+</project>
