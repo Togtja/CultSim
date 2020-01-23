@@ -4,6 +4,9 @@
 #include <cstdlib>
 #include <ctime>
 
+#include<fstream>
+#include<string>
+
 #include <SDL.h>
 #include <glad/glad.h>
 
@@ -11,24 +14,28 @@
 #define WINDOW_HEIGHT 800
 
 // Vertex shader source code
-const char* vertexSource = "#version 450 core\n"
-                           "layout(location=0) in vec2 aPosition;\n"
-                           "layout(location=0) uniform float uTime = 0.f;\n"
-                           "layout(location=1) uniform vec3 uColor = vec3(0.3f, 0.8f, 0.6f);\n"
-                           "layout(location=0) out vec3 vs_col;\n"
-                           "void main() {"
-                           "      mat2 rotMatrix = mat2(cos(uTime), -sin(uTime), sin(uTime), cos(uTime));"
-                           "      gl_Position = vec4(rotMatrix * aPosition, 0.f, 1.f);"
-                           "      vs_col = uColor;"
-                           "}";
 
-// Fragment shader source code
-const char* fragSource = "#version 450 core\n"
-                         "out vec4 color;\n"
-                         "layout(location=0) in vec3 vs_col;\n"
-                         "void main(){"
-                         "    color = vec4(vs_col, 1.f);"
-                         "}";
+const std::string readGLSLfromFile(const char* relativePath)
+{
+    std::ifstream glsl (relativePath, std::ios::in);
+    if(!glsl.is_open())
+    {
+        //Creating an error message
+        std::string errMsg = "failed to find " + std::string(relativePath) + "\n";
+        fprintf(stdout, errMsg.c_str());
+        return "";
+    }
+    
+    //reading the file
+    std::string content;
+    std::string line;
+    while(std::getline(glsl, line))
+    {
+        content += (line + "\n");
+    }
+    glsl.close();
+    return content;
+}
 
 /*!
  * \brief The vec2 struct contains two points to represent a 2D float vector
@@ -206,8 +213,15 @@ void initGL(struct vec2i* window_size)
 
     // Create shaders and program
     GLuint shaders[2];
-    shaders[0] = compileShader(vertexSource, GL_VERTEX_SHADER);
-    shaders[1] = compileShader(fragSource, GL_FRAGMENT_SHADER);
+    std::string vertex = readGLSLfromFile("bachelor/test_exec/src/vertex.vert");
+    std::string fragment = readGLSLfromFile("bachelor/test_exec/src/fragement.frag");
+    if(vertex == "" || fragment == "")
+    {
+        fprintf(stderr, "Failed to Initialize the vertex or the fragment from file\n");
+        exit(EXIT_FAILURE);
+    }
+    shaders[0] = compileShader(vertex.c_str(), GL_VERTEX_SHADER);
+    shaders[1] = compileShader(fragment.c_str(), GL_FRAGMENT_SHADER);
 
     gfxContext.program = createProgram(2, shaders);
 
