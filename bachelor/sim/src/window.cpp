@@ -1,6 +1,7 @@
 #include "window.h"
 
 #include <spdlog/spdlog.h>
+#include <glad/glad.h>
 
 namespace cs
 {
@@ -22,5 +23,14 @@ bool Window::init(std::string name, int width, int height)
         return false;
     }
     return true;
+}
+void Window::clear(){
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+void Window::display(){
+
+}
+void Window::set_background_color(){
+    //glClearColor();
 }
 } // namespace cs

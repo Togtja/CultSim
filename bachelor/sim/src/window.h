@@ -14,7 +14,9 @@ public:
     Window();
     SDL_Window* get_window();
     bool init(std::string name = "CultSim", int width = 1280, int height = 720);
-
+    void clear();
+    void display();
+    void set_background_color();
 private:
 };
 } // namespace cs
