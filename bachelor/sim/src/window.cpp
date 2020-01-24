@@ -24,12 +24,10 @@ bool Window::init(std::string name, int width, int height)
         return false;
     }
 
-    SDL_GLprofile profile = SDL_GL_CONTEXT_PROFILE_CORE;
-
-    // Create a double buffer context with the provided settings
+    /* Create a double buffer context with the provided settings */
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     m_context = SDL_GL_CreateContext(m_window);
