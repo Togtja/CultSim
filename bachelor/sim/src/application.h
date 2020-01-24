@@ -1,6 +1,6 @@
 #pragma once
+#include "window.h"
 
-#include <SDL2/SDL.h>
 #include <spdlog/spdlog.h>
 
 namespace cs
@@ -11,7 +11,7 @@ namespace cs
 class Application
 {
 private:
-    SDL_Window* m_window = nullptr;
+    Window m_window;
 
 public:
     void run();

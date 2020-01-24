@@ -36,7 +36,7 @@ bool Application::init()
 
 bool Application::init_gl()
 {
-    return false;
+    return m_window.init();
 }
 
 bool Application::init_imgui()
