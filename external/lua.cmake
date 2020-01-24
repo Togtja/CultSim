@@ -1,8 +1,8 @@
 # Set up lua
-include(FetchContent)
-message(STATUS "Could not find Lua package so getting it")
-
 if(WIN32)
+    include(FetchContent)
+    message(STATUS "Could not find Lua package so getting it")
+
     if(MSVC14)
         FetchContent_Declare(
             lua_external
