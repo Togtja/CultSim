@@ -4,6 +4,8 @@ message(STATUS "Could not find GoogleBenchmark package so we are getting it from
 
 # Disable testing library
 option(BENCHMARK_ENABLE_GTEST_TESTS OFF)
+option(BENCHMARK_ENABLE_ASSEMBLY_TESTS OFF)
+option(BENCHMARK_ENABLE_TESTING OFF)
 
 # Declare where to find glfw and what version to use
 FetchContent_Declare(
