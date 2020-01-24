@@ -6,7 +6,7 @@
 namespace cs
 {
 /**
- * @brief The Application class
+ * The application holds all state, the window main loop
  */
 class Application
 {
@@ -14,6 +14,9 @@ private:
     Window m_window;
 
 public:
+    /**
+     * Run the application, starting the main loop until a crash or normal shutdown
+     */
     void run();
 
 private:
@@ -52,7 +55,10 @@ private:
     void deinit_gl();
 
     /**
-     * @brief init_subsystem
+     * Initialize the subsystem with one of the Application's init_ functions and log on error
+     *
+     * @param f The init function to use
+     * @param name The name of the subsystem for use in logging
      */
     template<typename Func>
     bool init_subsystem(Func&& f, const std::string& name)
