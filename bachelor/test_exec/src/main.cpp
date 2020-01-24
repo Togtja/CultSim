@@ -3,6 +3,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <iostream>
+#include <memory>
+#include <vector>
 
 #include <SDL.h>
 #include <glad/glad.h>
@@ -14,7 +17,7 @@
 const char* vertexSource = "#version 450 core\n"
                            "layout(location=0) in vec2 aPosition;\n"
                            "layout(location=0) uniform float uTime = 0.f;\n"
-                           "layout(location=1) uniform vec3 uColor = vec3(0.3f, 0.8f, 0.6f);\n"
+                           "layout(location=1) uniform vec3 uColor = vec3(0.8f, 0.3f, 0.0f);\n"
                            "layout(location=0) out vec3 vs_col;\n"
                            "void main() {"
                            "      mat2 rotMatrix = mat2(cos(uTime), -sin(uTime), sin(uTime), cos(uTime));"
@@ -226,6 +229,38 @@ void terminateGL()
     SDL_Quit();
 }
 
+/* Clever Class */
+class VertexBuffer
+{
+private:
+    GLuint vbo = 0u;
+
+public:
+    explicit VertexBuffer(const std::vector<vec2>& data)
+    {
+        glCreateBuffers(1, &vbo);
+        glNamedBufferStorage(vbo, data.size() * sizeof(vec2), data.data(), 0);
+    }
+
+    VertexBuffer(const VertexBuffer& other) = delete;
+    VertexBuffer& operator=(const VertexBuffer& other) = delete;
+
+    ~VertexBuffer() noexcept
+    {
+        glDeleteBuffers(1, &vbo);
+    }
+
+    GLuint get() const
+    {
+        return vbo;
+    }
+};
+
+void process(VertexBuffer& vbo)
+{
+    auto vbo2 = vbo;
+}
+
 /* coreProfile: Minimal OpenGL 4.5 Core Profile demo that uses some key ideas of Direct State Access that
  * was introduced to OpenGL in version 4.5. In particular the glCreateBuffers over glGenBuffers,
  * and the glNamedBufferStroage functions that allow for data transfer without binding buffers,
@@ -237,22 +272,25 @@ int main(int argc, char* argv[])
     initGL(&winSize);
 
     // Create data required to draw a quad
-    struct vec2 vertices[4]  = {{-.5f, -.5f}, {.5f, -.5f}, {.5f, .5f}, {-.5f, .5f}};
-    unsigned char indices[6] = {0, 1, 2, 2, 3, 0};
+    std::vector<vec2> vertices         = {{-.5f, -.5f}, {.5f, -.5f}, {.5f, .5f}, {-.5f, .5f}};
+    std::vector<unsigned char> indices = {0, 1, 2, 2, 3, 0};
+
+    // Clever Example
+    auto vbo = VertexBuffer(vertices);
+    process(vbo);
 
     // Create VBO and IBO buffers respectively
     GLuint buffers[2];
     glCreateBuffers(2, buffers);
 
     // Fill buffers with data
-    glNamedBufferStorage(buffers[0], sizeof vertices, vertices, 0);
-    glNamedBufferStorage(buffers[1], sizeof indices, indices, 0);
+    glNamedBufferStorage(buffers[1], sizeof(unsigned char) * indices.size(), indices.data(), 0);
 
     // Create Vertex Array
     glCreateVertexArrays(1, &gfxContext.vao);
 
     // Assosciate VAO with the two buffers (vertices and indices)
-    glVertexArrayVertexBuffer(gfxContext.vao, 0, buffers[0], 0, sizeof(struct vec2));
+    glVertexArrayVertexBuffer(gfxContext.vao, 0, vbo.get(), 0, sizeof(struct vec2));
     glVertexArrayElementBuffer(gfxContext.vao, buffers[1]);
 
     // Set attribute 0 to be a 2 component float vector
@@ -269,7 +307,7 @@ int main(int argc, char* argv[])
     glUseProgram(gfxContext.program);
 
     // Set the background clear color
-    glClearColor(0.1f, 0.1f, 0.3f, 0.0f);
+    glClearColor(0.09f, 0.09f, 0.09f, 0.0f);
 
     int active = 1;
     while (active)
@@ -297,14 +335,16 @@ int main(int argc, char* argv[])
         glUniform1f(0, SDL_GetTicks() / 500.f);
 
         // Dynamically change color of quad based on sin and cos of the frame number
-        glUniform3f(1, (sinf(gfxContext.frameCount / 10.f) + 1.f) / 2.f, 0.8f, (cosf(gfxContext.frameCount / 20.f) + 1.f) / 2.f);
+        glUniform3f(1,
+                    (sinf(gfxContext.frameCount / 1000.f) + 1.f) / 2.f,
+                    0.8f,
+                    (cosf(gfxContext.frameCount / 2000.f) + 1.f) / 2.f);
 
         // Draw as Triangles, N indices of type Unsigned Byte
-        glDrawElements(GL_TRIANGLES, sizeof indices / sizeof indices[0], GL_UNSIGNED_BYTE, NULL);
+        glDrawElements(GL_TRIANGLES, sizeof(unsigned char) * indices.size(), GL_UNSIGNED_BYTE, NULL);
 
         // Swap back and front buffer to make image visible
         SDL_GL_SwapWindow(gfxContext.window);
-        SDL_Delay(16);
     }
 
     // Clean up buffers

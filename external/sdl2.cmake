@@ -1,6 +1,6 @@
 # Set up sdl2, either by finding the package directly, or by fetching it from GitHub
 
-include(FetchContent)  
+include(FetchContent)
 message(STATUS "Could not find sdl2 package so we are downloading it.")
 # Declare where to find SDL2 and what version to use
 FetchContent_Declare(
