@@ -35,28 +35,28 @@
       <task id="6" name="Finalize Group Rules" note="" work="28800" start="20200114T000000Z" end="20200114T170000Z" work-start="20200114T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="must-start-on" time="20200114T000000Z"/>
       </task>
-      <task id="7" name="Create Requirements" note="" work="201600" start="20200114T000000Z" end="20200122T170000Z" work-start="20200114T080000Z" percent-complete="66" priority="0" type="normal" scheduling="fixed-work">
+      <task id="7" name="Create Requirements" note="" work="201600" start="20200114T000000Z" end="20200122T170000Z" work-start="20200114T080000Z" percent-complete="95" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
       </task>
-      <task id="8" name="Do Risk Analysis" note="" work="144000" start="20200122T170000Z" end="20200129T170000Z" work-start="20200123T080000Z" percent-complete="70" priority="0" type="normal" scheduling="fixed-work">
+      <task id="8" name="Do Risk Analysis" note="" work="144000" start="20200122T170000Z" end="20200129T170000Z" work-start="20200123T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
         <predecessors>
           <predecessor id="1" predecessor-id="7" type="FS"/>
         </predecessors>
       </task>
       <task id="9" name="Schedule Regular Mentor Meetings" note="" work="28800" start="20200113T000000Z" end="20200113T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work"/>
-      <task id="10" name="Designate Roles and Responsibilities" note="" work="86400" start="20200120T000000Z" end="20200122T170000Z" work-start="20200120T080000Z" percent-complete="25" priority="0" type="normal" scheduling="fixed-work">
+      <task id="10" name="Designate Roles and Responsibilities" note="" work="86400" start="20200120T000000Z" end="20200122T170000Z" work-start="20200120T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200120T000000Z"/>
       </task>
-      <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="55" priority="0" type="normal" scheduling="fixed-work">
+      <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="88" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200113T000000Z"/>
       </task>
-      <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+      <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="50" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200116T000000Z"/>
       </task>
-      <task id="13" name="Set up Development Environments" note="" work="144000" start="20200115T000000Z" end="20200121T170000Z" work-start="20200115T080000Z" percent-complete="66" priority="0" type="normal" scheduling="fixed-work">
+      <task id="13" name="Set up Development Environments" note="" work="144000" start="20200115T000000Z" end="20200121T170000Z" work-start="20200115T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200115T000000Z"/>
       </task>
-      <task id="14" name="Write the Deliverable" note="" work="403200" start="20200114T000000Z" end="20200131T170000Z" work-start="20200114T080000Z" percent-complete="80" priority="0" type="normal" scheduling="fixed-work">
+      <task id="14" name="Write the Deliverable" note="" work="403200" start="20200114T000000Z" end="20200131T170000Z" work-start="20200114T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
       </task>
     </task>
