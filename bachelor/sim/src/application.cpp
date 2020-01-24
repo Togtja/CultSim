@@ -24,38 +24,44 @@ void Application::draw()
 {
 }
 
-void Application::init()
+bool Application::init()
 {
-    init_gl();
-    init_imgui();
-    init_physfs();
-    init_lua();
-    init_entt();
-    init_input();
+    return init_subsystem(&Application::init_gl, "OpenGL") &&         // Init OpenGL
+           init_subsystem(&Application::init_imgui, "ImGui") &&       // Init ImGui
+           init_subsystem(&Application::init_physfs, "PhysFS") &&     // Init PhysFS
+           init_subsystem(&Application::init_lua, "Lua") &&           // Init Lua
+           init_subsystem(&Application::init_entt, "EnTT") &&         // Init EnTT
+           init_subsystem(&Application::init_input, "Input Manager"); // Init Input Manager
 }
 
-void Application::init_gl()
+bool Application::init_gl()
 {
+    return false;
 }
 
-void Application::init_imgui()
+bool Application::init_imgui()
 {
+    return false;
 }
 
-void Application::init_physfs()
+bool Application::init_physfs()
 {
+    return false;
 }
 
-void Application::init_lua()
+bool Application::init_lua()
 {
+    return false;
 }
 
-void Application::init_entt()
+bool Application::init_entt()
 {
+    return false;
 }
 
-void Application::init_input()
+bool Application::init_input()
 {
+    return false;
 }
 
 void Application::deinit()

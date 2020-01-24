@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL2/SDL.h>
+#include <spdlog/spdlog.h>
 
 namespace cs
 {
@@ -22,19 +23,19 @@ private:
 
     void draw();
 
-    void init();
+    bool init();
 
-    void init_gl();
+    bool init_gl();
 
-    void init_imgui();
+    bool init_imgui();
 
-    void init_physfs();
+    bool init_physfs();
 
-    void init_lua();
+    bool init_lua();
 
-    void init_entt();
+    bool init_entt();
 
-    void init_input();
+    bool init_input();
 
     void deinit();
 
@@ -49,6 +50,20 @@ private:
     void deinit_imgui();
 
     void deinit_gl();
+
+    /**
+     * @brief init_subsystem
+     */
+    template<typename Func>
+    bool init_subsystem(Func&& f, const std::string& name)
+    {
+        if (!std::invoke(f, this))
+        {
+            spdlog::error("failed to initialize {}", name);
+            return false;
+        }
+        return true;
+    }
 };
 
 } // namespace cs
