@@ -33,4 +33,5 @@ target_link_libraries(
     sol2::sol2
     EnTT::EnTT
     spdlog::spdlog
+    glm::glm
 )
