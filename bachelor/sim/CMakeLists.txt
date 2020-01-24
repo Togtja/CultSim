@@ -9,11 +9,7 @@ set(EXEC_NAME cultsim)
 add_executable(${EXEC_NAME})
 
 # Add Source Files
-target_sources(
-    ${EXEC_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
-)
+include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 
 # Set Include Directories
 target_include_directories(
