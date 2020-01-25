@@ -10,8 +10,8 @@ Welcome to Cultsim's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-Docs
-====
+API Reference
+=============
 
 .. doxygennamespace:: cs
     :members:
