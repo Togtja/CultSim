@@ -6,7 +6,7 @@
 namespace cs
 {
 /**
- * The application holds all state, the window main loop
+ * Holds all state, the window and handles the main loop
  */
 class Application
 {
@@ -68,6 +68,7 @@ private:
             spdlog::error("failed to initialize {}", name);
             return false;
         }
+        spdlog::debug("initialized {}", name);
         return true;
     }
 };

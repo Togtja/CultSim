@@ -5,7 +5,35 @@
 
 namespace cs
 {
-SDL_Window* Window::get_window()
+Window::Window(Window&& other) noexcept : m_window(other.m_window), m_context(other.m_context)
+{
+    other.m_window  = nullptr;
+    other.m_context = nullptr;
+}
+
+Window& Window::operator=(Window&& other) noexcept
+{
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    deinit();
+    m_window  = other.m_window;
+    m_context = other.m_context;
+
+    other.m_window  = nullptr;
+    other.m_context = nullptr;
+
+    return *this;
+}
+
+Window::~Window() noexcept
+{
+    deinit();
+}
+
+SDL_Window* Window::get() const
 {
     return m_window;
 }
@@ -18,18 +46,19 @@ bool Window::init(std::string name, int width, int height)
                                 width,
                                 height,
                                 SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+
     if (m_window == nullptr)
     {
-        spdlog::error("failed to create window");
+        const auto error = SDL_GetError();
+        spdlog::error("failed to create window: {}", error);
         return false;
     }
 
-    /* Create a double buffer context with the provided settings */
+    /* Create a double buffered OpenGL 4.5 Core Profile context */
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
     m_context = SDL_GL_CreateContext(m_window);
 
     return true;
@@ -48,5 +77,18 @@ void Window::display()
 void Window::set_background_color(glm::vec3 color)
 {
     glClearColor(color.r, color.g, color.b, 0.f);
+}
+
+void Window::deinit() noexcept
+{
+    if (m_context)
+    {
+        SDL_GL_DeleteContext(m_context);
+    }
+
+    if (m_window)
+    {
+        SDL_DestroyWindow(m_window);
+    }
 }
 } // namespace cs
