@@ -1,5 +1,4 @@
 # Set up sol2, either by finding the package directly, or by fetching it from GitHub
-include(FetchContent)
 message(STATUS "Could not find PhysFS package so we are downloading it.")
 
 # Declare where to find glfw and what version to use

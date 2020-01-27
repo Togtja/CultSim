@@ -1,5 +1,4 @@
 # Set up DocTest, either by finding the package directly, or by fetching it from GitHub
-include(FetchContent)
 message(STATUS "Could not find DocTest package so we are getting it from GitHub instead.")
 
 # Declare where to find DocTest and what version to use
