@@ -3,7 +3,6 @@
 #include <string>
 #include <string_view>
 
-
 namespace cs
 {
 namespace fs
@@ -12,7 +11,7 @@ bool init(std::string_view project_name);
 void deinit();
 
 std::string read_file(std::string_view rpath);
-int write_file(std::string_view rpath);
+int64_t write_file(std::string_view rpath, const std::string& data);
 
 bool exists(std::string_view rpath);
 
