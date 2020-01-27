@@ -24,8 +24,8 @@ void Application::handle_input()
     SDL_Event e{};
     while (SDL_PollEvent(&e))
     {
-        if (e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE ||
-            e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+        if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
+            (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
             /* TODO: Do not abort */
             std::abort();
