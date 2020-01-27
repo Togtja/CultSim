@@ -52,15 +52,11 @@ private:
 
     bool init_lua();
 
-    bool init_entt();
-
     bool init_input();
 
     void deinit();
 
     void deinit_input();
-
-    void deinit_entt();
 
     void deinit_lua();
 

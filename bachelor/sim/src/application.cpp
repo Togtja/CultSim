@@ -31,7 +31,6 @@ bool Application::init(std::vector<char*> args)
            init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
            init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
            init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
-           init_subsystem(&Application::init_entt, "EnTT") &&           // Init EnTT
            init_subsystem(&Application::init_input, "Input Manager");   // Init Input Manager
 }
 
@@ -93,11 +92,6 @@ bool Application::init_lua()
     return true;
 }
 
-bool Application::init_entt()
-{
-    return false;
-}
-
 bool Application::init_input()
 {
     return false;
@@ -106,7 +100,6 @@ bool Application::init_input()
 void Application::deinit()
 {
     deinit_input();
-    deinit_entt();
     deinit_lua();
     deinit_physfs();
     deinit_imgui();
@@ -114,10 +107,6 @@ void Application::deinit()
 }
 
 void Application::deinit_input()
-{
-}
-
-void Application::deinit_entt()
 {
 }
 
