@@ -1,11 +1,13 @@
 image: gcc:9
 
 test:
-  tags: docker
+  tags: 
+    - docker
   script:
     - echo "Linting, Formatting etc"
 
 build:
-  tags: docker
+  tags:
+    - docker
   script:
     - echo "CMake Build"
