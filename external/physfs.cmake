@@ -11,3 +11,8 @@ FetchContent_Declare(
 
 # Populate it for building
 FetchContent_MakeAvailable(physfs_external)
+
+if(WIN32)
+    set(PHYSFS_LIBRARY ${PROJECT_BINARY_DIR}/_deps/physfs_external-build/physfs.lib)
+    set(PHYSFS_INCLUDE_DIR ${PROJECT_BINARY_DIR}/_deps/physfs_external-src/src)
+endif()
