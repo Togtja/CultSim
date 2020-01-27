@@ -1,7 +1,10 @@
 #pragma once
 #include "window.h"
 
+#include <vector>
+
 #include <glad/glad.h>
+#include <physfs.h>
 #include <spdlog/spdlog.h>
 
 namespace cs
@@ -18,7 +21,7 @@ public:
     /**
      * Run the application, starting the main loop until a crash or normal shutdown
      */
-    void run();
+    void run(std::vector<char*> args);
 
 private:
     void handle_input();
@@ -27,13 +30,13 @@ private:
 
     void draw();
 
-    bool init();
+    bool init(std::vector<char*> args);
 
     bool init_gl();
 
     bool init_imgui();
 
-    bool init_physfs();
+    bool init_physfs(std::vector<char*> args);
 
     bool init_lua();
 
@@ -61,10 +64,10 @@ private:
      * @param f The init function to use
      * @param name The name of the subsystem for use in logging
      */
-    template<typename Func>
-    bool init_subsystem(Func&& f, const std::string& name)
+    template<typename Func, typename... Args>
+    bool init_subsystem(Func&& f, const std::string& name, Args&&... args)
     {
-        if (!std::invoke(f, this))
+        if (!std::invoke(f, this, args...))
         {
             spdlog::error("failed to initialize {}", name);
             return false;

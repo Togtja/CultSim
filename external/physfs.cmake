@@ -13,6 +13,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(physfs_external)
 
 if(WIN32)
-    set(PHYSFS_LIBRARY ${PROJECT_BINARY_DIR}/_deps/physfs_external-build/physfs.lib)
-    set(PHYSFS_INCLUDE_DIR ${PROJECT_BINARY_DIR}/_deps/physfs_external-src/src)
+    set(PHYSFS_LIBRARY ${PROJECT_BINARY_DIR}/_deps/physfs_external-build/physfs.lib CACHE STRING "The path of PhysFS libary")
+    set(PHYSFS_INCLUDE_DIR ${PROJECT_BINARY_DIR}/_deps/physfs_external-src/src CACHE STRING "The path of PhysFS include")
 endif()
