@@ -10,4 +10,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/window.h
     ${CMAKE_CURRENT_LIST_DIR}/window.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/filesystem.h
+    ${CMAKE_CURRENT_LIST_DIR}/filesystem.cpp
 )
