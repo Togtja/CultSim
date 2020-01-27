@@ -1,4 +1,8 @@
+# Generated files
 build/
+builds/
+
+# IDE Files
 .vs/
 .vscode/
 .idea/

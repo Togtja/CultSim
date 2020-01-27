@@ -1,0 +1,9 @@
+image: gcc:9
+
+test:
+  script:
+    - echo "Linting, Formatting etc"
+
+build:
+  script:
+    - echo "CMake Build"
