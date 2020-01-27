@@ -71,7 +71,26 @@ bool Application::init_physfs(std::vector<char*> args)
 
 bool Application::init_lua()
 {
-    return false;
+    /* Load necessary libraries for Lua */
+    m_lua.open_libraries(sol::lib::base, sol::lib::math);
+
+    /* Bind IO Functions (globally) */
+    m_lua.set_function("writeFile", fs::write_file);
+    m_lua.set_function("readFile", fs::read_file);
+    m_lua.set_function("makeDirectory", fs::mkdir);
+    m_lua.set_function("renameFile", fs::rename_file);
+    m_lua.set_function("fileExists", fs::exists);
+    m_lua.set_function("deleteFile", fs::delete_file);
+
+    /* Bind Log Functions (available in log.*) */
+    auto log_table = m_lua.create_table("log");
+    log_table.set_function("debug", [](std::string_view msg) { spdlog::debug(msg); });
+    log_table.set_function("info", [](std::string_view msg) { spdlog::info(msg); });
+    log_table.set_function("warn", [](std::string_view msg) { spdlog::warn(msg); });
+    log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
+    log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
+
+    return true;
 }
 
 bool Application::init_entt()

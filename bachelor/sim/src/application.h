@@ -5,6 +5,7 @@
 
 #include <glad/glad.h>
 #include <physfs.h>
+#include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 
 namespace cs
@@ -16,6 +17,8 @@ class Application
 {
 private:
     Window m_window;
+
+    sol::state m_lua{};
 
 public:
     /**
