@@ -69,8 +69,11 @@ private:
     /**
      * Initialize the subsystem with one of the Application's init_ functions and log on error
      *
+     * @tparam Func The member function pointer for any of the init functions in the Application class
+     * @tparam Args Variadic template arguments for any remaining arguments
      * @param f The init function to use
      * @param name The name of the subsystem for use in logging
+     * @param args Any function arguments the initialization function might take
      */
     template<typename Func, typename... Args>
     bool init_subsystem(Func&& f, const std::string& name, Args&&... args)
