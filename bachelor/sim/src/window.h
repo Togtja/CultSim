@@ -22,7 +22,6 @@ public:
     Window()                               = default;
     Window(Window&& other) noexcept;
     Window& operator=(Window&& other) noexcept;
-    ~Window() noexcept;
 
     /**
      * Get a pointer to the underlying SDL_Window
@@ -59,12 +58,13 @@ public:
      */
     void set_background_color(glm::vec3 color);
 
-private:
     /**
      * Clean up and destroy all underlying resources that are successfully created
      *
      * @note This is a no-op if the window is not successfully initialized
      */
     void deinit() noexcept;
+
+private:
 };
 } // namespace cs

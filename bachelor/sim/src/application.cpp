@@ -2,9 +2,9 @@
 
 namespace cs
 {
-void Application::run()
+void Application::run(std::vector<char*> args)
 {
-    init();
+    init(args);
 
     /* Main Loop */
     while (false) {}
@@ -24,14 +24,14 @@ void Application::draw()
 {
 }
 
-bool Application::init()
+bool Application::init(std::vector<char*> args)
 {
-    return init_subsystem(&Application::init_gl, "OpenGL") &&         // Init OpenGL
-           init_subsystem(&Application::init_imgui, "ImGui") &&       // Init ImGui
-           init_subsystem(&Application::init_physfs, "PhysFS") &&     // Init PhysFS
-           init_subsystem(&Application::init_lua, "Lua") &&           // Init Lua
-           init_subsystem(&Application::init_entt, "EnTT") &&         // Init EnTT
-           init_subsystem(&Application::init_input, "Input Manager"); // Init Input Manager
+    return init_subsystem(&Application::init_gl, "OpenGL") &&           // Init OpenGL
+           init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
+           init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
+           init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
+           init_subsystem(&Application::init_entt, "EnTT") &&           // Init EnTT
+           init_subsystem(&Application::init_input, "Input Manager");   // Init Input Manager
 }
 
 bool Application::init_gl()
@@ -59,11 +59,18 @@ bool Application::init_gl()
 
 bool Application::init_imgui()
 {
-    return false;
+    // TODO: change true to false, also make the function
+    return true;
 }
 
-bool Application::init_physfs()
+bool Application::init_physfs(std::vector<char*> args)
 {
+    if (PHYSFS_init(args[0]))
+    {
+        return true;
+    }
+
+    spdlog::error("failed to initialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     return false;
 }
 
@@ -106,6 +113,10 @@ void Application::deinit_lua()
 
 void Application::deinit_physfs()
 {
+    if (!PHYSFS_deinit())
+    {
+        spdlog::error("failed to deinitialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+    }
 }
 
 void Application::deinit_imgui()
@@ -114,5 +125,8 @@ void Application::deinit_imgui()
 
 void Application::deinit_gl()
 {
+    m_window.deinit();
+
+    SDL_Quit();
 }
 } // namespace cs

@@ -28,11 +28,6 @@ Window& Window::operator=(Window&& other) noexcept
     return *this;
 }
 
-Window::~Window() noexcept
-{
-    deinit();
-}
-
 SDL_Window* Window::get() const
 {
     return m_window;
