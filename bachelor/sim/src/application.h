@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
 #include <glad/glad.h>
 #include <physfs.h>
 #include <sol/sol.hpp>
@@ -16,9 +18,16 @@ namespace cs
 class Application
 {
 private:
+    /**
+     * @warning Do not use until initialized
+     */
     Window m_window;
 
     sol::state m_lua{};
+
+    entt::registry m_entt{};
+
+    entt::dispatcher m_event_bus{};
 
 public:
     /**
