@@ -1,4 +1,5 @@
 #include "application.h"
+#include "filesystem.h"
 
 namespace cs
 {
@@ -65,13 +66,7 @@ bool Application::init_imgui()
 
 bool Application::init_physfs(std::vector<char*> args)
 {
-    if (PHYSFS_init(args[0]))
-    {
-        return true;
-    }
-
-    spdlog::error("failed to initialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-    return false;
+    return fs::init(args[0]);
 }
 
 bool Application::init_lua()
@@ -113,10 +108,7 @@ void Application::deinit_lua()
 
 void Application::deinit_physfs()
 {
-    if (!PHYSFS_deinit())
-    {
-        spdlog::error("failed to deinitialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
-    }
+    fs::deinit();
 }
 
 void Application::deinit_imgui()
