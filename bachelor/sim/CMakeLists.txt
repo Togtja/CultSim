@@ -3,6 +3,7 @@
 # Find Libraries to Link With
 find_package(OpenGL REQUIRED)
 find_package(Lua REQUIRED)
+find_package(PhysFS REQUIRED)
 
 # Define executable
 set(EXEC_NAME cultsim)
@@ -17,6 +18,7 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include
     ${LUA_INCLUDE_DIR}
+    ${PHYSFS_INCLUDE_DIR}
 )
 
 # Link with some libraries
@@ -26,7 +28,7 @@ target_link_libraries(
     OpenGL::GL
     $<$<PLATFORM_ID:Linux>:dl>
     glad::glad
-    physfs
+    ${PHYSFS_LIBRARY}
     SDL2main
     SDL2-static
     ${LUA_LIBRARIES}
