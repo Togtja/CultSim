@@ -1,6 +1,7 @@
 #pragma once
 #include "window.h"
 
+#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 namespace cs
