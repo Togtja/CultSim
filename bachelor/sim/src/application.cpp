@@ -36,7 +36,25 @@ bool Application::init()
 
 bool Application::init_gl()
 {
-    return m_window.init();
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
+        spdlog::error("failed to initialize SDL, {} ", SDL_GetError());
+        return false;
+    }
+
+    if (!m_window.init())
+    {
+        spdlog::error("failed to initialize window");
+        return false;
+    };
+
+    if (!gladLoadGL())
+    {
+        spdlog::error("failed to initialize glad");
+        return false;
+    }
+
+    return true;
 }
 
 bool Application::init_imgui()
