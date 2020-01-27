@@ -8,13 +8,29 @@ void Application::run(const std::vector<char*>& args)
     init(args);
 
     /* Main Loop */
-    while (false) {}
+    while (true)
+    {
+        /* Pseudo Code at the moment, must capture delta time etc. */
+        handle_input();
+        update(0.1666);
+        draw();
+    }
 
     deinit();
 }
 
 void Application::handle_input()
 {
+    SDL_Event e{};
+    while (SDL_PollEvent(&e))
+    {
+        if (e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE ||
+            e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE)
+        {
+            /* TODO: Do not abort */
+            std::abort();
+        }
+    }
 }
 
 void Application::update(float dt)
@@ -23,6 +39,9 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    m_window.clear();
+
+    m_window.display();
 }
 
 bool Application::init(std::vector<char*> args)
