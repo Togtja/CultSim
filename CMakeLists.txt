@@ -4,7 +4,7 @@ project(bachelor VERSION 0.0.0)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # Project CMake Options
-option(CULTSIM_BUILD_DOCS ON)
+option(CULTSIM_BUILD_DOCS "Build documentation for Cultsim" ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external ${CMAKE_MODULE_PATH})
 
