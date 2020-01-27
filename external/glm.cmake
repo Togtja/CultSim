@@ -1,6 +1,4 @@
 # Set up GLM by fetching it from GitHub
-find_package(glm 0.9)
-
 message(STATUS "Getting GLM from Github.")
 
 # Declare where to find GLM and what version to use
