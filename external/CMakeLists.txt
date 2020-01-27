@@ -2,7 +2,6 @@
 
 include(FetchContent)
 set(FETCHCONTENT_QUIET OFF)
-set(FETCHCONTENT_BASE_DIR ${CMAKE_BINARY_DIR})
 
 # Include All Dependencies
 include(benchmark.cmake)
