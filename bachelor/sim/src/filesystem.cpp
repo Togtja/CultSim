@@ -11,12 +11,16 @@ bool init(std::string_view project_name)
 {
     if (!PHYSFS_init(project_name.data()))
     {
-        return false;
         spdlog::error("failed to initialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+        return false;
     }
+
     char p_name[] = "cultsim";
     char g_name[] = "g107";
-    PHYSFS_addToSearchPath(PHYSFS_getPrefDir(g_name, p_name), 1);
+    PHYSFS_mount(PHYSFS_getPrefDir(g_name, p_name), nullptr, 1);
+
+    /* TODO: Set up our zip archive to be mounted here */
+
     PHYSFS_setWriteDir(PHYSFS_getPrefDir(g_name, p_name));
 
     return true;
@@ -108,7 +112,9 @@ bool rename_file(std::string_view rpath_old, std::string_view rpath_new)
     auto data  = read_file(rpath_old);
     auto bytes = write_file(rpath_new, data.data());
     spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes);
-    if (bytes == data.length())
+
+    /* TODO: Investigate type conversion */
+    if (static_cast<uint64_t>(bytes) == data.length())
     {
         if (!delete_file(rpath_old))
         {
