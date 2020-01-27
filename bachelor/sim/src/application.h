@@ -33,7 +33,7 @@ public:
     /**
      * Run the application, starting the main loop until a crash or normal shutdown
      */
-    void run(std::vector<char*> args);
+    void run(const std::vector<char*>& args);
 
 private:
     void handle_input();

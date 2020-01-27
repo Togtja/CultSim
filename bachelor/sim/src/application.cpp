@@ -3,7 +3,7 @@
 
 namespace cs
 {
-void Application::run(std::vector<char*> args)
+void Application::run(const std::vector<char*>& args)
 {
     init(args);
 
@@ -94,7 +94,8 @@ bool Application::init_lua()
 
 bool Application::init_input()
 {
-    return false;
+    /* TODO: Fix to not return true */
+    return true;
 }
 
 void Application::deinit()
