@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include <string_view>
 
 #include <SDL.h>
 #include <glm/vec3.hpp>
@@ -39,7 +39,7 @@ public:
      * @param height Requested height of the window
      * @return true if the window was successfully initialized, false otherwise
      */
-    bool init(std::string name = "CultSim", int width = 1280, int height = 720);
+    bool init(std::string_view name = "CultSim", int width = 1280, int height = 720);
 
     /**
      * Clear the window of all it's contents

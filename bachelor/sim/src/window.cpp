@@ -33,9 +33,9 @@ SDL_Window* Window::get() const
     return m_window;
 }
 
-bool Window::init(std::string name, int width, int height)
+bool Window::init(std::string_view name, int width, int height)
 {
-    m_window = SDL_CreateWindow(name.c_str(),
+    m_window = SDL_CreateWindow(name.data(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
                                 width,
