@@ -96,9 +96,10 @@ bool Application::init_lua()
     m_lua.set_function("writeFile", fs::write_file);
     m_lua.set_function("readFile", fs::read_file);
     m_lua.set_function("makeDirectory", fs::mkdir);
-    m_lua.set_function("renameFile", fs::rename_file);
+    m_lua.set_function("moveFile", fs::move_file);
     m_lua.set_function("fileExists", fs::exists);
     m_lua.set_function("deleteFile", fs::delete_file);
+    m_lua.set_function("copyFile", fs::copy_file);
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");
