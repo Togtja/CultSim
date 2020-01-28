@@ -17,11 +17,11 @@ bool init(std::string_view project_name)
 
     char p_name[] = "cultsim";
     char g_name[] = "g107";
-    PHYSFS_mount(PHYSFS_getPrefDir(g_name, p_name), nullptr, 1);
-
-    /* TODO: Set up our zip archive to be mounted here */
 
     PHYSFS_setWriteDir(PHYSFS_getPrefDir(g_name, p_name));
+
+    PHYSFS_mount(PHYSFS_getPrefDir(g_name, p_name), nullptr, 1);
+    PHYSFS_mount("data.zip", nullptr, 1);
 
     return true;
 }
