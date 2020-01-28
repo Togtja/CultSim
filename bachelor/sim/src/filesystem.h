@@ -58,13 +58,13 @@ bool exists(std::string_view rpath);
 bool mkdir(std::string_view rpath);
 
 /**
- * Rename the file (and / or move it) from the old to the new path
+ * Move the file (and / or rename it it) from the old to the new path
  *
  * @param rpath_old The source file to rename / move
  * @param rpath_new The destination path / name
  * @return true if successful, otherwise false
  */
-bool rename_file(std::string_view rpath_old, std::string_view rpath_new);
+bool move_file(std::string_view rpath_old, std::string_view rpath_new);
 
 /**
  * Delete a file or directory at the given path
@@ -74,6 +74,15 @@ bool rename_file(std::string_view rpath_old, std::string_view rpath_new);
  * @return true if successful, otherwise false
  */
 bool delete_file(std::string_view rpath);
+
+/**
+ * Copy the file from the old to the new path
+ *
+ * @param rpath_old The source file to copy
+ * @param rpath_new The destination path / name
+ * @return true if successful, otherwise false
+ */
+bool copy_file(std::string_view rpath_old, std::string_view rpath_new);
 
 } // namespace fs
 } // namespace cs
