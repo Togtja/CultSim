@@ -43,5 +43,15 @@ GLuint create_program(const std::vector<GLuint>& shaders);
  * @return The shader name as a human readable string
  */
 std::string get_gl_shader_type_name(GLenum type);
+
+/**
+ * \todo
+ */
+template<typename Container>
+constexpr typename Container::size_type size_bytes(const Container& container)
+{
+    return container.size() * sizeof(typename Container::value_type);
+}
+
 } // namespace gfx
 } // namespace cs
