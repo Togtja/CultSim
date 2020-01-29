@@ -45,6 +45,9 @@ struct SpriteVertex
     glm::vec2 tex_coord{};
 };
 
+/**
+ * The vertex layout of an instance of a sprite used by the sprite renderer
+ */
 struct SpriteInstanceVertex
 {
     glm::vec3 offset{};
