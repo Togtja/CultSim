@@ -1,6 +1,5 @@
-# Set up GLM, either by finding the package directly, or by fetching it from GitHub
-include(FetchContent)
-message(STATUS "Could not find GLM package so we are getting it from GitHub instead.")
+# Set up GLM by fetching it from GitHub
+message(STATUS "Getting GLM from Github.")
 
 # Declare where to find GLM and what version to use
 FetchContent_Declare(

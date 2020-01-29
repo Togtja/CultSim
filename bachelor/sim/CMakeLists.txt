@@ -1,0 +1,53 @@
+# Create Test Executable to Ensure OpenGL is Working
+
+# Find Libraries to Link With
+find_package(OpenGL REQUIRED)
+find_package(Lua REQUIRED)
+find_package(PhysFS REQUIRED)
+
+# Program Variables
+set(TEAM_NAME g107)
+
+# Define executable
+set(EXEC_NAME cultsim)
+add_executable(${EXEC_NAME})
+
+# Add Source Files
+include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
+
+# Set Include Directories
+target_include_directories(
+    ${EXEC_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${LUA_INCLUDE_DIR}
+    ${PHYSFS_INCLUDE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+# Link with some libraries
+target_link_libraries(
+    ${EXEC_NAME}
+    PRIVATE
+    OpenGL::GL
+    $<$<PLATFORM_ID:Linux>:dl>
+    glad::glad
+    ${PHYSFS_LIBRARY}
+    SDL2main
+    SDL2-static
+    ${LUA_LIBRARIES}
+    sol2::sol2
+    EnTT::EnTT
+    spdlog::spdlog
+    glm::glm
+)
+
+# Zip Resource folder and copy to binary directory so we can mount it with PhysFS
+add_custom_target(
+    cultsim_resource_copy ALL
+    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- *
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
+    DEPENDS cultsim
+    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip
+    COMMENT "Archiving resource files..."
+)

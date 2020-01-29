@@ -1,8 +1,8 @@
 # Set up lua
-include(FetchContent)  
-message(STATUS "Could not find Lua package so getting it")
-
 if(WIN32)
+    include(FetchContent)
+    message(STATUS "Could not find Lua package so getting it")
+
     if(MSVC14)
         FetchContent_Declare(
             lua_external
@@ -31,8 +31,5 @@ if(WIN32)
     #Bad cmake
     set(LUA_INCLUDE_DIR "${CMAKE_BINARY_DIR}/_deps/lua_external-src/include/" CACHE STRING "The path of include of lua")
     set(LUA_LIBRARIES "${CMAKE_BINARY_DIR}/_deps/lua_external-src/lua53.lib" CACHE STRING "The path of lua53.lib")
- 
+
 endif()
-
-
-
