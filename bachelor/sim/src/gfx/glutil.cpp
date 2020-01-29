@@ -1,3 +1,30 @@
+GLuint compile_shader(std::string_view source, GLenum type)
+{
+    /* Must extract c-string to comply with OpenGL interface */
+    const char* source_cstr = source.data();
+    GLuint shader           = glCreateShader(type);
+
+    glShaderSource(shader, 1, &source_cstr, nullptr);
+    glCompileShader(shader);
+
+    /* Check for erros */
+    int err, len;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &err);
+
+    if (!err)
+    {
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+        auto log = std::string(len, '\0');
+
+        glGetShaderInfoLog(shader, len, &len, log.data());
+        spdlog::error("{} shader compile error: %s\n", get_gl_shader_type_name(type).c_str(), log);
+
+        glDeleteShader(shader);
+        return 0;
+    }
+
+    return shader;
+}
 std::string get_gl_shader_type_name(GLenum type)
 {
     switch (type)

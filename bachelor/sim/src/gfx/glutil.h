@@ -4,6 +4,15 @@ namespace cs
 {
 namespace gfx
 {
+/**
+ * Compile a shader from the provided shader source code
+ *
+ * @param source The source code of the shader
+ * @param type The type of the shader
+ * @return OpenGL Name of the newly created shader
+ */
+GLuint compile_shader(std::string_view source, GLenum type);
+
 
 /**
  * Convert a shader type to a human readable string
