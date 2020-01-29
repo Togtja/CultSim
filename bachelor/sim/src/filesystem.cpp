@@ -151,23 +151,34 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new)
         spdlog::warn("the file: {} does not exist", rpath_old);
         return false;
     }
+
     if (rpath_new == rpath_old)
     {
         spdlog::warn("the old path is the same as the new path");
         return false;
     }
 
-    auto data  = read_file(rpath_old);
-    auto bytes = write_file(rpath_new, data.data());
+    const auto data          = read_file(rpath_old);
+    const auto bytes_written = write_file(rpath_new, data.data());
+    spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes_written);
 
-    spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes);
-
-    if (static_cast<uint64_t>(bytes) == data.length())
+    /** Attempt to write entire file contents and handle error if failed */
+    if (static_cast<uint64_t>(bytes_written) == data.length())
     {
         spdlog::info("succesfully copied file");
         return true;
     }
+    /** Error states below */
+    else if (bytes_written >= 0)
+    {
+        if (!delete_file(rpath_new))
+        {
+            spdlog::critical("filesystem corrupted by copy");
+            std::abort();
+        }
+    }
 
+    spdlog::error("could not copy file");
     return false;
 }
 
