@@ -36,6 +36,9 @@ public:
     void run(const std::vector<char*>& args);
 
 private:
+    /**
+     * Process application wide events and delegate the rest to an input manager
+     */
     void handle_input();
 
     void update(float dt);
@@ -44,10 +47,21 @@ private:
 
     bool init(std::vector<char*> args);
 
+    /**
+     * Initialize OpenGL, SDL and the Window
+     */
     bool init_gl();
 
+    /**
+     * Initialize ImGui so we can use it to draw Debug GUI's
+     */
     bool init_imgui();
 
+    /**
+     * Initialize PhysFS' filesystem
+     *
+     * @param args Command line arguments to the program
+     */
     bool init_physfs(std::vector<char*> args);
 
     bool init_lua();
