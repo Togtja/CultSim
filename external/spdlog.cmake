@@ -1,5 +1,4 @@
 # Set up spdlog, either by finding the package directly, or by fetching it from GitHub
-include(FetchContent)
 message(STATUS "Could not find spdlog package so we are getting it from GitHub instead.")
 
 # Declare where to find spdlog and what version to use

@@ -1,3 +1,8 @@
+# Set some FETCH CONTENT variables to ensure we don't over-download content
+
+include(FetchContent)
+set(FETCHCONTENT_QUIET OFF)
+
 # Include All Dependencies
 include(benchmark.cmake)
 include(sol2.cmake)
@@ -9,3 +14,6 @@ include(entt.cmake)
 include(spdlog.cmake)
 include(doctest.cmake)
 include(glm.cmake)
+
+# Set FC to be disconnected so we stop downloading
+set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "This has been reset to ON (set to OFF to download again)" FORCE)

@@ -1,5 +1,4 @@
 # Set up sol2, either by finding the package directly, or by fetching it from GitHub
-include(FetchContent)
 message(STATUS "Could not find PhysFS package so we are downloading it.")
 
 # Declare where to find glfw and what version to use
@@ -11,3 +10,8 @@ FetchContent_Declare(
 
 # Populate it for building
 FetchContent_MakeAvailable(physfs_external)
+
+if(WIN32)
+    set(PHYSFS_LIBRARY ${PROJECT_BINARY_DIR}/_deps/physfs_external-build/physfs.lib CACHE STRING "The path of PhysFS libary")
+    set(PHYSFS_INCLUDE_DIR ${PROJECT_BINARY_DIR}/_deps/physfs_external-src/src CACHE STRING "The path of PhysFS include")
+endif()

@@ -1,6 +1,10 @@
+# Generated files
 build/
+builds/
+
+# IDE Files
 .vs/
 .vscode/
 .idea/
-
+CMakeSettings.json
 CMakeLists.txt.user

@@ -7,8 +7,8 @@
 #include <memory>
 #include <vector>
 
-#include<fstream>
-#include<string>
+#include <fstream>
+#include <string>
 
 #include <SDL.h>
 #include <glad/glad.h>
@@ -38,19 +38,19 @@ const char* fragSource = "#version 450 core\n"
 
 const std::string readGLSLfromFile(const char* relativePath)
 {
-    std::ifstream glsl (relativePath, std::ios::in);
-    if(!glsl.is_open())
+    std::ifstream glsl(relativePath, std::ios::in);
+    if (!glsl.is_open())
     {
-        //Creating an error message
+        // Creating an error message
         std::string errMsg = "failed to find " + std::string(relativePath) + "\n";
         fprintf(stdout, errMsg.c_str());
         return "";
     }
 
-    //reading the file
+    // reading the file
     std::string content;
     std::string line;
-    while(std::getline(glsl, line))
+    while (std::getline(glsl, line))
     {
         content += (line + "\n");
     }
@@ -234,9 +234,9 @@ void initGL(struct vec2i* window_size)
 
     // Create shaders and program
     GLuint shaders[2];
-    std::string vertex = readGLSLfromFile("bachelor/test_exec/src/vertex.vert");
+    std::string vertex   = readGLSLfromFile("bachelor/test_exec/src/vertex.vert");
     std::string fragment = readGLSLfromFile("bachelor/test_exec/src/fragement.frag");
-    if(vertex == "" || fragment == "")
+    if (vertex == "" || fragment == "")
     {
         fprintf(stderr, "Failed to Initialize the vertex or the fragment from file\n");
         exit(EXIT_FAILURE);
@@ -261,38 +261,6 @@ void terminateGL()
     SDL_Quit();
 }
 
-/* Clever Class */
-class VertexBuffer
-{
-private:
-    GLuint vbo = 0u;
-
-public:
-    explicit VertexBuffer(const std::vector<vec2>& data)
-    {
-        glCreateBuffers(1, &vbo);
-        glNamedBufferStorage(vbo, data.size() * sizeof(vec2), data.data(), 0);
-    }
-
-    VertexBuffer(const VertexBuffer& other) = delete;
-    VertexBuffer& operator=(const VertexBuffer& other) = delete;
-
-    ~VertexBuffer() noexcept
-    {
-        glDeleteBuffers(1, &vbo);
-    }
-
-    GLuint get() const
-    {
-        return vbo;
-    }
-};
-
-void process(VertexBuffer& vbo)
-{
-    auto vbo2 = vbo;
-}
-
 /* coreProfile: Minimal OpenGL 4.5 Core Profile demo that uses some key ideas of Direct State Access that
  * was introduced to OpenGL in version 4.5. In particular the glCreateBuffers over glGenBuffers,
  * and the glNamedBufferStroage functions that allow for data transfer without binding buffers,
@@ -307,10 +275,6 @@ int main(int argc, char* argv[])
     std::vector<vec2> vertices         = {{-.5f, -.5f}, {.5f, -.5f}, {.5f, .5f}, {-.5f, .5f}};
     std::vector<unsigned char> indices = {0, 1, 2, 2, 3, 0};
 
-    // Clever Example
-    auto vbo = VertexBuffer(vertices);
-    process(vbo);
-
     // Create VBO and IBO buffers respectively
     GLuint buffers[2];
     glCreateBuffers(2, buffers);
@@ -322,7 +286,7 @@ int main(int argc, char* argv[])
     glCreateVertexArrays(1, &gfxContext.vao);
 
     // Assosciate VAO with the two buffers (vertices and indices)
-    glVertexArrayVertexBuffer(gfxContext.vao, 0, vbo.get(), 0, sizeof(struct vec2));
+    glVertexArrayVertexBuffer(gfxContext.vao, 0, buffers[0], 0, sizeof(struct vec2));
     glVertexArrayElementBuffer(gfxContext.vao, buffers[1]);
 
     // Set attribute 0 to be a 2 component float vector
