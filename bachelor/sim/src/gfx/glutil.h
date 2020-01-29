@@ -13,6 +13,15 @@ namespace gfx
  */
 GLuint compile_shader(std::string_view source, GLenum type);
 
+/**
+ * Compiles a shader from the given file
+ *
+ * @param rpath The relative path to the file which contains the shader source code
+ * @param type The type of the shader
+ * @return OpenGL Name of the newly created shader
+ */
+GLuint fcompile_shader(std::string_view rpath, GLenum type);
+
 
 /**
  * Convert a shader type to a human readable string

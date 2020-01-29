@@ -25,6 +25,18 @@ GLuint compile_shader(std::string_view source, GLenum type)
 
     return shader;
 }
+
+GLuint fcompile_shader(std::string_view rpath, GLenum type)
+{
+    /* Read the file contents */
+    auto source = fs::read_file(rpath);
+
+    /* Use other function to compile the extracted source, then clean up and return */
+    GLuint shader = compile_shader(source.c_str(), type);
+
+    return shader;
+}
+
 std::string get_gl_shader_type_name(GLenum type)
 {
     switch (type)
