@@ -20,7 +20,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
 target_include_directories(
     ${EXEC_NAME}
     PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/src
     ${LUA_INCLUDE_DIR}
     ${PHYSFS_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
