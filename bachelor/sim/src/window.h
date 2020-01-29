@@ -8,7 +8,9 @@
 namespace cs
 {
 /**
- * \todo
+ * A single window with it's own OpenGL context to use with rendering
+ *
+ * @note Always call init before using
  */
 class Window
 {
@@ -25,6 +27,7 @@ public:
 
     /**
      * Get a pointer to the underlying SDL_Window
+     *
      * @return Pointer to the underlying SDL_Window, it could be nullptr if window is not initialized     */
     SDL_Window* get() const;
 
