@@ -104,22 +104,36 @@ bool mkdir(std::string_view rpath)
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 {
+    if (exists(rpath_new))
+    {
+        spdlog::warn("attempt to overwrite file with move");
+        return false;
+    }
+
+    /** Copy old to new and attempt to clean up */
     if (copy_file(rpath_old, rpath_new))
     {
         if (!delete_file(rpath_old))
         {
-            spdlog::error("failed to delete old file during renaming");
+            spdlog::error("failed to delete old file during move");
+
+            /** Attempt to recover by deleting new file to restore file system state */
+            if (!delete_file(rpath_new))
+            {
+                spdlog::critical("failed to delete new files, file system corrupted");
+                std::abort();
+            }
+            return false;
         }
         return true;
     }
 
-    spdlog::error("failed to rename file");
-
+    /** At this point a new file is created, but is incomplete, so delete to restore fs state */
     if (exists(rpath_new))
     {
         if (!delete_file(rpath_new))
         {
-            spdlog::error("failed to delete new file during renaming");
+            spdlog::error("failed to delete new file during move");
         }
     }
     return false;
