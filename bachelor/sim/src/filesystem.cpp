@@ -141,7 +141,7 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 
 bool delete_file(std::string_view rpath)
 {
-    return PHYSFS_delete(rpath.data());
+    return static_cast<bool>(PHYSFS_delete(rpath.data()));
 }
 
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new)
