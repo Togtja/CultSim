@@ -10,21 +10,6 @@ namespace cs
 namespace gfx
 {
 /**
- * The vertex layout of a sprite used by the sprite renderer
- */
-struct SpriteVertex
-{
-    glm::vec2 pos{};
-    glm::vec2 tex_coord{};
-};
-
-struct SpriteInstanceVertex
-{
-    glm::vec3 offset{};
-    glm::vec3 color{};
-};
-
-/**
  * Describes how to look up what texture to use for a sprite in the rendering system
  */
 struct SpriteTextureID
@@ -49,6 +34,22 @@ struct SpriteTextureID
 
     /** Unspecified flag */
     uint16_t flag_c : 1;
+};
+
+/**
+ * The vertex layout of a sprite used by the sprite renderer
+ */
+struct SpriteVertex
+{
+    glm::vec2 pos{};
+    glm::vec2 tex_coord{};
+};
+
+struct SpriteInstanceVertex
+{
+    glm::vec3 offset{};
+    glm::vec3 color{};
+    SpriteTextureID texture{};
 };
 
 } // namespace gfx
