@@ -1,0 +1,17 @@
+/**
+ * This file is configured by CMake
+ */
+
+#include <string_view>
+
+/* Do not remove this line as it will break the file */
+/* clang-format off */
+
+constexpr std::string_view PROGRAM_TEAM = "@TEAM_NAME@";
+constexpr std::string_view PROGRAM_NAME = "@EXEC_NAME@";
+
+constexpr int PROGRAM_VERSION_MAJOR     = @PROJECT_VERSION_MAJOR@;
+constexpr int PROGRAM_VERSION_MINOR     = @PROJECT_VERSION_MINOR@;
+constexpr int PROGRAM_VERSION_PATCH     = @PROJECT_VERSION_PATCH@;
+
+/* clang-format on */

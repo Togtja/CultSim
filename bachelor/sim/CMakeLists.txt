@@ -5,6 +5,9 @@ find_package(OpenGL REQUIRED)
 find_package(Lua REQUIRED)
 find_package(PhysFS REQUIRED)
 
+# Program Variables
+set(TEAM_NAME g107)
+
 # Define executable
 set(EXEC_NAME cultsim)
 add_executable(${EXEC_NAME})
@@ -19,6 +22,7 @@ target_include_directories(
     ${CMAKE_CURRENT_LIST_DIR}/include
     ${LUA_INCLUDE_DIR}
     ${PHYSFS_INCLUDE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Link with some libraries

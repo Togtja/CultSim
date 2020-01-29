@@ -14,3 +14,10 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.h
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.cpp
 )
+
+# Configure file with CMake Variables
+
+configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/constants.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/constants.h
+)

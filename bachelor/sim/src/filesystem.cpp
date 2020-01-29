@@ -1,4 +1,5 @@
 #include "filesystem.h"
+#include "constants.h"
 
 #include <physfs.h>
 #include <spdlog/spdlog.h>
@@ -15,12 +16,9 @@ bool init(std::string_view project_name)
         return false;
     }
 
-    char p_name[] = "cultsim";
-    char g_name[] = "g107";
+    PHYSFS_setWriteDir(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()));
 
-    PHYSFS_setWriteDir(PHYSFS_getPrefDir(g_name, p_name));
-
-    PHYSFS_mount(PHYSFS_getPrefDir(g_name, p_name), nullptr, 1);
+    PHYSFS_mount(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()), nullptr, 1);
     PHYSFS_mount("data.zip", nullptr, 1);
 
     return true;
@@ -51,6 +49,7 @@ std::string read_file(std::string_view rpath)
 
     std::string ret(PHYSFS_fileLength(file), '\0');
     auto read_bytes = PHYSFS_readBytes(file, ret.data(), ret.length());
+
     if (read_bytes == 0)
     {
         spdlog::warn("the file: {} is empty", rpath);
@@ -59,6 +58,7 @@ std::string read_file(std::string_view rpath)
     {
         spdlog::error("the file: {} failed to read with error: {}", rpath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
+
     PHYSFS_close(file);
     return ret;
 }
@@ -77,6 +77,7 @@ int64_t write_file(std::string_view rpath, const std::string& data)
         spdlog::warn("could not write to {}", rpath);
         return -1;
     }
+
     auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
     if (write_bytes == 0)
     {
@@ -86,6 +87,7 @@ int64_t write_file(std::string_view rpath, const std::string& data)
     {
         spdlog::error("the file: {} failed to write with error: {}", rpath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
+
     PHYSFS_close(file);
     return write_bytes;
 }
