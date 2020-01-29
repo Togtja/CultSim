@@ -15,8 +15,6 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.cpp
 )
 
-include(${CMAKE_CURRENT_LIST_DIR}/gfx/CMakeLists.txt)
-
 # Configure file with CMake Variables
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/constants.h.in

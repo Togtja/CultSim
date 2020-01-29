@@ -10,5 +10,4 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.h
     ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.cpp
-
 )

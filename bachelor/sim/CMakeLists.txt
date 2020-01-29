@@ -14,6 +14,7 @@ add_executable(${EXEC_NAME})
 
 # Add Source Files
 include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
 
 # Set Include Directories
 target_include_directories(
