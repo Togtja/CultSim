@@ -144,7 +144,7 @@ bool delete_file(std::string_view rpath)
     return static_cast<bool>(PHYSFS_delete(rpath.data()));
 }
 
-bool copy_file(std::string_view rpath_old, std::string_view rpath_new)
+bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing)
 {
     if (!exists(rpath_old))
     {
@@ -155,6 +155,12 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new)
     if (rpath_new == rpath_old)
     {
         spdlog::warn("the old path is the same as the new path");
+        return false;
+    }
+
+    if (!overwrite_existing && exists(rpath_new))
+    {
+        spdlog::warn("refused to overwrite existing file: {}", rpath_new);
         return false;
     }
 
