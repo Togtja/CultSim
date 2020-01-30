@@ -94,10 +94,13 @@ SpriteRenderer::SpriteRenderer()
     glVertexArrayElementBuffer(m_vao, m_vbo);
     /** VERTEX FORMAT SETUP */
 }
-void SpriteRenderer::draw(glm::vec3 pos)
+
+void SpriteRenderer::clear()
 {
-    m_instance_data[0] = SpriteInstanceVertex{pos, glm::vec3{0, 1, 0}};
-    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex));
+    memset(m_instance_data, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
+    m_nsprites = 0u;
+}
+
 
 void SpriteRenderer::display()
 {

@@ -25,6 +25,9 @@ private:
 
 public:
     SpriteRenderer();
+
+    void clear();
+
     /**
      * TODO: this
      *
