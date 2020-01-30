@@ -62,17 +62,27 @@ SpriteRenderer::SpriteRenderer()
     /** Create VAO */
     glCreateVertexArrays(1, &m_vao);
 
+    /** Format VAO*/
     glVertexArrayAttribFormat(m_vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, pos));
     glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, tex_coord));
     glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, offset));
     glVertexArrayAttribFormat(m_vao, 3, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, color));
     glVertexArrayAttribIFormat(m_vao, 4, 1, GL_UNSIGNED_INT, offsetof(SpriteInstanceVertex, texture));
 
+    /** Binding VAO*/
     glVertexArrayAttribBinding(m_vao, 0, 0);
     glVertexArrayAttribBinding(m_vao, 1, 0);
     glVertexArrayAttribBinding(m_vao, 2, 1);
     glVertexArrayAttribBinding(m_vao, 3, 1);
     glVertexArrayAttribBinding(m_vao, 4, 1);
+
+    glVertexArrayBindingDivisor(m_vao, 1, 1);
+
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glEnableVertexArrayAttrib(m_vao, 1);
+    glEnableVertexArrayAttrib(m_vao, 2);
+    glEnableVertexArrayAttrib(m_vao, 3);
+    glEnableVertexArrayAttrib(m_vao, 4);
 
     /** VERTEX FORMAT SETUP */
 }
