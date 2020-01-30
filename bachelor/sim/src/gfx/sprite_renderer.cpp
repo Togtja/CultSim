@@ -44,8 +44,8 @@ SpriteRenderer::SpriteRenderer()
 
     /** Copy static sprite data to separate vbo */
     std::vector<uint8_t> transfer_data(size_bytes(quad) + size_bytes(indices));
-    memcpy(transfer_data.data(), quad.data(), size_bytes(quad));
-    memcpy(transfer_data.data() + size_bytes(quad), indices.data(), size_bytes(indices));
+    memcpy(transfer_data.data(), indices.data(), size_bytes(indices));
+    memcpy(transfer_data.data() + size_bytes(indices), quad.data(), size_bytes(quad));
 
     glNamedBufferStorage(m_vbo, size_bytes(quad) + size_bytes(indices), transfer_data.data(), 0);
 
@@ -84,6 +84,10 @@ SpriteRenderer::SpriteRenderer()
     glEnableVertexArrayAttrib(m_vao, 3);
     glEnableVertexArrayAttrib(m_vao, 4);
 
+    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, size_bytes(indices), sizeof(SpriteVertex));
+    glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
+
+    glVertexArrayElementBuffer(m_vao, m_vbo);
     /** VERTEX FORMAT SETUP */
 }
 
