@@ -1,18 +1,22 @@
+
 #include "application.h"
+#include "clock.h"
 #include "filesystem.h"
 
 namespace cs
 {
 void Application::run(const std::vector<char*>& args)
 {
+    auto current_time = 0.f;
     init(args);
 
     /* Main Loop */
-    while (true)
+    while (m_running)
     {
         /* Pseudo Code at the moment, must capture delta time etc. */
         handle_input();
-        update(0.1666);
+        update(get_current_time() - current_time);
+        current_time += get_current_time();
         draw();
     }
 
@@ -28,7 +32,7 @@ void Application::handle_input()
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
             /* TODO: Do not abort */
-            std::abort();
+            m_running = false;
         }
     }
 }

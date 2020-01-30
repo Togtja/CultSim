@@ -1,6 +1,8 @@
 #include "glutil.h"
 #include "filesystem.h"
 
+#include <chrono>
+
 #include <spdlog/spdlog.h>
 
 namespace cs
