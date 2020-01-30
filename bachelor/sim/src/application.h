@@ -29,6 +29,8 @@ private:
 
     entt::dispatcher m_event_bus{};
 
+    bool m_running = true;
+
 public:
     /**
      * Run the application, starting the main loop until a crash or normal shutdown
