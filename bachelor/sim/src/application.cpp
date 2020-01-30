@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "filesystem.h"
 #include "gfx/sprite_renderer.h"
+#include "gfx/glutil.h"
 
 namespace cs
 {
@@ -21,12 +22,12 @@ void Application::run(const std::vector<char*>& args)
         auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count();
         lag += elapsed;
 
-        /* Pseudo Code at the moment, must capture delta time etc. */
         handle_input();
 
+        /** TODO: Let the frame rate be set in preferences / options menu */
         while (lag >= SEC_PER_LOOP)
         {
-            update(std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count());
+            update(SEC_PER_LOOP);
             lag -= SEC_PER_LOOP;
         }
 
@@ -92,6 +93,10 @@ bool Application::init_gl()
         spdlog::error("failed to initialize glad");
         return false;
     }
+
+#ifndef NDEBUG
+    gfx::create_debug_callback();
+#endif
 
     return true;
 }

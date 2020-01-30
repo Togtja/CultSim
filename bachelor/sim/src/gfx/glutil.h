@@ -45,6 +45,11 @@ GLuint create_program(const std::vector<GLuint>& shaders);
 std::string get_gl_shader_type_name(GLenum type);
 
 /**
+ * Set up a default OpenGL Debug callback for error handling
+ */
+void create_debug_callback();
+
+/**
  * \todo
  */
 template<typename Container>
