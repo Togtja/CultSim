@@ -2,6 +2,7 @@
 #include <chrono>
 
 #include "application.h"
+#include "constants.h"
 #include "filesystem.h"
 #include "gfx/sprite_renderer.h"
 
@@ -10,15 +11,24 @@ namespace cs
 void Application::run(const std::vector<char*>& args)
 {
     auto current_time = std::chrono::steady_clock::now();
+    auto lag          = 0.f;
 
     init(args);
 
     /* Main Loop */
     while (m_running)
     {
+        auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count();
+        lag += elapsed;
+
         /* Pseudo Code at the moment, must capture delta time etc. */
         handle_input();
-        update(std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count());
+
+        while (lag >= SEC_PER_LOOP)
+        {
+            update(std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count());
+            lag -= SEC_PER_LOOP;
+        }
 
         current_time = std::chrono::steady_clock::now();
 
