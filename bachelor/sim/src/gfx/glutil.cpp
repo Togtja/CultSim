@@ -98,5 +98,35 @@ std::string get_gl_shader_type_name(GLenum type)
     }
 }
 
+#ifndef WIN32
+#    define APIENTRY
+#endif
+static void APIENTRY gl_debug_callback(GLenum source,
+                                       GLenum type,
+                                       GLuint id,
+                                       GLenum severity,
+                                       GLsizei length,
+                                       const GLchar* message,
+                                       const void* userParam)
+{
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_LOW: spdlog::debug(message); break;
+        case GL_DEBUG_SEVERITY_MEDIUM: spdlog::warn(message); break;
+        default: spdlog::error(message); break;
+    }
+}
+
+void create_debug_callback()
+{
+    glDebugMessageCallback(gl_debug_callback, nullptr);
+
+    /* Only enable LOW -> HIGH priority debug messages. Ignore Notifications */
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_HIGH, 0, nullptr, true);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_MEDIUM, 0, nullptr, true);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_LOW, 0, nullptr, true);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
+}
+
 } // namespace gfx
 } // namespace cs

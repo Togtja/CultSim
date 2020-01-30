@@ -3,6 +3,7 @@
 #include "clock.h"
 #include "filesystem.h"
 #include "gfx/sprite_renderer.h"
+#include "gfx/glutil.h"
 
 namespace cs
 {
@@ -78,6 +79,10 @@ bool Application::init_gl()
         spdlog::error("failed to initialize glad");
         return false;
     }
+
+#ifndef NDEBUG
+    gfx::create_debug_callback();
+#endif
 
     return true;
 }
