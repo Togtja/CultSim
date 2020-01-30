@@ -7,7 +7,7 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/imgui.h
     ${CMAKE_CURRENT_LIST_DIR}/imgui.cpp
 
-    ${CMAKE_CURRENT_LIST_DIR}/imgui_demo.h
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_demo.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/imgui_draw.cpp
 
