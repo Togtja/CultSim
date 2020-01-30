@@ -162,7 +162,7 @@ bool Application::init_imgui()
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init("#version 450");
+    ImGui_ImplOpenGL3_Init("#version 450 core");
 
     // TODO: change true to false, also make the function
     return true;
