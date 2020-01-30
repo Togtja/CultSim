@@ -57,7 +57,11 @@ SpriteRenderer::SpriteRenderer()
                          GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
     /** Acquire pointer to GPU memory so we can write sprite instance data to it later */
-    m_instance_data = static_cast<SpriteInstanceVertex*>(glMapNamedBuffer(m_ivbo, GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
+    m_instance_data = static_cast<SpriteInstanceVertex*>(
+        glMapNamedBufferRange(m_ivbo,
+                              0,
+                              sizeof(SpriteInstanceVertex) * SIM_MAX_AGENTS,
+                              GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT | GL_MAP_PERSISTENT_BIT));
 
     /** Create VAO */
     glCreateVertexArrays(1, &m_vao);
