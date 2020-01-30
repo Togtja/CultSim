@@ -27,5 +27,20 @@ public:
     void handle_input(const SDL_Scancode event);
     ~InputHandler();
 };
+
+class ContextHandler
+{
+private:
+    std::vector<KeyContext> m_active_stack;
+    std::map<KeyContext, InputHandler> m_input_map;
+
+public:
+    ContextHandler();
+    void add_context(KeyContext context);
+    void remove_context(KeyContext context);
+    void bind_key(KeyContext context, const SDL_Scancode event, const std::function<void()> function);
+    void unbind_key(KeyContext context, const SDL_Scancode event);
+    void handle_input(const SDL_Scancode event);
+};
 } // namespace input
 } // namespace cs
