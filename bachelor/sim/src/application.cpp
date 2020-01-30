@@ -93,7 +93,6 @@ void Application::handle_input()
         if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            /* TODO: Do not abort */
             m_running = false;
         }
     }
