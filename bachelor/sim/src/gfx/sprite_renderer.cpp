@@ -44,8 +44,8 @@ SpriteRenderer::SpriteRenderer()
 
     /** Copy static sprite data to separate vbo */
     std::vector<uint8_t> transfer_data(size_bytes(quad) + size_bytes(indices));
-    memcpy(transfer_data.data(), quad.data(), size_bytes(quad));
-    memcpy(transfer_data.data() + size_bytes(quad), indices.data(), size_bytes(indices));
+    memcpy(transfer_data.data(), indices.data(), size_bytes(indices));
+    memcpy(transfer_data.data() + size_bytes(indices), quad.data(), size_bytes(quad));
 
     glNamedBufferStorage(m_vbo, size_bytes(quad) + size_bytes(indices), transfer_data.data(), 0);
 
@@ -57,14 +57,50 @@ SpriteRenderer::SpriteRenderer()
                          GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
 
     /** Acquire pointer to GPU memory so we can write sprite instance data to it later */
-    m_instance_data = static_cast<SpriteInstanceVertex*>(glMapNamedBuffer(m_ivbo, GL_MAP_WRITE_BIT));
+    m_instance_data = static_cast<SpriteInstanceVertex*>(glMapNamedBuffer(m_ivbo, GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 
     /** Create VAO */
     glCreateVertexArrays(1, &m_vao);
 
+    /** Format VAO*/
+    glVertexArrayAttribFormat(m_vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, pos));
+    glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, tex_coord));
+    glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, offset));
+    glVertexArrayAttribFormat(m_vao, 3, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, color));
+    glVertexArrayAttribIFormat(m_vao, 4, 1, GL_UNSIGNED_INT, offsetof(SpriteInstanceVertex, texture));
+
+    /** Binding VAO*/
+    glVertexArrayAttribBinding(m_vao, 0, 0);
+    glVertexArrayAttribBinding(m_vao, 1, 0);
+    glVertexArrayAttribBinding(m_vao, 2, 1);
+    glVertexArrayAttribBinding(m_vao, 3, 1);
+    glVertexArrayAttribBinding(m_vao, 4, 1);
+
+    glVertexArrayBindingDivisor(m_vao, 1, 1);
+
+    glEnableVertexArrayAttrib(m_vao, 0);
+    glEnableVertexArrayAttrib(m_vao, 1);
+    glEnableVertexArrayAttrib(m_vao, 2);
+    glEnableVertexArrayAttrib(m_vao, 3);
+    glEnableVertexArrayAttrib(m_vao, 4);
+
+    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, size_bytes(indices), sizeof(SpriteVertex));
+    glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
+
+    glVertexArrayElementBuffer(m_vao, m_vbo);
     /** VERTEX FORMAT SETUP */
 }
+void SpriteRenderer::draw(glm::vec3 pos)
+{
+    m_instance_data[0] = SpriteInstanceVertex{pos, glm::vec3{0, 1, 0}};
+    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex));
 
+    glUseProgram(m_shader);
+
+    glBindVertexArray(m_vao);
+
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, 1);
+}
 } // namespace gfx
 
 } // namespace cs
