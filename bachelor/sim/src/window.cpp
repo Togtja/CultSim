@@ -87,7 +87,7 @@ void Window::deinit() noexcept
     }
 }
 
-void Window::get_context() const
+SDL_GLContext Window::get_context() const
 {
     return m_context;
 }
