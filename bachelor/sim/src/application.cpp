@@ -1,11 +1,15 @@
 
-#include <chrono>
-
 #include "application.h"
 #include "constants.h"
 #include "filesystem.h"
-#include "gfx/sprite_renderer.h"
 #include "gfx/glutil.h"
+#include "gfx/sprite_renderer.h"
+
+#include <chrono>
+
+#include "gfx/ImGUI/imgui.h"
+#include "gfx/ImGUI/imgui_impl_opengl3.h"
+#include "gfx/ImGUI/imgui_impl_sdl.h"
 
 namespace cs
 {
@@ -31,6 +35,15 @@ void Application::run(const std::vector<char*>& args)
             lag -= SEC_PER_LOOP;
         }
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(m_window.get());
+        ImGui::NewFrame();
+        {
+            ImGui::Begin("TEST", NULL, ImGuiWindowFlags_NoResize);
+
+            ImGui::End();
+        }
+
         current_time = std::chrono::steady_clock::now();
 
         draw();
@@ -47,7 +60,6 @@ void Application::handle_input()
         if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            /* TODO: Do not abort */
             m_running = false;
         }
     }
@@ -59,9 +71,11 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    static gfx::SpriteRenderer sp_r;
     m_window.clear();
-    sp_r.draw({0, 0, 0});
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     m_window.display();
 }
 
@@ -103,6 +117,19 @@ bool Application::init_gl()
 
 bool Application::init_imgui()
 {
+    // Set up Context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    // Set up Style
+    ImGui::StyleColorsDark();
+
+    // Set up Platform & renderer Bindings
+    ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
+    ImGui_ImplOpenGL3_Init("#version 450 core");
+
     // TODO: change true to false, also make the function
     return true;
 }
@@ -167,6 +194,9 @@ void Application::deinit_physfs()
 
 void Application::deinit_imgui()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Application::deinit_gl()

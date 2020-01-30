@@ -92,19 +92,27 @@ SpriteRenderer::SpriteRenderer()
     glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
 
     glVertexArrayElementBuffer(m_vao, m_vbo);
-    /** VERTEX FORMAT SETUP */
 }
-void SpriteRenderer::draw(glm::vec3 pos)
+
+void SpriteRenderer::clear()
 {
-    m_instance_data[0] = SpriteInstanceVertex{pos, glm::vec3{0, 1, 0}};
-    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex));
-
-    glUseProgram(m_shader);
-
-    glBindVertexArray(m_vao);
-
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, 1);
+    memset(m_instance_data, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
+    m_nsprites = 0u;
 }
+
+void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
+{
+    m_instance_data[m_nsprites++] = {pos, color, tex};
+}
+
+void SpriteRenderer::display()
+{
+    glUseProgram(m_shader);
+    glBindVertexArray(m_vao);
+    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
+}
+
 } // namespace gfx
 
 } // namespace cs

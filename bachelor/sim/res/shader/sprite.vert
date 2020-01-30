@@ -20,5 +20,5 @@ void main()
     out_texcoord = a_texcoord;
     out_texture  = a_texture;
 
-    gl_Position = vec4(a_position, 0.f, 1.f);
+    gl_Position = vec4(a_position, 0.f, 1.f) + vec4(a_offset, 0.f);
 }
