@@ -99,12 +99,14 @@ void SpriteRenderer::draw(glm::vec3 pos)
     m_instance_data[0] = SpriteInstanceVertex{pos, glm::vec3{0, 1, 0}};
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex));
 
+void SpriteRenderer::display()
+{
     glUseProgram(m_shader);
-
     glBindVertexArray(m_vao);
-
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, 1);
+    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 }
+
 } // namespace gfx
 
 } // namespace cs

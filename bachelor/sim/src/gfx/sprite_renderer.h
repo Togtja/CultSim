@@ -30,6 +30,8 @@ public:
      *
      */
     void draw(glm::vec3 pos);
+
+    void display();
 };
 
 } // namespace gfx
