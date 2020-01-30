@@ -1,11 +1,15 @@
 
-#include <chrono>
-
 #include "application.h"
 #include "constants.h"
 #include "filesystem.h"
-#include "gfx/sprite_renderer.h"
 #include "gfx/glutil.h"
+#include "gfx/sprite_renderer.h"
+
+#include <chrono>
+
+#include "gfx/ImGUI/imgui.h"
+#include "gfx/ImGUI/imgui_impl_opengl3.h"
+#include "gfx/ImGUI/imgui_impl_sdl.h"
 
 namespace cs
 {
@@ -31,9 +35,53 @@ void Application::run(const std::vector<char*>& args)
             lag -= SEC_PER_LOOP;
         }
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(m_window.get());
+        ImGui::NewFrame();
+        {
+            static int counter = 0;
+            // get the window size as a base for calculating widgets geometry
+            int sdl_width = 0, sdl_height = 0, controls_width = 0;
+            SDL_GetWindowSize(m_window.get(), &sdl_width, &sdl_height);
+            controls_width = sdl_width;
+            // make controls widget width to be 1/3 of the main window width
+            if ((controls_width /= 3) < 300)
+            {
+                controls_width = 300;
+            }
+
+            // position the controls widget in the top-right corner with some margin
+            ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_Always);
+            // here we set the calculated width and also make the height to be
+            // be the height of the main window also with some margin
+            ImGui::SetNextWindowSize(ImVec2(static_cast<float>(controls_width), static_cast<float>(sdl_height - 20)),
+                                     ImGuiCond_Always);
+            // create a window and append into it
+            ImGui::Begin("Controls", NULL, ImGuiWindowFlags_NoResize);
+
+            ImGui::Dummy(ImVec2(0.0f, 1.0f));
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "Platform");
+            ImGui::Text("%s", SDL_GetPlatform());
+            ImGui::Text("CPU cores: %d", SDL_GetCPUCount());
+            ImGui::Text("RAM: %.2f GB", SDL_GetSystemRAM() / 1024.0f);
+
+            // buttons and most other widgets return true when clicked/edited/activated
+            if (ImGui::Button("Counter button"))
+            {
+                std::cout << "counter button clicked\n";
+                counter++;
+            }
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::End();
+        }
+
         current_time = std::chrono::steady_clock::now();
 
         draw();
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     deinit();
@@ -59,9 +107,7 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    static gfx::SpriteRenderer sp_r;
     m_window.clear();
-    sp_r.draw({0, 0, 0});
     m_window.display();
 }
 
@@ -103,6 +149,19 @@ bool Application::init_gl()
 
 bool Application::init_imgui()
 {
+    // Set up Context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    // Set up Style
+    ImGui::StyleColorsDark();
+
+    // Set up Platform & renderer Bindings
+    ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
+    ImGui_ImplOpenGL3_Init("#version 450");
+
     // TODO: change true to false, also make the function
     return true;
 }
@@ -167,6 +226,9 @@ void Application::deinit_physfs()
 
 void Application::deinit_imgui()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Application::deinit_gl()
