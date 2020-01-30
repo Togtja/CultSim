@@ -92,7 +92,6 @@ SpriteRenderer::SpriteRenderer()
     glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
 
     glVertexArrayElementBuffer(m_vao, m_vbo);
-    /** VERTEX FORMAT SETUP */
 }
 
 void SpriteRenderer::clear()
@@ -101,6 +100,10 @@ void SpriteRenderer::clear()
     m_nsprites = 0u;
 }
 
+void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
+{
+    m_instance_data[m_nsprites++] = {pos, color, tex};
+}
 
 void SpriteRenderer::display()
 {

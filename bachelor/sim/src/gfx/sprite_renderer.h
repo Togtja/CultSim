@@ -21,7 +21,11 @@ private:
 
     uint32_t m_shader{};
 
+    /** Pointer to GPU memory where the instance variables are */
     SpriteInstanceVertex* m_instance_data{};
+
+    /** Current number of sprites about to be drawn */
+    uint32_t m_nsprites = 0u;
 
 public:
     SpriteRenderer();
@@ -29,10 +33,9 @@ public:
     void clear();
 
     /**
-     * TODO: this
      *
      */
-    void draw(glm::vec3 pos);
+    void draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex);
 
     void display();
 };
