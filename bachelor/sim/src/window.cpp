@@ -86,4 +86,9 @@ void Window::deinit() noexcept
         SDL_DestroyWindow(m_window);
     }
 }
+
+void Window::get_context() const
+{
+    return m_context;
+}
 } // namespace cs
