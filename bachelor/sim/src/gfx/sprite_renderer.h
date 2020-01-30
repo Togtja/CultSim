@@ -25,6 +25,11 @@ private:
 
 public:
     SpriteRenderer();
+    /**
+     * TODO: this
+     *
+     */
+    void draw(glm::vec3 pos);
 };
 
 } // namespace gfx

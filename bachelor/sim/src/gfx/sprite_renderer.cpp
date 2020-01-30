@@ -90,7 +90,12 @@ SpriteRenderer::SpriteRenderer()
     glVertexArrayElementBuffer(m_vao, m_vbo);
     /** VERTEX FORMAT SETUP */
 }
-
+void SpriteRenderer::draw(glm::vec3 pos)
+{
+    m_instance_data[0] = SpriteInstanceVertex{pos, glm::vec3{0, 1, 0}};
+    glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex));
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, 1);
+}
 } // namespace gfx
 
 } // namespace cs
