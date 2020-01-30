@@ -1,13 +1,15 @@
 
+#include <chrono>
+
 #include "application.h"
-#include "clock.h"
 #include "filesystem.h"
 
 namespace cs
 {
 void Application::run(const std::vector<char*>& args)
 {
-    auto current_time = 0.f;
+    auto current_time = std::chrono::steady_clock::now();
+
     init(args);
 
     /* Main Loop */
@@ -15,8 +17,10 @@ void Application::run(const std::vector<char*>& args)
     {
         /* Pseudo Code at the moment, must capture delta time etc. */
         handle_input();
-        update(get_current_time() - current_time);
-        current_time += get_current_time();
+        update(std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count());
+
+        current_time = std::chrono::steady_clock::now();
+
         draw();
     }
 
