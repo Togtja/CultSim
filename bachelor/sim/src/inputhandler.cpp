@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "spdlog.h"
+#include <spdlog/spdlog.h>
 
 namespace cs
 {
@@ -79,7 +79,19 @@ void ContextHandler::remove_context(KeyContext context)
 
 void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, const std::function<void()> function)
 {
-    m_input_map[context].bind_key(event, function);
+    auto input_it = m_input_map.find(context);
+    if (input_it != m_input_map.end())
+    {
+        // Get by reference, right?
+        auto input = m_input_map.at(context);
+        input.bind_key(event, function);
+    }
+    else
+    {
+        InputHandler new_input{context};
+        new_input.bind_key(event, function);
+        m_input_map.insert({context, new_input});
+    }
 }
 } // namespace input
 } // namespace cs
