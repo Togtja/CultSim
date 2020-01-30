@@ -1,5 +1,6 @@
 #include "application.h"
 #include "filesystem.h"
+#include "gfx/sprite_renderer.h"
 
 namespace cs
 {
@@ -39,8 +40,9 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    static gfx::SpriteRenderer sp_r;
     m_window.clear();
-
+    sp_r.draw({0, 0, 0});
     m_window.display();
 }
 
