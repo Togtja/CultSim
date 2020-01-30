@@ -95,6 +95,8 @@
 #endif
 #endif
 
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+
 // GL includes
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
