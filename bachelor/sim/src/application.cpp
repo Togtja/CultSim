@@ -80,8 +80,6 @@ void Application::run(const std::vector<char*>& args)
         current_time = std::chrono::steady_clock::now();
 
         draw();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     deinit();
@@ -108,6 +106,10 @@ void Application::update(float dt)
 void Application::draw()
 {
     m_window.clear();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     m_window.display();
 }
 
