@@ -38,11 +38,8 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
-        {
-            ImGui::Begin("TEST", NULL, ImGuiWindowFlags_NoResize);
 
-            ImGui::End();
-        }
+        ImGui::Text("FPS: %6.3f", ImGui::GetIO().Framerate);
 
         current_time = std::chrono::steady_clock::now();
 
@@ -71,7 +68,17 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    static gfx::SpriteRenderer r{};
     m_window.clear();
+    r.clear();
+
+    constexpr float nspr = 10'000;
+    for (int i = 0; i < nspr; ++i)
+    {
+        r.draw({(i - nspr) / (float)nspr, 0.f, 0.f}, {i / (float)nspr, 0.2f, 0.2f}, {});
+    }
+
+    r.display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
