@@ -25,6 +25,21 @@ void InputHandler::bind_key(const SDL_Scancode event, const std::function<void()
         spdlog::debug("this context (id: {}) already has a binding for this event ({})", m_context_type, event);
     }
 }
+
+void InputHandler::handle_input(const SDL_Scancode event)
+{
+    auto key_it = m_key_binding.find(event);
+    if (key_it != m_key_binding.end())
+    {
+        // Call the function the event maps to
+        m_key_binding.at(event)();
+    }
+    else
+    {
+        spdlog::debug("keybinding does not exist from before");
+    }
+}
+
 InputHandler::~InputHandler()
 {
 }
