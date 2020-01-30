@@ -46,7 +46,7 @@ target_link_libraries(
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
     cultsim_resource_copy ALL
-    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- *
+    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
     DEPENDS cultsim
     BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip
