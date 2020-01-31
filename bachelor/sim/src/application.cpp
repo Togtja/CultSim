@@ -1,4 +1,3 @@
-
 #include "application.h"
 #include "constants.h"
 #include "filesystem.h"
