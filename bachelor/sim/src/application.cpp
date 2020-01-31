@@ -72,11 +72,19 @@ void Application::draw()
     m_window.clear();
     r.clear();
 
+    auto time            = SDL_GetTicks();
     constexpr float nspr = 1'000'000;
-    for (int i = 0; i < nspr; ++i)
+    for (int i = 0; i < std::sqrt(nspr) - 1; ++i)
     {
-        auto ratio = i / nspr;
-        r.draw({ratio * 500.f, ratio * -360.f, 0.f}, {ratio, 1.f - ratio, 0.2f}, {});
+        auto xratio = i / std::sqrt(nspr);
+
+        for (int j = 0; j < std::sqrt(nspr) - 1; ++j)
+        {
+            auto yratio = j / std::sqrt(nspr);
+            r.draw({-640.f + xratio * 1280.f, -360.f + yratio * 720.f, 0.f},
+                   {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
+                   {});
+        }
     }
 
     r.display();
