@@ -7,6 +7,9 @@
 
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace cs
 {
@@ -21,6 +24,12 @@ SpriteRenderer::SpriteRenderer()
 
     glDeleteShader(vertex_shader);
     glDeleteShader(frag_shader);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     if (!static_cast<bool>(m_shader))
     {
@@ -92,6 +101,12 @@ SpriteRenderer::SpriteRenderer()
     glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
 
     glVertexArrayElementBuffer(m_vao, m_vbo);
+
+    glUseProgram(m_shader);
+    glBindVertexArray(m_vao);
+
+    auto proj = glm::ortho(-640.f, 640.f, -360.f, 360.f);
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
 void SpriteRenderer::clear()
@@ -106,9 +121,9 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
-    glUseProgram(m_shader);
-    glBindVertexArray(m_vao);
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
+    glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
+
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 }
 

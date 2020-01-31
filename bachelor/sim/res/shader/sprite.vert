@@ -14,11 +14,13 @@ layout(location = 0) out vec3 out_color;
 layout(location = 1) out vec2 out_texcoord;
 layout(location = 2) out uint out_texture;
 
+layout(location = 0) uniform mat4 u_projection;
+
 void main()
 {
     out_color    = a_color;
     out_texcoord = a_texcoord;
     out_texture  = a_texture;
 
-    gl_Position = vec4(a_position, 0.f, 1.f) + vec4(a_offset, 0.f);
+    gl_Position = u_projection * (vec4(a_position * 10.f, 0.f, 1.f) + vec4(a_offset, 0.f));
 }

@@ -39,7 +39,7 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
 
-        ImGui::Text("FPS: %6.3f", ImGui::GetIO().Framerate);
+        ImGui::Text("FPS: %6.3f", 1.f / elapsed);
 
         current_time = std::chrono::steady_clock::now();
 
@@ -72,10 +72,11 @@ void Application::draw()
     m_window.clear();
     r.clear();
 
-    constexpr float nspr = 10'000;
+    constexpr float nspr = 1'000'000;
     for (int i = 0; i < nspr; ++i)
     {
-        r.draw({(i - nspr) / (float)nspr, 0.f, 0.f}, {i / (float)nspr, 0.2f, 0.2f}, {});
+        auto ratio = i / nspr;
+        r.draw({ratio * 500.f, ratio * -360.f, 0.f}, {ratio, 1.f - ratio, 0.2f}, {});
     }
 
     r.display();
