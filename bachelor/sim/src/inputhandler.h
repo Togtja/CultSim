@@ -76,6 +76,11 @@ public:
     void remove_context(KeyContext context);
 
     /**
+     * Remove the top context from the context stack
+     */
+    void remove_context();
+
+    /**
      * Bind context to a key, and that key to a function
      *
      * @param context The context you want to bind a key for

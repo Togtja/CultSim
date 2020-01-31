@@ -85,6 +85,11 @@ void ContextHandler::remove_context(KeyContext context)
     }
 }
 
+void ContextHandler::remove_context()
+{
+    m_active_stack.pop_back();
+}
+
 void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, const std::function<void()> function)
 {
     auto input_it = m_input_map.find(context);
