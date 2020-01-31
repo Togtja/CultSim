@@ -49,6 +49,14 @@ public:
      * @param event the key even you want to trigger
      */
     void handle_input(const SDL_Scancode event);
+    /**
+     * Given an event, checks if this context has that event
+     *
+     * @param event The event you want to check
+     *
+     * @return true if the event is in the context else false
+     */
+    bool has_event(const SDL_Scancode event);
     ~InputHandler();
 };
 

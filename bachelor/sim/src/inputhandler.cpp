@@ -15,8 +15,7 @@ InputHandler::InputHandler(KeyContext type)
 
 void InputHandler::bind_key(const SDL_Scancode event, const std::function<void()> function)
 {
-    auto key_it = m_key_binding.find(event);
-    if (key_it == m_key_binding.end())
+    if (!has_event(event))
     {
         m_key_binding.emplace(event, function);
     }
@@ -36,16 +35,25 @@ void InputHandler::unbind_key(const SDL_Scancode event)
 
 void InputHandler::handle_input(const SDL_Scancode event)
 {
-    auto key_it = m_key_binding.find(event);
-    if (key_it != m_key_binding.end())
+    if (has_event(event))
     {
         // Call the function the event maps to
         m_key_binding.at(event)();
     }
     else
     {
-        spdlog::debug("keybinding does not exist from before");
+        spdlog::debug("no keybinding for {} exist from before in context id: {}", event, m_context_type);
     }
+}
+
+bool InputHandler::has_event(const SDL_Scancode event)
+{
+    auto key_it = m_key_binding.find(event);
+    if (key_it != m_key_binding.end())
+    {
+        return true;
+    }
+    return false;
 }
 
 InputHandler::~InputHandler()
@@ -123,10 +131,9 @@ void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
 void ContextHandler::handle_input(const SDL_Scancode event)
 {
     // Iterate over the the active context stack
-    for (auto it = m_active_stack.begin(); it != m_active_stack.end(); it++)
+    for (auto it = m_active_stack.end(); it != m_active_stack.begin(); it--)
     {
-        auto input_it = m_input_map.find(*it);
-        if (input_it != m_input_map.end())
+        if (m_input_map.at(*it).has_event(event))
         {
             auto input = m_input_map.at(*it);
             input.handle_input(event);
