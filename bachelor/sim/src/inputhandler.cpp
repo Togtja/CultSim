@@ -103,9 +103,7 @@ void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, cons
     auto input_it = m_input_map.find(context);
     if (input_it != m_input_map.end())
     {
-        // Get by reference, right?
-        auto input = m_input_map.at(context);
-        input.bind_key(event, function);
+        m_input_map.at(context).bind_key(event, function);
     }
     else
     {
@@ -124,20 +122,18 @@ void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
     }
     else
     {
-        spdlog::debug("could not unbind, because no input created for the context (id: {}", context);
+        spdlog::debug("could not unbind, because no input created for the context (id: {})", context);
     }
 }
 
 void ContextHandler::handle_input(const SDL_Scancode event)
 {
     // Iterate over the the active context stack
-    for (auto it = m_active_stack.end(); it != m_active_stack.begin(); it--)
+    for (auto it = m_active_stack.rbegin(); it != m_active_stack.rend(); it++)
     {
         if (m_input_map.at(*it).has_event(event))
         {
-            auto input = m_input_map.at(*it);
-            input.handle_input(event);
-            spdlog::debug("we found the input {}", event);
+            m_input_map.at(*it).handle_input(event);
             return;
         }
     }
