@@ -80,9 +80,10 @@ bool delete_file(std::string_view rpath);
  *
  * @param rpath_old The source file to copy
  * @param rpath_new The destination path / name
+ * @param overwrite_existing Set this to true if you want to overwrite existing files
  * @return true if successful, otherwise false
  */
-bool copy_file(std::string_view rpath_old, std::string_view rpath_new);
+bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing = false);
 
 } // namespace fs
 } // namespace cs

@@ -104,22 +104,36 @@ bool mkdir(std::string_view rpath)
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 {
+    if (exists(rpath_new))
+    {
+        spdlog::warn("attempt to overwrite file with move");
+        return false;
+    }
+
+    /** Copy old to new and attempt to clean up */
     if (copy_file(rpath_old, rpath_new))
     {
         if (!delete_file(rpath_old))
         {
-            spdlog::error("failed to delete old file during renaming");
+            spdlog::error("failed to delete old file during move");
+
+            /** Attempt to recover by deleting new file to restore file system state */
+            if (!delete_file(rpath_new))
+            {
+                spdlog::critical("failed to delete new files, file system corrupted");
+                std::abort();
+            }
+            return false;
         }
         return true;
     }
 
-    spdlog::error("failed to rename file");
-
+    /** At this point a new file is created, but is incomplete, so delete to restore fs state */
     if (exists(rpath_new))
     {
         if (!delete_file(rpath_new))
         {
-            spdlog::error("failed to delete new file during renaming");
+            spdlog::error("failed to delete new file during move");
         }
     }
     return false;
@@ -127,33 +141,50 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 
 bool delete_file(std::string_view rpath)
 {
-    return PHYSFS_delete(rpath.data());
+    return static_cast<bool>(PHYSFS_delete(rpath.data()));
 }
 
-bool copy_file(std::string_view rpath_old, std::string_view rpath_new)
+bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing)
 {
     if (!exists(rpath_old))
     {
         spdlog::warn("the file: {} does not exist", rpath_old);
         return false;
     }
+
     if (rpath_new == rpath_old)
     {
         spdlog::warn("the old path is the same as the new path");
         return false;
     }
 
-    auto data  = read_file(rpath_old);
-    auto bytes = write_file(rpath_new, data.data());
+    if (!overwrite_existing && exists(rpath_new))
+    {
+        spdlog::warn("refused to overwrite existing file: {}", rpath_new);
+        return false;
+    }
 
-    spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes);
+    const auto data          = read_file(rpath_old);
+    const auto bytes_written = write_file(rpath_new, data.data());
+    spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes_written);
 
-    if (static_cast<uint64_t>(bytes) == data.length())
+    /** Attempt to write entire file contents and handle error if failed */
+    if (static_cast<uint64_t>(bytes_written) == data.length())
     {
         spdlog::info("succesfully copied file");
         return true;
     }
+    /** Error states below */
+    else if (bytes_written >= 0)
+    {
+        if (!delete_file(rpath_new))
+        {
+            spdlog::critical("filesystem corrupted by copy");
+            std::abort();
+        }
+    }
 
+    spdlog::error("could not copy file");
     return false;
 }
 

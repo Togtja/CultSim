@@ -1,6 +1,7 @@
 # Generated files
 build/
 builds/
+vs_build/
 
 # IDE Files
 .vs/

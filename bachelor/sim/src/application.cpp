@@ -1,18 +1,48 @@
+
 #include "application.h"
+#include "constants.h"
 #include "filesystem.h"
+#include "gfx/glutil.h"
+#include "gfx/sprite_renderer.h"
+
+#include <chrono>
+
+#include "gfx/ImGUI/imgui.h"
+#include "gfx/ImGUI/imgui_impl_opengl3.h"
+#include "gfx/ImGUI/imgui_impl_sdl.h"
 
 namespace cs
 {
 void Application::run(const std::vector<char*>& args)
 {
+    auto current_time = std::chrono::steady_clock::now();
+    auto lag          = 0.f;
+
     init(args);
 
     /* Main Loop */
-    while (true)
+    while (m_running)
     {
-        /* Pseudo Code at the moment, must capture delta time etc. */
+        auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count();
+        lag += elapsed;
+
         handle_input();
-        update(0.1666);
+
+        /** TODO: Let the frame rate be set in preferences / options menu */
+        while (lag >= SEC_PER_LOOP)
+        {
+            update(SEC_PER_LOOP);
+            lag -= SEC_PER_LOOP;
+        }
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(m_window.get());
+        ImGui::NewFrame();
+
+        ImGui::Text("FPS: %6.3f", 1.f / elapsed);
+
+        current_time = std::chrono::steady_clock::now();
+
         draw();
     }
 
@@ -27,8 +57,7 @@ void Application::handle_input()
         if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            /* TODO: Do not abort */
-            std::abort();
+            m_running = false;
         }
     }
 }
@@ -39,7 +68,21 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    static gfx::SpriteRenderer r{};
     m_window.clear();
+    r.clear();
+
+    constexpr float nspr = 1'000'000;
+    for (int i = 0; i < nspr; ++i)
+    {
+        auto ratio = i / nspr;
+        r.draw({ratio * 500.f, ratio * -360.f, 0.f}, {ratio, 1.f - ratio, 0.2f}, {});
+    }
+
+    r.display();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     m_window.display();
 }
@@ -73,11 +116,28 @@ bool Application::init_gl()
         return false;
     }
 
+#ifndef NDEBUG
+    gfx::create_debug_callback();
+#endif
+
     return true;
 }
 
 bool Application::init_imgui()
 {
+    // Set up Context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+
+    // Set up Style
+    ImGui::StyleColorsDark();
+
+    // Set up Platform & renderer Bindings
+    ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
+    ImGui_ImplOpenGL3_Init("#version 450 core");
+
     // TODO: change true to false, also make the function
     return true;
 }
@@ -142,6 +202,9 @@ void Application::deinit_physfs()
 
 void Application::deinit_imgui()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Application::deinit_gl()
