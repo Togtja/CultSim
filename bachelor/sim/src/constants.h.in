@@ -14,4 +14,7 @@ constexpr int PROGRAM_VERSION_MAJOR     = @PROJECT_VERSION_MAJOR@;
 constexpr int PROGRAM_VERSION_MINOR     = @PROJECT_VERSION_MINOR@;
 constexpr int PROGRAM_VERSION_PATCH     = @PROJECT_VERSION_PATCH@;
 
+constexpr int SIM_MAX_AGENTS = 1'000'000;
+constexpr float SEC_PER_LOOP = 0.007;
+
 /* clang-format on */

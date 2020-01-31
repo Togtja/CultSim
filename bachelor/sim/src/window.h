@@ -68,6 +68,8 @@ public:
      */
     void deinit() noexcept;
 
+    SDL_GLContext get_context() const;
+
 private:
 };
 } // namespace cs

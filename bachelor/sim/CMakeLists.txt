@@ -14,12 +14,14 @@ add_executable(${EXEC_NAME})
 
 # Add Source Files
 include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/ImGUI/CMakeLists.txt)
 
 # Set Include Directories
 target_include_directories(
     ${EXEC_NAME}
     PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_LIST_DIR}/src
     ${LUA_INCLUDE_DIR}
     ${PHYSFS_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -45,7 +47,7 @@ target_link_libraries(
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
     cultsim_resource_copy ALL
-    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- *
+    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
     DEPENDS cultsim
     BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip

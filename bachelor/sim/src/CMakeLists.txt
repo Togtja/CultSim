@@ -13,10 +13,13 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.h
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/inputhandler.h
+    ${CMAKE_CURRENT_LIST_DIR}/inputhandler.cpp
+
 )
 
 # Configure file with CMake Variables
-
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/constants.h.in
     ${CMAKE_CURRENT_BINARY_DIR}/constants.h
