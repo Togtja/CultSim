@@ -101,6 +101,20 @@ void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, cons
         m_input_map.emplace(context, new_input);
     }
 }
+void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
+{
+    auto input_it = m_input_map.find(context);
+    if (input_it != m_input_map.end())
+    {
+        auto input = m_input_map.at(context);
+        input.unbind_key(event);
+    }
+    else
+    {
+        spdlog::debug("could not unbind, because no input created for the context (id: {}", context);
+    }
+}
+
     }
 }
 } // namespace input
