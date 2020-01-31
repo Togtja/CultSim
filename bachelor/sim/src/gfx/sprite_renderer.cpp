@@ -96,7 +96,6 @@ SpriteRenderer::SpriteRenderer()
 
 void SpriteRenderer::clear()
 {
-    memset(m_instance_data, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     m_nsprites = 0u;
 }
 
