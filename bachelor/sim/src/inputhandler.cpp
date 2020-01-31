@@ -98,7 +98,9 @@ void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, cons
     {
         InputHandler new_input{context};
         new_input.bind_key(event, function);
-        m_input_map.insert({context, new_input});
+        m_input_map.emplace(context, new_input);
+    }
+}
     }
 }
 } // namespace input
