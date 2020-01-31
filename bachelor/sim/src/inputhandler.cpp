@@ -115,7 +115,21 @@ void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
     }
 }
 
+void ContextHandler::handle_input(const SDL_Scancode event)
+{
+    // Iterate over the the active context stack
+    for (auto it = m_active_stack.begin(); it != m_active_stack.end(); it++)
+    {
+        auto input_it = m_input_map.find(*it);
+        if (input_it != m_input_map.end())
+        {
+            auto input = m_input_map.at(*it);
+            input.handle_input(event);
+            spdlog::debug("we found the input {}", event);
+            return;
+        }
     }
+    spdlog::debug("could not find anything for the {} event", event);
 }
 } // namespace input
 } // namespace cs
