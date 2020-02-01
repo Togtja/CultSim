@@ -101,7 +101,7 @@ void ContextHandler::remove_context(KeyContext context)
 
 void ContextHandler::remove_context()
 {
-    if (m_active_stack.size <= 1)
+    if (m_active_stack.size() <= 1)
     {
         spdlog::warn("trying to remove the default context");
         return;
@@ -140,7 +140,7 @@ void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
 void ContextHandler::handle_input(const SDL_Scancode event)
 {
     // Iterate over the the active context stack
-    for (auto it = m_active_stack.rbegin(); it != m_active_stack.rend(); it++)
+    for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         if (m_input_map.at(*it).has_event(event))
         {
