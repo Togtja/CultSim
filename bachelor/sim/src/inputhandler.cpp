@@ -63,6 +63,7 @@ InputHandler::~InputHandler()
 /******** CONTEXT HANDLER *********/
 ContextHandler::ContextHandler()
 {
+    add_context(KeyContext::DefaultContext);
 }
 
 void ContextHandler::add_context(KeyContext context)
@@ -81,6 +82,11 @@ void ContextHandler::add_context(KeyContext context)
 
 void ContextHandler::remove_context(KeyContext context)
 {
+    if (context == KeyContext::DefaultContext)
+    {
+        spdlog::warn("trying to remove the default context");
+        return;
+    }
     auto context_it = std::find(std::begin(m_active_stack), std::end(m_active_stack), context);
     /** If it is not the end then we have it */
     if (context_it != std::end(m_active_stack))
@@ -95,6 +101,10 @@ void ContextHandler::remove_context(KeyContext context)
 
 void ContextHandler::remove_context()
 {
+    if (m_active_stack.size <= 1)
+    {
+        spdlog::warn("trying to remove the default context");
+    }
     m_active_stack.pop_back();
 }
 
