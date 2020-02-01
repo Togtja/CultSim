@@ -104,6 +104,7 @@ void ContextHandler::remove_context()
     if (m_active_stack.size <= 1)
     {
         spdlog::warn("trying to remove the default context");
+        return;
     }
     m_active_stack.pop_back();
 }
