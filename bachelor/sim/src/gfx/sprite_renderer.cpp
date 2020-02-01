@@ -109,11 +109,6 @@ SpriteRenderer::SpriteRenderer()
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
-void SpriteRenderer::clear()
-{
-    m_nsprites = 0u;
-}
-
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
     m_instance_data[m_nsprites++] = {pos, color, tex};
@@ -123,8 +118,9 @@ void SpriteRenderer::display()
 {
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
-
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
+
+    m_nsprites = 0u;
 }
 
 } // namespace gfx
