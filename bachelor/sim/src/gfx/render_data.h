@@ -60,5 +60,14 @@ struct SpriteInstanceVertex
     SpriteTextureID texture{};
 };
 
+/**
+ * The vertex layout used by primitive shapes such as grids, cylinders, circles etc
+ */
+struct PrimitiveVertex
+{
+    glm::vec3 position{};
+    glm::vec3 color{};
+};
+
 } // namespace gfx
 } // namespace cs
