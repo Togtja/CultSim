@@ -7,6 +7,11 @@ LangManager::LangManager(sol::state_view lua) : m_lua(lua)
 {
     set_locale("en");
 }
+
+LangManager::LangManager(sol::state_view lua, const std::string& locale) : m_lua(lua)
+{
+    set_locale(locale);
+}
 void LangManager::set_locale(const std::string& locale)
 {
     m_langs_map.clear();

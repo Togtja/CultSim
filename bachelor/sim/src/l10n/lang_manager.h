@@ -25,6 +25,15 @@ public:
      * @param lua takes in a lua state_view to run lua script
      */
     LangManager(sol::state_view lua);
+
+    /**
+     * Creates a Language Manager to do localizations
+     *
+     * @param lua takes in a lua state_view to run lua script
+     * @param locale initialize it with a language locale
+     */
+    LangManager(sol::state_view lua, const std::string& locale);
+
     /**
      * Changes the current locale/langauge we are running
      * @param locale the key of the langauge you want to change to
