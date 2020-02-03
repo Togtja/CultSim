@@ -8,6 +8,12 @@ option(CULTSIM_BUILD_DOCS "Build documentation for Cultsim" ON)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external ${CMAKE_MODULE_PATH})
 
+if(CMAKE_BUILD_TYPE STREQUAL "[Dd]ebug")
+    set(CULTSIM_DEBUG 1)
+else()
+    set(CULTSIM_DEBUG 0)
+endif()
+
 add_subdirectory(external)
 add_subdirectory(bachelor)
 
