@@ -89,8 +89,9 @@ SpriteRenderer::SpriteRenderer()
 
     glUseProgram(m_shader);
 
-    // Initialize Camera
-    m_camera.init((glm::vec3)(0.f, 27.f, 0.f));
+    auto proj = glm::ortho(-960.f, 960.f, -540.f, 540.f);
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
+}
 
 
 }
@@ -114,6 +115,7 @@ void SpriteRenderer::display()
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
+    return {};
 }
 
 } // namespace gfx

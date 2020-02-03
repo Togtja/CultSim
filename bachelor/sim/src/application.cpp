@@ -91,7 +91,7 @@ void Application::draw()
         for (int j = 0; j < std::sqrt(nspr) - 1; ++j)
         {
             auto yratio = j / std::sqrt(nspr);
-            r.draw({-640.f + xratio * 1280.f, -360.f + yratio * 720.f, 0.f},
+            r.draw({-960.f + xratio * 1920.f, -540.f + yratio * 1080.f, 0.f},
                    {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
                    {});
         }
