@@ -204,7 +204,7 @@ bool Application::init_input()
 
 bool Application::init_camera()
 {
-    m_camera.init(glm::vec2(0.f,0.f));
+    m_camera.init(glm::vec3(0.f,27.f,0.f),(glm::vec2)(0.f,0.f));
 
     return false;
 }
