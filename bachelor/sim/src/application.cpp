@@ -3,8 +3,10 @@
 #include "filesystem.h"
 #include "gfx/glutil.h"
 #include "gfx/sprite_renderer.h"
+#include "inputhandler.h"
 
 #include <chrono>
+#include <functional>
 
 #include "gfx/ImGUI/imgui.h"
 #include "gfx/ImGUI/imgui_impl_opengl3.h"
@@ -57,6 +59,10 @@ void Application::handle_input()
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
             m_running = false;
+        }
+        if (e.type == SDL_KEYDOWN)
+        {
+            input::get_input().handle_input(e.key.keysym.scancode);
         }
     }
 }
@@ -181,6 +187,10 @@ bool Application::init_lua()
 
 bool Application::init_input()
 {
+    input::ContextHandler& inputs = input::get_input();
+    std::function<void()> test([] { spdlog::info("You have hit the spacebar"); });
+
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
     /* TODO: Fix to not return true */
     return true;
 }
