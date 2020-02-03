@@ -35,6 +35,14 @@ public:
     LangManager(sol::state_view lua, const std::string& locale);
 
     /**
+     * Get a vector list of all avaliable langauges
+     * Rather it checks for files in the l10n folder
+     *
+     * @return returns a list of all languages
+     */
+    std::vector<std::string> available_lang();
+
+    /**
      * Changes the current locale/langauge we are running
      * @param locale the key of the langauge you want to change to
      */

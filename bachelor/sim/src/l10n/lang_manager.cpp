@@ -12,6 +12,12 @@ LangManager::LangManager(sol::state_view lua, const std::string& locale) : m_lua
 {
     set_locale(locale);
 }
+
+std::vector<std::string> LangManager::available_lang()
+{
+    return fs::list_directory("l10n");
+}
+
 void LangManager::set_locale(const std::string& locale)
 {
     m_langs_map.clear();
