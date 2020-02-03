@@ -87,6 +87,7 @@ void Application::draw()
         }
     }
 
+    m_camera.get_view_matrix();
     r.display();
 
     ImGui::Render();
@@ -101,7 +102,8 @@ bool Application::init(std::vector<char*> args)
            init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
            init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
            init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
-           init_subsystem(&Application::init_input, "Input Manager");   // Init Input Manager
+           init_subsystem(&Application::init_input, "Input Manager") && // Init Input Manager
+           init_subsystem(&Application::init_camera, "Camera");
 }
 
 bool Application::init_gl()
@@ -184,6 +186,13 @@ bool Application::init_input()
 {
     /* TODO: Fix to not return true */
     return true;
+}
+
+bool Application::init_camera()
+{
+    m_camera.init(glm::vec2(0.f,0.f));
+
+    return false;
 }
 
 void Application::deinit()

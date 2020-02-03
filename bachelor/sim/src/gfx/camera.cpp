@@ -1,10 +1,24 @@
 #include "camera.h"
 
+#include "glm/gtc/matrix_transform.hpp"
+
 namespace cs
 {
 namespace gfx
 {
-void camera::turn(GLfloat angle)
+void Camera::init(glm::vec2 position)
+{
+    m_pos = position;
+
+}
+
+glm::mat4 Camera::get_view_matrix()
+{
+
+    return glm::lookAt((glm::vec3)(m_pos.x,20.f,m_pos.y),(glm::vec3)(m_pos.x,0.f,m_pos.y),(glm::vec3)(0.f,1.f,0.f));
+}
+
+void Camera::turn(GLfloat angle)
 {
     if (m_rotation + angle > 360.f)
     {
@@ -19,11 +33,12 @@ void camera::turn(GLfloat angle)
         m_rotation += angle;
     }
 }
-void camera::move(glm::uvec2)
+void Camera::move(glm::vec2 movement)
 {
-
+    m_pos.x += movement.x * m_speed;
+    m_pos.y += movement.y * m_speed;
 }
-void camera::zoom(float)
+void Camera::zoom(float)
 {
 }
 } // namespace gfx
