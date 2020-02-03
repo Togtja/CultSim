@@ -57,12 +57,10 @@ private:
 
 public:
     PrimitiveQuad(float side_length, float m_ratio = 1.f);
-    ;
 
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_tris() override;
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
 
-PrimitiveQuad::PrimitiveQuad(float side_length, float ratio);
 } // namespace gfx
 } // namespace cs
