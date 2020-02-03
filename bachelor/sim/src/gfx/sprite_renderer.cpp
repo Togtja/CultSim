@@ -89,8 +89,10 @@ SpriteRenderer::SpriteRenderer()
 
     glUseProgram(m_shader);
 
-    auto proj = glm::ortho(-960.f, 960.f, -540.f, 540.f);
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
+    // Initialize Camera
+    m_camera.init((glm::vec3)(0.f, 27.f, 0.f));
+
+
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
@@ -102,6 +104,9 @@ void SpriteRenderer::display()
 {
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
+
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
+
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
     m_nsprites = 0u;
