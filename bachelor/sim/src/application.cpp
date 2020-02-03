@@ -69,16 +69,18 @@ void Application::draw()
     static gfx::SpriteRenderer r{};
     m_window.clear();
 
-    auto time            = SDL_GetTicks();
-    constexpr float nspr = 1'000'000;
-    for (int i = 0; i < std::sqrt(nspr) - 1; ++i)
-    {
-        auto xratio = i / std::sqrt(nspr);
+    auto time              = SDL_GetTicks();
+    constexpr float nspr   = 1'000'000;
+    constexpr float nsprsq = 1'000;
 
-        for (int j = 0; j < std::sqrt(nspr) - 1; ++j)
+    for (int i = 0; i < nsprsq; ++i)
+    {
+        auto xratio = (-0.5 + i / nsprsq) * 10.f;
+
+        for (int j = 0; j < nsprsq; ++j)
         {
-            auto yratio = j / std::sqrt(nspr);
-            r.draw({-960.f + xratio * 1920.f, -540.f + yratio * 1080.f, 0.f},
+            auto yratio = (-0.5f + j / nsprsq) * 10.f;
+            r.draw({xratio * 1920.f, yratio * 1080.f, 0.f},
                    {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
                    {});
         }
