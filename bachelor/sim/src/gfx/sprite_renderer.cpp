@@ -45,10 +45,10 @@ SpriteRenderer::SpriteRenderer()
     glCreateBuffers(1, &m_vbo);
 
     /** TODO: Consider changing it */
-    const std::vector<SpriteVertex> quad = {{{-0.5f, -0.5f}, {0.f, 0.f}},
-                                            {{-0.5f, 0.5f}, {0.f, 1.f}},
-                                            {{0.5f, 0.5f}, {1.f, 1.f}},
-                                            {{0.5f, -0.5f}, {1.f, 0.f}}};
+    const std::vector<SpriteVertex> quad = {{{-0.5f, 0.f, -0.5f}, {0.f, 0.f}},
+                                            {{-0.5f, 0.f, 0.5f}, {0.f, 1.f}},
+                                            {{0.5f, 0.f, 0.5f}, {1.f, 1.f}},
+                                            {{0.5f, 0.f, -0.5f}, {1.f, 0.f}}};
 
     const std::vector<uint8_t> indices = {0, 1, 2, 0, 2, 3};
 
