@@ -10,10 +10,9 @@ namespace cs
 namespace gfx
 {
 
-void Camera::init(glm::vec3 position, glm::vec2 bounds)
+void Camera::init(glm::vec3 position)
 {
     m_pos = position;
-    m_bounds = bounds;
     m_speed  = 0.001;
 }
 
@@ -36,6 +35,11 @@ void Camera::zoom(float zoom)
 void Camera::set_speed(float speed)
 {
     m_speed = std::clamp(speed, 0.0001f, 0.1f);
+}
+
+void Camera::set_boundaries(glm::vec2 bounds)
+{
+    m_bounds = bounds;
 }
 
 } // namespace gfx

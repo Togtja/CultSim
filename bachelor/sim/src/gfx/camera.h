@@ -22,7 +22,7 @@ public:
     * @Param position The Initial position of the camera
     * @Param bounds The boundaries of the scene
     */
-    void init(glm::vec3 position ,glm::vec2 bounds);
+    void init(glm::vec3 position);
 
 
     glm::mat4 get_view_matrix();
@@ -54,6 +54,13 @@ public:
     * @Note speed is clamped between 0.0001 and 0.1
     */
     void set_speed(float speed);
+
+    /**
+    * Set the boundaries of the current scene
+    *
+    * @Param bounds The boundaries of the scene we are currently in;
+    */
+    void set_boundaries(glm::vec2 bounds);
 };
 } // namespace gfx
 } // namespace cs
