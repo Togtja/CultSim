@@ -29,7 +29,6 @@ void Application::run(const std::vector<char*>& args)
 
         handle_input();
 
-        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
 
@@ -153,6 +152,7 @@ bool Application::init_imgui()
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
     ImGui_ImplOpenGL3_Init("#version 450 core");
+    ImGui_ImplOpenGL3_NewFrame();
 
     // TODO: change true to false, also make the function
     return true;
