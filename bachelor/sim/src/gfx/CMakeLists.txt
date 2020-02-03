@@ -17,6 +17,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.h
     ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/primitives.h
+    ${CMAKE_CURRENT_LIST_DIR}/primitives.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/camera.h
     ${CMAKE_CURRENT_LIST_DIR}/camera.cpp
 )
