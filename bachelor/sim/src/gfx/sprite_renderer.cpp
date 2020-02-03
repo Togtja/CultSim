@@ -6,10 +6,10 @@
 #include <iterator>
 
 #include <glad/glad.h>
-#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs
 {
@@ -125,6 +125,10 @@ void SpriteRenderer::display()
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
+}
+
+SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
+{
 }
 
 } // namespace gfx
