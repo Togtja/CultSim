@@ -54,8 +54,7 @@ void Application::handle_input()
     while (SDL_PollEvent(&e))
     {
         ImGui_ImplSDL2_ProcessEvent(&e);
-        if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
-            (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+        if (e.type == SDL_WINDOWEVENT_CLOSE || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
             m_running = false;
         }
