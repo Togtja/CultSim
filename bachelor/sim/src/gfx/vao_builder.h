@@ -23,13 +23,13 @@ public:
 
     VaoBuilder& enable(unsigned index);
 
-    VaoBuilder& vbo(unsigned vbo, unsigned binding);
+    VaoBuilder& vbo(unsigned vbo, unsigned binding, unsigned offset = 0u, unsigned stride = 0u);
 
     VaoBuilder& ebo(unsigned ebo);
 
     VaoBuilder& divisor(unsigned binding, unsigned divisor);
 
-    unsigned build() const;
+    unsigned build();
 };
 } // namespace gfx
 
