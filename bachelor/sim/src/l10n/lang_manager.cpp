@@ -32,7 +32,9 @@ void LangManager::set_locale(const std::string& locale)
     }
     m_lang = m_langs_map.at("lang");
 }
+std::string_view LangManager::current_lang()
 {
+    return m_lang;
 }
 
 LangManager::~LangManager()

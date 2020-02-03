@@ -47,6 +47,11 @@ public:
      * @param locale the key of the langauge you want to change to
      */
     void set_locale(const std::string& locale);
+    /**
+     * A short hand to get the current language, in English
+     * @return Name of language in english
+     */
+    std::string_view current_lang();
     ~LangManager();
 };
 } // namespace lang
