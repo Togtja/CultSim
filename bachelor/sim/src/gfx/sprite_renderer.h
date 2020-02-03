@@ -40,13 +40,18 @@ private:
 public:
     SpriteRenderer();
 
-    void clear();
-
     /**
+     * Add a new sprite to the draw list using the given position color and texture
      *
+     * @param pos The position to draw the sprite at in world coordinates
+     * @param color The color tint to apply to the sprite texture
+     * @param tex The texture ID of the texture that you want to draw
      */
     void draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex);
 
+    /**
+     * Display submits the draw list for this frame to the GPU and renders the scene
+     */
     void display();
 
     SpriteTextureID get_texture(std::string_view rpath);
