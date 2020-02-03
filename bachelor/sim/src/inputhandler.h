@@ -1,5 +1,5 @@
 #include <functional>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include <SDL_events.h>
@@ -19,7 +19,7 @@ namespace detail
 class InputHandler
 {
 private:
-    std::map<SDL_Scancode, std::function<void()>> m_key_binding;
+    std::unordered_map<SDL_Scancode, std::function<void()>> m_key_binding;
     KeyContext m_context_type;
 
 public:
@@ -68,7 +68,7 @@ class ContextHandler
 {
 private:
     std::vector<KeyContext> m_active_stack;
-    std::map<KeyContext, detail::InputHandler> m_input_map;
+    std::unordered_map<KeyContext, detail::InputHandler> m_input_map;
 
 public:
     friend ContextHandler& get_input();
