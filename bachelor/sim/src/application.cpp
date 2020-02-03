@@ -29,6 +29,10 @@ void Application::run(const std::vector<char*>& args)
 
         handle_input();
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL2_NewFrame(m_window.get());
+        ImGui::NewFrame();
+
         /** TODO: Let the frame rate be set in preferences / options menu */
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
@@ -55,6 +59,7 @@ void Application::handle_input()
     SDL_Event e{};
     while (SDL_PollEvent(&e))
     {
+        ImGui_ImplSDL2_ProcessEvent(&e);
         if ((e.type == SDL_WINDOWEVENT && e.window.type == SDL_WINDOWEVENT_CLOSE) ||
             (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
