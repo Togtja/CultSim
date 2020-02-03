@@ -1,6 +1,7 @@
 #include "sprite_renderer.h"
 #include "constants.h"
 #include "glutil.h"
+#include "vao_builder.h"
 
 #include <algorithm>
 #include <iterator>
@@ -73,37 +74,25 @@ SpriteRenderer::SpriteRenderer()
                               GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT | GL_MAP_PERSISTENT_BIT));
 
     /** Create VAO */
-    glCreateVertexArrays(1, &m_vao);
-
-    /** Format VAO*/
-    glVertexArrayAttribFormat(m_vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, pos));
-    glVertexArrayAttribFormat(m_vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(SpriteVertex, tex_coord));
-    glVertexArrayAttribFormat(m_vao, 2, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, offset));
-    glVertexArrayAttribFormat(m_vao, 3, 3, GL_FLOAT, GL_FALSE, offsetof(SpriteInstanceVertex, color));
-    glVertexArrayAttribIFormat(m_vao, 4, 1, GL_UNSIGNED_INT, offsetof(SpriteInstanceVertex, texture));
-
-    /** Binding VAO*/
-    glVertexArrayAttribBinding(m_vao, 0, 0);
-    glVertexArrayAttribBinding(m_vao, 1, 0);
-    glVertexArrayAttribBinding(m_vao, 2, 1);
-    glVertexArrayAttribBinding(m_vao, 3, 1);
-    glVertexArrayAttribBinding(m_vao, 4, 1);
-
-    glVertexArrayBindingDivisor(m_vao, 1, 1);
-
-    glEnableVertexArrayAttrib(m_vao, 0);
-    glEnableVertexArrayAttrib(m_vao, 1);
-    glEnableVertexArrayAttrib(m_vao, 2);
-    glEnableVertexArrayAttrib(m_vao, 3);
-    glEnableVertexArrayAttrib(m_vao, 4);
-
-    glVertexArrayVertexBuffer(m_vao, 0, m_vbo, size_bytes(indices), sizeof(SpriteVertex));
-    glVertexArrayVertexBuffer(m_vao, 1, m_ivbo, 0, sizeof(SpriteInstanceVertex));
-
-    glVertexArrayElementBuffer(m_vao, m_vbo);
+    m_vao = VaoBuilder()
+                .attribute(0, 2, GL_FLOAT, offsetof(SpriteVertex, pos))
+                .attribute(1, 2, GL_FLOAT, offsetof(SpriteVertex, tex_coord))
+                .attribute(2, 3, GL_FLOAT, offsetof(SpriteInstanceVertex, offset))
+                .attribute(3, 3, GL_FLOAT, offsetof(SpriteInstanceVertex, color))
+                .iattribute(4, 1, GL_UNSIGNED_INT, offsetof(SpriteInstanceVertex, texture))
+                .divisor(1, 1)
+                .bind_attribute(0, 0)
+                .bind_attribute(1, 0)
+                .bind_attribute(2, 1)
+                .bind_attribute(3, 1)
+                .bind_attribute(4, 1)
+                .ebo(m_vbo)
+                .vbo(m_vbo, 0, size_bytes(indices), sizeof(SpriteVertex))
+                .vbo(m_ivbo, 1, 0, sizeof(SpriteInstanceVertex))
+                .bind()
+                .build();
 
     glUseProgram(m_shader);
-    glBindVertexArray(m_vao);
 
     // Initialize Camera
     m_camera.init((glm::vec3)(0.f, 27.f, 0.f));
