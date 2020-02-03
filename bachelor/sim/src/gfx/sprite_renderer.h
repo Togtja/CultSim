@@ -13,8 +13,7 @@ namespace gfx
 class SpriteRenderer
 {
 private:
-
-    Camera m_camera;
+    Camera m_camera{};
 
     uint32_t m_vao{};
 

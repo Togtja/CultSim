@@ -29,9 +29,6 @@ SpriteRenderer::SpriteRenderer()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-
     if (!static_cast<bool>(m_shader))
     {
         spdlog::critical("could not create sprite shader program");
@@ -75,7 +72,7 @@ SpriteRenderer::SpriteRenderer()
 
     /** Create VAO */
     m_vao = VaoBuilder()
-                .attribute(0, 0, 2, GL_FLOAT, offsetof(SpriteVertex, pos))
+                .attribute(0, 0, 3, GL_FLOAT, offsetof(SpriteVertex, pos))
                 .attribute(1, 0, 2, GL_FLOAT, offsetof(SpriteVertex, tex_coord))
                 .attribute(2, 1, 3, GL_FLOAT, offsetof(SpriteInstanceVertex, offset))
                 .attribute(3, 1, 3, GL_FLOAT, offsetof(SpriteInstanceVertex, color))
@@ -90,9 +87,7 @@ SpriteRenderer::SpriteRenderer()
     glUseProgram(m_shader);
 
     // Initialize Camera
-    m_camera.init((glm::vec3)(0.f, 27.f, 0.f));
-
-
+    m_camera.init(glm::vec3(0.f, 27.f, 0.f));
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
