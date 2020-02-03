@@ -188,6 +188,11 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
     return false;
 }
 
+std::string_view get_errorstring()
+{
+    return get_errorstring();
+}
+
 std::vector<std::string> list_directory(std::string_view rpath)
 {
     if (!PHYSFS_isDirectory(rpath.data()))

@@ -87,6 +87,13 @@ bool delete_file(std::string_view rpath);
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing = false);
 
 /**
+ * Get the latest error string from the underlying filesystem
+ *
+ * @return The latest errorstring
+ */
+std::string_view get_errorstring();
+
+/**
  * Reads a directory, and returns a list of the files inside the directory
  *
  * @param rpath The relative path of the directory you want to list
