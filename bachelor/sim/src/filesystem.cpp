@@ -190,12 +190,18 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
 
 std::vector<std::string> list_directory(std::string_view rpath)
 {
+    if (!PHYSFS_isDirectory(rpath.data()))
+    {
+        spdlog::warn("not a directory, returns empty vector");
+        return {};
+    }
     std::vector<std::string> files;
     auto files_raw = PHYSFS_enumerateFiles(rpath.data());
     for (char* file = *files_raw; file; file = *++files_raw)
     {
         files.emplace_back(file);
     }
+    PHYSFS_freeList(files_raw);
     return files;
 }
 
