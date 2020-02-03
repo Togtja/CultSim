@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 namespace cs
 {
 namespace gfx
@@ -21,13 +23,15 @@ public:
 
     VaoBuilder& iattribute(unsigned index, int size, unsigned type, unsigned offset);
 
-    VaoBuilder& enable(unsigned index);
+    VaoBuilder& bind_attribute(unsigned index, unsigned binding);
 
     VaoBuilder& vbo(unsigned vbo, unsigned binding, unsigned offset = 0u, unsigned stride = 0u);
 
     VaoBuilder& ebo(unsigned ebo);
 
     VaoBuilder& divisor(unsigned binding, unsigned divisor);
+
+    VaoBuilder& bind();
 
     unsigned build();
 };
