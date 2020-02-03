@@ -61,10 +61,6 @@ InputHandler::~InputHandler()
 }
 
 /******** CONTEXT HANDLER *********/
-ContextHandler::ContextHandler()
-{
-    add_context(KeyContext::DefaultContext);
-}
 
 void ContextHandler::add_context(KeyContext context)
 {
@@ -152,5 +148,17 @@ void ContextHandler::handle_input(const SDL_Scancode event)
     }
     spdlog::debug("could not find anything for the {} event", event);
 }
+
+ContextHandler::ContextHandler()
+{
+    add_context(KeyContext::DefaultContext);
+}
+
+ContextHandler& get_input()
+{
+    static ContextHandler instance{};
+    return instance;
+}
+
 } // namespace input
 } // namespace cs

@@ -67,7 +67,9 @@ private:
     std::map<KeyContext, InputHandler> m_input_map;
 
 public:
-    ContextHandler();
+    friend ContextHandler& get_input();
+    ContextHandler(ContextHandler const&) = delete;
+    void operator=(ContextHandler const&) = delete;
     /**
      * Adds a new context and create an input handler for it
      * and add it to the top of the context stack
@@ -106,11 +108,20 @@ public:
     void unbind_key(KeyContext context, const SDL_Scancode event);
 
     /**
-     * handle's input from an event, goes through the context stack and runs the first found event matching function
+     * Handle's input from an event, goes through the context stack and runs the first found event matching function
      *
      * @param event The event you want to run
      */
     void handle_input(const SDL_Scancode event);
+
+private:
+    ContextHandler();
 };
+/**
+ * Get the input manager singleton
+ *
+ * @return The input manager singleton
+ */
+ContextHandler& get_input();
 } // namespace input
 } // namespace cs
