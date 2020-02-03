@@ -1,9 +1,10 @@
 #include "camera.h"
-
+#include <iostream>
 #include <algorithm>
 
 #include "glm/gtc/matrix_transform.hpp"
-
+#include "glm/gtx/string_cast.hpp"
+#include "spdlog/spdlog.h"
 
 namespace cs
 {
@@ -18,8 +19,10 @@ void Camera::init(glm::vec3 position)
 
 glm::mat4 Camera::get_view_matrix()
 {
+    auto view_mat = glm::lookAt(glm::vec3(m_pos.x, 200.f, m_pos.z),glm::vec3(m_pos.x+0.1f, 0.f, m_pos.z), glm::vec3(0.f, 1.f, 0.f));
+    auto proj = glm::perspectiveFov(glm::radians(120.f), 16.f, 9.f, 0.01f, 2000.f);
 
-    return glm::lookAt((glm::vec3)(m_pos.x,20.f,m_pos.y),(glm::vec3)(m_pos.x,0.f,m_pos.y),(glm::vec3)(0.f,1.f,0.f));
+    return proj * view_mat;
 }
 
 void Camera::move(glm::vec3 movement)
