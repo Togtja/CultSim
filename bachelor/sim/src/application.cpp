@@ -111,7 +111,7 @@ bool Application::init(std::vector<char*> args)
            init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
            init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
            init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
-           init_subsystem(&Application::init_input, "Input Manager") && // Init Input Manager
+           init_subsystem(&Application::init_input, "Input Manager");   // Init Input Manager
 }
 
 bool Application::init_gl()
