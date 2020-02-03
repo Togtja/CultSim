@@ -80,7 +80,6 @@ void Application::draw()
 {
     static gfx::SpriteRenderer r{};
     m_window.clear();
-    r.clear();
 
     auto time            = SDL_GetTicks();
     constexpr float nspr = 1'000'000;
