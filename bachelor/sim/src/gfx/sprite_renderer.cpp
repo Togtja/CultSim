@@ -128,6 +128,10 @@ void SpriteRenderer::display()
     m_nsprites = 0u;
 }
 
+SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
+{
+}
+
 } // namespace gfx
 
 } // namespace cs
