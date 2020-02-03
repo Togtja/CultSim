@@ -106,10 +106,7 @@ SpriteRenderer::SpriteRenderer()
     glBindVertexArray(m_vao);
 
     // Initialize Camera
-    m_camera.init({0.f, 27.f, 0.f});
-
-    auto proj = glm::ortho(-640.f, 640.f, -360.f, 360.f);
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
+    m_camera.init((glm::vec3)(0.f, 27.f, 0.f));
 
 
 }
