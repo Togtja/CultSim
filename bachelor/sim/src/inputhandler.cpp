@@ -8,6 +8,8 @@ namespace cs
 {
 namespace input
 {
+namespace detail
+{
 InputHandler::InputHandler(KeyContext type)
 {
     m_context_type = type;
@@ -59,6 +61,8 @@ bool InputHandler::has_event(const SDL_Scancode event)
 InputHandler::~InputHandler()
 {
 }
+
+} // namespace detail
 
 /******** CONTEXT HANDLER *********/
 
@@ -116,7 +120,7 @@ void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, cons
     }
     else
     {
-        InputHandler new_input{context};
+        detail::InputHandler new_input{context};
         new_input.bind_key(event, function);
         m_input_map.emplace(context, new_input);
     }

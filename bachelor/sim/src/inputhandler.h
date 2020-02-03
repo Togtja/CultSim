@@ -13,6 +13,8 @@ enum class KeyContext
     Agent,
     AgentOnHover,
 };
+namespace detail
+{
 /** Handles input for a certain context */
 class InputHandler
 {
@@ -60,11 +62,13 @@ public:
     ~InputHandler();
 };
 
+} // namespace detail
+
 class ContextHandler
 {
 private:
     std::vector<KeyContext> m_active_stack;
-    std::map<KeyContext, InputHandler> m_input_map;
+    std::map<KeyContext, detail::InputHandler> m_input_map;
 
 public:
     friend ContextHandler& get_input();
