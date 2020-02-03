@@ -1,7 +1,7 @@
 #version 450 core
 
 /** Per Vertex Attributes */
-layout(location = 0) in vec2 a_position;
+layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texcoord;
 
 /** Per Instance Attributes */
@@ -22,5 +22,5 @@ void main()
     out_texcoord = a_texcoord;
     out_texture  = a_texture;
 
-    gl_Position = u_projection * (vec4(a_position * vec2(1.2f, 0.8f), 0.f, 1.f) + vec4(a_offset, 0.f));
+    gl_Position = u_projection * (vec4(a_position, 1.f) + vec4(a_offset, 0.f));
 }

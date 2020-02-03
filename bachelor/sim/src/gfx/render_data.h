@@ -46,7 +46,7 @@ struct SpriteTextureID
  */
 struct SpriteVertex
 {
-    glm::vec2 pos{};
+    glm::vec3 pos{};
     glm::vec2 tex_coord{};
 };
 
