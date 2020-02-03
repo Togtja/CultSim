@@ -68,16 +68,18 @@ ContextHandler::ContextHandler()
 
 void ContextHandler::add_context(KeyContext context)
 {
+    if (m_active_stack.size() > 0 && context == KeyContext::DefaultContext)
+    {
+        return;
+    }
+
     auto context_it = std::find(std::begin(m_active_stack), std::end(m_active_stack), context);
-    /** If it is the end then it is not already there */
-    if (context_it == std::end(m_active_stack))
+    /** If it is not at the end then it is already there so remove it and then add it */
+    if (context_it != std::end(m_active_stack))
     {
-        m_active_stack.push_back(context);
+        remove_context(context);
     }
-    else
-    {
-        spdlog::debug("trying to add context id {} and it is here from before", context);
-    }
+    m_active_stack.push_back(context);
 }
 
 void ContextHandler::remove_context(KeyContext context)
