@@ -36,14 +36,15 @@ public:
 
     /**
      * Get a vector list of all avaliable langauges
-     * Rather it checks for files in the l10n folder
      *
+     * @note It checks for files in the l10n folder
      * @return returns a list of all languages
      */
     std::vector<std::string> available_lang();
 
     /**
      * Changes the current locale/langauge we are running
+     *
      * @param locale the key of the langauge you want to change to
      */
     void set_locale(const std::string& locale);
@@ -53,6 +54,7 @@ public:
      *
      * @note id's and values for langauges can be found in l10n folder
      * @param id The id/key of the string you want
+     * @return The value that belongs to the key, i.e. string in the locale language
      */
     std::string_view get_locale(std::string_view id);
 
