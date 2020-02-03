@@ -43,8 +43,5 @@ std::string_view LangManager::current_lang()
     return m_lang;
 }
 
-LangManager::~LangManager()
-{
-}
 } // namespace lang
 } // namespace cs

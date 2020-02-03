@@ -60,10 +60,10 @@ public:
 
     /**
      * A short hand to get the current language, in English
+     *
      * @return Name of language in english
      */
     std::string_view current_lang();
-    ~LangManager();
 };
 } // namespace lang
 } // namespace cs
