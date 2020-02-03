@@ -6,7 +6,6 @@
 #include "inputhandler.h"
 #include "l10n/lang_manager.h"
 
-
 #include <chrono>
 #include <functional>
 
@@ -22,7 +21,6 @@ void Application::run(const std::vector<char*>& args)
     auto lag          = 0.f;
 
     init(args);
-    lang::LangManager lang;
     /* Main Loop */
     while (m_running)
     {
@@ -40,11 +38,6 @@ void Application::run(const std::vector<char*>& args)
         {
             update(SEC_PER_LOOP);
             lag -= SEC_PER_LOOP;
-        }
-
-        if (ImGui::Button("Test me"))
-        {
-            spdlog::info(lang.available_lang());
         }
 
         ImGui::Text("FPS: %6.3f", 1.f / elapsed);
