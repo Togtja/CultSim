@@ -1,6 +1,5 @@
 #pragma once
 #include "window.h"
-#include "gfx/camera.h"
 
 #include <vector>
 
@@ -23,8 +22,6 @@ private:
      * @warning Do not use until initialized
      */
     Window m_window;
-
-    gfx::Camera m_camera;
 
     sol::state m_lua{};
 
@@ -72,8 +69,6 @@ private:
     bool init_lua();
 
     bool init_input();
-
-    bool init_camera();
 
     void deinit();
 
