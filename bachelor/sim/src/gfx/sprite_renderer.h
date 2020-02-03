@@ -1,6 +1,7 @@
 #pragma once
 
 #include "render_data.h"
+#include "camera.h"
 
 #include <vector>
 
@@ -11,6 +12,9 @@ namespace gfx
 class SpriteRenderer
 {
 private:
+
+    Camera m_camera;
+
     uint32_t m_vao{};
 
     /** Template VBO */

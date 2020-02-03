@@ -6,10 +6,10 @@
 #include <iterator>
 
 #include <glad/glad.h>
-#include <spdlog/spdlog.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs
 {
@@ -105,8 +105,13 @@ SpriteRenderer::SpriteRenderer()
     glUseProgram(m_shader);
     glBindVertexArray(m_vao);
 
+    // Initialize Camera
+    m_camera.init({0.f, 27.f, 0.f});
+
     auto proj = glm::ortho(-640.f, 640.f, -360.f, 360.f);
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
+
+
 }
 
 void SpriteRenderer::clear()
@@ -116,6 +121,7 @@ void SpriteRenderer::clear()
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
+    glUniformMatrix4fv(0,1,GL_FALSE,glm::value_ptr(m_camera.get_view_matrix()));
     m_instance_data[m_nsprites++] = {pos, color, tex};
 }
 
