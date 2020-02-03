@@ -11,7 +11,7 @@ namespace gfx
 {
 DebugRenderer::DebugRenderer()
 {
-    m_vao = VaoBuilder().attribute(0, 2, GL_FLOAT, 0u).bind_attribute(0, 0).build();
+    m_vao = VaoBuilder().attribute(0, 0, 2, GL_FLOAT, 0u).build();
 
     std::vector<glm::vec2> rect = {{-.5f, -.5f}, {-.5f, .5f}, {.5f, .5f}, {.5f, -.5f}};
 }
