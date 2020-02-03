@@ -47,6 +47,15 @@ public:
      * @param locale the key of the langauge you want to change to
      */
     void set_locale(const std::string& locale);
+
+    /**
+     * Get a locale given an id
+     *
+     * @note id's and values for langauges can be found in l10n folder
+     * @param id The id/key of the string you want
+     */
+    std::string_view get_locale(std::string_view id);
+
     /**
      * A short hand to get the current language, in English
      * @return Name of language in english
