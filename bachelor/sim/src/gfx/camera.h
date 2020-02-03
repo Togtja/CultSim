@@ -19,8 +19,7 @@ public:
     /**
     * Initialize the Camera with values dependent on scene
     *
-    * @Param position The Initial position of the camera
-    * @Param bounds The boundaries of the scene
+    * @param position The Initial position of the camera
     */
     void init(glm::vec3 position);
 
@@ -30,18 +29,18 @@ public:
     /**
     * Move the camera along the (X,Z) plane
     *
-    * @Param dir Direction of movement
+    * @param dir Direction of movement
     *
-    * @Note The position of the camera is clamped to not go outside of the bounds defined in Camera.m_bounds
+    * @note The position of the camera is clamped to not go outside of the bounds defined in Camera.m_bounds
     */
     void move(glm::vec3 dir);
 
     /**
     * Zoom in or out with the camera
     *
-    * @Param zoom how much to zoom in or out
+    * @param zoom how much to zoom in or out
     *
-    * @Note zoom can not zoom out beyond 50 or zoom in beyond 1
+    * @note zoom can not zoom out beyond 50 or zoom in beyond 1
     */
     void zoom(float zoom);
 
@@ -49,16 +48,16 @@ public:
     /**
     * Set the speed at which the camera moves and zooms
     *
-    * @Param speed The speed at which we move
+    * @param speed The speed at which we move
     *
-    * @Note speed is clamped between 0.0001 and 0.1
+    * @note speed is clamped between 0.0001 and 0.1
     */
     void set_speed(float speed);
 
     /**
     * Set the boundaries of the current scene
     *
-    * @Param bounds The boundaries of the scene we are currently in;
+    * @param bounds The boundaries of the scene we are currently in;
     */
     void set_boundaries(glm::vec2 bounds);
 };

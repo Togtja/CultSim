@@ -121,7 +121,6 @@ void SpriteRenderer::clear()
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
-    glUniformMatrix4fv(0,1,GL_FALSE,glm::value_ptr(m_camera.get_view_matrix()));
     m_instance_data[m_nsprites++] = {pos, color, tex};
 }
 
@@ -129,6 +128,8 @@ void SpriteRenderer::display()
 {
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
+
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
 
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 }
