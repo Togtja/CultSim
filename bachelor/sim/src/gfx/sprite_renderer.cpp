@@ -89,7 +89,7 @@ SpriteRenderer::SpriteRenderer()
 
     glUseProgram(m_shader);
 
-    auto proj = glm::ortho(-640.f, 640.f, -360.f, 360.f);
+    auto proj = glm::ortho(-960.f, 960.f, -540.f, 540.f);
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(proj));
 }
 
@@ -113,6 +113,7 @@ void SpriteRenderer::display()
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
+    return {};
 }
 
 } // namespace gfx
