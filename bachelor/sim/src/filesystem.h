@@ -1,7 +1,9 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace cs
 {
@@ -30,6 +32,14 @@ void deinit();
  * @return A string containing the full contents of the file
  */
 std::string read_file(std::string_view rpath);
+
+/**
+ * Read the entire file at the relative file path as bytes
+ *
+ * @param rpath The relative file path to read from
+ * @return A vector of bytes read
+ */
+std::vector<uint8_t> read_byte_file(std::string_view rpath);
 
 /**
  * Write the text stored in data to the given relative file path
