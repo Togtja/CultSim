@@ -19,11 +19,9 @@ public:
     VaoBuilder& operator=(VaoBuilder&&) = delete;
     ~VaoBuilder();
 
-    VaoBuilder& attribute(unsigned index, int size, unsigned type, unsigned offset, bool normalized = false);
+    VaoBuilder& attribute(unsigned index, unsigned binding, int size, unsigned type, unsigned offset, bool normalized = false);
 
-    VaoBuilder& iattribute(unsigned index, int size, unsigned type, unsigned offset);
-
-    VaoBuilder& bind_attribute(unsigned index, unsigned binding);
+    VaoBuilder& iattribute(unsigned index, unsigned binding, int size, unsigned type, unsigned offset);
 
     VaoBuilder& vbo(unsigned vbo, unsigned binding, unsigned offset = 0u, unsigned stride = 0u);
 

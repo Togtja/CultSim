@@ -19,23 +19,19 @@ VaoBuilder::~VaoBuilder()
     }
 }
 
-VaoBuilder& VaoBuilder::attribute(unsigned index, int size, unsigned type, unsigned offset, bool normalized)
+VaoBuilder& VaoBuilder::attribute(unsigned index, unsigned binding, int size, unsigned type, unsigned offset, bool normalized)
 {
     glVertexArrayAttribFormat(m_vao, index, size, type, normalized, offset);
+    glVertexArrayAttribBinding(m_vao, index, binding);
     glEnableVertexArrayAttrib(m_vao, index);
     return *this;
 }
 
-VaoBuilder& VaoBuilder::iattribute(unsigned index, int size, unsigned type, unsigned offset)
+VaoBuilder& VaoBuilder::iattribute(unsigned index, unsigned binding, int size, unsigned type, unsigned offset)
 {
     glVertexArrayAttribIFormat(m_vao, index, size, type, offset);
-    glEnableVertexArrayAttrib(m_vao, index);
-    return *this;
-}
-
-VaoBuilder& VaoBuilder::bind_attribute(unsigned index, unsigned binding)
-{
     glVertexArrayAttribBinding(m_vao, index, binding);
+    glEnableVertexArrayAttrib(m_vao, index);
     return *this;
 }
 
