@@ -49,6 +49,50 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> cs::gfx::Primiti
     return {verts, indices};
 }
 
+cs::gfx::PrimitiveQuad::PrimitiveQuad(float side_length, float ratio) : m_side_length(side_length), m_ratio(ratio)
+{
+}
+
+std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> PrimitiveQuad::generate_tris()
+{
+    std::vector<PrimitiveVertex> verts{};
+    std::vector<unsigned> indices{};
+
+    /** Manually insert the four points */
+    verts.push_back({{m_side_length * -0.5f * m_ratio, m_side_length * -0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * 0.5f * m_ratio, m_side_length * -0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * 0.5f * m_ratio, m_side_length * 0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * -0.5f * m_ratio, m_side_length * 0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(2);
+    indices.push_back(3);
+    indices.push_back(0);
+
+    return {verts, indices};
+}
+
+std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> PrimitiveQuad::generate_outline()
+{
+    std::vector<PrimitiveVertex> verts{};
+    std::vector<unsigned> indices{};
+
+    /** Manually insert the four points */
+    verts.push_back({{m_side_length * -0.5f * m_ratio, m_side_length * -0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * 0.5f * m_ratio, m_side_length * -0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * 0.5f * m_ratio, m_side_length * 0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+    verts.push_back({{m_side_length * -0.5f * m_ratio, m_side_length * 0.5f / m_ratio, 0.f}, {1.f, 1.f, 1.f}});
+
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
+    indices.push_back(0);
+
+    return {verts, indices};
+}
 } // namespace gfx
 
 } // namespace cs
