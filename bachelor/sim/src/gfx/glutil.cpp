@@ -3,6 +3,7 @@
 
 #include <chrono>
 
+#include "stb_image.h"
 #include <spdlog/spdlog.h>
 
 namespace cs
@@ -96,6 +97,32 @@ std::string get_gl_shader_type_name(GLenum type)
         case GL_COMPUTE_SHADER: return "compute"; break;
         default: return "invalid"; break;
     }
+}
+
+LoadedTexture load_texture(std::string_view rpath)
+{
+    if (!fs::exists(rpath))
+    {
+        spdlog::warn("texture does not exist: {}", rpath);
+        return {};
+    }
+
+    /** Load bytes and parse as image */
+    auto out         = LoadedTexture{};
+    const auto bytes = fs::read_byte_file(rpath);
+    auto pixels      = stbi_load_from_memory(bytes.data(), bytes.size(), &out.width, &out.height, nullptr, STBI_rgb_alpha);
+
+    /** Copy pixels into output */
+    out.pixels.resize(out.width * out.height);
+    memcpy(out.pixels.data(), pixels, out.pixels.size());
+
+    stbi_image_free(pixels);
+    return out;
+}
+
+std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset, int yoffset, int w, int h, int cols, int count)
+{
+    return {};
 }
 
 #ifndef WIN32
