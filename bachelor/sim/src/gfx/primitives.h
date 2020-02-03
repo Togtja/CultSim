@@ -32,6 +32,9 @@ public:
     virtual std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() = 0;
 };
 
+/**
+ * Implementation of IPrimitive that generates a 2D circular shape
+ */
 class PrimitiveCircle : public IPrimitive
 {
 private:
@@ -48,6 +51,18 @@ public:
 
 class PrimitiveQuad : public IPrimitive
 {
+private:
+    float m_side_length = 1.f;
+    float m_ratio       = 1.f;
+
+public:
+    PrimitiveQuad(float side_length, float m_ratio = 1.f);
+    ;
+
+    std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_tris() override;
+    std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
+
+PrimitiveQuad::PrimitiveQuad(float side_length, float ratio);
 } // namespace gfx
 } // namespace cs
