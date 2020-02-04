@@ -46,7 +46,7 @@ struct SpriteTextureID
  */
 struct SpriteVertex
 {
-    glm::vec2 pos{};
+    glm::vec3 pos{};
     glm::vec2 tex_coord{};
 };
 
@@ -58,6 +58,15 @@ struct SpriteInstanceVertex
     glm::vec3 offset{};
     glm::vec3 color{};
     SpriteTextureID texture{};
+};
+
+/**
+ * The vertex layout used by primitive shapes such as grids, cylinders, circles etc
+ */
+struct PrimitiveVertex
+{
+    glm::vec3 position{};
+    glm::vec3 color{};
 };
 
 } // namespace gfx

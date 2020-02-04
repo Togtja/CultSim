@@ -12,7 +12,7 @@ bool init(std::string_view project_name)
 {
     if (!PHYSFS_init(project_name.data()))
     {
-        spdlog::error("failed to initialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+        spdlog::error("failed to initialize PhysFS, {}", get_errorstring());
         return false;
     }
 
@@ -28,11 +28,17 @@ void deinit()
 {
     if (!PHYSFS_deinit())
     {
-        spdlog::error("failed to deinitialize PhysFS, {}", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+        spdlog::error("failed to deinitialize PhysFS, {}", get_errorstring());
     }
 }
 
 std::string read_file(std::string_view rpath)
+{
+    auto read_bytes = read_byte_file(rpath);
+    return std::string(read_bytes.begin(), read_bytes.end());
+}
+
+std::vector<uint8_t> read_byte_file(std::string_view rpath)
 {
     if (!exists(rpath))
     {
@@ -43,20 +49,20 @@ std::string read_file(std::string_view rpath)
     auto file = PHYSFS_openRead(rpath.data());
     if (file == nullptr)
     {
-        spdlog::warn("could not open {}", rpath);
+        spdlog::warn("could not open {} due to {}", rpath.data(), get_errorstring());
         return {};
     }
 
-    std::string ret(PHYSFS_fileLength(file), '\0');
-    auto read_bytes = PHYSFS_readBytes(file, ret.data(), ret.length());
+    auto ret        = std::vector<uint8_t>(PHYSFS_fileLength(file));
+    auto read_bytes = PHYSFS_readBytes(file, ret.data(), ret.size());
 
     if (read_bytes == 0)
     {
         spdlog::warn("the file: {} is empty", rpath);
     }
-    else if (read_bytes <= -1)
+    else if (read_bytes == -1)
     {
-        spdlog::error("the file: {} failed to read with error: {}", rpath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+        spdlog::error("the file: {} failed to read with error: {}", rpath, get_errorstring());
     }
 
     PHYSFS_close(file);
@@ -85,7 +91,7 @@ int64_t write_file(std::string_view rpath, const std::string& data)
     }
     else if (write_bytes <= -1)
     {
-        spdlog::error("the file: {} failed to write with error: {}", rpath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
+        spdlog::error("the file: {} failed to write with error: {}", rpath, get_errorstring());
     }
 
     PHYSFS_close(file);
@@ -186,6 +192,11 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
 
     spdlog::error("could not copy file");
     return false;
+}
+
+std::string_view get_errorstring()
+{
+    return get_errorstring();
 }
 
 std::vector<std::string> list_directory(std::string_view rpath)

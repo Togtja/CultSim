@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -31,6 +32,14 @@ void deinit();
  * @return A string containing the full contents of the file
  */
 std::string read_file(std::string_view rpath);
+
+/**
+ * Read the entire file at the relative file path as bytes
+ *
+ * @param rpath The relative file path to read from
+ * @return A vector of bytes read
+ */
+std::vector<uint8_t> read_byte_file(std::string_view rpath);
 
 /**
  * Write the text stored in data to the given relative file path
@@ -85,6 +94,13 @@ bool delete_file(std::string_view rpath);
  * @return true if successful, otherwise false
  */
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing = false);
+
+/**
+ * Get the latest error string from the underlying filesystem
+ *
+ * @return The latest errorstring
+ */
+std::string_view get_errorstring();
 
 /**
  * Reads a directory, and returns a list of the files inside the directory
