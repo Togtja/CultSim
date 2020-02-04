@@ -76,7 +76,7 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    static gfx::SpriteRenderer r{};
+    auto& r = gfx::get_renderer();
     m_window.clear();
 
     auto time              = SDL_GetTicks();
@@ -90,13 +90,13 @@ void Application::draw()
         for (int j = 0; j < nsprsq; ++j)
         {
             auto yratio = (-0.5f + j / nsprsq) * 10.f;
-            r.draw({xratio * 1920.f, yratio * 1080.f, 0.f},
-                   {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
-                   {});
+            r.sprite().draw({xratio * 1920.f, yratio * 1080.f, 0.f},
+                            {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
+                            {});
         }
     }
 
-    r.display();
+    r.sprite().display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -197,6 +197,7 @@ bool Application::init_input()
 
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
     /* TODO: Fix to not return true */
+
     return true;
 }
 
