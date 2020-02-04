@@ -1,6 +1,7 @@
 #include "debug_renderer.h"
 #include "vao_builder.h"
 #include "render_data.h"
+#include "glutil.h"
 
 #include <vector>
 
@@ -13,15 +14,23 @@ namespace gfx
 {
 DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
 {
-    m_vao = VaoBuilder().attribute(0, 0, 2, GL_FLOAT, 0u).build();
+    m_vao = VaoBuilder().attribute(0, 0, 3, GL_FLOAT, 0u).attribute(1, 0, 3, GL_FLOAT, offsetof(PrimitiveVertex, color)).build();
 
     glCreateBuffers(1, &m_linevbo);
     glNamedBufferStorage(m_linevbo, sizeof(PrimitiveVertex) * 2u, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+    auto vs  = fcompile_shader("shader/debug.vert", GL_VERTEX_SHADER);
+    auto fs  = fcompile_shader("shader/debug.frag", GL_FRAGMENT_SHADER);
+    m_shader = create_program({vs, fs});
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    glLineWidth(2.f);
 }
 
-void DebugRenderer::draw_line(glm::vec2 from, glm::vec2 to, glm::vec3 color)
+void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
 {
-    auto data = std::vector<PrimitiveVertex>{{{from.x, 0.f, from.y}, color}, {{to.x, 0.f, to.y}, color}};
+    auto data = std::vector<PrimitiveVertex>{{{from.x, from.y, from.z}, {1.f, 1.f, 1.f}}, {{to.x, to.y, to.z}, {1.f, 1.f, 1.f}}};
 
     glNamedBufferSubData(m_linevbo, 0, sizeof(PrimitiveVertex) * 2, data.data());
     glBindVertexArray(m_vao);

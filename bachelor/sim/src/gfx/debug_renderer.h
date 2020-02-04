@@ -27,7 +27,7 @@ private:
 public:
     DebugRenderer(Camera& camera);
 
-    void draw_line(glm::vec2 from, glm::vec2 to, glm::vec3 color);
+    void draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color);
 
     void draw_rect(glm::vec2 tl, glm::vec2 size, glm::vec3 color);
 
