@@ -28,8 +28,10 @@ glm::mat4 Camera::get_view_matrix() const
 
 void Camera::move(glm::vec3 delta)
 {
-    m_pos.x = std::clamp(m_pos.x + (delta.x * m_speed), 0 - (m_bounds.x / 2), m_bounds.x / 2);
-    m_pos.z += std::clamp(m_pos.z + (delta.z * m_speed), 0 - (m_bounds.y / 2), m_bounds.y / 2);
+    m_pos += delta;
+    m_pos.x = glm::clamp(m_pos.x, -m_bounds.x / 2.f, m_bounds.x / 2.f);
+    m_pos.y = glm::clamp(m_pos.y, 5.f, 1000.f);
+    m_pos.z = glm::clamp(m_pos.z, -m_bounds.y / 2.f, m_bounds.y / 2.f);
 }
 void Camera::zoom(float zoom)
 {
