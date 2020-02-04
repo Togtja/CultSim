@@ -1,12 +1,14 @@
 #include "camera.h"
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 
+
+#include <SDL.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/spdlog.h>
-#include <SDL2/SDL.h>
+
 
 namespace cs
 {

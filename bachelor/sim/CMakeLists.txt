@@ -9,29 +9,37 @@ find_package(PhysFS REQUIRED)
 set(TEAM_NAME g107)
 
 # Define executable
-set(EXEC_NAME cultsim)
-add_executable(${EXEC_NAME})
+set(EXEC_NAME cultlib)
+
+add_library(${EXEC_NAME} SHARED)
+add_library(${EXEC_NAME}::${EXEC_NAME} ALIAS ${EXEC_NAME})
 
 # Add Source Files
 include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/ImGUI/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/l10n/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/include/cultsim/CMakeLists.txt)
+
 
 # Set Include Directories
 target_include_directories(
     ${EXEC_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/src
-    ${LUA_INCLUDE_DIR}
+    PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/include
     ${PHYSFS_INCLUDE_DIR}
+    ${LUA_INCLUDE_DIR}
+
+    PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/include/cultsim
+    ${CMAKE_CURRENT_LIST_DIR}/src
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Link with some libraries
 target_link_libraries(
     ${EXEC_NAME}
-    PRIVATE
+    PUBLIC
     OpenGL::GL
     $<$<PLATFORM_ID:Linux>:dl>
     glad::glad
@@ -43,14 +51,6 @@ target_link_libraries(
     EnTT::EnTT
     spdlog::spdlog
     glm::glm
-)
 
-# Zip Resource folder and copy to binary directory so we can mount it with PhysFS
-add_custom_target(
-    cultsim_resource_copy ALL
-    COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n
-    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
-    DEPENDS cultsim
-    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip
-    COMMENT "Archiving resource files..."
+    doctest
 )
