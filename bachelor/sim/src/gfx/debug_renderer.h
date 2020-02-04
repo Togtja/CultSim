@@ -1,5 +1,7 @@
 #pragma once
 
+#include "camera.h"
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -10,6 +12,8 @@ namespace gfx
 class DebugRenderer
 {
 private:
+    Camera& m_camera;
+
     uint32_t m_linevbo{};
 
     uint32_t m_rectvbo{};
@@ -21,7 +25,7 @@ private:
     uint32_t m_shader{};
 
 public:
-    DebugRenderer();
+    DebugRenderer(Camera& camera);
 
     void draw_line(glm::vec2 from, glm::vec2 to, glm::vec3 color);
 
