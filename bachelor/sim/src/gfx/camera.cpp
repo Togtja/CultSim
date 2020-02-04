@@ -14,23 +14,22 @@ namespace gfx
 {
 void Camera::init(glm::vec3 position)
 {
-    m_pos   = position;
-    m_speed = 0.001;
+    m_pos = position;
 }
 
-glm::mat4 Camera::get_view_matrix()
+glm::mat4 Camera::get_view_matrix() const
 {
-    auto view_mat = glm::rotate(glm::mat4(1.f), glm::radians(90.f), {1.f, 0.f, 0.f});
-    view_mat      = glm::translate(view_mat, {-m_pos.x, -m_pos.y, -m_pos.z});
-    auto proj     = glm::perspectiveFov(glm::radians(90.f), 16.f, 9.f, 0.01f, 2000.f);
+    auto view_mat   = glm::rotate(glm::mat4(1.f), glm::radians(90.f), {1.f, 0.f, 0.f});
+    view_mat        = glm::translate(view_mat, {-m_pos.x, -m_pos.y, -m_pos.z});
+    const auto proj = glm::perspectiveFov(glm::radians(90.f), 16.f, 9.f, 0.01f, 2000.f);
 
     return proj * view_mat;
 }
 
-void Camera::move(glm::vec3 movement)
+void Camera::move(glm::vec3 delta)
 {
-    m_pos.x = std::clamp(m_pos.x + (movement.x * m_speed), 0 - (m_bounds.x / 2), m_bounds.x / 2);
-    m_pos.z += std::clamp(m_pos.z + (movement.z * m_speed), 0 - (m_bounds.y / 2), m_bounds.y / 2);
+    m_pos.x = std::clamp(m_pos.x + (delta.x * m_speed), 0 - (m_bounds.x / 2), m_bounds.x / 2);
+    m_pos.z += std::clamp(m_pos.z + (delta.z * m_speed), 0 - (m_bounds.y / 2), m_bounds.y / 2);
 }
 void Camera::zoom(float zoom)
 {

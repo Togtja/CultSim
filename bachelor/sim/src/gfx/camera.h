@@ -11,11 +11,13 @@ namespace gfx
 class Camera
 {
 private:
-    glm::vec3 m_pos;
-    GLfloat m_speed;
-    glm::vec2 m_bounds;
+    glm::vec3 m_pos    = {0.f, 0.f, 0.f};
+    glm::vec2 m_bounds = {20.f, 20.f};
+    GLfloat m_speed    = 10.f;
 
 public:
+    Camera() = default;
+
     /**
      * Initialize the Camera with values dependent on scene
      *
@@ -23,15 +25,15 @@ public:
      */
     void init(glm::vec3 position);
 
-    glm::mat4 get_view_matrix();
+    glm::mat4 get_view_matrix() const;
 
     /**
-     * Move the camera along the (X,Z) plane
+     * Move the camera by an arbitrary amount
      *
-     * @param dir Direction of movement
+     * @param delta How much to move on each axis
      * @note The position of the camera is clamped to not go outside of the bounds defined in Camera.m_bounds
      */
-    void move(glm::vec3 dir);
+    void move(glm::vec3 delta);
 
     /**
      * Zoom in or out with the camera
