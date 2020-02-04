@@ -87,13 +87,17 @@ void Application::draw()
         for (int j = 0; j < nsprsq; ++j)
         {
             auto yratio = (-0.5f + j / nsprsq) * 10.f;
-            r.sprite().draw({xratio * 1920.f, yratio * 1080.f, 0.f},
+            r.sprite().draw({xratio * 1920.f, yratio * 1080.f, -5.f},
                             {std::sin(time / 1000.f) + 1.f - xratio, std::cos(time / 1000.f) + yratio, xratio},
                             {});
         }
     }
 
     r.sprite().display();
+
+    r.debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+    r.debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+    r.debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -192,7 +196,14 @@ bool Application::init_input()
     input::ContextHandler& inputs = input::get_input();
     std::function<void()> test([] { spdlog::info("You have hit the spacebar"); });
 
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 0.f, -1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, [] { gfx::get_renderer().move_camera({-1.f, 0.f, 0.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, 0.f, 1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, [] { gfx::get_renderer().move_camera({1.f, 0.f, 0.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({1.f, 4.f, 0.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, -4.f, 0.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
+
     /* TODO: Fix to not return true */
 
     return true;
