@@ -16,7 +16,7 @@ namespace cs
 {
 namespace gfx
 {
-SpriteRenderer::SpriteRenderer()
+SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 {
     /** Init Shader */
     auto vertex_shader = fcompile_shader("shader/sprite.vert", GL_VERTEX_SHADER);

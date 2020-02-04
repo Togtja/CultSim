@@ -13,7 +13,7 @@ namespace gfx
 class SpriteRenderer
 {
 private:
-    Camera m_camera{};
+    Camera& m_camera;
 
     uint32_t m_vao{};
 
@@ -41,7 +41,7 @@ private:
     SpriteTextureID m_next_texture_id{};
 
 public:
-    SpriteRenderer();
+    SpriteRenderer(Camera& camera);
 
     /**
      * Add a new sprite to the draw list using the given position color and texture
