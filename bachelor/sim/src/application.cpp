@@ -4,7 +4,7 @@
 #include "gfx/glutil.h"
 #include "gfx/sprite_renderer.h"
 #include "inputhandler.h"
-#include "l10n/lang_manager.h"
+#include "gfx/renderer.h"
 
 #include <chrono>
 #include <functional>
@@ -33,9 +33,6 @@ void Application::run(const std::vector<char*>& args)
         ImGui::NewFrame();
 
         /** TODO: Let the frame rate be set in preferences / options menu */
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(m_window.get());
-        ImGui::NewFrame();
 
         while (lag >= SEC_PER_LOOP)
         {
