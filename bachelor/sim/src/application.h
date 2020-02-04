@@ -47,7 +47,7 @@ private:
 
     void draw();
 
-    bool init(std::vector<char*> args);
+    bool init(const std::vector<char*>& args);
 
     /**
      * Initialize OpenGL, SDL and the Window

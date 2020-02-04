@@ -5,9 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 /**
  * Describes how to look up what texture to use for a sprite in the rendering system
@@ -69,5 +67,4 @@ struct PrimitiveVertex
     glm::vec3 color{};
 };
 
-} // namespace gfx
 } // namespace cs

@@ -5,9 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 class DebugRenderer
 {
@@ -25,7 +23,7 @@ private:
     uint32_t m_shader{};
 
 public:
-    DebugRenderer(Camera& camera);
+    explicit DebugRenderer(Camera& camera);
 
     void draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color);
 
@@ -33,5 +31,4 @@ public:
 
     void draw_circle(glm::vec2 pos, float radius, glm::vec3 color);
 };
-} // namespace gfx
 } // namespace cs

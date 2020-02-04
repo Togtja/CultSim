@@ -29,7 +29,7 @@ public:
      * Get a pointer to the underlying SDL_Window
      *
      * @return Pointer to the underlying SDL_Window, it could be nullptr if window is not initialized     */
-    SDL_Window* get() const;
+    [[nodiscard]] SDL_Window* get() const;
 
     /**
      * Initialize a Window with the provided title and size
@@ -68,7 +68,7 @@ public:
      */
     void deinit() noexcept;
 
-    SDL_GLContext get_context() const;
+    [[nodiscard]] SDL_GLContext get_context() const;
 
 private:
 };

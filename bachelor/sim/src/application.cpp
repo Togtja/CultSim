@@ -105,7 +105,7 @@ void Application::draw()
     m_window.display();
 }
 
-bool Application::init(std::vector<char*> args)
+bool Application::init(const std::vector<char*>& args)
 {
     return init_subsystem(&Application::init_gl, "OpenGL") &&           // Init OpenGL
            init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
@@ -126,7 +126,7 @@ bool Application::init_gl()
     {
         spdlog::error("failed to initialize window");
         return false;
-    };
+    }
 
     if (!gladLoadGL())
     {
