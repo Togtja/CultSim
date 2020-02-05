@@ -1,7 +1,7 @@
 #include "application.h"
 #include "constants.h"
 #include "entity/components.h"
-#include "filesystem.h"
+#include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "gfx/renderer.h"
 #include "gfx/sprite_renderer.h"
