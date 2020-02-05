@@ -1,11 +1,11 @@
 #include "application.h"
 #include "constants.h"
+#include "entity/components.h"
 #include "filesystem.h"
 #include "gfx/glutil.h"
+#include "gfx/renderer.h"
 #include "gfx/sprite_renderer.h"
 #include "inputhandler.h"
-#include "gfx/renderer.h"
-#include "entity/components.h"
 
 #include <chrono>
 #include <functional>
@@ -76,7 +76,12 @@ void Application::handle_input()
 
 void Application::update(float dt)
 {
-
+    auto mov_sprite_view = m_entt.view<component::Position, component::Movement>();
+    mov_sprite_view.each([dt](component::Position& pos, component::Movement& mov) {
+        mov.speed -= 1.f*dt;
+        pos.position.x += mov.direction.x * (mov.speed * dt);
+        pos.position.y += mov.direction.y * (mov.speed * dt);
+        });
 }
 
 void Application::draw()
@@ -85,10 +90,9 @@ void Application::draw()
     m_window.clear();
 
     auto pos_sprite_view = m_entt.view<component::Position, component::Sprite>();
-    pos_sprite_view.each([&r](const component::Position& pos, const component::Sprite& sprite)
-    {
+    pos_sprite_view.each([&r](const component::Position& pos, const component::Sprite& sprite) {
         r.sprite().draw(pos.position, sprite.color, sprite.texture);
-    });
+        });
 
     r.sprite().display();
 

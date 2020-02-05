@@ -6,7 +6,7 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/spdlog.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 namespace cs::gfx
 {
