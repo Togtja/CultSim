@@ -22,10 +22,6 @@ void Application::run(const std::vector<char*>& args)
     auto lag          = 0.f;
 
     /** Example */
-    auto agent = m_entt.create();
-    m_entt.assign<component::Position>(agent, glm::vec3(0.f));
-    m_entt.assign<component::Movement>(agent, glm::normalize(glm::vec2(1.f, 1.f)), 25.f);
-    m_entt.assign<component::Sprite>(agent, gfx::SpriteTextureID{}, glm::vec3(1.f, 0.f, 0.f));
 
     init(args);
     /* Main Loop */
@@ -76,23 +72,12 @@ void Application::handle_input()
 
 void Application::update(float dt)
 {
-    auto mov_sprite_view = m_entt.view<component::Position, component::Movement>();
-    mov_sprite_view.each([dt](component::Position& pos, component::Movement& mov) {
-        mov.speed -= 1.f*dt;
-        pos.position.x += mov.direction.x * (mov.speed * dt);
-        pos.position.y += mov.direction.y * (mov.speed * dt);
-        });
 }
 
 void Application::draw()
 {
     auto& r = gfx::get_renderer();
     m_window.clear();
-
-    auto pos_sprite_view = m_entt.view<component::Position, component::Sprite>();
-    pos_sprite_view.each([&r](const component::Position& pos, const component::Sprite& sprite) {
-        r.sprite().draw(pos.position, sprite.color, sprite.texture);
-        });
 
     r.sprite().display();
 
