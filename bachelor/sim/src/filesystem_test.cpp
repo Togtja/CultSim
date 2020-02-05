@@ -15,5 +15,5 @@ TEST_CASE("testing the file system")
     CHECK(cs::fs::exists(name) == true);
     CHECK(cs::fs::read_file(name) == data);
     CHECK(cs::fs::delete_file(name) == true);
-    CHECK(cs::fs::exists(name) == true);
+    CHECK(cs::fs::exists(name) == false);
 }
