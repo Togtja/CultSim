@@ -21,8 +21,6 @@ void Application::run(const std::vector<char*>& args)
     auto current_time = std::chrono::steady_clock::now();
     auto lag          = 0.f;
 
-    /** Example */
-
     init(args);
     /* Main Loop */
     while (m_running)
