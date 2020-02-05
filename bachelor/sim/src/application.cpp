@@ -2,9 +2,9 @@
 #include "constants.h"
 #include "filesystem.h"
 #include "gfx/glutil.h"
+#include "gfx/renderer.h"
 #include "gfx/sprite_renderer.h"
 #include "inputhandler.h"
-#include "gfx/renderer.h"
 
 #include <chrono>
 #include <functional>

@@ -11,13 +11,6 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
 )
 
-# Set Include Directories
-target_include_directories(
-    ${EXEC_NAME}
-    PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/include
-)
-
 # Link with some libraries
 target_link_libraries(
     ${EXEC_NAME}

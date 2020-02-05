@@ -10,6 +10,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.h
     ${CMAKE_CURRENT_LIST_DIR}/filesystem.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/filesystem_test.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/inputhandler.h
     ${CMAKE_CURRENT_LIST_DIR}/inputhandler.cpp
