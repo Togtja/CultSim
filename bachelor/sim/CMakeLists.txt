@@ -53,7 +53,7 @@ target_link_libraries(
     glad::glad
     ${PHYSFS_LIBRARY}
     SDL2
-    ${LUA_LIBRARIES}
+    ${LUA_LIBRARY}
     sol2::sol2
     EnTT::EnTT
     spdlog::spdlog

@@ -1,5 +1,6 @@
 # Create Excecutable
 find_package(OpenGL REQUIRED)
+find_package(Lua REQUIRED)
 
 # Program Variables
 set(TEAM_NAME g107)
@@ -22,17 +23,18 @@ target_link_libraries(
     PRIVATE
     cultlib::cultlib
     $<$<PLATFORM_ID:Linux>:dl>
+    glad::glad
     OpenGL::GL
     SDL2main
     SDL2
     glm
     EnTT::EnTT
-    glad::glad
     ${PHYSFS_LIBRARY}
-    sol2::sol2
-    ${LUA_LIBRARIES}
     spdlog::spdlog
+    ${LUA_LIBRARIES}
+    sol2::sol2
 )
+
 target_sources(
     ${EXEC_NAME}
     PRIVATE
