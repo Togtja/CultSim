@@ -21,6 +21,11 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/ImGUI/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/l10n/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/include/cultsim/CMakeLists.txt)
 
+target_compile_features(
+    ${EXEC_NAME}
+    PUBLIC
+    cxx_std_17
+)
 
 # Set Include Directories
 target_include_directories(
@@ -47,7 +52,6 @@ target_link_libraries(
     $<$<PLATFORM_ID:Linux>:dl>
     glad::glad
     ${PHYSFS_LIBRARY}
-    SDL2main
     SDL2
     ${LUA_LIBRARIES}
     sol2::sol2
