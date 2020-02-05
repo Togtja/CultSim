@@ -42,10 +42,25 @@ target_sources(
 )
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
-    cultsim_resource_copy ALL
+    cultlib_resource_copy ALL
     COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
-    DEPENDS cultsim
+    DEPENDS cultlib
     BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip
     COMMENT "Archiving resource files..."
 )
+
+
+add_custom_command(OUTPUT
+${PROJECT_BINARY_DIR}/bachelor/sim_exec/cultlib.dll
+COMMAND ${CMAKE_COMMAND} -E copy_if_different
+${PROJECT_BINARY_DIR}/bachelor/sim/cultlib.dll
+${PROJECT_BINARY_DIR}/bachelor/sim_exec/cultlib.dll
+        DEPENDS cultlib
+)
+
+add_custom_target(copy_files ALL
+    DEPENDS ${PROJECT_BINARY_DIR}/bachelor/sim_exec/cultlib.dll
+)
+#configure_file(${PROJECT_BINARY_DIR}/bachelor/sim/cultlib.dll
+#         ${PROJECT_BINARY_DIR}/bachelor/sim_exec/cultlib.dll COPYONLY)
