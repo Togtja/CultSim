@@ -9,7 +9,7 @@
 
 namespace cs::lang
 {
-class LangManager
+class LanguageManager
 {
 private:
     std::unordered_map<std::string, std::string> m_langs_map;
@@ -22,7 +22,7 @@ public:
      *
      * @param lua takes in a lua state_view to run lua script
      */
-    explicit LangManager(sol::state_view lua);
+    explicit LanguageManager(sol::state_view lua);
 
     /**
      * Creates a Language Manager to do localizations
@@ -30,7 +30,7 @@ public:
      * @param lua takes in a lua state_view to run lua script
      * @param locale initialize it with a language locale
      */
-    LangManager(sol::state_view lua, const std::string& locale);
+    LanguageManager(sol::state_view lua, const std::string& locale);
 
     /**
      * Get a vector list of all avaliable langauges

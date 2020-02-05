@@ -7,13 +7,6 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/application.h
     ${CMAKE_CURRENT_LIST_DIR}/application.cpp
-
-    ${CMAKE_CURRENT_LIST_DIR}/window.h
-    ${CMAKE_CURRENT_LIST_DIR}/window.cpp
-
-    ${CMAKE_CURRENT_LIST_DIR}/inputhandler.h
-    ${CMAKE_CURRENT_LIST_DIR}/inputhandler.cpp
-
 )
 
 # Configure file with CMake Variables

@@ -25,4 +25,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/camera.h
     ${CMAKE_CURRENT_LIST_DIR}/camera.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/window.h
+    ${CMAKE_CURRENT_LIST_DIR}/window.cpp
 )

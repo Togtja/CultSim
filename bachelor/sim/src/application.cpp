@@ -5,7 +5,7 @@
 #include "gfx/glutil.h"
 #include "gfx/renderer.h"
 #include "gfx/sprite_renderer.h"
-#include "inputhandler.h"
+#include "input/input_handler.h"
 
 #include <chrono>
 #include <functional>
