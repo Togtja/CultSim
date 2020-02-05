@@ -14,6 +14,9 @@ set(EXEC_NAME cultlib)
 add_library(${EXEC_NAME} SHARED)
 add_library(${EXEC_NAME}::${EXEC_NAME} ALIAS ${EXEC_NAME})
 
+include(GenerateExportHeader)
+generate_export_header(cultlib)
+
 # Add Source Files
 include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
@@ -32,11 +35,11 @@ target_include_directories(
     ${EXEC_NAME}
     PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}
 
     PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/include/cultsim
     ${CMAKE_CURRENT_LIST_DIR}/src
-    ${CMAKE_CURRENT_BINARY_DIR}
     ${PHYSFS_INCLUDE_DIR}
     ${LUA_INCLUDE_DIR}
 )
@@ -53,7 +56,7 @@ target_link_libraries(
     glad::glad
     ${PHYSFS_LIBRARY}
     SDL2
-    ${LUA_LIBRARY}
+    ${LUA_LIBRARIES}
     sol2::sol2
     EnTT::EnTT
     spdlog::spdlog

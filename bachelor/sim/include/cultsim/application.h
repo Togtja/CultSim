@@ -15,7 +15,7 @@ namespace cs
 /**
  * Holds all state, the window and handles the main loop
  */
-class Application
+class CULTLIB_EXPORT Application
 {
 private:
     /**

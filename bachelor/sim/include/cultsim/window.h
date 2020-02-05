@@ -1,4 +1,5 @@
 #pragma once
+#include "cultlib_export.h"
 
 #include <string_view>
 
@@ -12,7 +13,7 @@ namespace cs
  *
  * @note Always call init before using
  */
-class Window
+class CULTLIB_EXPORT Window
 {
 private:
     SDL_Window* m_window    = nullptr;
