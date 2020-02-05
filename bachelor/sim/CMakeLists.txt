@@ -43,6 +43,7 @@ target_link_libraries(
     EnTT::EnTT
     spdlog::spdlog
     glm::glm
+    doctest
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
