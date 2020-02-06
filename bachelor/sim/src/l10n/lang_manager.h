@@ -7,9 +7,7 @@
 #include <sol/sol.hpp>
 #include <spdlog/spdlog.h>
 
-namespace cs
-{
-namespace lang
+namespace cs::lang
 {
 class LangManager
 {
@@ -24,7 +22,7 @@ public:
      *
      * @param lua takes in a lua state_view to run lua script
      */
-    LangManager(sol::state_view lua);
+    explicit LangManager(sol::state_view lua);
 
     /**
      * Creates a Language Manager to do localizations
@@ -65,5 +63,4 @@ public:
      */
     std::string_view current_lang();
 };
-} // namespace lang
 } // namespace cs

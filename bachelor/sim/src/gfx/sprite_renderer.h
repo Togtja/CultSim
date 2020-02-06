@@ -6,9 +6,7 @@
 #include <string_view>
 #include <vector>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 class SpriteRenderer
 {
@@ -41,7 +39,7 @@ private:
     SpriteTextureID m_next_texture_id{};
 
 public:
-    SpriteRenderer(Camera& camera);
+    explicit SpriteRenderer(Camera& camera);
 
     /**
      * Add a new sprite to the draw list using the given position color and texture
@@ -60,5 +58,4 @@ public:
     SpriteTextureID get_texture(std::string_view rpath);
 };
 
-} // namespace gfx
 } // namespace cs

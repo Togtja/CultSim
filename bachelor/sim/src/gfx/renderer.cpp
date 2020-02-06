@@ -1,8 +1,6 @@
 #include "renderer.h"
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 DebugRenderer& Renderer::debug()
 {
@@ -46,9 +44,8 @@ Renderer::Renderer() : m_debug_renderer(m_camera), m_sprite_renderer(m_camera)
 
 Renderer& get_renderer()
 {
-    static auto r = Renderer{};
+    static Renderer r{};
     return r;
 }
 
-} // namespace gfx
 } // namespace cs

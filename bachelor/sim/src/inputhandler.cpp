@@ -4,9 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-namespace cs
-{
-namespace input
+namespace cs::input
 {
 namespace detail
 {
@@ -51,16 +49,11 @@ void InputHandler::handle_input(const SDL_Scancode event)
 bool InputHandler::has_event(const SDL_Scancode event)
 {
     auto key_it = m_key_binding.find(event);
-    if (key_it != m_key_binding.end())
-    {
-        return true;
-    }
-    return false;
+    return key_it != m_key_binding.end();
 }
 
 InputHandler::~InputHandler()
-{
-}
+= default;
 
 } // namespace detail
 
@@ -68,7 +61,7 @@ InputHandler::~InputHandler()
 
 void ContextHandler::add_context(KeyContext context)
 {
-    if (m_active_stack.size() > 0 && context == KeyContext::DefaultContext)
+    if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
     {
         return;
     }
@@ -164,5 +157,4 @@ ContextHandler& get_input()
     return instance;
 }
 
-} // namespace input
 } // namespace cs

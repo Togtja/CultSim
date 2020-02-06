@@ -6,9 +6,7 @@
 
 #include <glad/glad.h>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 /**
  * Data about a loaded texture with relevant information for further processing
@@ -94,5 +92,4 @@ constexpr typename Container::size_type size_bytes(const Container& container)
     return container.size() * sizeof(typename Container::value_type);
 }
 
-} // namespace gfx
 } // namespace cs

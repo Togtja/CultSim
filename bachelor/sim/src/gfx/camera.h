@@ -4,9 +4,7 @@
 #include <glm/vec2.hpp>
 #include <glm/glm.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 class Camera
 {
@@ -25,7 +23,12 @@ public:
      */
     void init(glm::vec3 position);
 
-    glm::mat4 get_view_matrix() const;
+    /**
+     * Get the current view-projection matrix from the camera
+     *
+     * @return Current view-projection matrix based on the camera state
+     */
+    [[nodiscard]] glm::mat4 get_view_matrix() const;
 
     /**
      * Move the camera by an arbitrary amount
@@ -58,5 +61,4 @@ public:
      */
     void set_boundaries(glm::vec2 bounds);
 };
-} // namespace gfx
 } // namespace cs

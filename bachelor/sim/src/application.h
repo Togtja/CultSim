@@ -1,5 +1,6 @@
 #pragma once
 #include "window.h"
+#include "scenes/scenemanager.h"
 
 #include <vector>
 
@@ -22,6 +23,8 @@ private:
      * @warning Do not use until initialized
      */
     Window m_window;
+
+    SceneManager m_scene_manager{};
 
     sol::state m_lua{};
 
@@ -47,7 +50,7 @@ private:
 
     void draw();
 
-    bool init(std::vector<char*> args);
+    bool init(const std::vector<char*>& args);
 
     /**
      * Initialize OpenGL, SDL and the Window

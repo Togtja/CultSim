@@ -17,6 +17,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/ImGUI/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/l10n/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/entity/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/scenes/CMakeLists.txt)
 
 # Set Include Directories
 target_include_directories(
@@ -43,6 +45,7 @@ target_link_libraries(
     EnTT::EnTT
     spdlog::spdlog
     glm::glm
+    doctest
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS

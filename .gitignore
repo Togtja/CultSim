@@ -9,3 +9,5 @@ vs_build/
 .idea/
 CMakeSettings.json
 CMakeLists.txt.user
+cmake-build-debug/
+cmake-build-release/
