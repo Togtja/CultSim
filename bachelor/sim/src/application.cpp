@@ -21,6 +21,15 @@ void Application::run(const std::vector<char*>& args)
     auto current_time = std::chrono::steady_clock::now();
     auto lag          = 0.f;
 
+    for (int i = 0; i < 100; i++)
+    {
+        auto agent = m_entt.create();
+        glm::vec2 pos(i * 15, 0);
+
+        m_entt.assign<component::Position>(agent, glm::vec3(pos, 0));
+        m_entt.assign<component::Movement>(agent, glm::normalize(glm::vec2(1.f, 1.f)), 25.f * (1 + (i / 5.f)));
+        m_entt.assign<component::Sprite>(agent, gfx::SpriteTextureID{}, glm::vec3(1.f, 0.f, 0.f));
+    }
     init(args);
     /* Main Loop */
     while (m_running)
@@ -76,6 +85,11 @@ void Application::draw()
 {
     auto& r = gfx::get_renderer();
     m_window.clear();
+
+    auto pos_sprite_view = m_entt.view<component::Position, component::Sprite>();
+    pos_sprite_view.each([&r](const component::Position& pos, const component::Sprite& sprite) {
+        r.sprite().draw(pos.position, sprite.color, sprite.texture);
+    });
 
     r.sprite().display();
 
