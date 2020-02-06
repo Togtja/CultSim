@@ -118,7 +118,7 @@ struct Produce
     std::vector<EProduce> produces{};
 };
 
-struct Drop_Items
+struct DropItems
 {
     enum EDeathDrops
     {
