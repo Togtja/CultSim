@@ -86,10 +86,12 @@ void Application::handle_input()
 
 void Application::update(float dt)
 {
+    m_scene_manager.update(dt);
 }
 
 void Application::draw()
 {
+    m_scene_manager.draw();
     auto& r = gfx::get_renderer();
     m_window.clear();
 

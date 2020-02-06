@@ -1,5 +1,7 @@
 #pragma once
 #include "gfx/window.h"
+#include "window.h"
+#include "scenes/scenemanager.h"
 
 #include <vector>
 
@@ -22,6 +24,8 @@ private:
      * @warning Do not use until initialized
      */
     Window m_window;
+
+    SceneManager m_scene_manager{};
 
     sol::state m_lua{};
 
