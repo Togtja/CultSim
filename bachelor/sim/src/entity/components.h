@@ -2,6 +2,8 @@
 
 #include "gfx/render_data.h"
 
+#include <vector>
+
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
@@ -34,40 +36,40 @@ struct Animation
 
 struct Emotion
 {
-    /*In percentages from -100 - 100 */
+    /** In percentages from -100 - 100 */
 
-    /*-100=Depressed - 100= Ecstatic*/
+    /** -100=Depressed - 100= Ecstatic*/
     float happiness{};
 
-    /*-100=Livid - 100 = tranquil*/
+    /** -100=Livid - 100 = tranquil*/
     float calm{};
 
-    /*-100=Unmotivated - 100 = Very motivated*/
+    /** -100=Unmotivated - 100 = Very motivated*/
     float motivation{};
 };
 
 struct Status
 {
-    /*In percentages from 0 - 100 */
+    /** In percentages from 0 - 100 */
 
-    /*0=Dead - 100 = Full health*/
+    /** 0=Dead - 100 = Full health*/
     float health = 100;
 
-    /*0 = No energy - 100 = Full energy*/
+    /** 0 = No energy - 100 = Full energy*/
     float energy = 100;
 
-    /*0 = Starving - 100 = Well fed*/
+    /** 0 = Starving - 100 = Well fed*/
     float nourishment = 100;
 };
 
 struct Attributes
 {
-    /*In percentages from -100 - 100 */
+    /** In percentages from -100 - 100 */
 
-    /*-100 = repulsive - 100 = enticing  */
+    /** -100 = repulsive - 100 = enticing  */
     float attractiveness{};
 
-    /*-100 = terrifying - 100 = soothing*/
+    /** -100 = terrifying - 100 = soothing*/
     float soothing{};
 };
 
