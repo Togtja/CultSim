@@ -21,5 +21,9 @@ bool AI::is_colliding()
 }
 void AI::update(float dt)
 {
+bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float treshold)
+{
+    glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(treshold));
+    return boolvec.x && boolvec.y;
 }
 } // namespace cs::system

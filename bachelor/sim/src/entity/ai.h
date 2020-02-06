@@ -12,6 +12,8 @@ public:
     bool is_visible(glm::vec2 pos, glm::vec2 pos2, float rad);
     bool is_colliding();
     void update(float dt) override;
+private:
+    bool close_enough(glm::vec2 pos, glm::vec2 pos2, float treshold);
 };
 
 } // namespace cs::system
