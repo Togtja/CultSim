@@ -2,9 +2,7 @@
 
 #include <functional>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 /**
  * Utility class to create Vertex Array Objects with a builder like interface
@@ -91,6 +89,4 @@ public:
      */
     unsigned build();
 };
-} // namespace gfx
-
 } // namespace cs

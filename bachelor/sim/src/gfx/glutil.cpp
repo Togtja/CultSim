@@ -7,9 +7,7 @@
 #include "stb_image.h"
 #include <spdlog/spdlog.h>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 GLuint compile_shader(std::string_view source, GLenum type)
 {
@@ -90,13 +88,13 @@ std::string get_gl_shader_type_name(GLenum type)
 {
     switch (type)
     {
-        case GL_VERTEX_SHADER: return "vertex"; break;
-        case GL_GEOMETRY_SHADER: return "geometry"; break;
-        case GL_TESS_CONTROL_SHADER: return "tesselation control"; break;
-        case GL_TESS_EVALUATION_SHADER: return "tesselation evaluation"; break;
-        case GL_FRAGMENT_SHADER: return "fragment"; break;
-        case GL_COMPUTE_SHADER: return "compute"; break;
-        default: return "invalid"; break;
+        case GL_VERTEX_SHADER: return "vertex";
+        case GL_GEOMETRY_SHADER: return "geometry";
+        case GL_TESS_CONTROL_SHADER: return "tesselation control";
+        case GL_TESS_EVALUATION_SHADER: return "tesselation evaluation";
+        case GL_FRAGMENT_SHADER: return "fragment";
+        case GL_COMPUTE_SHADER: return "compute";
+        default: return "invalid";
     }
 }
 
@@ -156,5 +154,4 @@ void create_debug_callback()
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, false);
 }
 
-} // namespace gfx
 } // namespace cs

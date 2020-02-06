@@ -2,9 +2,7 @@
 
 #include <glad/glad.h>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 VaoBuilder::VaoBuilder()
 {
@@ -65,5 +63,4 @@ unsigned VaoBuilder::build()
     m_vao    = 0u;
     return tmp;
 }
-} // namespace gfx
 } // namespace cs

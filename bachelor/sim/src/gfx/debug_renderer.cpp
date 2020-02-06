@@ -8,9 +8,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
 {
@@ -40,5 +38,4 @@ void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
     glUniform3f(1, color.r, color.g, color.b);
     glDrawArrays(GL_LINES, 0, 2);
 }
-} // namespace gfx
 } // namespace cs

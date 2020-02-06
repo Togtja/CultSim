@@ -4,9 +4,7 @@
 #include <physfs.h>
 #include <spdlog/spdlog.h>
 
-namespace cs
-{
-namespace fs
+namespace cs::fs
 {
 bool init(std::string_view project_name)
 {
@@ -171,7 +169,7 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
     }
 
     const auto data          = read_file(rpath_old);
-    const auto bytes_written = write_file(rpath_new, data.data());
+    const auto bytes_written = write_file(rpath_new, data);
     spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes_written);
 
     /** Attempt to write entire file contents and handle error if failed */
@@ -196,12 +194,15 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
 
 std::string_view get_errorstring()
 {
-    return get_errorstring();
+    return PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
 }
 
 std::vector<std::string> list_directory(std::string_view rpath)
 {
-    if (!PHYSFS_isDirectory(rpath.data()))
+    PHYSFS_Stat stat{};
+    PHYSFS_stat(rpath.data(), &stat);
+
+    if (stat.filetype != PHYSFS_FILETYPE_DIRECTORY)
     {
         spdlog::warn("not a directory, returns empty vector");
         return {};
@@ -216,5 +217,4 @@ std::vector<std::string> list_directory(std::string_view rpath)
     return files;
 }
 
-} // namespace fs
 } // namespace cs

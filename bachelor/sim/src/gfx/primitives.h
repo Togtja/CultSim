@@ -7,9 +7,7 @@
 
 #include <glm/vec3.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 /**
  * Interface for primitive generation, override for shapes like grid, circle and other primitives
@@ -43,7 +41,7 @@ private:
 
 public:
     PrimitiveCircle() = default;
-    PrimitiveCircle(float radius, int detail = 32);
+    explicit PrimitiveCircle(float radius, int detail = 32);
 
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_tris() override;
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
@@ -56,11 +54,10 @@ private:
     float m_ratio       = 1.f;
 
 public:
-    PrimitiveQuad(float side_length, float m_ratio = 1.f);
+    explicit PrimitiveQuad(float side_length, float m_ratio = 1.f);
 
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_tris() override;
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
 
-} // namespace gfx
 } // namespace cs

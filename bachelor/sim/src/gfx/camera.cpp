@@ -6,11 +6,9 @@
 #include <glm/gtx/string_cast.hpp>
 #include <glm/trigonometric.hpp>
 #include <spdlog/spdlog.h>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 void Camera::init(glm::vec3 position)
 {
@@ -48,5 +46,4 @@ void Camera::set_boundaries(glm::vec2 bounds)
     m_bounds = bounds;
 }
 
-} // namespace gfx
 } // namespace cs

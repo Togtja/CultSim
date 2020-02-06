@@ -5,9 +5,7 @@
 #include <string_view>
 #include <vector>
 
-namespace cs
-{
-namespace fs
+namespace cs::fs
 {
 /**
  * Initialize the virtual file system powered by PhysFS
@@ -110,5 +108,4 @@ std::string_view get_errorstring();
  */
 std::vector<std::string> list_directory(std::string_view rpath);
 
-} // namespace fs
 } // namespace cs

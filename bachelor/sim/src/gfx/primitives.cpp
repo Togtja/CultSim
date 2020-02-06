@@ -3,9 +3,7 @@
 #include <glm/trigonometric.hpp>
 #include <glm/gtc/constants.hpp>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 PrimitiveCircle::PrimitiveCircle(float radius, int detail) : m_radius(radius), m_detail(detail)
 {
@@ -22,7 +20,7 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> cs::gfx::Primiti
     for (int i = 0; i < m_detail; ++i)
     {
         /** Add current point using ratio */
-        const auto ratio = i / static_cast<float>(m_detail);
+        const auto ratio = static_cast<float>(i) / static_cast<float>(m_detail);
         verts.push_back({{glm::cos(ratio * glm::two_pi<float>()), glm::sin(ratio * glm::two_pi<float>()), 0.f}, {1.f, 1.f, 1.f}});
 
         /** Add indices for center, current and next point along the circle */
@@ -41,7 +39,7 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> cs::gfx::Primiti
 
     for (int i = 0; i < m_detail; ++i)
     {
-        const auto ratio = i / static_cast<float>(m_detail);
+        const auto ratio = static_cast<float>(i) / static_cast<float>(m_detail);
         verts.push_back({{glm::cos(ratio * glm::two_pi<float>()), glm::sin(ratio * glm::two_pi<float>()), 0.f}, {1.f, 1.f, 1.f}});
         indices.push_back(i);
     }
@@ -93,6 +91,4 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> PrimitiveQuad::g
 
     return {verts, indices};
 }
-} // namespace gfx
-
 } // namespace cs

@@ -4,9 +4,7 @@
 #include "sprite_renderer.h"
 #include "debug_renderer.h"
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 class Renderer
 {
@@ -31,7 +29,7 @@ public:
      * @return
      */
     DebugRenderer& debug();
-    const DebugRenderer& debug() const;
+    [[nodiscard]] const DebugRenderer& debug() const;
 
     /**
      * Get a handle to the sprite renderer
@@ -39,7 +37,7 @@ public:
      * @return
      */
     SpriteRenderer& sprite();
-    const SpriteRenderer& sprite() const;
+    [[nodiscard]] const SpriteRenderer& sprite() const;
 
     void set_camera_position(glm::vec3 pos);
 
@@ -58,5 +56,4 @@ private:
  */
 Renderer& get_renderer();
 
-} // namespace gfx
 } // namespace cs

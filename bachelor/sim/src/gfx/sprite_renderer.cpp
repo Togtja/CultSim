@@ -12,9 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
-namespace cs
-{
-namespace gfx
+namespace cs::gfx
 {
 SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 {
@@ -113,7 +111,5 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
     return {};
 }
-
-} // namespace gfx
 
 } // namespace cs
