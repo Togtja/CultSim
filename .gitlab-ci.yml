@@ -1,10 +1,13 @@
 image: gcc:9
 
+before_script:
+  - apt-get update --yes
+  - apt-get install --yes cmake
+
 test:
   tags:
     - docker
   script:
-    - apt install cmake
     - cmake --version
 
 build:
