@@ -14,6 +14,7 @@ struct Position
 
 struct Movement
 {
+    glm::vec2 desired_direction{};
     glm::vec2 direction{};
     float speed = 1.f;
 };
