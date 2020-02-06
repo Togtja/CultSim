@@ -4,7 +4,7 @@ image: frolvlad/alpine-gxx
 before_script:
   - apk update
   - apk add git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
-  - apk add physfs physfs-dev physfs-static --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main
+  - apk add physfs physfs-dev physfs-static --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
 
 test:
   tags:
