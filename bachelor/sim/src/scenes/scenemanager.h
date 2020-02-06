@@ -36,12 +36,13 @@ private:
 public:
 
     /**
-    * Pushes a new Scene onto the stack
-    * @tparam IScene_ The Scene getting pushed onto the stack
-    * @tparam CtorArgs_ The types of Constructor arguments for said scene
-    *
-    * @param args The contructor arguments for the scene
-    */
+     * Pushes a new Scene onto the stack
+     *
+     * @tparam IScene_ The Scene getting pushed onto the stack
+     * @tparam CtorArgs_ The types of Constructor arguments for said scene
+     *
+     * @param args The constructor arguments for the scene
+     */
     template<typename IScene_, typename... CtorArgs_>
     void push(CtorArgs_&&... args)
     {
@@ -51,25 +52,37 @@ public:
     /**
     * Checks if stack is empty
     */
-    bool empty() const;
+    [[nodiscard]] bool empty() const;
 
     /**
     * Clears the stack of scenes
     */
     void clear();
 
+    /**
+     * Pop the last added scene from the scene stack
+     */
     void pop();
 
+    /**
+     * Update all scenes and process pending scene commands
+     *
+     * @param dt Delta time since this function was last called
+     */
     void update(float dt);
 
+    /**
+     * Draw all scenes until the end or a scene returns false
+     */
     void draw();
 
     /**
-    * gets our currently active Scene
+    * Get the currently active Scene
+     *
     * @return returns the active scene, or nullptr if there is no active scene
     * @warning Do not store the Scene after a pop, it will be invalid
     */
-    IScene* get_active_scene() const;
+    [[nodiscard]] IScene* get_active_scene() const;
 };
 
 } // namespace cs
