@@ -69,30 +69,25 @@ struct Attributes
     float soothing{};
 };
 
-struct Sense
+struct Vision
 {
-    enum ESenses
-    {
-        Vision = 1 << 0,
-        Smell  = 1 << 1,
-        Sound  = 1 << 2,
-        None   = 1 << 4,
-
-    };
-
-    ESenses senses = None;
-
     float vision_radius{};
     float fov{};
+};
 
+struct Smell
+{
     float smell_radius{};
+};
 
+struct Hearing
+{
     float sound_radius{};
 };
 
 struct Reproduction
 {
-    bool can_reproduce= false;
+    bool can_reproduce = false;
 
     enum ESex
     {
