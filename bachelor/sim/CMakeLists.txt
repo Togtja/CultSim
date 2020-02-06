@@ -22,7 +22,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/filesystem/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/input/CMakeLists.txt)
 
 # Discover tests written by the executable
-doctest_discover_tests(${EXEC_NAME})
+doctest_discover_tests(${EXEC_NAME} EXTRA_ARGS --exit)
 
 # Set Include Directories
 target_include_directories(
