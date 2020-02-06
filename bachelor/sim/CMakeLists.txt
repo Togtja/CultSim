@@ -18,6 +18,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/gfx/ImGUI/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/l10n/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/entity/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/filesystem/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/input/CMakeLists.txt)
 
 # Set Include Directories
 target_include_directories(
