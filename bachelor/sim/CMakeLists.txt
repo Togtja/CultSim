@@ -51,6 +51,11 @@ target_link_libraries(
     spdlog::spdlog
     glm::glm
     doctest
+# Explicitly enable C++ 17 for this executable
+target_compile_features(
+        ${EXEC_NAME}
+        PRIVATE
+        cxx_std_17
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
