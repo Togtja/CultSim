@@ -17,6 +17,7 @@ bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
 }
 bool AI::is_colliding()
 {
+    return false;
 }
 void AI::update(float dt)
 {
