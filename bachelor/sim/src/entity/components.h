@@ -10,6 +10,7 @@ namespace cs::component
 struct Position
 {
     glm::vec3 position{};
+    glm::vec3 desired_position{};
 };
 
 struct Movement
