@@ -3,7 +3,7 @@ image: frolvlad/alpine-gxx
 # Install dependencies for build up front
 before_script:
   - apk update
-  - apk add git make cmake mesa lua libx11-dev
+  - apk add git make cmake mesa lua libx11-dev libext-dev
 
 test:
   tags:
