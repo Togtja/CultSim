@@ -26,7 +26,7 @@ private:
 
         ECommandType command_type = ECommandType::Nothing;
 
-        Command(std::unique_ptr<IScene> scene, ECommandType type) : new_scene(std::move(scene)), command_type(type)
+        Command(std::unique_ptr<IScene> scene, ECommandType type) : new_scene(std::move(scene)), command_type(type){};
     };
 
     std::vector<std::unique_ptr<IScene>> m_scenestack = {};
@@ -69,7 +69,7 @@ public:
     * @return returns the active scene, or nullptr if there is no active scene
     * @warning Do not store the Scene after a pop, it will be invalid
     */
-    IScene* get_active_scene() cosnt;
+    IScene* get_active_scene() const;
 };
 
 } // namespace cs
