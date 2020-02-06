@@ -1,10 +1,11 @@
 image: gcc:9
 
 test:
-  tags: 
+  tags:
     - docker
   script:
-    - echo "Linting, Formatting etc"
+    - apt install cmake
+    - cmake --version
 
 build:
   tags:
