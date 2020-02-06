@@ -9,7 +9,7 @@ class AI : public ISystem
 private:
 public:
     using ISystem::ISystem;
-    bool is_visible();
+    bool is_visible(glm::vec2 pos, glm::vec2 pos2, float rad);
     bool is_colliding();
     void update(float dt) override;
 };
