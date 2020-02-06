@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "entity/ai.h"
 #include "entity/components.h"
+#include "entity/movement.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "gfx/renderer.h"
@@ -34,6 +35,8 @@ void Application::run(const std::vector<char*>& args)
     }
     init(args);
     system::AI ai(m_entt);
+    system::Movement move(m_entt);
+
     /* Main Loop */
     while (m_running)
     {
@@ -51,9 +54,9 @@ void Application::run(const std::vector<char*>& args)
         {
             update(SEC_PER_LOOP);
             ai.update(SEC_PER_LOOP);
+            move.update(SEC_PER_LOOP);
             lag -= SEC_PER_LOOP;
         }
-
         ImGui::Text("FPS: %6.3f", 1.f / elapsed);
 
         current_time = std::chrono::steady_clock::now();
