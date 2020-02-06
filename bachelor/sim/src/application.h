@@ -1,4 +1,5 @@
 #pragma once
+#include "gfx/window.h"
 #include "window.h"
 #include "scenes/scenemanager.h"
 
