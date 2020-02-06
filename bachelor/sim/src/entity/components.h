@@ -72,7 +72,7 @@ struct Attributes
 struct Vision
 {
     float vision_radius{};
-    float fov{};
+    uint8_t fov{};
 };
 
 struct Smell
