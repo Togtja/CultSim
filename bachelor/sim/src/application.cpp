@@ -1,5 +1,6 @@
 #include "application.h"
 #include "constants.h"
+#include "entity/ai.h"
 #include "entity/components.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
@@ -32,6 +33,7 @@ void Application::run(const std::vector<char*>& args)
         m_entt.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
     }
     init(args);
+    system::AI ai(m_entt);
     /* Main Loop */
     while (m_running)
     {
@@ -48,6 +50,7 @@ void Application::run(const std::vector<char*>& args)
         while (lag >= SEC_PER_LOOP)
         {
             update(SEC_PER_LOOP);
+            ai.update(SEC_PER_LOOP);
             lag -= SEC_PER_LOOP;
         }
 
