@@ -69,4 +69,18 @@ struct Attributes
     float soothing;
 };
 
+struct Senses
+{
+
+    bool blinded;
+    float vision_radius;
+    float fov;
+
+    bool senses_impaired;
+    float sense_radius;
+};
+
+struct AI
+{
+};
 } // namespace cs::component
