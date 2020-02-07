@@ -13,9 +13,9 @@ bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
     return x * x + y * y <= rad * rad;
 }
 
-bool AI::is_colliding()
+bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 {
-    return false;
+    return is_visible(pos, pos2, size + size2);
 }
 
 glm::vec2 AI::path_finding()
@@ -34,16 +34,21 @@ void AI::update(float dt)
                          component::Movement& mov,
                          component::Sprite& spr,
                          component::Vision& vis) {
-        auto view2 = m_registry.view<component::Position>();
         if (close_enough(pos.position, pos.desired_position, 1.f))
         {
             pos.desired_position = glm::vec3(path_finding(), 0);
         }
+
+        auto view2 = m_registry.view<component::Position>();
         for (auto et2 : view2)
         {
             if (et == et2)
             {
                 continue;
+            }
+            while (is_colliding(pos.position, view2.get(et2).position, 7.5f, 7.5f))
+            {
+                pos.position += mov.speed * glm::vec3(mov.direction, 0) * -dt;
             }
             // is_visible(pos.position, view2.get(et2).position, vis.vision_radius)
             // glm::distance(pos.position, view2.get(et2).position) < vis.vision_radius
