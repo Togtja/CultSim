@@ -51,6 +51,24 @@ target_link_libraries(
     spdlog::spdlog
     glm::glm
     doctest
+
+    # Link with gcov on GNU for code coverage
+    $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:gcov>
+)
+
+# Explicitly enable C++ 17 for this executable
+target_compile_features(
+        ${EXEC_NAME}
+        PRIVATE
+        cxx_std_17
+)
+
+# Set compile flags for code coverage computation on Clang / GNU
+target_compile_options(
+        ${EXEC_NAME}
+        PRIVATE
+        $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate -fcoverage-mapping>
+        $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:--coverage>
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
