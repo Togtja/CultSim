@@ -10,17 +10,20 @@ layout(location = 3) in vec3 a_color;
 layout(location = 4) in uint a_texture; // TODO: Make it 16 bit if we can (and messure)
 
 /** Outputs */
-layout(location = 0) out vec3 out_color;
-layout(location = 1) out vec2 out_texcoord;
-layout(location = 2) out uint out_texture;
+layout(location = 0) out VertexData
+{
+    vec3 color;
+    vec2 texcoord;
+    uint texture;
+} vs_out;
 
 layout(location = 0) uniform mat4 u_projection;
 
 void main()
 {
-    out_color    = a_color;
-    out_texcoord = a_texcoord;
-    out_texture  = a_texture;
+    vs_out.color    = a_color;
+    vs_out.texcoord = a_texcoord;
+    vs_out.texture  = a_texture;
 
-    gl_Position = u_projection * (vec4(a_position, 1.f) * 10.f + vec4(a_offset.xzy, 0.f));
+    gl_Position = u_projection * (vec4(a_position, 1.f) * 10.f + vec4(a_offset, 0.f));
 }
