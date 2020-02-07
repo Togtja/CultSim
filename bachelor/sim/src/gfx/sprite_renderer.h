@@ -55,6 +55,12 @@ public:
      */
     void display();
 
+    /**
+     * Get the texture id of a given texture
+     *
+     * @param rpath Relative path to the texture file you want the ID of
+     * @return An ID to the given texture
+     */
     SpriteTextureID get_texture(std::string_view rpath);
 
 private:

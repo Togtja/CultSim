@@ -84,8 +84,38 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 
     glUseProgram(m_shader);
 
-    // Initialize Camera
+    /** Initialize Camera */
     m_camera.init(glm::vec3(0.f, 27.f, 0.f));
+
+    /** Create texture bindings for color */
+    m_color_texture_handles.resize(8);
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_color_texture_handles.data());
+    for (auto tex : m_color_texture_handles)
+    {
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        /** TODO: Fix Hard coded texture size and layers */
+        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+    }
+    glBindTextures(0, 8, m_color_texture_handles.data());
+
+    /** Same for normal textures */
+    m_normal_texture_handles.resize(8);
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_normal_texture_handles.data());
+    for (auto tex : m_normal_texture_handles)
+    {
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        /** TODO: Fix Hard coded texture size and layers */
+        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+    }
+    glBindTextures(8, 8, m_normal_texture_handles.data());
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
