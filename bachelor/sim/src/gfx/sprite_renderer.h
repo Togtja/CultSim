@@ -56,6 +56,9 @@ public:
     void display();
 
     SpriteTextureID get_texture(std::string_view rpath);
+
+private:
+    bool increment_next_texture_id();
 };
 
 } // namespace cs

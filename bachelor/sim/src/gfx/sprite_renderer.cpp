@@ -110,6 +110,22 @@ void SpriteRenderer::display()
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
     return {};
+
+bool SpriteRenderer::increment_next_texture_id()
+{
+    if (m_next_texture_id.start == 31)
+    {
+        ++m_next_texture_id.bind_slot;
+        m_next_texture_id.start = 0;
+    }
+
+    if (m_next_texture_id.index > 7)
+    {
+        spdlog::error("sprite renderer is full on textures!");
+        return false;
+    }
+
+    return true;
 }
 
 } // namespace cs
