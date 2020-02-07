@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 project(bachelor VERSION 0.0.0)
 
 # Project CMake Options
-option(CULTSIM_BUILD_DOCS "Build documentation for Cultsim" ON)
+option(CULTSIM_BUILD_DOCS "Build documentation for Cultsim" OFF)
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/external ${CMAKE_MODULE_PATH})
 

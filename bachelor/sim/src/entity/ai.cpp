@@ -12,6 +12,7 @@ bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
     float y = pos.y - pos2.y;
     return x * x + y * y <= rad * rad;
 }
+
 bool AI::is_colliding()
 {
     return false;

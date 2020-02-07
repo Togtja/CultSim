@@ -1,13 +1,19 @@
-image: gcc:9
+image: frolvlad/alpine-gxx
 
+# Install dependencies for build up front
+before_script:
+  - apk update
+  - apk add git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
+  - apk add cppcheck physfs physfs-dev physfs-static --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+
+# Run unit tests (soon -> run linter and formatting)
 test:
-  tags: 
-    - docker
-  script:
-    - echo "Linting, Formatting etc"
-
-build:
   tags:
     - docker
   script:
-    - echo "CMake Build"
+    - cmake --version
+    - mkdir build
+    - cd build
+    - cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
+    - make -j4
+    - ctest
