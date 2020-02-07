@@ -40,10 +40,10 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     glCreateBuffers(1, &m_vbo);
 
     /** TODO: Consider changing it */
-    const std::vector<SpriteVertex> quad = {{{-0.5f, 0.f, -0.5f}, {0.f, 0.f}},
-                                            {{-0.5f, 0.f, 0.5f}, {0.f, 1.f}},
-                                            {{0.5f, 0.f, 0.5f}, {1.f, 1.f}},
-                                            {{0.5f, 0.f, -0.5f}, {1.f, 0.f}}};
+    const std::vector<SpriteVertex> quad = {{{-0.5f, -0.5f, 0.f}, {1.f, 1.f}},
+                                            {{-0.5f, 0.5f, 0.f}, {1.f, 0.f}},
+                                            {{0.5f, 0.5f, 0.f}, {0.f, 0.f}},
+                                            {{0.5f, -0.5f, 0.f}, {0.f, 1.f}}};
 
     const std::vector<uint8_t> indices = {0, 1, 2, 0, 2, 3};
 
@@ -85,7 +85,7 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     glUseProgram(m_shader);
 
     /** Initialize Camera */
-    m_camera.init(glm::vec3(0.f, 27.f, 0.f));
+    m_camera.init(glm::vec3(0.f, 0.f, 27.f));
 
     /** Create texture bindings for color */
     m_color_texture_handles.resize(8);
