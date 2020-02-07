@@ -1,5 +1,5 @@
 #include "rendering.h"
-#include "components.h"
+#include "entity/components/components.h"
 
 namespace cs::system
 {

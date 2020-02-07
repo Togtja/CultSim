@@ -1,5 +1,5 @@
 #include "ai.h"
-#include "entity/components.h"
+#include "entity/components/components.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>

@@ -1,13 +1,7 @@
-# Add source files for this directory
-
 target_sources(
         ${EXEC_NAME}
         PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR}/components.h
-
         ${CMAKE_CURRENT_LIST_DIR}/system.h
-
-        ${CMAKE_CURRENT_LIST_DIR}/need.h
 
         ${CMAKE_CURRENT_LIST_DIR}/ai.h
         ${CMAKE_CURRENT_LIST_DIR}/ai.cpp
@@ -17,4 +11,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/rendering.h
         ${CMAKE_CURRENT_LIST_DIR}/rendering.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/need.h
+        ${CMAKE_CURRENT_LIST_DIR}/need.cpp
 )

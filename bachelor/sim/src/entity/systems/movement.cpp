@@ -1,5 +1,5 @@
 #include "movement.h"
-#include "components.h"
+#include "entity/components/components.h"
 #include <glm/glm.hpp>
 namespace cs::system
 {
