@@ -25,8 +25,3 @@ TEST_CASE("fail to initialize twice")
     REQUIRE(cs::fs::init("app") == false);
     cs::fs::deinit();
 }
-
-TEST_CASE("fail to deinitialize if not initialized")
-{
-    cs::fs::deinit();
-}
