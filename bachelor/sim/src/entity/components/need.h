@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace cs::ai
 {
@@ -13,7 +14,7 @@ struct Need
 
     float status{};
 
-    vector<std::string> tag{};
-}
+    std::vector<std::string> tag{};
+};
 
 } // namespace cs::ai
