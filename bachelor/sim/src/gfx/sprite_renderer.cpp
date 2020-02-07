@@ -92,8 +92,8 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_color_texture_handles.data());
     for (auto tex : m_color_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -107,8 +107,8 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_normal_texture_handles.data());
     for (auto tex : m_normal_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -143,10 +143,22 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
     // auto normal_data = load_texture(...);
 
     /** Set the texture ID to have appropriate values */
-    auto textureID = m_next_texture_id;
-    textureID.length = 0;
-    textureID.index = 0;
+    auto textureID     = m_next_texture_id;
+    textureID.length   = 0;
+    textureID.index    = 0;
     textureID.flag_lit = 1;
+
+    glTextureSubImage3D(m_color_texture_handles[textureID.bind_slot],
+                        0,
+                        0,
+                        0,
+                        textureID.start,
+                        512,
+                        512,
+                        1,
+                        GL_RGBA,
+                        GL_UNSIGNED_BYTE,
+                        color_data.pixels.data());
 
     increment_next_texture_id();
     return textureID;
