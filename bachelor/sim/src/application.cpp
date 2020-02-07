@@ -3,12 +3,10 @@
 #include "entity/ai.h"
 #include "entity/components.h"
 #include "entity/movement.h"
+#include "entity/rendering.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
-#include "gfx/renderer.h"
-#include "gfx/sprite_renderer.h"
 #include "input/input_handler.h"
-
 #include <chrono>
 #include <functional>
 
@@ -36,6 +34,7 @@ void Application::run(const std::vector<char*>& args)
     init(args);
     system::AI ai(m_entt);
     system::Movement move(m_entt);
+    system::Rendering rendering(m_entt);
 
     /* Main Loop */
     while (m_running)
@@ -62,6 +61,7 @@ void Application::run(const std::vector<char*>& args)
         current_time = std::chrono::steady_clock::now();
 
         draw();
+        rendering.update(0);
     }
 
     deinit();
@@ -94,11 +94,6 @@ void Application::draw()
     m_scene_manager.draw();
     auto& r = gfx::get_renderer();
     m_window.clear();
-
-    auto pos_sprite_view = m_entt.view<component::Position, component::Sprite>();
-    pos_sprite_view.each([&r](const component::Position& pos, const component::Sprite& sprite) {
-        r.sprite().draw(pos.position, sprite.color, sprite.texture);
-    });
 
     r.sprite().display();
 
@@ -203,12 +198,12 @@ bool Application::init_input()
     input::ContextHandler& inputs = input::get_input();
     std::function<void()> test([] { spdlog::info("You have hit the spacebar"); });
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 0.f, -1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 1.f, 0.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, [] { gfx::get_renderer().move_camera({-1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, 0.f, 1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, -1.f, 0.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, [] { gfx::get_renderer().move_camera({1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({1.f, 4.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, -4.f, 0.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({0.f, 0.f, -4.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, 0.f, 4.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
 
     /* TODO: Fix to not return true */

@@ -12,4 +12,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/movement.h
         ${CMAKE_CURRENT_LIST_DIR}/movement.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/rendering.h
+        ${CMAKE_CURRENT_LIST_DIR}/rendering.cpp
 )
