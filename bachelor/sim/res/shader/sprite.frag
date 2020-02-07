@@ -1,14 +1,26 @@
 #version 450 core
 
 /** Inputs */
-layout(location = 0) in vec3 in_color;
-layout(location = 1) in vec2 in_texcoord;
-layout(location = 2) in flat uint in_texture;
+layout(location = 0) in VertexData
+{
+    vec3 color;
+    vec2 texcoord;
+    flat uint texture;
+} vs_in;
 
 /** Outputs */
 layout(location = 0) out vec4 out_color;
 
+/** Uniforms */
+layout(location = 1, binding = 0) uniform sampler2DArray colorTextures[8];
+layout(location = 9, binding = 8) uniform sampler2DArray normalTextures[8];
+
+vec4 sample_sprite()
+{
+    return texture(colorTextures[bitfieldExtract(vs_in.texture, 0, 4)], vec3(vs_in.texcoord, bitfieldExtract(vs_in.texture, 4, 5)));
+}
+
 void main()
 {
-    out_color = vec4(in_color, 1.f);
+    out_color = sample_sprite() * vec4(vs_in.color, 1.f);
 }

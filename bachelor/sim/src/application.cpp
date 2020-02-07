@@ -198,12 +198,12 @@ bool Application::init_input()
     input::ContextHandler& inputs = input::get_input();
     std::function<void()> test([] { spdlog::info("You have hit the spacebar"); });
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 0.f, -1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 1.f, 0.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, [] { gfx::get_renderer().move_camera({-1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, 0.f, 1.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, -1.f, 0.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, [] { gfx::get_renderer().move_camera({1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({1.f, 4.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, -4.f, 0.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({0.f, 0.f, -4.f}); });
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, 0.f, 4.f}); });
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
 
     /* TODO: Fix to not return true */

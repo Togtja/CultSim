@@ -40,10 +40,10 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     glCreateBuffers(1, &m_vbo);
 
     /** TODO: Consider changing it */
-    const std::vector<SpriteVertex> quad = {{{-0.5f, 0.f, -0.5f}, {0.f, 0.f}},
-                                            {{-0.5f, 0.f, 0.5f}, {0.f, 1.f}},
-                                            {{0.5f, 0.f, 0.5f}, {1.f, 1.f}},
-                                            {{0.5f, 0.f, -0.5f}, {1.f, 0.f}}};
+    const std::vector<SpriteVertex> quad = {{{-0.5f, -0.5f, 0.f}, {1.f, 1.f}},
+                                            {{-0.5f, 0.5f, 0.f}, {1.f, 0.f}},
+                                            {{0.5f, 0.5f, 0.f}, {0.f, 0.f}},
+                                            {{0.5f, -0.5f, 0.f}, {0.f, 1.f}}};
 
     const std::vector<uint8_t> indices = {0, 1, 2, 0, 2, 3};
 
@@ -84,8 +84,38 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 
     glUseProgram(m_shader);
 
-    // Initialize Camera
-    m_camera.init(glm::vec3(0.f, 27.f, 0.f));
+    /** Initialize Camera */
+    m_camera.init(glm::vec3(0.f, 0.f, 27.f));
+
+    /** Create texture bindings for color */
+    m_color_texture_handles.resize(8);
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_color_texture_handles.data());
+    for (auto tex : m_color_texture_handles)
+    {
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        /** TODO: Fix Hard coded texture size and layers */
+        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+    }
+    glBindTextures(0, 8, m_color_texture_handles.data());
+
+    /** Same for normal textures */
+    m_normal_texture_handles.resize(8);
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 8, m_normal_texture_handles.data());
+    for (auto tex : m_normal_texture_handles)
+    {
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+        /** TODO: Fix Hard coded texture size and layers */
+        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+    }
+    glBindTextures(8, 8, m_normal_texture_handles.data());
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
@@ -109,7 +139,46 @@ void SpriteRenderer::display()
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
-    return {};
+    auto color_data = load_texture(rpath);
+    // auto normal_data = load_texture(...);
+
+    /** Set the texture ID to have appropriate values */
+    auto textureID     = m_next_texture_id;
+    textureID.length   = 0;
+    textureID.index    = 0;
+    textureID.flag_lit = 1;
+
+    glTextureSubImage3D(m_color_texture_handles[textureID.bind_slot],
+                        0,
+                        0,
+                        0,
+                        textureID.start,
+                        512,
+                        512,
+                        1,
+                        GL_RGBA,
+                        GL_UNSIGNED_BYTE,
+                        color_data.pixels.data());
+
+    increment_next_texture_id();
+    return textureID;
 }
 
-} // namespace cs
+bool SpriteRenderer::increment_next_texture_id()
+{
+    if (m_next_texture_id.start == 31)
+    {
+        ++m_next_texture_id.bind_slot;
+        m_next_texture_id.start = 0;
+    }
+
+    if (m_next_texture_id.index > 7)
+    {
+        spdlog::error("sprite renderer is full on textures!");
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace cs::gfx
