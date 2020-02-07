@@ -139,7 +139,18 @@ void SpriteRenderer::display()
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 {
-    return {};
+    auto color_data = load_texture(rpath);
+    // auto normal_data = load_texture(...);
+
+    /** Set the texture ID to have appropriate values */
+    auto textureID = m_next_texture_id;
+    textureID.length = 0;
+    textureID.index = 0;
+    textureID.flag_lit = 1;
+
+    increment_next_texture_id();
+    return textureID;
+}
 
 bool SpriteRenderer::increment_next_texture_id()
 {
@@ -158,4 +169,4 @@ bool SpriteRenderer::increment_next_texture_id()
     return true;
 }
 
-} // namespace cs
+} // namespace cs::gfx
