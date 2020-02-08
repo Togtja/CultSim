@@ -13,7 +13,7 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/A_human_token.png");
+    auto tex = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
@@ -26,9 +26,9 @@ void ScenarioScene::on_enter()
     }
 
     /** Add required systems */
-    m_active_systems.emplace_back(system::AI(m_registry));
-    m_active_systems.emplace_back(system::Movement(m_registry));
-    m_active_systems.emplace_back(system::Rendering(m_registry));
+    m_active_systems.emplace_back(new system::AI(m_registry));
+    m_active_systems.emplace_back(new system::Movement(m_registry));
+    m_active_systems.emplace_back(new system::Rendering(m_registry));
 }
 
 void ScenarioScene::on_exit()

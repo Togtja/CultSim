@@ -19,7 +19,7 @@ public:
     unsigned update_count = 0u;
     unsigned draw_count   = 0u;
 
-    MockScene(bool block_update, bool block_draw) : m_blocking_update(block_update), m_blocking_draw(block_draw)
+    MockScene(bool block_update, bool block_draw) : m_blocking_update(!block_update), m_blocking_draw(!block_draw)
     {
     }
 
