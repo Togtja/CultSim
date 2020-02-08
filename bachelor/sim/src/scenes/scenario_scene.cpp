@@ -1,9 +1,11 @@
 #include "scenario_scene.h"
-#include "entity/components.h"
-#include "gfx/renderer.h"
 #include "entity/ai.h"
+#include "entity/components.h"
 #include "entity/movement.h"
 #include "entity/rendering.h"
+#include "gfx/renderer.h"
+
+#include "gfx/ImGUI/imgui.h"
 
 namespace cs
 {
@@ -13,7 +15,7 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
+    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
@@ -37,10 +39,14 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    for(auto& system : m_active_systems)
+    ImGui::Begin("Scenario Scene");
+
+    for (auto& system : m_active_systems)
     {
         system->update(dt);
     }
+
+    ImGui::End();
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);
