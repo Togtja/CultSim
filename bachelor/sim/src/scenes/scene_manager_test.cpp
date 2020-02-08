@@ -55,15 +55,18 @@ TEST_CASE("scene_manager_scene_ops")
     cs::SceneManager sm{};
     constexpr float fake_dt = 1.f / 60.f;
 
-    SUBCASE("calls proper methods")
-    {
-        sm.push<cs::test::MockScene>(true, true);
-        sm.update(fake_dt);
-        auto* scene = dynamic_cast<cs::test::MockScene*>(sm.get_active_scene());
+    sm.push<cs::test::MockScene>(true, true);
+    sm.update(fake_dt);
+    auto* scene = dynamic_cast<cs::test::MockScene*>(sm.get_active_scene());
 
-        REQUIRE(scene->enter_count == 1);
-        REQUIRE(scene->update_count == 1);
-        sm.draw();
-        REQUIRE(scene->draw_count == 1);
-    }
+    REQUIRE(scene->enter_count == 1);
+    REQUIRE(scene->update_count == 1);
+    sm.draw();
+    REQUIRE(scene->draw_count == 1);
+
+    sm.pop();
+    sm.update(fake_dt);
+    REQUIRE(scene->exit_count == 1); // Kind of UB. But should work (delete test if this fails somehow)
+    scene = dynamic_cast<cs::test::MockScene*>(sm.get_active_scene());
+    REQUIRE(scene == nullptr);
 }
