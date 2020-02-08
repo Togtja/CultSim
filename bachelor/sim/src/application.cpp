@@ -1,5 +1,6 @@
 #include "application.h"
 #include "constants.h"
+#include "delta_clock.h"
 #include "entity/components.h"
 #include "entity/rendering.h"
 #include "filesystem/filesystem.h"
@@ -18,35 +19,24 @@ namespace cs
 {
 void Application::run(const std::vector<char*>& args)
 {
-    auto current_time = std::chrono::steady_clock::now();
-    auto lag          = 0.f;
-
     init(args);
 
     /** Add default scene */
     m_scene_manager.push<ScenarioScene>("basic_needs");
 
+    /** Temporary replacement of DT until we figure out frame rate issues! */
+    DeltaClock dt_clock{};
+
     /** Main Loop */
     while (m_running)
     {
-        auto elapsed = std::chrono::duration<float>(std::chrono::steady_clock::now() - current_time).count();
-        lag += elapsed;
-
         handle_input();
 
+        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
 
-        /** TODO: Let the frame rate be set in preferences / options menu */
-
-        while (lag >= SEC_PER_LOOP)
-        {
-            update(SEC_PER_LOOP);
-            lag -= SEC_PER_LOOP;
-        }
-
-        ImGui::Text("FPS: %6.3f", 1.f / elapsed);
-        current_time = std::chrono::steady_clock::now();
+        update(dt_clock.restart());
 
         draw();
     }
@@ -123,7 +113,10 @@ bool Application::init_gl()
         return false;
     }
 
-    glClearColor(0.15f, 0.15f, 0.15f, 0.0f);
+    glClearColor(0.12f, 0.12f, 0.12f, 0.0f);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 #ifndef NDEBUG
     gfx::create_debug_callback();
@@ -207,7 +200,6 @@ bool Application::init_imgui()
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
     ImGui_ImplOpenGL3_Init("#version 450 core");
-    ImGui_ImplOpenGL3_NewFrame();
 
     return true;
 }
