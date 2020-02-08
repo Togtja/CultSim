@@ -1,6 +1,6 @@
 #pragma once
 #include "gfx/window.h"
-#include "scenes/scenemanager.h"
+#include "scenes/scene_manager.h"
 
 #include <vector>
 
@@ -27,10 +27,6 @@ private:
     SceneManager m_scene_manager{};
 
     sol::state m_lua{};
-
-    entt::registry m_entt{};
-
-    entt::dispatcher m_event_bus{};
 
     bool m_running = true;
 
