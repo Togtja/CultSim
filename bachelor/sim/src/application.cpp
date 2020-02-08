@@ -145,7 +145,13 @@ bool Application::init_imgui()
 
     /** Load custom UI Font */
     auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
-    io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_file.data()), 14, 14);
+
+    /** Malloc because ImGui uses it under the hood, and will take ownership */
+    auto font_memory = malloc(font_file.size());
+    memcpy(font_memory, font_file.data(), font_file.size());
+
+    /** Give font ot ImGui (do not free above memory! ImGui does it) */
+    io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
 
     /** Set up Style colors */
     ImVec4* colors                         = ImGui::GetStyle().Colors;
