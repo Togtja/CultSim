@@ -47,7 +47,7 @@ void SceneManager::update(float dt)
     /** Update all scenes until the end or we hit a blocking scene */
     for (auto it = m_scenestack.rbegin(); it != m_scenestack.rend(); ++it)
     {
-        if(!(*it)->update(dt))
+        if (!(*it)->update(dt))
         {
             break;
         }
@@ -63,6 +63,11 @@ void SceneManager::draw()
             break;
         }
     }
+}
+
+unsigned SceneManager::size() const
+{
+    return m_scenestack.size();
 }
 
 IScene* SceneManager::get_active_scene() const

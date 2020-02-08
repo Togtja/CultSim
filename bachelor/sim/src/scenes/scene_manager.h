@@ -43,7 +43,6 @@ private:
     std::vector<Command> m_pending_commands = {};
 
 public:
-
     /**
      * Pushes a new Scene onto the stack
      *
@@ -59,13 +58,13 @@ public:
     }
 
     /**
-    * Checks if stack is empty
-    */
+     * Checks if stack is empty
+     */
     [[nodiscard]] bool empty() const;
 
     /**
-    * Clears the stack of scenes
-    */
+     * Clears the stack of scenes
+     */
     void clear();
 
     /**
@@ -86,11 +85,18 @@ public:
     void draw();
 
     /**
-    * Get the currently active Scene
+     * Get the number of scenes currently on the stack
      *
-    * @return returns the active scene, or nullptr if there is no active scene
-    * @warning Do not store the Scene after a pop, it will be invalid
-    */
+     * @return Number of scenes on the stack
+     */
+    [[nodiscard]] unsigned size() const;
+
+    /**
+     * Get the currently active Scene
+     *
+     * @return returns the active scene, or nullptr if there is no active scene
+     * @warning Do not store the Scene after a pop, it will be invalid
+     */
     [[nodiscard]] IScene* get_active_scene() const;
 };
 
