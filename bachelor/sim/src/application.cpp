@@ -21,20 +21,7 @@ void Application::run(const std::vector<char*>& args)
     auto current_time = std::chrono::steady_clock::now();
     auto lag          = 0.f;
 
-    for (int i = 0; i < 100; i++)
-    {
-        auto agent = m_entt.create();
-        glm::vec2 pos(i * 15, 0);
-
-        m_entt.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
-        m_entt.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 25.f);
-        m_entt.assign<component::Sprite>(agent, gfx::SpriteTextureID{}, glm::vec3(1.f, 0.f, 0.f));
-        m_entt.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
-    }
     init(args);
-    system::AI ai(m_entt);
-    system::Movement move(m_entt);
-    system::Rendering rendering(m_entt);
 
     /* Main Loop */
     while (m_running)
@@ -52,16 +39,13 @@ void Application::run(const std::vector<char*>& args)
         while (lag >= SEC_PER_LOOP)
         {
             update(SEC_PER_LOOP);
-            ai.update(SEC_PER_LOOP);
-            move.update(SEC_PER_LOOP);
             lag -= SEC_PER_LOOP;
         }
-        ImGui::Text("FPS: %6.3f", 1.f / elapsed);
 
+        ImGui::Text("FPS: %6.3f", 1.f / elapsed);
         current_time = std::chrono::steady_clock::now();
 
         draw();
-        rendering.update(0);
     }
 
     deinit();
@@ -92,9 +76,9 @@ void Application::update(float dt)
 void Application::draw()
 {
     m_scene_manager.draw();
-    auto& r = gfx::get_renderer();
     m_window.clear();
 
+    auto& r = gfx::get_renderer();
     r.sprite().display();
 
     r.debug().draw_line({-1000.f, 0.f, 0.f}, {1000.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
@@ -135,6 +119,8 @@ bool Application::init_gl()
         spdlog::error("failed to initialize glad");
         return false;
     }
+
+    glClearColor(0.15f, 0.15f, 0.15f, 0.0f);
 
 #ifndef NDEBUG
     gfx::create_debug_callback();
