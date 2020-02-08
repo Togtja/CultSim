@@ -59,14 +59,6 @@ public:
     }
 
     /**
-     * Push an existing Scene onto the stack
-     *
-     * @param scene The scene to push to the stack
-     * @note Ownership must be transferred
-     */
-    void push(std::unique_ptr<IScene> scene);
-
-    /**
     * Checks if stack is empty
     */
     [[nodiscard]] bool empty() const;

@@ -2,11 +2,6 @@
 
 namespace cs
 {
-void SceneManager::push(std::unique_ptr<IScene> scene)
-{
-    m_pending_commands.emplace_back(std::move(scene), ECommandType::Push);
-}
-
 bool SceneManager::empty() const
 {
     return m_scenestack.empty();
