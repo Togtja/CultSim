@@ -2,6 +2,11 @@
 
 namespace cs
 {
+void SceneManager::push(std::unique_ptr<IScene> scene)
+{
+    m_pending_commands.emplace_back(std::move(scene), ECommandType::Push);
+}
+
 bool SceneManager::empty() const
 {
     return m_scenestack.empty();
@@ -39,6 +44,17 @@ void SceneManager::update(float dt)
                 }
                 break;
             default: break;
+        }
+    }
+
+    m_pending_commands.clear();
+
+    /** Update all scenes until the end or we hit a blocking scene */
+    for (auto it = m_scenestack.rbegin(); it != m_scenestack.rend(); ++it)
+    {
+        if(!(*it)->update(dt))
+        {
+            break;
         }
     }
 }
