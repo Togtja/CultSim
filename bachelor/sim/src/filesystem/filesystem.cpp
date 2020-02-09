@@ -226,14 +226,13 @@ bool is_directory(std::string_view rpath)
         return false;
     }
     PHYSFS_Stat stat{};
-    PHYSFS_stat(rpath.data(), &stat);
-
-    if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY)
+    if (static_cast<bool>(PHYSFS_stat(rpath.data(), &stat)))
     {
-        return true;
+        return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
     }
-    return false;
+    spdlog::warn("getting the Directory: '{}' stats failed with error: {}", get_errorstring());
 }
+
 bool is_file(std::string_view rpath)
 {
     if (!exists(rpath))
@@ -241,12 +240,10 @@ bool is_file(std::string_view rpath)
         return false;
     }
     PHYSFS_Stat stat{};
-    PHYSFS_stat(rpath.data(), &stat);
-
-    if (stat.filetype == PHYSFS_FILETYPE_REGULAR)
+    if (static_cast<bool>(PHYSFS_stat(rpath.data(), &stat)))
     {
-        return true;
+        return stat.filetype == PHYSFS_FILETYPE_REGULAR;
     }
-    return false;
+    spdlog::warn("getting the File: '{}' stats failed with error: {}", get_errorstring());
 }
 } // namespace cs::fs
