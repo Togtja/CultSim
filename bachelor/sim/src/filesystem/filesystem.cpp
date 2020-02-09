@@ -214,6 +214,10 @@ std::vector<std::string> list_directory(std::string_view rpath)
     }
     std::vector<std::string> files;
     auto files_raw = PHYSFS_enumerateFiles(rpath.data());
+    if (files_raw == nullptr)
+    {
+        return {};
+    }
     for (char* file = *files_raw; file; file = *++files_raw)
     {
         files.emplace_back(file);
@@ -234,6 +238,7 @@ bool is_directory(std::string_view rpath)
         return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
     }
     spdlog::warn("getting the Directory: '{}' stats failed with error: {}", get_errorstring());
+    return false;
 }
 
 bool is_file(std::string_view rpath)
@@ -248,5 +253,6 @@ bool is_file(std::string_view rpath)
         return stat.filetype == PHYSFS_FILETYPE_REGULAR;
     }
     spdlog::warn("getting the File: '{}' stats failed with error: {}", get_errorstring());
+    return false;
 }
 } // namespace cs::fs
