@@ -233,5 +233,18 @@ bool is_directory(std::string_view rpath)
     }
     return false;
 }
+bool is_file(std::string_view rpath)
+{
+    if (!exists(rpath))
+    {
+        return false;
+    }
+    PHYSFS_Stat stat{};
+    PHYSFS_stat(rpath.data(), &stat);
 
-} // namespace cs
+    if (stat.filetype == PHYSFS_FILETYPE_REGULAR)
+    {
+        return true;
+    }
+    return false;
+}
