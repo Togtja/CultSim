@@ -191,21 +191,11 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
     spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes_written);
 
     /** Attempt to write entire file contents and handle error if failed */
-    if (static_cast<uint64_t>(bytes_written) == data.length())
+    if (bytes_written == data.length())
     {
         spdlog::info("successfully copied file");
         return true;
     }
-    /** Error states below */
-    else if (bytes_written >= 0)
-    {
-        if (!delete_file(rpath_new))
-        {
-            spdlog::critical("filesystem corrupted by copy");
-            std::abort();
-        }
-    }
-
     spdlog::error("could not copy file");
     return false;
 }
