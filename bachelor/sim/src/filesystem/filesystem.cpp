@@ -145,7 +145,12 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 
 bool delete_file(std::string_view rpath)
 {
-    return static_cast<bool>(PHYSFS_delete(rpath.data()));
+    if (static_cast<bool>(PHYSFS_delete(rpath.data())))
+    {
+        return true;
+    }
+    spdlog::error("the file/dir: {} could not be deleted: {}", rpath, get_errorstring());
+    return false;
 }
 
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing)
