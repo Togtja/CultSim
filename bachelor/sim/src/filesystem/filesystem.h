@@ -108,4 +108,10 @@ std::string_view get_errorstring();
  */
 std::vector<std::string> list_directory(std::string_view rpath);
 
-} // namespace cs
+/**
+ * Checks if the given path is a directory
+ *
+ * @param rpath The relative path of the potential directory you want to check
+ * @returns true if it is a directory otherwise false
+ */
+bool is_directory(std::string_view rpath);

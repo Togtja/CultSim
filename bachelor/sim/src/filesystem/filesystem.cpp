@@ -221,5 +221,20 @@ std::vector<std::string> list_directory(std::string_view rpath)
     PHYSFS_freeList(files_raw);
     return files;
 }
+bool is_directory(std::string_view rpath)
+{
+    if (!exists(rpath))
+    {
+        return false;
+    }
+    PHYSFS_Stat stat{};
+    PHYSFS_stat(rpath.data(), &stat);
+
+    if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY)
+    {
+        return true;
+    }
+    return false;
+}
 
 } // namespace cs
