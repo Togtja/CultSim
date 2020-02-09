@@ -40,14 +40,14 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath)
 {
     if (!exists(rpath))
     {
-        spdlog::warn("file: {} does not exist", rpath);
+        spdlog::warn("file: '{}' does not exist or is directory", rpath);
         return {};
     }
 
     auto file = PHYSFS_openRead(rpath.data());
     if (file == nullptr)
     {
-        spdlog::warn("could not open {} due to {}", rpath.data(), get_errorstring());
+        spdlog::error("could not open '{}' due to {}", rpath.data(), get_errorstring());
         return {};
     }
 
@@ -56,11 +56,11 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath)
 
     if (read_bytes == 0)
     {
-        spdlog::warn("the file: {} is empty", rpath);
+        spdlog::warn("the file: '{}' is empty", rpath);
     }
     else if (read_bytes == -1)
     {
-        spdlog::error("the file: {} failed to read with error: {}", rpath, get_errorstring());
+        spdlog::error("the file: '{}' failed to read with error: {}", rpath, get_errorstring());
     }
 
     PHYSFS_close(file);
@@ -71,14 +71,14 @@ int64_t write_file(std::string_view rpath, const std::string& data)
 {
     if (!exists(rpath))
     {
-        spdlog::debug("file: {} does not exist", rpath);
-        spdlog::info("creating file: {}", rpath);
+        spdlog::debug("file: '{}' does not exist", rpath);
+        spdlog::info("creating file: '{}'", rpath);
     }
 
     auto file = PHYSFS_openWrite(rpath.data());
     if (file == nullptr)
     {
-        spdlog::warn("could not write to {}", rpath);
+        spdlog::error("could not write to '{}' due to {}", rpath, get_errorstring());
         return -1;
     }
 
@@ -149,7 +149,7 @@ bool delete_file(std::string_view rpath)
     {
         return true;
     }
-    spdlog::error("the file/dir: {} could not be deleted: {}", rpath, get_errorstring());
+    spdlog::error("the file/dir: '{}' could not be deleted: {}", rpath, get_errorstring());
     return false;
 }
 
@@ -157,7 +157,7 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
 {
     if (!exists(rpath_old))
     {
-        spdlog::warn("the file: {} does not exist", rpath_old);
+        spdlog::warn("the file: '{}' does not exist or is not a file", rpath_old);
         return false;
     }
 
@@ -169,7 +169,7 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
 
     if (!overwrite_existing && exists(rpath_new))
     {
-        spdlog::warn("refused to overwrite existing file: {}", rpath_new);
+        spdlog::warn("refused to overwrite existing file: '{}'", rpath_new);
         return false;
     }
 
@@ -218,6 +218,7 @@ std::vector<std::string> list_directory(std::string_view rpath)
     PHYSFS_freeList(files_raw);
     return files;
 }
+
 bool is_directory(std::string_view rpath)
 {
     if (!exists(rpath))
