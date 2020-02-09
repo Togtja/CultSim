@@ -204,10 +204,7 @@ std::string_view get_errorstring()
 
 std::vector<std::string> list_directory(std::string_view rpath)
 {
-    PHYSFS_Stat stat{};
-    PHYSFS_stat(rpath.data(), &stat);
-
-    if (stat.filetype != PHYSFS_FILETYPE_DIRECTORY)
+    if (!is_directory(rpath))
     {
         spdlog::warn("not a directory, returns empty vector");
         return {};
