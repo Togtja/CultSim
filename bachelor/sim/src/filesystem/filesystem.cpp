@@ -82,18 +82,31 @@ int64_t write_file(std::string_view rpath, const std::string& data)
         return -1;
     }
 
+    // Note is a u64bit int, where the 64bit is failure
     auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
-    if (write_bytes == 0)
+    if (write_bytes == data.length())
     {
-        spdlog::info("nothing written to file: {}", rpath);
+        spdlog::info("nothing written to file: '{}'", rpath);
+        PHYSFS_close(file);
+        return write_bytes;
     }
-    else if (write_bytes <= -1)
+    else if (write_bytes == -1)
     {
-        spdlog::error("the file: {} failed to write with error: {}", rpath, get_errorstring());
+        spdlog::error("the file: '{}' failed to write with error: {}", rpath, get_errorstring());
     }
-
-    PHYSFS_close(file);
-    return write_bytes;
+    else
+    {
+        spdlog::error("the file: '{}' failed to write all bytes with error: {}", rpath, get_errorstring());
+    }
+    if (exists(rpath))
+    {
+        if (!delete_file(rpath))
+        {
+            spdlog::critical("filesystem corrupted by failed write");
+            std::abort();
+        }
+    }
+    return -1;
 }
 
 bool exists(std::string_view rpath)
