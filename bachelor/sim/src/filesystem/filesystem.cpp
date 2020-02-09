@@ -38,7 +38,7 @@ std::string read_file(std::string_view rpath)
 
 std::vector<uint8_t> read_byte_file(std::string_view rpath)
 {
-    if (!exists(rpath))
+    if (!is_file(rpath))
     {
         spdlog::warn("file: '{}' does not exist or is directory", rpath);
         return {};
@@ -67,7 +67,7 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath)
     return ret;
 }
 
-int64_t write_file(std::string_view rpath, const std::string& data)
+uint64_t write_file(std::string_view rpath, const std::string& data)
 {
     if (!exists(rpath))
     {
@@ -82,18 +82,31 @@ int64_t write_file(std::string_view rpath, const std::string& data)
         return -1;
     }
 
+    // Note is a u64bit int, where the 64bit is failure
     auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
-    if (write_bytes == 0)
+    if (write_bytes == data.length())
     {
-        spdlog::info("nothing written to file: {}", rpath);
+        spdlog::info("nothing written to file: '{}'", rpath);
+        PHYSFS_close(file);
+        return write_bytes;
     }
-    else if (write_bytes <= -1)
+    else if (write_bytes == -1)
     {
-        spdlog::error("the file: {} failed to write with error: {}", rpath, get_errorstring());
+        spdlog::error("the file: '{}' failed to write with error: {}", rpath, get_errorstring());
     }
-
-    PHYSFS_close(file);
-    return write_bytes;
+    else
+    {
+        spdlog::error("the file: '{}' failed to write all bytes with error: {}", rpath, get_errorstring());
+    }
+    if (exists(rpath))
+    {
+        if (!delete_file(rpath))
+        {
+            spdlog::critical("filesystem corrupted by failed write");
+            std::abort();
+        }
+    }
+    return -1;
 }
 
 bool exists(std::string_view rpath)
@@ -108,7 +121,7 @@ bool mkdir(std::string_view rpath)
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 {
-    if (exists(rpath_new))
+    if (is_file(rpath_new))
     {
         spdlog::warn("attempt to overwrite file with move");
         return false;
@@ -155,7 +168,7 @@ bool delete_file(std::string_view rpath)
 
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing)
 {
-    if (!exists(rpath_old))
+    if (!is_file(rpath_old))
     {
         spdlog::warn("the file: '{}' does not exist or is not a file", rpath_old);
         return false;
@@ -178,21 +191,11 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
     spdlog::debug("read {} bytes, wrote {} bytes", data.length(), bytes_written);
 
     /** Attempt to write entire file contents and handle error if failed */
-    if (static_cast<uint64_t>(bytes_written) == data.length())
+    if (bytes_written == data.length())
     {
         spdlog::info("successfully copied file");
         return true;
     }
-    /** Error states below */
-    else if (bytes_written >= 0)
-    {
-        if (!delete_file(rpath_new))
-        {
-            spdlog::critical("filesystem corrupted by copy");
-            std::abort();
-        }
-    }
-
     spdlog::error("could not copy file");
     return false;
 }
@@ -226,14 +229,13 @@ bool is_directory(std::string_view rpath)
         return false;
     }
     PHYSFS_Stat stat{};
-    PHYSFS_stat(rpath.data(), &stat);
-
-    if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY)
+    if (static_cast<bool>(PHYSFS_stat(rpath.data(), &stat)))
     {
-        return true;
+        return stat.filetype == PHYSFS_FILETYPE_DIRECTORY;
     }
-    return false;
+    spdlog::warn("getting the Directory: '{}' stats failed with error: {}", get_errorstring());
 }
+
 bool is_file(std::string_view rpath)
 {
     if (!exists(rpath))
@@ -241,12 +243,10 @@ bool is_file(std::string_view rpath)
         return false;
     }
     PHYSFS_Stat stat{};
-    PHYSFS_stat(rpath.data(), &stat);
-
-    if (stat.filetype == PHYSFS_FILETYPE_REGULAR)
+    if (static_cast<bool>(PHYSFS_stat(rpath.data(), &stat)))
     {
-        return true;
+        return stat.filetype == PHYSFS_FILETYPE_REGULAR;
     }
-    return false;
+    spdlog::warn("getting the File: '{}' stats failed with error: {}", get_errorstring());
 }
 } // namespace cs::fs
