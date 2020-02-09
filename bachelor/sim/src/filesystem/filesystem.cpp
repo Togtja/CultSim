@@ -38,7 +38,7 @@ std::string read_file(std::string_view rpath)
 
 std::vector<uint8_t> read_byte_file(std::string_view rpath)
 {
-    if (!exists(rpath))
+    if (!is_file(rpath))
     {
         spdlog::warn("file: '{}' does not exist or is directory", rpath);
         return {};
@@ -67,7 +67,7 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath)
     return ret;
 }
 
-int64_t write_file(std::string_view rpath, const std::string& data)
+uint64_t write_file(std::string_view rpath, const std::string& data)
 {
     if (!exists(rpath))
     {
@@ -121,7 +121,7 @@ bool mkdir(std::string_view rpath)
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
 {
-    if (exists(rpath_new))
+    if (is_file(rpath_new))
     {
         spdlog::warn("attempt to overwrite file with move");
         return false;
@@ -168,7 +168,7 @@ bool delete_file(std::string_view rpath)
 
 bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool overwrite_existing)
 {
-    if (!exists(rpath_old))
+    if (!is_file(rpath_old))
     {
         spdlog::warn("the file: '{}' does not exist or is not a file", rpath_old);
         return false;
