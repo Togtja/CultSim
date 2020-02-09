@@ -248,3 +248,4 @@ bool is_file(std::string_view rpath)
     }
     return false;
 }
+} // namespace cs::fs
