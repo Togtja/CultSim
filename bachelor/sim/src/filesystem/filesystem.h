@@ -77,7 +77,7 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new);
 /**
  * Delete a file or directory at the given path
  *
- * @note Also deletes all sub-directories files if any
+ * @note If directory it must be empty
  * @param rpath The relative file path to read from
  * @return true if successful, otherwise false
  */
