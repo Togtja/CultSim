@@ -74,9 +74,9 @@ void Application::draw()
     auto& r = gfx::get_renderer();
     r.sprite().display();
 
-    r.debug().draw_line({-1000.f, 0.f, 0.f}, {1000.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    r.debug().draw_line({0.f, -1000.f, 0.f}, {0.f, 1000.f, 0.f}, {0.f, 1.f, 0.f});
-    r.debug().draw_line({0.f, 0.f, -1000.f}, {0.f, 0.f, 1000.f}, {0.f, 0.f, 1.f});
+    r.debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+    r.debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+    r.debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
