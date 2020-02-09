@@ -50,10 +50,10 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath);
 int64_t write_file(std::string_view rpath, const std::string& data);
 
 /**
- * Checks if the file at the given path exists
+ * Checks if the file or directory at the given path exists
  *
- * @param rpath The relative file path to read from
- * @return true if the file exists, otherwise false
+ * @param rpath The relative file/directory path to read from
+ * @return true if the file/directory exists, otherwise false
  */
 bool exists(std::string_view rpath);
 
