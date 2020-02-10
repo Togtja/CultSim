@@ -145,7 +145,7 @@ void SpriteRenderer::init_shader()
     glUseProgram(m_shader);
 }
 
-bool SpriteRenderer::init_texture_slots()
+void SpriteRenderer::init_texture_slots()
 {
     /** Create texture bindings for color */
     m_color_texture_handles.resize(8);
@@ -177,5 +177,4 @@ bool SpriteRenderer::init_texture_slots()
     }
     glBindTextures(8, 8, m_normal_texture_handles.data());
 }
-
 } // namespace cs::gfx

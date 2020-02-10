@@ -70,7 +70,7 @@ private:
 
     void init_shader();
 
-    bool init_texture_slots();
+    void init_texture_slots();
 };
 
 } // namespace cs
