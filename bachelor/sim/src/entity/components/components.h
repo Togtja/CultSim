@@ -37,7 +37,7 @@ struct Animation
 
 struct Needs
 {
-    std::vector<ai::Need> Needs{};
+    std::vector<ai::Need> needs{};
 };
 
 struct Vision
