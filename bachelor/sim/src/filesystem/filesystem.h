@@ -42,18 +42,19 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath);
 /**
  * Write the text stored in data to the given relative file path
  *
- * @note Also creates necessary parent directories and the file if it does not exist
+ * @note Write to 63 bit, where the 64th bit the error bit. If length is greater than 0x7FFFFFFFFFFFFFFF, this function will
+ * immediately fail. It also creates necessary parent directories and the file if it does not exist
  * @param rpath The relative file path to read from
  * @param data The text data to write to the file
  * @return Number of bytes written, -1 if an error occurs
  */
-int64_t write_file(std::string_view rpath, const std::string& data);
+uint64_t write_file(std::string_view rpath, const std::string& data);
 
 /**
- * Checks if the file at the given path exists
+ * Checks if the file or directory at the given path exists
  *
- * @param rpath The relative file path to read from
- * @return true if the file exists, otherwise false
+ * @param rpath The relative file/directory path to read from
+ * @return true if the file/directory exists, otherwise false
  */
 bool exists(std::string_view rpath);
 
@@ -77,7 +78,7 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new);
 /**
  * Delete a file or directory at the given path
  *
- * @note Also deletes all sub-directories files if any
+ * @note If directory it must be empty
  * @param rpath The relative file path to read from
  * @return true if successful, otherwise false
  */
@@ -108,4 +109,19 @@ std::string_view get_errorstring();
  */
 std::vector<std::string> list_directory(std::string_view rpath);
 
-} // namespace cs
+/**
+ * Checks if the given path is a directory and exist
+ *
+ * @param rpath The relative path of the directory you want to check
+ * @returns true if it is a directory otherwise false
+ */
+bool is_directory(std::string_view rpath);
+
+/**
+ * Checks if the given path is a file
+ *
+ * @param rpath The relative path of the file you want to check
+ * @returns true if it is a file otherwise false
+ */
+bool is_file(std::string_view rpath);
+} // namespace cs::fs
