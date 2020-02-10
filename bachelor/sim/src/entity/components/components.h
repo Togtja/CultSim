@@ -96,6 +96,11 @@ struct DropItems
     std::vector<EDeathDrops> deathdrops{};
 };
 
+struct NeedQueue
+{
+    std::vector<ai::Need> pressing_needs{};
+};
+
 struct AI
 {
 };
