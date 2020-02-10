@@ -14,6 +14,8 @@ struct Need
 
     float status{};
 
+    float decay_rate{};
+
     std::vector<std::string> tag{};
 };
 
