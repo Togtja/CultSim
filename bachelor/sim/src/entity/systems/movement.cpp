@@ -1,9 +1,6 @@
 #include "movement.h"
 #include "entity/components/components.h"
-<<<<<<< HEAD:bachelor/sim/src/entity/systems/movement.cpp
 
-=======
->>>>>>> 62eba4525e2695d08985798bfefdabb5a00346d7:bachelor/sim/src/entity/movement.cpp
 #include <glm/glm.hpp>
 
 namespace cs::system
