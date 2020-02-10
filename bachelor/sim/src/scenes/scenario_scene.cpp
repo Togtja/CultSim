@@ -1,8 +1,8 @@
 #include "scenario_scene.h"
-#include "entity/ai.h"
-#include "entity/components.h"
-#include "entity/movement.h"
-#include "entity/rendering.h"
+#include "entity/systems/ai.h"
+#include "entity/components/components.h"
+#include "entity/systems/movement.h"
+#include "entity/systems/rendering.h"
 #include "gfx/renderer.h"
 
 #include "gfx/ImGUI/imgui.h"
