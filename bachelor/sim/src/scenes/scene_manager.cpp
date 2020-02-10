@@ -35,8 +35,8 @@ void SceneManager::update(float dt)
                 for (auto it = m_scenestack.rbegin(); it != m_scenestack.rend(); ++it)
                 {
                     (*it)->on_exit();
-                    m_scenestack.pop_back();
                 }
+                m_scenestack.clear();
                 break;
             default: break;
         }
