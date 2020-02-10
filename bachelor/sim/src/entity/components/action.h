@@ -6,8 +6,8 @@ namespace cs::ai
 {
 struct Action
 {
-    std::string need_name{};
-
     std::vector<std::string> tags{};
+
+    // TODO: Actual functionality
 };
 } // namespace cs::ai
