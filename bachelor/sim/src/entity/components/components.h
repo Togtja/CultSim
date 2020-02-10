@@ -2,6 +2,7 @@
 
 #include "gfx/render_data.h"
 #include "need.h"
+#include "action.h"
 
 #include <vector>
 
@@ -38,6 +39,8 @@ struct Animation
 struct Needs
 {
     std::vector<ai::Need> needs{};
+
+    std::vector<ai::Need> pressing_needs{};
 };
 
 struct Vision
@@ -96,9 +99,9 @@ struct DropItems
     std::vector<EDeathDrops> deathdrops{};
 };
 
-struct NeedQueue
+struct Actions
 {
-    std::vector<ai::Need> pressing_needs{};
+    std::vector<ai::Action> actions{};
 };
 
 struct AI
