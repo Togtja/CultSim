@@ -1,4 +1,5 @@
 #include "application.h"
+#include "constants.h"
 
 #include <vector>
 
@@ -8,6 +9,9 @@
 int main(int argc, char* argv[])
 {
     const auto args = std::vector(argv, argv + argc);
+
+    /** Disable logs before running tests as we don't want them to pollute test information */
+    spdlog::set_level(spdlog::level::off);
 
     /** Set up testing context and set some default options */
     doctest::Context context{};
@@ -21,6 +25,16 @@ int main(int argc, char* argv[])
     {
         return res;
     }
+
+    /** Based on DEBUG or not, set the log level thereafter */
+    if constexpr (CULTSIM_DEBUG)
+    {
+        spdlog::set_level(spdlog::level::debug);
+    } else
+    {
+        spdlog::set_level(spdlog::level::info);
+    }
+
 
     /** Run the program */
     cs::Application cultsim{};

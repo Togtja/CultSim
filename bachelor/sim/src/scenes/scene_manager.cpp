@@ -1,4 +1,4 @@
-#include "scenemanager.h"
+#include "scene_manager.h"
 
 namespace cs
 {
@@ -41,6 +41,17 @@ void SceneManager::update(float dt)
             default: break;
         }
     }
+
+    m_pending_commands.clear();
+
+    /** Update all scenes until the end or we hit a blocking scene */
+    for (auto it = m_scenestack.rbegin(); it != m_scenestack.rend(); ++it)
+    {
+        if (!(*it)->update(dt))
+        {
+            break;
+        }
+    }
 }
 
 void SceneManager::draw()
@@ -52,6 +63,11 @@ void SceneManager::draw()
             break;
         }
     }
+}
+
+unsigned SceneManager::size() const
+{
+    return m_scenestack.size();
 }
 
 IScene* SceneManager::get_active_scene() const

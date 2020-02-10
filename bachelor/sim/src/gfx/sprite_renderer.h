@@ -65,6 +65,12 @@ public:
 
 private:
     bool increment_next_texture_id();
+
+    void init_vbo_and_vao();
+
+    void init_shader();
+
+    bool init_texture_slots();
 };
 
 } // namespace cs

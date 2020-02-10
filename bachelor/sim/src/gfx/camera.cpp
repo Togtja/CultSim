@@ -18,7 +18,7 @@ void Camera::init(glm::vec3 position)
 glm::mat4 Camera::get_view_matrix() const
 {
     const auto view_mat = glm::translate(glm::mat4(1.f), -m_pos);
-    const auto proj     = glm::perspectiveFov(glm::radians(90.f), 16.f, 9.f, 0.01f, 2000.f);
+    const auto proj     = glm::perspectiveFov(glm::radians(90.f), 16.f, 9.f, 1.f, 200.f);
 
     return proj * view_mat;
 }

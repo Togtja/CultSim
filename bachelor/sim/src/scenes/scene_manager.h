@@ -8,9 +8,15 @@
 
 namespace cs
 {
+/**
+ * Manages scene changes and updates of the various scenes that exist in the application
+ */
 class SceneManager
 {
 private:
+    /**
+     * Represents the desired action for a command
+     */
     enum class ECommandType : uint16_t
     {
         Nothing,
@@ -19,9 +25,12 @@ private:
         Clear
     };
 
+    /**
+     * A reified command to be executed later in order to not break the scene stack in the middle of a frame
+     */
     struct Command
     {
-        /*Used when Command is Push*/
+        /** Used when Command is Push, otherwise nullptr */
         std::unique_ptr<IScene> new_scene = nullptr;
 
         ECommandType command_type = ECommandType::Nothing;
@@ -34,29 +43,28 @@ private:
     std::vector<Command> m_pending_commands = {};
 
 public:
-
     /**
      * Pushes a new Scene onto the stack
      *
-     * @tparam IScene_ The Scene getting pushed onto the stack
-     * @tparam CtorArgs_ The types of Constructor arguments for said scene
+     * @tparam Scene The Scene getting pushed onto the stack
+     * @tparam CtorArgs The types of Constructor arguments for said scene
      *
      * @param args The constructor arguments for the scene
      */
-    template<typename IScene_, typename... CtorArgs_>
-    void push(CtorArgs_&&... args)
+    template<typename Scene, typename... CtorArgs>
+    void push(CtorArgs&&... args)
     {
-        m_pending_commands.emplace_back(std::make_unique<IScene_>(std::forward<CtorArgs_>(args)...), ECommandType::Push);
+        m_pending_commands.emplace_back(std::make_unique<Scene>(std::forward<CtorArgs>(args)...), ECommandType::Push);
     }
 
     /**
-    * Checks if stack is empty
-    */
+     * Checks if stack is empty
+     */
     [[nodiscard]] bool empty() const;
 
     /**
-    * Clears the stack of scenes
-    */
+     * Clears the stack of scenes
+     */
     void clear();
 
     /**
@@ -77,11 +85,18 @@ public:
     void draw();
 
     /**
-    * Get the currently active Scene
+     * Get the number of scenes currently on the stack
      *
-    * @return returns the active scene, or nullptr if there is no active scene
-    * @warning Do not store the Scene after a pop, it will be invalid
-    */
+     * @return Number of scenes on the stack
+     */
+    [[nodiscard]] unsigned size() const;
+
+    /**
+     * Get the currently active Scene
+     *
+     * @return returns the active scene, or nullptr if there is no active scene
+     * @warning Do not store the Scene after a pop, it will be invalid
+     */
     [[nodiscard]] IScene* get_active_scene() const;
 };
 
