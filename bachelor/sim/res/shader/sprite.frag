@@ -12,8 +12,8 @@ layout(location = 0) in VertexData
 layout(location = 0) out vec4 out_color;
 
 /** Uniforms */
-layout(location = 1, binding = 0) uniform sampler2DArray colorTextures[8];
-layout(location = 9, binding = 8) uniform sampler2DArray normalTextures[8];
+layout(binding = 0) uniform sampler2DArray colorTextures[8];
+layout(binding = 8) uniform sampler2DArray normalTextures[8];
 
 vec4 sample_sprite()
 {
