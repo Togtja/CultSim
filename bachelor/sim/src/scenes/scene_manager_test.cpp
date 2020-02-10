@@ -66,7 +66,6 @@ TEST_CASE("scene_manager_scene_ops")
 
     sm.pop();
     sm.update(fake_dt);
-    REQUIRE(scene->exit_count == 1); // Kind of UB. But should work (delete test if this fails somehow)
     scene = dynamic_cast<cs::test::MockScene*>(sm.get_active_scene());
     REQUIRE(scene == nullptr);
 }
