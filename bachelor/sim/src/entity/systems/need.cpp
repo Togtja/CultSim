@@ -7,16 +7,27 @@ void Need::update(float dt)
 {
     auto view = m_registry.view<component::Needs>();
     view.each([dt](component::Needs& needs) {
+
         for (auto need : needs.needs)
         {
             need.status -= need.decay_rate;
-            if (need.status <= 50.f)
+            auto found = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), need);
+            //If the need does not exist in pressing needs
+            if (found != needs.pressing_needs.end())
             {
-                //If the need is not allready present in pressing_needs
-                if (std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), need) != needs.pressing_needs.end())
+                //Add it if it should be there
+                if (need.status <= 50.f)
                 {
-                    //pressing_needs are sorted later by the mitigation system
-                    needs.pressing_needs.push_back(need);
+                    needs.pressing_needs.emplace_back(need);
+                }
+            }
+            //If the need does exist in pressing needs
+            else
+            {
+                //Remove it if it should not be there
+                if (need.status >= 50.f)
+                {
+                    needs.pressing_needs.erase(found);
                 }
             }
         }
