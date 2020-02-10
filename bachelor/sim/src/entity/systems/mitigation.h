@@ -1,3 +1,5 @@
+#include "entity/components/components.h"
+#include "entity/components/need.h"
 #include "system.h"
 
 #include <vector>
@@ -11,5 +13,7 @@ public:
     using ISystem::ISystem;
 
     void update(float dt) override;
+
+    bool add_actions(component::Actions& actions, const ai::Need& need);
 };
 } // namespace cs::system
