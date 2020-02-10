@@ -21,7 +21,7 @@ public:
     void update(float dt) override;
 
 private:
-    bool close_enough(glm::vec2 pos, glm::vec2 pos2, float treshold);
+    bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold);
 };
 
 } // namespace cs::system
