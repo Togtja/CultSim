@@ -1,4 +1,5 @@
 #include "need.h"
+<<<<<<< HEAD
 #include "entity/components/components.h"
 
 namespace cs::system
@@ -11,3 +12,5 @@ void Need::update(float dt)
           need.status -= need.decay_rate;
         }
 } // namespace cs::system
+=======
+>>>>>>> 62eba4525e2695d08985798bfefdabb5a00346d7
