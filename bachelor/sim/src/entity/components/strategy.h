@@ -1,10 +1,11 @@
+#pragma once
 
 #include <string>
 #include <vector>
 
 namespace cs::ai
 {
-struct Action
+struct Strategy
 {
     float desirability{};
 

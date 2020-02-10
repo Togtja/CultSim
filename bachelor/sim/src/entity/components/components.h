@@ -1,8 +1,8 @@
 #pragma once
 
-#include "action.h"
 #include "gfx/render_data.h"
 #include "need.h"
+#include "strategy.h"
 
 #include <vector>
 
@@ -99,11 +99,11 @@ struct DropItems
     std::vector<EDeathDrops> deathdrops{};
 };
 
-struct Actions
+struct Strategies
 {
-    std::vector<ai::Action> actions{};
+    std::vector<ai::Strategy> strategies{};
 
-    std::vector<ai::Action> staged_actions{};
+    std::vector<ai::Strategy> staged_strategies{};
 };
 
 struct AI
