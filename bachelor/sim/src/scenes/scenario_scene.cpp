@@ -24,8 +24,8 @@ void ScenarioScene::on_enter()
     ai::Action action     = {};
     ai::Strategy strategy = {static_cast<std::string>("Eat food"), 0, {}, tags::TAG_Food, std::vector<ai::Action>({action})};
 
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/A_human_token.png");
-    for (int i = 0; i < 1; i++)
+    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    for (int i = 0; i < 10000; i++)
     {
         auto agent = m_registry.create();
         glm::vec2 pos(i * 15, 0);
@@ -33,7 +33,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
         m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 25.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
-        m_registry.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
+        m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
@@ -55,6 +55,7 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
+    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {
