@@ -9,6 +9,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <entt/fwd.hpp>
 
 namespace cs::component
 {
@@ -46,6 +47,7 @@ struct Needs
 
 struct Vision
 {
+    std::vector<entt::entity> seen{};
     float vision_radius{};
     uint8_t fov{};
 };
