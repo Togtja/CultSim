@@ -1,5 +1,8 @@
 #include "ai.h"
+#include "constants.h"
 #include "entity/components.h"
+
+#include <unordered_map>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
@@ -28,44 +31,49 @@ glm::vec2 AI::path_finding()
 
 void AI::update(float dt)
 {
-    auto view = m_registry.view<component::Position, component::Movement, component::Sprite, component::Vision>();
-    view.each([dt, this](entt::entity et,
-                         component::Position& pos,
-                         component::Movement& mov,
-                         component::Sprite& spr,
-                         component::Vision& vis) {
-        if (close_enough(pos.position, pos.desired_position, 1.f))
+    std::unordered_map<uint32_t, std::vector<entt::entity>> collision_grid{};
+
+    auto hash = [](glm::vec2 pos) -> glm::ivec2 {
+        return {static_cast<int>(pos.x) / static_cast<int>(SIM_GRID_SIZE),
+                static_cast<int>(pos.y) / static_cast<int>(SIM_GRID_SIZE)};
+    };
+
+    /** Construct collision grid */
+
+    m_registry.view<component::Position>().each([&collision_grid, &hash](entt::entity e, const component::Position& pos) {
+        auto min = hash(pos.position);
+        collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
+    });
+
+    m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
+    auto vis_view = m_registry.group<component::Vision>(entt::get<component::Position>);
+    for (auto& [hash, cell] : collision_grid)
+    {
+        /* Don't bother if there are less than two motes in the cell */
+        if (cell.size() < 2)
         {
-            pos.desired_position = glm::vec3(path_finding(), 0);
+            continue;
         }
 
-        auto view2 = m_registry.view<component::Position>();
-        for (auto et2 : view2)
+        /* Loop through all motes in that cell */
+        for (size_t i = 0u; i < cell.size() - 1; ++i)
         {
-            if (et == et2)
+            auto&& [apos, avis] = vis_view.get<component::Vision, component::Position>(cell[i]);
+            for (size_t j = i + 1u; j < cell.size(); ++j)
             {
-                continue;
-            }
-            while (is_colliding(pos.position, view2.get(et2).position, 7.5f, 7.5f))
-            {
-                pos.position += mov.speed * glm::vec3(mov.direction, 0) * -dt;
-            }
-            // is_visible(pos.position, view2.get(et2).position, vis.vision_radius)
-            // glm::distance(pos.position, view2.get(et2).position) < vis.vision_radius
-            if (is_visible(pos.position, view2.get(et2).position, vis.vision_radius))
-            {
-                // Found eachother
-                spr.color.r = 0;
-                spr.color.g = 1;
-                break;
-            }
-            else
-            {
-                spr.color.r = 1;
-                spr.color.g = 0;
+                /* Detect if there is a collision */
+                auto&& [bpos, bvis] = vis_view.get<component::Vision, component::Position>(cell[i]);
+                if (close_enough(avis.position, bvis.position, apos.vision_radius))
+                {
+                    apos.seen.push_back(cell[j]);
+                }
+                if (close_enough(bvis.position, avis.position, bpos.vision_radius))
+                {
+                    bpos.seen.push_back(cell[i]);
+                }
             }
         }
-    });
+    }
 }
 
 bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
