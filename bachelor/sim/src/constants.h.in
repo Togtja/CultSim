@@ -15,6 +15,7 @@ constexpr int PROGRAM_VERSION_MINOR     = @PROJECT_VERSION_MINOR@;
 constexpr int PROGRAM_VERSION_PATCH     = @PROJECT_VERSION_PATCH@;
 
 constexpr int SIM_MAX_AGENTS = 1'000'000;
+constexpr int SIM_GRID_SIZE = 64;
 
 /** True when compiled in debug mode, otherwise false */
 constexpr bool CULTSIM_DEBUG = @CULTSIM_DEBUG@;
