@@ -106,6 +106,11 @@ struct Strategies
     std::vector<ai::Strategy> staged_strategies{};
 };
 
+struct Tags
+{
+    std::vector<std::string> tags{};
+};
+
 struct AI
 {
 };
