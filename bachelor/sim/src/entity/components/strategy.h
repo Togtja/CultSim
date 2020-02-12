@@ -13,7 +13,7 @@ struct Strategy
 
     float desirability{};
 
-    std::vector<std::string> requirements{};
+    tags::ETag requirements{};
 
     tags::ETag tags{};
 
