@@ -14,6 +14,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/need.h
         ${CMAKE_CURRENT_LIST_DIR}/need.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/need_test.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.h
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.cpp
