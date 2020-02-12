@@ -1,4 +1,5 @@
 #pragma once
+#include "tags.h"
 
 #include <string>
 #include <vector>
@@ -15,7 +16,7 @@ struct Need
 
     float decay_rate{};
 
-    std::vector<std::string> tag{};
+    tags::ETag tags{};
 
     bool operator<(Need const& need2)
     {
