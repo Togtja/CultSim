@@ -3,6 +3,7 @@
 #include "gfx/render_data.h"
 #include "need.h"
 #include "strategy.h"
+#include "tags.h"
 
 #include <vector>
 
@@ -108,7 +109,7 @@ struct Strategies
 
 struct Tags
 {
-    std::vector<std::string> tags{};
+    tags::ETag tag{};
 };
 
 struct AI
