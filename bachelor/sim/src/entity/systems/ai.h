@@ -14,7 +14,7 @@ public:
 
     bool is_visible(glm::vec2 pos, glm::vec2 pos2, float rad);
 
-    bool is_colliding(glm::vec2 pos, glm::vec2 pos2, float size1, float size);
+    bool is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2);
 
     glm::vec2 path_finding();
 
