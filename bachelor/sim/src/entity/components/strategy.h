@@ -1,5 +1,7 @@
 #pragma once
 
+#include "tags.h"
+
 #include <string>
 #include <vector>
 
@@ -11,13 +13,19 @@ struct Strategy
 
     float desirability{};
 
-    std::vector<std::string> tags{};
+    std::vector<std::string> requirements{};
+
+    tags::ETag tags{};
 
     bool operator==(Strategy const& strategy2)
     {
-        return name == strategy2.name
+        return name == strategy2.name;
     }
 
+    bool operator<(Strategy const& strategy2)
+    {
+        return desirability < strategy2.desirability;
+    }
     // TODO: Actual functionality
 };
 } // namespace cs::ai
