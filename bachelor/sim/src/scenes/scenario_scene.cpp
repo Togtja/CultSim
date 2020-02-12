@@ -1,10 +1,11 @@
 #include "scenario_scene.h"
-#include "entity/systems/ai.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
+#include "entity/components/tags.h"
+#include "entity/systems/ai.h"
 #include "entity/systems/movement.h"
-#include "entity/systems/rendering.h"
 #include "entity/systems/need.h"
+#include "entity/systems/rendering.h"
 #include "gfx/renderer.h"
 
 #include "gfx/ImGUI/imgui.h"
@@ -17,11 +18,7 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need = {static_cast<std::string>("hunger"),
-                     3.f,
-                     100.f,
-                     1.f,
-                     std::vector<std::string>({static_cast<std::string>("food")})};
+    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/A_human_token.png");
     for (int i = 0; i < 100; i++)
@@ -33,7 +30,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 25.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}),std::vector<ai::Need>({}));
+        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
     }
 
     /** Add required systems */
