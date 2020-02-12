@@ -18,6 +18,8 @@ public:
 
     glm::vec2 path_finding();
 
+    glm::ivec2 world_to_grid(glm::vec2 pos);
+
     void update(float dt) override;
 
 private:

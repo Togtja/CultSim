@@ -29,6 +29,11 @@ glm::vec2 AI::path_finding()
     return glm::vec2(dist(gen), dist(gen));
 }
 
+glm::ivec2 AI::world_to_grid(glm::vec2 pos)
+{
+    return {static_cast<int>(pos.x) / static_cast<int>(SIM_GRID_SIZE), static_cast<int>(pos.y) / static_cast<int>(SIM_GRID_SIZE)};
+}
+
 void AI::update(float dt)
 {
     std::unordered_map<uint32_t, std::vector<entt::entity>> collision_grid{};
