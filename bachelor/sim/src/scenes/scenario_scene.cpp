@@ -2,7 +2,9 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/systems/action.h"
 #include "entity/systems/ai.h"
+#include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
@@ -18,10 +20,12 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
+    ai::Need need         = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
+    ai::Action action     = {};
+    ai::Strategy strategy = {static_cast<std::string>("Eat food"), 0, {}, tags::TAG_Food, std::vector<ai::Action>({action})};
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/A_human_token.png");
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1; i++)
     {
         auto agent = m_registry.create();
         glm::vec2 pos(i * 15, 0);
@@ -31,6 +35,8 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
+        m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
+        m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 
     /** Add required systems */
@@ -38,6 +44,8 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
+    m_active_systems.emplace_back(new system::Mitigation(m_registry));
+    m_active_systems.emplace_back(new system::Action(m_registry));
 }
 
 void ScenarioScene::on_exit()
