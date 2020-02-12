@@ -26,6 +26,11 @@ struct Strategy
     {
         return desirability < strategy2.desirability;
     }
+
+    bool operator>(Strategy const& strategy2)
+    {
+        return desirability > strategy2.desirability;
+    }
     // TODO: Actual functionality
 };
 } // namespace cs::ai
