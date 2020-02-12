@@ -14,6 +14,6 @@ public:
 
     void update(float dt) override;
 
-    bool add_actions(component::Strategies& actions, const ai::Need& need, const component::Tags& tags);
+    bool add_strategies(component::Strategies& actions, const ai::Need& need, const component::Tags& tags);
 };
 } // namespace cs::system
