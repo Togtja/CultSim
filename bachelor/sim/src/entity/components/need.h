@@ -17,21 +17,20 @@ struct Need
     float decay_rate{};
 
     tags::ETag tags{};
-
-    bool operator<(Need const& need2)
-    {
-        return ((100 / (status + 0.01)) * weight < (100 / (need2.status + 0.01)) * need2.weight);
-    }
-
-    bool operator>(Need const& need2)
-    {
-        return ((100 / status + 0.01)) * weight > (100 / (need2.status+0.01))*need2.weight);
-    }
-
-    bool operator==(Need const& need2)
-    {
-        return name == need2.name;
-    }
 };
 
+inline bool operator<(Need const& lhs, Need const& rhs)
+{
+    return ((100 / (lhs.status + 0.01)) * lhs.weight < (100 / (rhs.status + 0.01)) * rhs.weight);
+}
+
+inline bool operator>(Need const& lhs, Need const& rhs)
+{
+    return ((100 / (lhs.status + 0.01)) * lhs.weight > (100 / (rhs.status + 0.01)) * rhs.weight);
+}
+
+inline bool operator==(Need const& lhs, Need const& rhs)
+{
+    return lhs.name == rhs.name;
+}
 } // namespace cs::ai

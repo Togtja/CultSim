@@ -16,21 +16,21 @@ struct Strategy
     tags::ETag requirements{};
 
     tags::ETag tags{};
-
-    bool operator==(Strategy const& strategy2)
-    {
-        return name == strategy2.name;
-    }
-
-    bool operator<(Strategy const& strategy2)
-    {
-        return desirability < strategy2.desirability;
-    }
-
-    bool operator>(Strategy const& strategy2)
-    {
-        return desirability > strategy2.desirability;
-    }
     // TODO: Actual functionality
 };
+
+inline bool operator==(Strategy const& lhs, Strategy const& rhs)
+{
+    return lhs.name == rhs.name;
+}
+
+inline bool operator<(Strategy const& lhs, Strategy const& rhs)
+{
+    return lhs.desirability < rhs.desirability;
+}
+
+inline bool operator>(Strategy const& lhs, Strategy const& rhs)
+{
+    return lhs.desirability > rhs.desirability;
+}
 } // namespace cs::ai
