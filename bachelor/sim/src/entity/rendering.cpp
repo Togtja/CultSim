@@ -14,14 +14,14 @@ void Rendering::update(float dt)
     ImGui::ColorPicker3("No See Color", glm::value_ptr(noseecolor));
     ImGui::ColorPicker3("See Color", glm::value_ptr(seecolor));
 
-    m_registry.group<component::Sprite>(entt::get<component::Vision>).each([](component::Sprite& spr, const component::Vision& vis) {
-       spr.color = vis.seen.empty() ? noseecolor : seecolor;
-    });
+    m_registry.group<component::Sprite>(entt::get<component::Vision>)
+        .each([](component::Sprite& spr, const component::Vision& vis) {
+            spr.color = glm::mix(noseecolor, seecolor, glm::vec3(vis.seen.size() / 15.f));
+        });
 
     auto pos_sprite_view = m_registry.view<component::Position, component::Sprite>();
     pos_sprite_view.each([this](const component::Position& pos, const component::Sprite& sprite) {
         m_renderer.sprite().draw(pos.position, sprite.color, sprite.texture);
     });
-
 }
 } // namespace cs::system
