@@ -62,7 +62,7 @@ bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Nee
         }
     }
 
-    if (strategies.staged_strategies.size != 0)
+    if (strategies.staged_strategies.size() != 0)
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
         return true;
