@@ -1,4 +1,5 @@
 #include "mitigation.h"
+#include "common_helpers.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
@@ -9,8 +10,8 @@ namespace cs::system
 {
 void Mitigation::update(float dt)
 {
-    auto view = m_registry.view<component::Needs, component::Strategies>();
-    view.each([this, dt](component::Needs& needs, component::Strategies& strategies) {
+    auto view = m_registry.view<component::Needs, component::Strategies, component::Tags>();
+    view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
         if (!needs.pressing_needs.empty())
         {
             auto temp = needs.pressing_needs;
@@ -25,7 +26,7 @@ void Mitigation::update(float dt)
 
             if (strategies.staged_strategies.empty())
             {
-                if (!(add_actions(strategies, needs.pressing_needs[0])))
+                if (!(add_actions(strategies, needs.pressing_needs[0], tags)))
                 {
                     spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
@@ -33,30 +34,26 @@ void Mitigation::update(float dt)
         }
     });
 }
-bool Mitigation::add_actions(component::Strategies& strategies, const ai::Need& need)
+bool Mitigation::add_actions(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
 {
-    std::vector<ai::Strategy> temp{};
+    ai::Strategy temp{};
 
-    for (auto tag : need.tag)
+    // Find actions with tags that match any tag of the need
+    for (auto strategy : strategies.strategies)
     {
-        // Find actions with tags that match any tag of the need
-        for (auto strategy : strategies.strategies)
+        auto matching_tags = count_set_bits(strategy.tags & need.tags);
+        if (matching_tags != 0)
         {
-            int matching_tags{};
-            if ((matching_tags = std::count(strategy.tags.begin(), strategy.tags.end(), tag)) != 0)
-            {
-                // increase desirability by number of matched tags
-                strategy.desirability += matching_tags;
-
-                // If the Action is not allready in our list of temporary actions, add it
-                if (std::find(temp.begin(), temp.end(), strategy) != temp.end())
-                {
-                    temp.push_back(strategy);
-                }
-            }
+            temp = strategy;
+            temp.desirability += matching_tags;
+            strategies.staged_strategies.push_back(temp);
         }
     }
 
+    if (strategies.staged_strategies.size != 0)
+    {
+        std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
+    }
     return false;
 }
 } // namespace cs::system
