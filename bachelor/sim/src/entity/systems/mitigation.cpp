@@ -26,7 +26,11 @@ void Mitigation::update(float dt)
 
             if (strategies.staged_strategies.empty())
             {
-                if (!(add_actions(strategies, needs.pressing_needs[0], tags)))
+                if ((add_strategies(strategies, needs.pressing_needs[0], tags)))
+                {
+                    // TODO: Actually use the staged strategies
+                }
+                else
                 {
                     spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
@@ -34,25 +38,34 @@ void Mitigation::update(float dt)
         }
     });
 }
-bool Mitigation::add_actions(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
+bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
 {
     ai::Strategy temp{};
 
     // Find actions with tags that match any tag of the need
     for (auto strategy : strategies.strategies)
     {
-        auto matching_tags = count_set_bits(strategy.tags & need.tags);
-        if (matching_tags != 0)
+        // Bitwise operation have very low costs so we check everything we can bitwise before going into the "slightly" more
+        // costly count_set_bits function
+
+        // Check if the entities tags match the requirements of the strategy
+        if (strategy.requirements & tags.tags == strategy.requirements)
         {
-            temp = strategy;
-            temp.desirability += matching_tags;
-            strategies.staged_strategies.push_back(temp);
+            // Check if ANY of the strategies tags matches the needs tags
+            if (strategy.tags & need.tags != 0)
+            {
+                auto matching_tags = count_set_bits(strategy.tags & need.tags);
+                temp               = strategy;
+                temp.desirability += matching_tags;
+                strategies.staged_strategies.push_back(temp);
+            }
         }
     }
 
     if (strategies.staged_strategies.size != 0)
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
+        return true;
     }
     return false;
 }
