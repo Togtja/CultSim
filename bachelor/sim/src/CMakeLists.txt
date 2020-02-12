@@ -10,6 +10,9 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/delta_clock.h
         ${CMAKE_CURRENT_LIST_DIR}/delta_clock.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/common_helpers.h
+
 )
 
 # Configure file with CMake Variables
