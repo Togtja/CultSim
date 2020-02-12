@@ -5,6 +5,8 @@ target_sources(
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/robin_hood.h
+
         ${CMAKE_CURRENT_LIST_DIR}/application.h
         ${CMAKE_CURRENT_LIST_DIR}/application.cpp
 
