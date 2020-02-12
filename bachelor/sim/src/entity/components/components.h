@@ -109,7 +109,7 @@ struct Strategies
 
 struct Tags
 {
-    tags::ETag tag{};
+    tags::ETag tags{};
 };
 
 struct AI
