@@ -5,6 +5,8 @@
 #include "entity/rendering.h"
 #include "gfx/renderer.h"
 
+#include <random>
+
 #include "gfx/ImGUI/imgui.h"
 
 namespace cs
@@ -15,14 +17,18 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
+    static auto seed = std::random_device{};
+    static auto gen  = std::mt19937{seed()};
+    std::normal_distribution<float> rng(0.f, 1.f);
+
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100'00; i++)
     {
         auto agent = m_registry.create();
-        glm::vec2 pos(i * 15, 0);
+        glm::vec2 pos(i * 15.f, 0.f);
 
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
-        m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 100.f);
+        m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
     }

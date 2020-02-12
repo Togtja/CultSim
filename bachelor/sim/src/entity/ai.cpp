@@ -54,28 +54,52 @@ void AI::update(float dt)
     m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = m_registry.group<component::Vision>(entt::get<component::Position>);
 
-    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
-        auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
-        auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
-        for (int x = min.x; x <= max.x; x++)
+    for (auto& [hash, cell] : collision_grid)
+    {
+        /* Don't bother if there are less than two motes in the cell */
+        if (cell.size() < 2)
         {
-            for (int y = min.y; y <= max.y; y++)
+            continue;
+        }
+
+        /* Loop through all motes in that cell */
+        for (size_t i = 0u; i < cell.size() - 1; ++i)
+        {
+            auto&& [apos, avis] = vis_view.get<component::Vision, component::Position>(cell[i]);
+            for (size_t j = i + 1u; j < cell.size(); ++j)
             {
-                for (auto&& e2 : collision_grid[x * SIM_GRID_SIZE + y])
+                /* Detect if there is a collision */
+                auto&& [bpos, bvis] = vis_view.get<component::Vision, component::Position>(cell[j]);
+                if (is_visible(avis.position, bvis.position, apos.vision_radius))
                 {
-                    auto& pos2 = m_registry.get<component::Position>(e2);
-                    if (e == e2)
-                    {
-                        continue;
-                    }
-                    if (is_visible(pos.position, pos2.position, vis.vision_radius))
-                    {
-                        vis.seen.push_back(e);
-                    }
+                    apos.seen.push_back(cell[j]);
                 }
             }
         }
-    });
+    }
+    //
+    //    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
+    //        auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+    //        auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+    //        for (int x = min.x; x <= max.x; x++)
+    //        {
+    //            for (int y = min.y; y <= max.y; y++)
+    //            {
+    //                for (auto&& e2 : collision_grid[x * SIM_GRID_SIZE + y])
+    //                {
+    //                    auto& pos2 = m_registry.get<component::Position>(e2);
+    //                    if (e == e2)
+    //                    {
+    //                        continue;
+    //                    }
+    //                    if (is_visible(pos.position, pos2.position, vis.vision_radius))
+    //                    {
+    //                        vis.seen.push_back(e);
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    });
 }
 
 bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
