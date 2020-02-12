@@ -26,11 +26,7 @@ void Mitigation::update(float dt)
 
             if (strategies.staged_strategies.empty())
             {
-                if ((add_strategies(strategies, needs.pressing_needs[0], tags)))
-                {
-                    // TODO: Actually use the staged strategies
-                }
-                else
+                if (!(add_strategies(strategies, needs.pressing_needs[0], tags)))
                 {
                     spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
