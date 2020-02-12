@@ -16,7 +16,7 @@ void Rendering::update(float dt)
 
     m_registry.group<component::Sprite>(entt::get<component::Vision>)
         .each([](component::Sprite& spr, const component::Vision& vis) {
-            spr.color = glm::mix(noseecolor, seecolor, glm::vec3(vis.seen.size() / 15.f));
+            spr.color = glm::mix(noseecolor, seecolor, glm::vec3(vis.seen.size() / 1.f));
         });
 
     auto pos_sprite_view = m_registry.view<component::Position, component::Sprite>();

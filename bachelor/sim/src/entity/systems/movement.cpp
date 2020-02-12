@@ -10,8 +10,8 @@ namespace cs::system
 void Movement::update(float dt)
 {
     static auto seed = std::random_device{};
-    static auto gen = std::mt19937{seed()};
-    std::uniform_real_distribution<float> rng(-1.f, 1.f);
+    static auto gen  = std::mt19937{seed()};
+    std::normal_distribution<float> rng(0.f, 1.f);
 
     auto view = m_registry.view<component::Position, component::Movement>();
     view.each([dt, &rng](component::Position& pos, component::Movement& mov) {
@@ -21,7 +21,7 @@ void Movement::update(float dt)
 
         if(glm::distance(pos.position, pos.desired_position) < 10.f)
         {
-            pos.desired_position = {rng(seed) * 500.f, rng(seed) * 500.f, 0.f};
+            pos.desired_position = {rng(seed) * 15000.f, rng(seed) * 15000.f, 0.f};
         }
     });
 }
