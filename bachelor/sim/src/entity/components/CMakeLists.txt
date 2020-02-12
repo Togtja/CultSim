@@ -10,4 +10,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/strategy.h
 
         ${CMAKE_CURRENT_LIST_DIR}/tags.h
+
+        ${CMAKE_CURRENT_LIST_DIR}/action.h
 )
