@@ -1,3 +1,4 @@
+#pragma once
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "system.h"

@@ -16,7 +16,7 @@ void Mitigation::update(float dt)
         {
             auto temp = needs.pressing_needs;
             // Put the most pressing needs to the front
-            std::sort(needs.pressing_needs.begin(), needs.pressing_needs.end());
+            std::sort(needs.pressing_needs.begin(), needs.pressing_needs.end(), std::greater<ai::Need>());
 
             // If the most pressing need has changed
             if (!(temp[0] == needs.pressing_needs[0]))
@@ -49,10 +49,10 @@ bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Nee
         // costly count_set_bits function
 
         // Check if the entities tags match the requirements of the strategy
-        if (strategy.requirements & tags.tags == strategy.requirements)
+        if ((strategy.requirements & tags.tags) == strategy.requirements)
         {
             // Check if ANY of the strategies tags matches the needs tags
-            if (strategy.tags & need.tags != 0)
+            if ((strategy.tags & need.tags) != 0)
             {
                 auto matching_tags = count_set_bits(strategy.tags & need.tags);
                 temp               = strategy;
@@ -64,7 +64,7 @@ bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Nee
 
     if (strategies.staged_strategies.size() != 0)
     {
-        std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
+        std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end(), std::greater<ai::Strategy>());
         return true;
     }
     return false;
