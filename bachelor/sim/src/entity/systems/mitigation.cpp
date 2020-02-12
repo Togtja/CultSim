@@ -14,6 +14,7 @@ void Mitigation::update(float dt)
     view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
         if (!needs.pressing_needs.empty())
         {
+            for (auto need : needs.pressing_needs) {}
             auto temp = needs.pressing_needs;
             // Put the most pressing needs to the front
             std::sort(needs.pressing_needs.begin(), needs.pressing_needs.end(), std::greater<ai::Need>());
@@ -30,6 +31,10 @@ void Mitigation::update(float dt)
                 {
                     spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
+            }
+            for (auto strategy : strategies.staged_strategies)
+            {
+                spdlog::info("Staged_strategy: {}", strategy.name);
             }
         }
     });
