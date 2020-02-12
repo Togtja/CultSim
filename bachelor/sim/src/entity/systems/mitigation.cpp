@@ -42,19 +42,18 @@ bool Mitigation::add_actions(component::Strategies& strategies, const ai::Need& 
         // Find actions with tags that match any tag of the need
         for (auto strategy : strategies.strategies)
         {
-            // TODO: Add == operator to strategies
+            int matching_tags{};
+            if ((matching_tags = std::count(strategy.tags.begin(), strategy.tags.end(), tag)) != 0)
+            {
+                // increase desirability by number of matched tags
+                strategy.desirability += matching_tags;
 
-            //   if (std::find(strategy.tags.begin(), strategy.tags.end(), tag) != strategy.tags.end())
-            //   {
-            //       // increase desirability by 1
-            //       strategy.desirability++;
-            //
-            //       // If the Action is not allready in our list of temporary actions, add it
-            //       if (std::find(temp.begin(), temp.end(), strategy) != temp.end())
-            //       {
-            //           temp.push_back(strategy);
-            //       }
-            //   }
+                // If the Action is not allready in our list of temporary actions, add it
+                if (std::find(temp.begin(), temp.end(), strategy) != temp.end())
+                {
+                    temp.push_back(strategy);
+                }
+            }
         }
     }
 
