@@ -36,11 +36,10 @@ glm::ivec2 AI::world_to_grid(glm::vec2 pos)
 
 void AI::update(float dt)
 {
-    std::unordered_map<uint32_t, std::vector<entt::entity>> collision_grid{};
+    collision_grid.clear();
 
     /** Construct collision grid */
-
-    m_registry.view<component::Position>().each([&collision_grid, this](entt::entity e, const component::Position& pos) {
+    m_registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
         auto min = world_to_grid(pos.position - glm::vec3(50.f, 50.f, 0));
         auto max = world_to_grid(pos.position + glm::vec3(50.f, 50.f, 0));
         for (int x = min.x; x <= max.x; x++)
@@ -55,7 +54,7 @@ void AI::update(float dt)
     m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = m_registry.group<component::Vision>(entt::get<component::Position>);
 
-    vis_view.each([this, &collision_grid](entt::entity e, component::Vision& vis, const component::Position& pos) {
+    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
         auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         for (int x = min.x; x <= max.x; x++)
