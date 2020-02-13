@@ -29,7 +29,7 @@ void Need::update(float dt)
                 if (need.status <= 50.f)
                 {
                     needs.pressing_needs.push_back(need);
-                    spdlog::warn("Need {} has dropped to critical levels", need.name);
+                    // spdlog::warn("Need {} has dropped to critical levels", need.name);
                 }
             }
         }

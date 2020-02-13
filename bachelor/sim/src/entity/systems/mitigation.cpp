@@ -32,10 +32,10 @@ void Mitigation::update(float dt)
                     spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
             }
-            for (auto strategy : strategies.staged_strategies)
-            {
-                spdlog::info("Staged_strategy: {}", strategy.name);
-            }
+            // for (auto strategy : strategies.staged_strategies)
+            //{
+            //    spdlog::info("Staged_strategy: {}", strategy.name);
+            //}
         }
     });
 }

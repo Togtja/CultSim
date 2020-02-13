@@ -7,9 +7,6 @@ struct Action
 {
     // TODO: Actually implement actions
 
-    inline void run()
-    {
-        spdlog::warn("Running action");
-    };
+    inline void run(){};
 };
 } // namespace cs::ai
