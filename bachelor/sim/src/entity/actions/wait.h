@@ -6,8 +6,9 @@ namespace cs::action
 class Wait : public IAction
 {
 public:
-    void success() override;
-    void failure() override;
+    // There are no consequences for succeeding to wait
+    void success() override{};
+    void failure() override{};
 
 private:
     using IAction::IAction;
