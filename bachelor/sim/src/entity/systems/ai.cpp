@@ -1,4 +1,5 @@
 #include "ai.h"
+#include "constants.h"
 #include "entity/components/components.h"
 
 #include <glm/glm.hpp>
@@ -26,43 +27,43 @@ glm::vec2 AI::path_finding()
     return glm::vec2(dist(gen), dist(gen));
 }
 
+glm::ivec2 AI::world_to_grid(glm::vec2 pos)
+{
+    return {static_cast<int>(pos.x) / static_cast<int>(SIM_GRID_SIZE), static_cast<int>(pos.y) / static_cast<int>(SIM_GRID_SIZE)};
+}
+
 void AI::update(float dt)
 {
-    auto view = m_registry.view<component::Position, component::Movement, component::Sprite, component::Vision>();
-    view.each([dt, this](entt::entity et,
-                         component::Position& pos,
-                         component::Movement& mov,
-                         component::Sprite& spr,
-                         component::Vision& vis) {
-        if (close_enough(pos.position, pos.desired_position, 1.f))
-        {
-            pos.desired_position = glm::vec3(path_finding(), 0);
-        }
+    collision_grid.clear();
 
-        auto view2 = m_registry.view<component::Position>();
-        for (auto et2 : view2)
+    /** Construct collision grid */
+    m_registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
+        auto min = world_to_grid(pos.position);
+        collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
+    });
+
+    m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
+    auto vis_view = m_registry.group<component::Vision, component::Position>();
+
+    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
+        auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        for (int x = min.x; x <= max.x; x++)
         {
-            if (et == et2)
+            for (int y = min.y; y <= max.y; y++)
             {
-                continue;
-            }
-            while (is_colliding(pos.position, view2.get(et2).position, 7.5f, 7.5f))
-            {
-                pos.position += mov.speed * glm::vec3(mov.direction, 0) * -dt;
-            }
-            // is_visible(pos.position, view2.get(et2).position, vis.vision_radius)
-            // glm::distance(pos.position, view2.get(et2).position) < vis.vision_radius
-            if (is_visible(pos.position, view2.get(et2).position, vis.vision_radius))
-            {
-                // Found eachother
-                spr.color.r = 0;
-                spr.color.g = 1;
-                break;
-            }
-            else
-            {
-                spr.color.r = 1;
-                spr.color.g = 0;
+                for (auto&& e2 : collision_grid[x * SIM_GRID_SIZE + y])
+                {
+                    auto& pos2 = m_registry.get<component::Position>(e2);
+                    if (e == e2)
+                    {
+                        continue;
+                    }
+                    if (is_visible(pos.position, pos2.position, vis.vision_radius))
+                    {
+                        vis.seen.push_back(e2);
+                    }
+                }
             }
         }
     });

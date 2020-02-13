@@ -47,11 +47,11 @@ void ScenarioScene::on_enter()
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
+    m_active_systems.emplace_back(new system::Mitigation(m_registry));
+    m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
-    m_active_systems.emplace_back(new system::Mitigation(m_registry));
-    m_active_systems.emplace_back(new system::Action(m_registry));
 }
 
 void ScenarioScene::on_exit()

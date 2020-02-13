@@ -1,5 +1,6 @@
 #pragma once
-#include "entity/systems/system.h"
+#include "robin_hood.h"
+#include "system.h"
 
 #include <random>
 
@@ -19,6 +20,8 @@ public:
     glm::vec2 path_finding();
 
     glm::ivec2 world_to_grid(glm::vec2 pos);
+
+    robin_hood::unordered_flat_map<int, std::vector<entt::entity>> collision_grid{};
 
     void update(float dt) override;
 
