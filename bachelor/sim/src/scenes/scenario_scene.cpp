@@ -34,9 +34,13 @@ void ScenarioScene::on_enter()
     for (int i = 0; i < 100000; i++)
     {
         auto agent = m_registry.create();
-        glm::vec2 pos(i * 15.f, 0.f);
-
-        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
+        int i1     = i;
+        if (i % 2 == 1)
+        {
+            i1 = -i;
+        }
+        glm::vec2 pos(i1 * 15.f, 0.f);
+        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0));
         m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
