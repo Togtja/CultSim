@@ -10,6 +10,8 @@
 #include "entity/systems/rendering.h"
 #include "gfx/renderer.h"
 
+#include <random>
+
 #include "gfx/ImGUI/imgui.h"
 
 namespace cs
@@ -24,16 +26,20 @@ void ScenarioScene::on_enter()
     ai::Action action     = {};
     ai::Strategy strategy = {static_cast<std::string>("Eat food"), 0, {}, tags::TAG_Food, std::vector<ai::Action>({action})};
 
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/A_human_token.png");
-    for (int i = 0; i < 1; i++)
+    static auto seed = std::random_device{};
+    static auto gen  = std::mt19937{seed()};
+    std::normal_distribution<float> rng(0.f, 1.f);
+
+    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    for (int i = 0; i < 1000; i++)
     {
         auto agent = m_registry.create();
-        glm::vec2 pos(i * 15, 0);
+        glm::vec2 pos(i * 15.f, 0.f);
 
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
-        m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 25.f);
+        m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
-        m_registry.assign<component::Vision>(agent, 40.f, static_cast<uint8_t>(0));
+        m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
@@ -41,11 +47,11 @@ void ScenarioScene::on_enter()
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
+    m_active_systems.emplace_back(new system::Mitigation(m_registry));
+    m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
-    m_active_systems.emplace_back(new system::Mitigation(m_registry));
-    m_active_systems.emplace_back(new system::Action(m_registry));
 }
 
 void ScenarioScene::on_exit()
@@ -55,6 +61,7 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
+    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {
