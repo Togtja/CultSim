@@ -5,7 +5,6 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/requirement.h
 
-        ${CMAKE_CURRENT_LIST_DIR}/timed_action.h
-        ${CMAKE_CURRENT_LIST_DIR}/timed_action.cpp
-
+        ${CMAKE_CURRENT_LIST_DIR}/wait.h
+        ${CMAKE_CURRENT_LIST_DIR}/wait.cpp
 )
