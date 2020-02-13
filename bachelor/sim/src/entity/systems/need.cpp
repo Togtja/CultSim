@@ -17,7 +17,7 @@ void Need::update(float dt)
             if (found != needs.pressing_needs.end())
             {
                 // Remove it if it should not be there
-                if (need.status >= 50.f)
+                if (need.status > 50.f)
                 {
                     needs.pressing_needs.erase(found);
                 }
