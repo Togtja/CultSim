@@ -19,12 +19,12 @@ void Movement::update(float dt)
     view.each([dt, &rng](component::Position& pos, component::Movement& mov) {
         glm::vec3 temp = pos.desired_position - pos.position;
         mov.direction  = glm::normalize(temp);
-        pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
-
-        if(glm::distance(pos.position, pos.desired_position) < 10.f)
+        pos.position += glm::vec3(mov.direction * mov.avoidance * (mov.speed * dt), 0.f);
+        if (glm::distance(pos.position, pos.desired_position) < 10.f)
         {
             pos.desired_position = {rng(seed) * 15000.f, rng(seed) * 15000.f, 0.f};
         }
+        mov.avoidance = glm::vec3(1); // Reset the avoidance force
     });
 }
 } // namespace cs::system
