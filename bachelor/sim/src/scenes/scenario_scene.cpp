@@ -31,7 +31,7 @@ void ScenarioScene::on_enter()
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 10000; i++)
+    for (int i = 0; i < 1000; i++)
     {
         auto agent = m_registry.create();
         glm::vec2 pos(i * 15.f, 0.f);
