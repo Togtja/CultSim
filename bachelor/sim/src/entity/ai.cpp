@@ -45,7 +45,7 @@ void AI::update(float dt)
     });
 
     m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
-    auto vis_view = m_registry.group<component::Vision>(entt::get<component::Position>);
+    auto vis_view = m_registry.group<component::Vision, component::Position>();
 
     vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
         auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
