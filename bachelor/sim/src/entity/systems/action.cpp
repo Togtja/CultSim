@@ -1,6 +1,6 @@
 
 #include "action.h"
-#include "..\components\action.h"
+#include "entity/components/action.h"
 #include "entity/components/components.h"
 namespace cs::system
 {
@@ -10,7 +10,7 @@ void Action::update(float dt)
     view.each([this, dt](component::Strategies& strategies) {
         if (!strategies.staged_strategies.empty())
         {
-            for (auto strategy : strategies.staged_strategies)
+            for (const auto& strategy : strategies.staged_strategies)
             {
                 for (auto action : strategy.actions)
                 {
