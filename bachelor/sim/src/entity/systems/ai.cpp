@@ -2,8 +2,12 @@
 #include "constants.h"
 #include "entity/components/components.h"
 
+#include <algorithm>
+#include <execution>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <pstl/execution_defs.h>
 
 namespace cs::system
 {
@@ -45,14 +49,22 @@ void AI::update(float dt)
     m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = m_registry.group<component::Vision, component::Position>();
 
-    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
+    std::for_each(std::execution::par_unseq, vis_view.begin(), vis_view.end(), [this, &vis_view](entt::entity e) {
+        auto&& vis      = vis_view.get<component::Vision>(e);
+        const auto& pos = vis_view.get<component::Position>(e);
+
         auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                for (auto&& e2 : collision_grid[x * SIM_GRID_SIZE + y])
+                if (collision_grid.find(x * SIM_GRID_SIZE + y) == collision_grid.end())
+                {
+                    continue;
+                }
+
+                for (auto e2 : collision_grid[x * SIM_GRID_SIZE + y])
                 {
                     auto& pos2 = m_registry.get<component::Position>(e2);
                     if (e == e2)
