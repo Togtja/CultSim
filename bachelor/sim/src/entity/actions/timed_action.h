@@ -4,21 +4,21 @@
 
 namespace cs::action
 {
-class TimedAction : public IAction
+class ITimedAction : public IAction
 {
 private:
     float m_time_to_complete{};
     float m_time_left{};
 
-    void success() override;
-    void failure() override;
+    virtual void success() override = 0;
+    virtual void failure() override = 0;
 
 public:
-    TimedAction(std::string name, std::vector<Requirement> requirements, float time_to_complete, float time_left) :
+    ITimedAction(std::string name, std::vector<Requirement> requirements, float time_to_complete, float time_left) :
         IAction(name, requirements),
         m_time_to_complete(time_to_complete),
         m_time_left(time_left){};
 
-    void update(float dt) override;
+    virtual void update(float dt) override = 0;
 };
 } // namespace cs::action
