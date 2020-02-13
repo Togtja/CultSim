@@ -7,9 +7,10 @@
 
 #include <vector>
 
+#include <entt/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <entt/fwd.hpp>
+
 
 namespace cs::component
 {
@@ -21,7 +22,7 @@ struct Position
 
 struct Movement
 {
-    glm::vec2 desired_direction{};
+    glm::vec2 avoidance{};
     glm::vec2 direction{};
     float speed = 1.f;
 };
