@@ -1,7 +1,6 @@
-
 #include "action.h"
-#include "entity/components/action.h"
 #include "entity/components/components.h"
+
 namespace cs::system
 {
 void Action::update(float dt)
