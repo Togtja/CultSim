@@ -19,7 +19,7 @@ void Rendering::update(float dt)
             spr.color = glm::mix(noseecolor, seecolor, glm::vec3(vis.seen.size() / 1.f));
         });
 
-    auto pos_sprite_view = m_registry.group<component::Sprite>(entt::get<component::Position>);
+    auto pos_sprite_view = m_registry.view<component::Sprite, component::Position>();
     pos_sprite_view.each([this](const component::Sprite& sprite, const component::Position& pos) {
         m_renderer.sprite().draw(pos.position, sprite.color, sprite.texture);
     });
