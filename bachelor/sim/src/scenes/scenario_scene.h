@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity/system.h"
+#include "entity/systems/system.h"
 #include "scene.h"
 
 #include <string_view>

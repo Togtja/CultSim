@@ -1,6 +1,9 @@
 #pragma once
 
 #include "gfx/render_data.h"
+#include "need.h"
+#include "strategy.h"
+#include "tags.h"
 
 #include <vector>
 
@@ -34,43 +37,11 @@ struct Animation
     float current_progress{};
 };
 
-struct Emotion
+struct Needs
 {
-    /** In percentages from -100 - 100 */
+    std::vector<ai::Need> needs{};
 
-    /** -100=Depressed - 100= Ecstatic*/
-    float happiness{};
-
-    /** -100=Livid - 100 = tranquil*/
-    float calm{};
-
-    /** -100=Unmotivated - 100 = Very motivated*/
-    float motivation{};
-};
-
-struct Status
-{
-    /** In percentages from 0 - 100 */
-
-    /** 0=Dead - 100 = Full health*/
-    float health = 100;
-
-    /** 0 = No energy - 100 = Full energy*/
-    float energy = 100;
-
-    /** 0 = Starving - 100 = Well fed*/
-    float nourishment = 100;
-};
-
-struct Attributes
-{
-    /** In percentages from -100 - 100 */
-
-    /** -100 = repulsive - 100 = enticing  */
-    float attractiveness{};
-
-    /** -100 = terrifying - 100 = soothing*/
-    float soothing{};
+    std::vector<ai::Need> pressing_needs{};
 };
 
 struct Vision
@@ -127,6 +98,18 @@ struct DropItems
     };
 
     std::vector<EDeathDrops> deathdrops{};
+};
+
+struct Strategies
+{
+    std::vector<ai::Strategy> strategies{};
+
+    std::vector<ai::Strategy> staged_strategies{};
+};
+
+struct Tags
+{
+    tags::ETag tags{};
 };
 
 struct AI
