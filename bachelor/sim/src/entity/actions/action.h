@@ -10,7 +10,7 @@ namespace cs::action
 class IAction
 {
 protected:
-    std::vector<Requirement> m_requirements{};
+    std::vector<IRequirement> m_requirements{};
     float m_time_to_complete{};
     float m_time_left{};
 
@@ -20,7 +20,7 @@ protected:
 public:
     std::string m_name{};
 
-    IAction(std::string name, float time_to_complete, float time_left, std::vector<Requirement> requirements) :
+    IAction(std::string name, float time_to_complete, float time_left, std::vector<IRequirement> requirements) :
         m_name(name),
         m_time_to_complete(time_to_complete),
         m_time_left(time_left),
