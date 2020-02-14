@@ -21,6 +21,10 @@ public:
     {
     }
 
+    explicit RandomEngine(uint64_t seed) : m_random_generator(seed)
+    {
+    }
+
     RandomEngine(const RandomEngine&) = delete;
     RandomEngine& operator=(const RandomEngine&) = delete;
 
