@@ -11,18 +11,16 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-
 namespace cs::component
 {
 struct Position
 {
     glm::vec3 position{};
-    glm::vec3 desired_position{};
 };
 
 struct Movement
 {
-    glm::vec2 avoidance{};
+    std::vector<glm::vec3> desired_position{};
     glm::vec2 direction{};
     float speed = 1.f;
 };

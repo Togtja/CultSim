@@ -16,14 +16,24 @@ void Movement::update(float dt)
 
     auto view = m_registry.group<component::Movement, component::Position>();
     view.each([dt, &rng](component::Movement& mov, component::Position& pos) {
-        glm::vec3 temp = pos.desired_position - pos.position;
+        // Will Never trigger as the code is now
+        // if (pos.desired_position.empty())
+        //{
+        //    return;
+        //}
+        auto& cur_head = mov.desired_position.back();
+        glm::vec3 temp = cur_head - pos.position;
         mov.direction  = glm::normalize(temp);
-        pos.position += glm::vec3(mov.direction * mov.avoidance * (mov.speed * dt), 0.f);
-        if (glm::distance(pos.position, pos.desired_position) < 10.f)
+        pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
+        if (glm::distance(pos.position, cur_head) < 5.f)
         {
-            pos.desired_position = {rng(seed) * 15000.f, rng(seed) * 15000.f, 0.f};
+            mov.desired_position.pop_back();
+            if (mov.desired_position.empty())
+            {
+                // Arrived at final destination
+                mov.desired_position.push_back({rng(seed) * 1500.f, rng(seed) * 1500.f, 0.f});
+            }
         }
-        mov.avoidance = glm::vec3(1); // Reset the avoidance force
     });
 }
 } // namespace cs::system

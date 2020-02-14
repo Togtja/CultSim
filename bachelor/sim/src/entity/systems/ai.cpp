@@ -84,12 +84,11 @@ void AI::update(float dt)
                             }
                             // How much ahead we see
                             auto ahead = glm::vec2(pos.position.x, pos.position.y) + move->direction * (vis.vision_radius / 2);
-                            // 10 should be the size of the entt on pos2
-                            if (is_visible(ahead, pos2.position, 5))
+                            // 5 should be the size of the entt on pos2
+                            if (is_visible(ahead, pos2.position, 5 + 4))
                             {
                                 auto avoid_force = ahead - glm::vec2(pos2.position.x, pos2.position.y);
-                                move->avoidance  = glm::normalize(avoid_force);
-                                move->avoidance *= 1;
+                                move->desired_position.push_back(pos.position + glm::normalize(glm::vec3(avoid_force, 0)) * 2.f);
                             }
                         }
                     }
