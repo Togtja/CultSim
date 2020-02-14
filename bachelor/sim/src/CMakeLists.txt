@@ -16,8 +16,10 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/preferences.h
         ${CMAKE_CURRENT_LIST_DIR}/preferences.cpp
 
-        ${CMAKE_CURRENT_LIST_DIR}/common_helpers.h
+        ${CMAKE_CURRENT_LIST_DIR}/random_engine.h
+        ${CMAKE_CURRENT_LIST_DIR}/random_engine.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/common_helpers.h
 )
 
 # Configure file with CMake Variables
