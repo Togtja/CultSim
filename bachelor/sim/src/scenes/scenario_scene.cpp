@@ -32,8 +32,10 @@ void ScenarioScene::on_enter()
                           5.f,
                           0.f,
                           {},
-                          []() { spdlog::warn("We are running action: eat"); },
-                          {}};
+                          []() { spdlog::warn("We finished action: eat"); },
+                          []() {
+                              spdlog::warn("We failed to finish action: eat");
+                          }};
     ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>({action})};
 
     static auto seed = std::random_device{};
@@ -41,7 +43,7 @@ void ScenarioScene::on_enter()
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
         glm::vec2 pos(i * 15.f, 0.f);
@@ -52,6 +54,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
+        m_registry.assign<component::Requirement>(agent, std::vector<action::Requirement>({}));
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 
