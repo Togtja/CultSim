@@ -1,6 +1,7 @@
 #pragma once
 
-#include "robin_hood.h"
+#include "gfx/window.h"
+#include "l10n/lang_manager.h"
 
 #include <string>
 #include <string_view>
@@ -8,6 +9,7 @@
 #include <variant>
 #include <vector>
 
+#include "robin_hood.h"
 #include <entt/signal/sigh.hpp>
 #include <glm/vec2.hpp>
 
@@ -35,6 +37,9 @@ struct Preference
 class PreferenceManager
 {
 private:
+    /** Application window */
+    Window& m_window;
+
     /** Window resolution */
     Preference m_resolution{"Resolution", "The resolution of your game window", glm::ivec2{1280, 720}};
 
@@ -50,8 +55,8 @@ private:
     entt::sigh<void(const Preference&, const Preference&)> m_preference_changed{};
 
 public:
-    PreferenceManager() = default;
-    explicit PreferenceManager(std::string_view from_file);
+    explicit PreferenceManager(Window& window);
+    explicit PreferenceManager(Window& window, std::string_view from_file);
 
     /**
      * Sink for subscribing to preference changes
