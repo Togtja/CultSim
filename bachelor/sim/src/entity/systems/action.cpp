@@ -1,25 +1,75 @@
 #include "action.h"
 #include "entity/components/components.h"
 
+#include <random>
+
+#include "spdlog/spdlog.h"
+
 namespace cs::system
 {
+Action::Action(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
+{
+    m_dispatcher.sink<event::ArrivedAtDestination>().connect<&Action::respond_arrive>(this);
+}
+
+Action::~Action() noexcept
+{
+    m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&Action::respond_arrive>(this);
+}
+
 void Action::update(float dt)
 {
-    auto view = m_registry.view<component::Strategies>();
-    view.each([this, dt](component::Strategies& strategies) {
-        if (!strategies.staged_strategies.empty())
+    auto view = m_registry.view<component::Strategies, component::Requirement>();
+    view.each([this, dt](component::Strategies& strategies, component::Requirement& requirements) {
+        if (requirements.staged_requirements.empty())
         {
-            for (const auto& strategy : strategies.staged_strategies)
+            for (auto& strategy : strategies.staged_strategies)
             {
-                for (auto action : strategy.actions)
+                if (!strategy.actions.empty())
                 {
-                    action.run();
-                    // Let run while the action is not finished / Aborted
-                    strategies.staged_strategies.clear();
-                    break;
+                    auto& action = strategy.actions.back();
+                    if (!action.requirements.empty())
+                    {
+                        spdlog::warn("Pushing back requirement {}", action.requirements.back().name);
+                        requirements.staged_requirements.push_back(action.requirements.back());
+                        action.requirements.back().init();
+                        action.requirements.pop_back();
+                    }
+                    else
+                    {
+                        action.time_spent += dt;
+                        spdlog::info("Time spent: {}", action.time_spent);
+                        if (action.time_spent >= action.time_to_complete)
+                        {
+                            std::random_device rand;
+                            std::mt19937 gen(rand());
+                            if (std::bernoulli_distribution(0.9)(gen))
+                            {
+                                action.success();
+                            }
+                            else
+                            {
+                                action.failure();
+                            }
+                            strategy.actions.pop_back();
+                        }
+                    }
                 }
             }
         }
+        else
+        {
+            spdlog::error("We are in the requirements");
+            if (requirements.staged_requirements.back().predicate())
+            {
+                requirements.staged_requirements.pop_back();
+            }
+        }
     });
+}
+
+void Action::respond_arrive(const event::ArrivedAtDestination& data)
+{
+    spdlog::info("{} arrived at X:{} Y:{}", static_cast<uint32_t>(data.entity), data.position.x, data.position.y);
 }
 } // namespace cs::system

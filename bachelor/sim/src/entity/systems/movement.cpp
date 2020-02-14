@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "entity/components/components.h"
+#include "entity/events.h"
 
 #include <random>
 
@@ -9,6 +10,10 @@
 
 namespace cs::system
 {
+Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
+{
+}
+
 void Movement::update(float dt)
 {
     static auto seed = std::random_device{};
@@ -16,14 +21,15 @@ void Movement::update(float dt)
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto view = m_registry.view<component::Position, component::Movement>();
-    view.each([dt, &rng](component::Position& pos, component::Movement& mov) {
+    view.each([dt, &rng, this](entt::entity e, component::Position& pos, component::Movement& mov) {
         glm::vec3 temp = pos.desired_position - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
 
-        if(glm::distance(pos.position, pos.desired_position) < 10.f)
+        if (glm::distance(pos.position, pos.desired_position) < 10.f)
         {
-            pos.desired_position = {rng(seed) * 15000.f, rng(seed) * 15000.f, 0.f};
+            m_dispatcher.enqueue(event::ArrivedAtDestination{e, pos.desired_position});
+            pos.desired_position = {rng(seed) * 150.f, rng(seed) * 150.f, 0.f};
         }
     });
 }

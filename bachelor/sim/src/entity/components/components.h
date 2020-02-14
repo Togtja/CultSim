@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/actions/requirement.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "strategy.h"
@@ -7,9 +8,9 @@
 
 #include <vector>
 
+#include <entt/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
-#include <entt/fwd.hpp>
 
 namespace cs::component
 {
@@ -107,6 +108,11 @@ struct Strategies
     std::vector<ai::Strategy> strategies{};
 
     std::vector<ai::Strategy> staged_strategies{};
+};
+
+struct Requirement
+{
+    std::vector<action::Requirement> staged_requirements{};
 };
 
 struct Tags
