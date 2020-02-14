@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include <SDL.h>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 namespace cs
@@ -61,6 +62,12 @@ public:
      */
     void set_background_color(glm::vec3 color);
 
+    void resize(const glm::ivec2& resolution);
+
+    void set_fullscreen(bool fullscreen);
+
+    bool confirm_dialog(std::string_view title, std::string_view message);
+
     /**
      * Clean up and destroy all underlying resources that are successfully created
      *
@@ -69,7 +76,5 @@ public:
     void deinit() noexcept;
 
     [[nodiscard]] SDL_GLContext get_context() const;
-
-private:
 };
 } // namespace cs
