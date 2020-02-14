@@ -57,6 +57,7 @@ const Preference& PreferenceManager::get_language() const
 
 void PreferenceManager::set_language(std::string_view language)
 {
+    /** TODO: Interact with Locale, or integrate it */
     m_language.value = std::string(language);
 }
 } // namespace cs
