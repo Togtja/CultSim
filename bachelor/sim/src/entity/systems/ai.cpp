@@ -7,7 +7,6 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
-#include <pstl/execution_defs.h>
 
 namespace cs::system
 {
