@@ -4,8 +4,19 @@
 #include <random>
 
 #include "spdlog/spdlog.h"
+
 namespace cs::system
 {
+Action::Action(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
+{
+    m_dispatcher.sink<event::ArrivedAtDestination>().connect<&Action::respond_arrive>(this);
+}
+
+Action::~Action() noexcept
+{
+    m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&Action::respond_arrive>(this);
+}
+
 void Action::update(float dt)
 {
     auto view = m_registry.view<component::Strategies, component::Requirement>();
@@ -21,7 +32,7 @@ void Action::update(float dt)
                     {
                         spdlog::warn("Pushing back requirement {}", action.requirements.back().name);
                         requirements.staged_requirements.push_back(action.requirements.back());
-                        action.requirements.back().Init();
+                        action.requirements.back().init();
                         action.requirements.pop_back();
                     }
                     else
@@ -49,11 +60,16 @@ void Action::update(float dt)
         else
         {
             spdlog::error("We are in the requirements");
-            if (requirements.staged_requirements.back().Predicate())
+            if (requirements.staged_requirements.back().predicate())
             {
                 requirements.staged_requirements.pop_back();
             }
         }
     });
+}
+
+void Action::respond_arrive(const event::ArrivedAtDestination& data)
+{
+    spdlog::info("{} arrived at X:{} Y:{}", static_cast<uint32_t>(data.entity), data.position.x, data.position.y);
 }
 } // namespace cs::system
