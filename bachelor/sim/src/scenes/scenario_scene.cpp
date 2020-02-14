@@ -1,4 +1,6 @@
 #include "scenario_scene.h"
+#include "entity/actions/action.h"
+#include "entity/actions/requirement.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
@@ -10,9 +12,11 @@
 #include "entity/systems/rendering.h"
 #include "gfx/renderer.h"
 
+#include <functional>
 #include <random>
 
 #include "gfx/ImGUI/imgui.h"
+#include "spdlog/spdlog.h"
 
 namespace cs
 {
@@ -22,9 +26,15 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need         = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
-    ai::Action action     = {};
-    ai::Strategy strategy = {static_cast<std::string>("Eat food"), 0, {}, tags::TAG_Food, std::vector<ai::Action>({action})};
+    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
+    action::Action action{static_cast<std::string>("eat"),
+                          std::vector<action::Requirement>{},
+                          5.f,
+                          0.f,
+                          {},
+                          []() { spdlog::warn("We are running action: eat"); },
+                          {}};
+    ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>({action})};
 
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
