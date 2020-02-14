@@ -2,30 +2,23 @@
 
 #include "requirement.h"
 
+#include <functional>
 #include <string>
 #include <vector>
 
 namespace cs::action
 {
-class IAction
+struct Action
 {
-protected:
-    std::vector<IRequirement> m_requirements{};
-    float m_time_to_complete{};
-    float m_time_left{};
+    std::string name{};
 
-    virtual void success() = 0;
-    virtual void failure() = 0;
+    std::vector<IRequirement> requirements{};
 
-public:
-    std::string m_name{};
+    float time_to_complete{};
+    float time_spent{};
 
-    IAction(std::string name, float time_to_complete, float time_left, std::vector<IRequirement> requirements) :
-        m_name(name),
-        m_time_to_complete(time_to_complete),
-        m_time_left(time_left),
-        m_requirements(requirements){};
-
-    virtual void update(float dt) = 0;
+    std::function<void> abort{};
+    std::function<void> success{};
+    std::function<void> failure{};
 };
 } // namespace cs::action

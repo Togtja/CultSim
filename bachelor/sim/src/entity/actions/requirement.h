@@ -1,14 +1,14 @@
 #pragma once
+#include <functional>
+#include <string>
 
 namespace cs::action
 {
-class IRequirement
+struct Requirement
 {
-private:
-    virtual void success() = 0;
-    virtual void failure() = 0;
+    std::string name;
 
-public:
-    virtual void update(float dt) = 0;
+    std::function<bool> Init{};
+    std::function<void> Predicate{};
 };
 } // namespace cs::action
