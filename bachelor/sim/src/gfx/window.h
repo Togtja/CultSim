@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include <SDL.h>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 namespace cs
@@ -60,6 +61,10 @@ public:
      * @param color The color that will become the background of this window
      */
     void set_background_color(glm::vec3 color);
+
+    void resize(const glm::ivec2& resolution);
+
+    void set_fullscreen(bool fullscreen);
 
     /**
      * Clean up and destroy all underlying resources that are successfully created
