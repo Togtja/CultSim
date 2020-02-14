@@ -10,7 +10,7 @@ class Camera
 {
 private:
     glm::vec3 m_pos    = {0.f, 0.f, 0.f};
-    glm::vec2 m_bounds = {20.f, 20.f};
+    glm::vec2 m_bounds = {200.f, 200.f};
     GLfloat m_speed    = 10.f;
 
 public:
