@@ -8,7 +8,7 @@ struct Requirement
 {
     std::string name;
 
-    std::function<bool> Init{};
-    std::function<void> Predicate{};
+    std::function<bool(void)> Init{};
+    std::function<void(void)> Predicate{};
 };
 } // namespace cs::action
