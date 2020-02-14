@@ -58,6 +58,8 @@ public:
     explicit PreferenceManager(Window& window);
     explicit PreferenceManager(Window& window, std::string_view from_file);
 
+    void show_debug_ui();
+
     /**
      * Sink for subscribing to preference changes
      *
