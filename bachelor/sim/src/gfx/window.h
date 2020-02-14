@@ -66,6 +66,8 @@ public:
 
     void set_fullscreen(bool fullscreen);
 
+    bool confirm_dialog(std::string_view title, std::string_view message);
+
     /**
      * Clean up and destroy all underlying resources that are successfully created
      *
@@ -74,7 +76,5 @@ public:
     void deinit() noexcept;
 
     [[nodiscard]] SDL_GLContext get_context() const;
-
-private:
 };
 } // namespace cs

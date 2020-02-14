@@ -1,10 +1,15 @@
 #include "window.h"
 
+#include <array>
+
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 namespace cs
 {
+static const SDL_MessageBoxColorScheme s_dialog_color_scheme = {
+    {{15, 15, 25}, {240, 190, 0}, {45, 45, 50}, {25, 25, 35}, {255, 255, 255}}};
+
 Window::Window(Window&& other) noexcept : m_window(other.m_window), m_context(other.m_context)
 {
     other.m_window  = nullptr;
@@ -96,6 +101,24 @@ void Window::set_fullscreen(bool fullscreen)
         SDL_SetWindowBordered(m_window, SDL_TRUE);
         SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
     }
+}
+
+bool Window::confirm_dialog(std::string_view title, std::string_view message)
+{
+    const SDL_MessageBoxButtonData buttons[] = {{SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT, 0, "Confirm"},
+                                                {SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, 1, "Cancel"}};
+
+    const SDL_MessageBoxData information =
+        {SDL_MESSAGEBOX_WARNING, m_window, title.data(), message.data(), SDL_arraysize(buttons), buttons, &s_dialog_color_scheme};
+
+    int response = -1;
+    if (SDL_ShowMessageBox(&information, &response) < 0)
+    {
+        return false;
+    }
+
+    spdlog::debug("user clicked button {} - {}", response, buttons[response].text);
+    return response == 0;
 }
 
 void Window::deinit() noexcept
