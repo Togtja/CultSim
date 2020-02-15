@@ -65,7 +65,7 @@ private:
 
     void create_instance();
 
-    VkPhysicalDevice pick_physical_device();
+    VkPhysicalDevice pick_physical_device(const std::vector<VkPhysicalDevice>& available);
 
     void create_device();
 

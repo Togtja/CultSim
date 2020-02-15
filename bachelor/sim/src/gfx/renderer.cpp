@@ -2,6 +2,8 @@
 #include "constants.h"
 #include "glutil.h"
 
+#include <vector>
+
 #include <spdlog/spdlog.h>
 
 namespace cs::gfx
@@ -81,13 +83,43 @@ void Renderer::create_instance()
     spdlog::info("created Vulkan instance");
 }
 
-VkPhysicalDevice Renderer::pick_physical_device()
+VkPhysicalDevice Renderer::pick_physical_device(const std::vector<VkPhysicalDevice>& available)
 {
-    return nullptr;
+    for (auto pdev : available)
+    {
+        VkPhysicalDeviceProperties2 properties = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+        vkGetPhysicalDeviceProperties2(pdev, &properties);
+
+        if (properties.properties.apiVersion >= VK_API_VERSION_1_1 &&
+            properties.properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        {
+            spdlog::info("using gpu {}", properties.properties.deviceName);
+            return pdev;
+        }
+    }
+
+    if (!available.empty())
+    {
+        VkPhysicalDeviceProperties2 properties = {VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+        vkGetPhysicalDeviceProperties2(available.front(), &properties);
+        spdlog::warn("using backup gpu {}", properties.properties.deviceName);
+        return available.front();
+    }
+
+    spdlog::critical("no Vulkan supported gpu's!");
+    return VK_NULL_HANDLE;
 }
 
 void Renderer::create_device()
 {
+    uint32_t pd_count{};
+    vkEnumeratePhysicalDevices(m_instance, &pd_count, nullptr);
+
+    std::vector<VkPhysicalDevice> pdevices(pd_count);
+    vkEnumeratePhysicalDevices(m_instance, &pd_count, pdevices.data());
+
+    m_pdevice = pick_physical_device(pdevices);
+    assert(m_pdevice);
 }
 
 void Renderer::create_swapchain()
