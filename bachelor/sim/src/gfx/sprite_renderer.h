@@ -13,16 +13,6 @@ class SpriteRenderer
 private:
     Camera& m_camera;
 
-    uint32_t m_vao{};
-
-    /** Template VBO */
-    uint32_t m_vbo{};
-
-    /** Instance VBO */
-    uint32_t m_ivbo{};
-
-    uint32_t m_shader{};
-
     /** Pointer to GPU memory where the instance variables are */
     SpriteInstanceVertex* m_instance_data{};
 
@@ -65,10 +55,6 @@ public:
 
 private:
     bool increment_next_texture_id();
-
-    void init_vbo_and_vao();
-
-    void init_shader();
 
     void init_texture_slots();
 };

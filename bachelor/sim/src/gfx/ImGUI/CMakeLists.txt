@@ -11,9 +11,6 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/imgui_draw.cpp
 
-    ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_opengl3.h
-    ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_opengl3.cpp
-
     ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_sdl.h
     ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_sdl.cpp
 

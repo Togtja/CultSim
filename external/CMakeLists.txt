@@ -14,6 +14,7 @@ include(entt.cmake)
 include(spdlog.cmake)
 include(doctest.cmake)
 include(glm.cmake)
+include(volk.cmake)
 
 # Set FC to be disconnected so we stop downloading
 set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "This has been reset to ON (set to OFF to download again)" FORCE)

@@ -1,20 +1,14 @@
 #include "application.h"
 #include "constants.h"
 #include "delta_clock.h"
-#include "entity/components/components.h"
-#include "entity/systems/ai.h"
-#include "entity/systems/movement.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
-#include "gfx/glutil.h"
 #include "input/input_handler.h"
 #include "scenes/scenario_scene.h"
 
-#include <chrono>
 #include <functional>
 
 #include "gfx/ImGUI/imgui.h"
-#include "gfx/ImGUI/imgui_impl_opengl3.h"
 #include "gfx/ImGUI/imgui_impl_sdl.h"
 
 namespace cs
@@ -34,9 +28,9 @@ void Application::run(const std::vector<char*>& args)
     {
         handle_input();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(m_window.get());
-        ImGui::NewFrame();
+        //        ImGui_ImplOpenGL3_NewFrame();
+        //        ImGui_ImplSDL2_NewFrame(m_window.get());
+        //        ImGui::NewFrame();
 
         update(dt_clock.restart());
 
@@ -51,7 +45,7 @@ void Application::handle_input()
     SDL_Event e{};
     while (SDL_PollEvent(&e))
     {
-        ImGui_ImplSDL2_ProcessEvent(&e);
+        //        ImGui_ImplSDL2_ProcessEvent(&e);
         if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
             m_running = false;
@@ -66,7 +60,7 @@ void Application::handle_input()
 void Application::update(float dt)
 {
     m_scene_manager.update(dt);
-    m_preferences.show_debug_ui();
+    // m_preferences.show_debug_ui();
 }
 
 void Application::draw()
@@ -77,12 +71,7 @@ void Application::draw()
     auto& r = gfx::get_renderer();
     r.sprite().display();
 
-    r.debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    r.debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-    r.debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    // ImGui::Render();
 
     m_window.display();
 }
@@ -91,7 +80,7 @@ bool Application::init(const std::vector<char*>& args)
 {
     return init_subsystem(&Application::init_gl, "OpenGL") &&           // Init OpenGL
            init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
-           init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
+           //           init_subsystem(&Application::init_imgui, "ImGui") &&         // Init ImGui
            init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
            init_subsystem(&Application::init_input, "Input Manager");   // Init Input Manager
 }
@@ -109,21 +98,6 @@ bool Application::init_gl()
         spdlog::error("failed to initialize window");
         return false;
     }
-
-    if (!gladLoadGL())
-    {
-        spdlog::error("failed to initialize glad");
-        return false;
-    }
-
-    glClearColor(0.12f, 0.12f, 0.12f, 0.0f);
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-#ifndef NDEBUG
-    gfx::create_debug_callback();
-#endif
 
     return true;
 }
@@ -200,10 +174,8 @@ bool Application::init_imgui()
     colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
 
-    // Set up Platform & renderer Bindings
-    ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init("#version 450 core");
-
+    /** Set up Platform & renderer Bindings */
+    // ImGui_ImplSDL2_InitForVulkan(m_window.get());
     return true;
 }
 
@@ -274,7 +246,6 @@ void Application::deinit_physfs()
 
 void Application::deinit_imgui()
 {
-    ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 }

@@ -2,7 +2,6 @@
 #include "filesystem/filesystem.h"
 
 #include <gfx/ImGUI/imgui.h>
-#include <glad/glad.h>
 
 namespace cs
 {

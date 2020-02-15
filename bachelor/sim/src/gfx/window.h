@@ -17,7 +17,6 @@ class Window
 {
 private:
     SDL_Window* m_window    = nullptr;
-    SDL_GLContext m_context = nullptr;
 
 public:
     Window& operator=(const Window& other) = delete;
@@ -74,7 +73,5 @@ public:
      * @note This is a no-op if the window is not successfully initialized
      */
     void deinit() noexcept;
-
-    [[nodiscard]] SDL_GLContext get_context() const;
 };
 } // namespace cs

@@ -7,7 +7,6 @@
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include <glad/glad.h>
 #include <physfs.h>
 #include <sol/sol.hpp>
 #include <spdlog/spdlog.h>

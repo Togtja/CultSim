@@ -4,6 +4,7 @@
 find_package(OpenGL REQUIRED)
 find_package(Lua REQUIRED)
 find_package(PhysFS REQUIRED)
+find_package(Vulkan REQUIRED)
 
 # Program Variables
 set(TEAM_NAME g107)
@@ -41,20 +42,20 @@ target_include_directories(
 
 # Link with some libraries
 target_link_libraries(
-    ${EXEC_NAME}
-    PRIVATE
-    OpenGL::GL
-    $<$<PLATFORM_ID:Linux>:dl>
-    glad::glad
-    ${PHYSFS_LIBRARY}
-    SDL2main
-    SDL2-static
-    ${LUA_LIBRARIES}
-    sol2::sol2
-    EnTT::EnTT
-    spdlog::spdlog
-    glm::glm
-    doctest
+        ${EXEC_NAME}
+        PRIVATE
+        Vulkan::Vulkan
+        volk
+        $<$<PLATFORM_ID:Linux>:dl>
+        ${PHYSFS_LIBRARY}
+        SDL2main
+        SDL2-static
+        ${LUA_LIBRARIES}
+        sol2::sol2
+        EnTT::EnTT
+        spdlog::spdlog
+        glm
+        doctest
 
     # Link with gcov on GNU for code coverage
     $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:gcov>

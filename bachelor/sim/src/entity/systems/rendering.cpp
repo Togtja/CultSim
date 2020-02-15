@@ -11,9 +11,6 @@ void Rendering::update(float dt)
     static glm::vec3 noseecolor{1.f, 0.f, 0.f};
     static glm::vec3 seecolor{0.f, 1.f, 0.f};
 
-    ImGui::ColorPicker3("No See Color", glm::value_ptr(noseecolor));
-    ImGui::ColorPicker3("See Color", glm::value_ptr(seecolor));
-
     m_registry.group<component::Sprite>(entt::get<component::Vision>)
         .each([](component::Sprite& spr, const component::Vision& vis) {
             spr.color = glm::mix(noseecolor, seecolor, glm::vec3(vis.seen.size() / 1.f));

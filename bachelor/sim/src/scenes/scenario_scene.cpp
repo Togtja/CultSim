@@ -73,15 +73,10 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    ImGui::Begin("Scenario Scene");
-    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
-
     for (auto& system : m_active_systems)
     {
         system->update(dt);
     }
-
-    ImGui::End();
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);

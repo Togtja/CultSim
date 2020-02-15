@@ -37,7 +37,7 @@ void Renderer::set_camera_bounds(glm::vec2 bounds)
     m_camera.set_boundaries(bounds);
 }
 
-Renderer::Renderer() : m_debug_renderer(m_camera), m_sprite_renderer(m_camera)
+Renderer::Renderer() : m_sprite_renderer(m_camera)
 {
     m_camera.init({0.f, 0.f, 0.f});
 }

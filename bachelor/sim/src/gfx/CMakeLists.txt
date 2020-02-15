@@ -11,9 +11,6 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.h
     ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.cpp
 
-    ${CMAKE_CURRENT_LIST_DIR}/vao_builder.h
-    ${CMAKE_CURRENT_LIST_DIR}/vao_builder.cpp
-
     ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.h
     ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.cpp
 

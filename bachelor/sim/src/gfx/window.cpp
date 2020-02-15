@@ -2,7 +2,6 @@
 
 #include <array>
 
-#include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
 namespace cs
@@ -10,10 +9,9 @@ namespace cs
 static const SDL_MessageBoxColorScheme s_dialog_color_scheme = {
     {{15, 15, 25}, {240, 190, 0}, {45, 45, 50}, {25, 25, 35}, {255, 255, 255}}};
 
-Window::Window(Window&& other) noexcept : m_window(other.m_window), m_context(other.m_context)
+Window::Window(Window&& other) noexcept : m_window(other.m_window)
 {
     other.m_window  = nullptr;
-    other.m_context = nullptr;
 }
 
 Window& Window::operator=(Window&& other) noexcept
@@ -25,10 +23,8 @@ Window& Window::operator=(Window&& other) noexcept
 
     deinit();
     m_window  = other.m_window;
-    m_context = other.m_context;
 
     other.m_window  = nullptr;
-    other.m_context = nullptr;
 
     return *this;
 }
@@ -45,7 +41,7 @@ bool Window::init(std::string_view name, int width, int height)
                                 SDL_WINDOWPOS_CENTERED,
                                 width,
                                 height,
-                                SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+                                SDL_WINDOW_VULKAN | SDL_WINDOW_SHOWN);
 
     if (m_window == nullptr)
     {
@@ -54,19 +50,11 @@ bool Window::init(std::string_view name, int width, int height)
         return false;
     }
 
-    /* Create a double buffered OpenGL 4.5 Core Profile context */
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    m_context = SDL_GL_CreateContext(m_window);
-
     return true;
 }
 
 void Window::clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void Window::display()
@@ -76,7 +64,6 @@ void Window::display()
 
 void Window::set_background_color(glm::vec3 color)
 {
-    glClearColor(color.r, color.g, color.b, 0.f);
 }
 
 void Window::resize(const glm::ivec2& resolution)
@@ -123,19 +110,9 @@ bool Window::confirm_dialog(std::string_view title, std::string_view message)
 
 void Window::deinit() noexcept
 {
-    if (m_context)
-    {
-        SDL_GL_DeleteContext(m_context);
-    }
-
     if (m_window)
     {
         SDL_DestroyWindow(m_window);
     }
-}
-
-SDL_GLContext Window::get_context() const
-{
-    return m_context;
 }
 } // namespace cs
