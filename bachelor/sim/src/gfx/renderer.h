@@ -1,8 +1,10 @@
 #pragma once
 
 #include "camera.h"
-#include "sprite_renderer.h"
 #include "debug_renderer.h"
+#include "sprite_renderer.h"
+
+#include <volk.h>
 
 namespace cs::gfx
 {
@@ -15,6 +17,18 @@ private:
 
     SpriteRenderer m_sprite_renderer;
 
+    VkInstance m_instance{VK_NULL_HANDLE};
+
+    VkPhysicalDevice m_pdevice{VK_NULL_HANDLE};
+
+    VkDevice m_device{VK_NULL_HANDLE};
+
+    VkQueue m_gfx_queue{VK_NULL_HANDLE};
+
+    VkSurfaceKHR m_surface{VK_NULL_HANDLE};
+
+    VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+
 public:
     friend Renderer& get_renderer();
 
@@ -22,6 +36,7 @@ public:
     Renderer(Renderer&&)      = delete;
     Renderer& operator=(const Renderer&) = delete;
     Renderer& operator=(Renderer&&) = delete;
+    ~Renderer() noexcept;
 
     /**
      * Get a handle to the debug renderer
@@ -47,6 +62,14 @@ public:
 
 private:
     Renderer();
+
+    void create_instance();
+
+    VkPhysicalDevice pick_physical_device();
+
+    void create_device();
+
+    void create_swapchain();
 };
 
 /**
@@ -56,4 +79,4 @@ private:
  */
 Renderer& get_renderer();
 
-} // namespace cs
+} // namespace cs::gfx

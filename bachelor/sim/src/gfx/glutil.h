@@ -1,11 +1,21 @@
 #pragma once
 
+#include <cassert>
 #include <string>
 #include <string_view>
 #include <vector>
 
+#include <volk.h>
+
 namespace cs::gfx
 {
+#define VK_CHECK(call)                                                                                                           \
+    do                                                                                                                           \
+    {                                                                                                                            \
+        VkResult result_ = call;                                                                                                 \
+        assert(result_ == VK_SUCCESS);                                                                                           \
+    } while (false)
+
 /**
  * Data about a loaded texture with relevant information for further processing
  */
