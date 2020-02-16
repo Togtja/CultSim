@@ -12,6 +12,7 @@ namespace cs::gfx
 {
 Renderer::~Renderer() noexcept
 {
+    VK_CHECK(vkDeviceWaitIdle(m_device));
     m_sprite_renderer.deinit();
 
     for (auto view : m_swapchain_views)
