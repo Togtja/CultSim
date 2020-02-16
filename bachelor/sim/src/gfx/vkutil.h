@@ -19,4 +19,10 @@ VkImageView create_image_view(VkDevice device, VkImage image, VkFormat format);
 VkFramebuffer create_framebuffer(VkDevice device, VkRenderPass rp, VkImageView image_view, VkExtent2D extent);
 
 VkSemaphore create_semaphore(VkDevice device);
+
+VkCommandPool create_command_pool(VkDevice device, uint32_t queue_index, VkCommandPoolCreateFlags flags);
+
+VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool);
+
+void end_one_time_cmd_buffer(VkCommandBuffer buffer);
 } // namespace cs::vk

@@ -113,4 +113,40 @@ VkSemaphore create_semaphore(VkDevice device)
 
     return out;
 }
+
+VkCommandPool create_command_pool(VkDevice device, uint32_t queue_index, VkCommandPoolCreateFlags flags)
+{
+    VkCommandPoolCreateInfo create_info = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
+    create_info.queueFamilyIndex        = queue_index;
+    create_info.flags |= flags;
+
+    VkCommandPool out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateCommandPool(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
+
+VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool)
+{
+    VkCommandBufferAllocateInfo allocate_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO};
+    allocate_info.commandBufferCount          = 1;
+    allocate_info.commandPool                 = pool;
+    allocate_info.level                       = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+    VkCommandBuffer out{VK_NULL_HANDLE};
+    VK_CHECK(vkAllocateCommandBuffers(device, &allocate_info, &out));
+    assert(out);
+
+    VkCommandBufferBeginInfo begin_info = {VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+    begin_info.flags                    = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VK_CHECK(vkBeginCommandBuffer(out, &begin_info));
+    return out;
+}
+
+void end_one_time_cmd_buffer(VkCommandBuffer buffer)
+{
+    vkEndCommandBuffer(buffer);
+}
 } // namespace cs::vk
