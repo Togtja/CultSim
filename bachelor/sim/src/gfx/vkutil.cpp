@@ -2,6 +2,8 @@
 #include "filesystem/filesystem.h"
 #include "render_data.h"
 
+#include <spdlog/spdlog.h>
+
 namespace cs::vk
 {
 uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags)
@@ -72,6 +74,42 @@ VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& 
     }
 
     return avail[0];
+}
+
+VkBool32 default_debug_callback(VkDebugReportFlagsEXT flags,
+                                VkDebugReportObjectTypeEXT objectType,
+                                uint64_t object,
+                                size_t location,
+                                int32_t messageCode,
+                                const char* pLayerPrefix,
+                                const char* pMessage,
+                                void* pUserData)
+{
+    switch (flags)
+    {
+        case VK_DEBUG_REPORT_ERROR_BIT_EXT: spdlog::error("LAYER {}: {}", pLayerPrefix, pMessage); break;
+        case VK_DEBUG_REPORT_WARNING_BIT_EXT: spdlog::warn("LAYER {}: {}", pLayerPrefix, pMessage); break;
+        case VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT: spdlog::warn("LAYER {}: {}", pLayerPrefix, pMessage); break;
+        case VK_DEBUG_REPORT_INFORMATION_BIT_EXT: spdlog::info("LAYER {}: {}", pLayerPrefix, pMessage); break;
+        default: spdlog::info("UNKNOWN SEVERITY | LAYER {}: {}", pLayerPrefix, pMessage);
+    }
+
+    assert(!(flags & VK_DEBUG_REPORT_ERROR_BIT_EXT));
+    return VK_FALSE;
+}
+
+VkDebugReportCallbackEXT register_debug_callback(VkInstance instance)
+{
+    VkDebugReportCallbackCreateInfoEXT create_info = {VK_STRUCTURE_TYPE_DEBUG_REPORT_CREATE_INFO_EXT};
+    create_info.flags = VK_DEBUG_REPORT_DEBUG_BIT_EXT | VK_DEBUG_REPORT_INFORMATION_BIT_EXT | VK_DEBUG_REPORT_WARNING_BIT_EXT |
+                        VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
+    create_info.pfnCallback = default_debug_callback;
+
+    VkDebugReportCallbackEXT out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateDebugReportCallbackEXT(instance, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
 }
 
 VkRenderPass create_render_pass(VkDevice device, VkFormat format)

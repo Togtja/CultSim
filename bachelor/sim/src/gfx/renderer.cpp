@@ -96,6 +96,7 @@ void Renderer::create_instance(const Window& window)
 
     std::vector<const char*> extensions(ext_count);
     SDL_Vulkan_GetInstanceExtensions(window.get(), &ext_count, extensions.data());
+    extensions.push_back(VK_EXT_DEBUG_REPORT_EXTENSION_NAME);
 
     instance_info.ppEnabledExtensionNames = extensions.data();
     instance_info.enabledExtensionCount   = ext_count;
@@ -103,6 +104,7 @@ void Renderer::create_instance(const Window& window)
     VK_CHECK(vkCreateInstance(&instance_info, nullptr, &m_instance));
     volkLoadInstance(m_instance);
 
+    vk::register_debug_callback(m_instance);
     spdlog::info("created Vulkan instance");
 }
 

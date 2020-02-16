@@ -25,6 +25,17 @@ VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPre
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail);
 
+VkBool32 default_debug_callback(VkDebugReportFlagsEXT flags,
+                                VkDebugReportObjectTypeEXT objectType,
+                                uint64_t object,
+                                size_t location,
+                                int32_t messageCode,
+                                const char* pLayerPrefix,
+                                const char* pMessage,
+                                void* pUserData);
+
+VkDebugReportCallbackEXT register_debug_callback(VkInstance instance);
+
 VkRenderPass create_render_pass(VkDevice device, VkFormat format);
 
 VkImageView create_image_view(VkDevice device, VkImage image, VkFormat format);
