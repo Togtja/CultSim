@@ -39,17 +39,27 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
     return textureID;
 }
 
-void SpriteRenderer::init()
+void SpriteRenderer::init(const std::vector<VkImageView>& sc_image_views)
 {
     m_device = volkGetLoadedDevice();
 
     m_renderpass = vk::create_render_pass(m_device);
+
+    for (auto image : sc_image_views)
+    {
+        m_framebuffers.push_back(vk::create_framebuffer(m_device, m_renderpass, image, {1280, 720}));
+    }
 
     init_texture_slots();
 }
 
 void SpriteRenderer::deinit()
 {
+    for (auto fb : m_framebuffers)
+    {
+        vkDestroyFramebuffer(m_device, fb, nullptr);
+    }
+
     vkDestroyRenderPass(m_device, m_renderpass, nullptr);
 }
 

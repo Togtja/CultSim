@@ -34,6 +34,8 @@ private:
 
     std::vector<VkImage> m_swapchain_images{};
 
+    std::vector<VkImageView> m_swapchain_views{};
+
 public:
     friend Renderer& get_renderer();
 

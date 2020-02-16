@@ -19,7 +19,7 @@ private:
 
     VkRenderPass m_renderpass{VK_NULL_HANDLE};
 
-    VkFramebuffer m_framebuffer{VK_NULL_HANDLE};
+    std::vector<VkFramebuffer> m_framebuffers{};
 
     VkPipeline m_pipeline{VK_NULL_HANDLE};
 
@@ -70,7 +70,7 @@ public:
     SpriteTextureID get_texture(std::string_view rpath);
 
 private:
-    void init();
+    void init(const std::vector<VkImageView>& sc_image_views);
 
     void deinit();
 

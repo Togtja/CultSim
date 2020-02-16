@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "constants.h"
 #include "glutil.h"
+#include "vkutil.h"
 
 #include <vector>
 
@@ -12,6 +13,11 @@ namespace cs::gfx
 Renderer::~Renderer() noexcept
 {
     m_sprite_renderer.deinit();
+
+    for (auto view : m_swapchain_views)
+    {
+        vkDestroyImageView(m_device, view, nullptr);
+    }
 
     vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
     vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
@@ -60,7 +66,7 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    m_sprite_renderer.init();
+    m_sprite_renderer.init(m_swapchain_views);
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
@@ -236,6 +242,11 @@ void Renderer::create_swapchain(const Window& window)
     vkGetSwapchainImagesKHR(m_device, m_swapchain, &image_count, images.data());
     m_swapchain_images = std::move(images);
     assert(image_count);
+
+    for (auto image : m_swapchain_images)
+    {
+        m_swapchain_views.push_back(vk::create_image_view(m_device, image));
+    }
 }
 
 Renderer& get_renderer()
