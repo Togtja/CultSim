@@ -1,5 +1,6 @@
 #include "vkutil.h"
 #include "filesystem/filesystem.h"
+#include "render_data.h"
 
 namespace cs::vk
 {
@@ -197,6 +198,42 @@ VkShaderModule load_shader(VkDevice device, std::string_view rpath)
 
     VkShaderModule out{VK_NULL_HANDLE};
     VK_CHECK(vkCreateShaderModule(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
+VkPipeline create_gfx_pipeline(VkDevice device, VkPipelineCache pipecache, const std::vector<ShaderModuleAndStage>& shaders)
+{
+    std::vector<VkPipelineShaderStageCreateInfo> shader_stages{};
+    for (auto shader : shaders)
+    {
+        VkPipelineShaderStageCreateInfo create_info = {VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};
+        create_info.module                          = shader.module;
+        create_info.stage                           = shader.stage;
+        create_info.pName                           = "main";
+    }
+
+    /** Vertex Inputs */
+    std::vector<VkVertexInputBindingDescription> vertex_bindings{
+        {0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
+    std::vector<VkVertexInputAttributeDescription> vertex_attributes{{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                     {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                     {2, 0, VK_FORMAT_R32_UINT}};
+
+    VkPipelineVertexInputStateCreateInfo vertex_input_info = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
+    vertex_input_info.vertexBindingDescriptionCount        = vertex_bindings.size();
+    vertex_input_info.pVertexBindingDescriptions           = vertex_bindings.data();
+    vertex_input_info.vertexAttributeDescriptionCount      = vertex_attributes.size();
+    vertex_input_info.pVertexAttributeDescriptions         = vertex_attributes.data();
+
+    /** Put it all together */
+    VkGraphicsPipelineCreateInfo create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO};
+    create_info.pStages                      = shader_stages.data();
+    create_info.stageCount                   = shader_stages.size();
+    create_info.pVertexInputState            = &vertex_input_info;
+
+    VkPipeline out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateGraphicsPipelines(device, pipecache, 1, &create_info, nullptr, &out));
     assert(out);
 
     return out;

@@ -20,9 +20,9 @@ vec2(0.f, 0.f)
 };
 
 /** Per Instance Attributes */
-layout(location = 2) in vec3 a_offset;
-layout(location = 3) in vec3 a_color;
-layout(location = 4) in uint a_texture;// TODO: Make it 16 bit if we can (and messure)
+layout(location = 0) in vec3 a_offset;
+layout(location = 1) in vec3 a_color;
+layout(location = 2) in uint a_texture;// TODO: Make it 16 bit if we can (and messure)
 
 /** Outputs */
 layout(location = 0) out VertexData
