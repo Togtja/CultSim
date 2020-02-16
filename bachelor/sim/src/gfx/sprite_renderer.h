@@ -90,6 +90,8 @@ public:
 private:
     void init(const SpriteRendererCreateInfo& create_info);
 
+    void init_pipeline();
+
     void deinit();
 
     bool increment_next_texture_id();

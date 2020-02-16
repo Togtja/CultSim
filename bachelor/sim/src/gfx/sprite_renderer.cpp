@@ -92,19 +92,29 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     m_swapchain = create_info.swapchain;
     m_gfx_queue = create_info.gfx_queue;
 
+    /** Create render pass and frame buffers */
     m_renderpass = vk::create_render_pass(m_device, create_info.sc_format);
-
     for (auto image : create_info.sc_image_views)
     {
         m_framebuffers.push_back(vk::create_framebuffer(m_device, m_renderpass, image, {1280, 720}));
     }
 
-    m_aq_sem  = vk::create_semaphore(m_device);
-    m_rel_sem = vk::create_semaphore(m_device);
-
+    /** Create synchronization prim's and command pool */
+    m_aq_sem   = vk::create_semaphore(m_device);
+    m_rel_sem  = vk::create_semaphore(m_device);
     m_cmd_pool = vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
 
+    init_pipeline();
     init_texture_slots();
+}
+
+void SpriteRenderer::init_pipeline()
+{
+    VkShaderModule vs = vk::load_shader(m_device, "shader/sprite.vert.spv");
+    VkShaderModule fs = vk::load_shader(m_device, "shader/sprite.frag.spv");
+
+    vkDestroyShaderModule(m_device, vs, nullptr);
+    vkDestroyShaderModule(m_device, fs, nullptr);
 }
 
 void SpriteRenderer::deinit()

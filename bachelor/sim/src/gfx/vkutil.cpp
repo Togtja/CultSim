@@ -193,7 +193,7 @@ VkShaderModule load_shader(VkDevice device, std::string_view rpath)
 
     VkShaderModuleCreateInfo create_info = {VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
     create_info.pCode                    = reinterpret_cast<const uint32_t*>(bytevec.data());
-    create_info.codeSize                 = bytevec.size() / sizeof(uint32_t);
+    create_info.codeSize                 = bytevec.size();
 
     VkShaderModule out{VK_NULL_HANDLE};
     VK_CHECK(vkCreateShaderModule(device, &create_info, nullptr, &out));
