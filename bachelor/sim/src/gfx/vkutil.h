@@ -17,4 +17,6 @@ VkRenderPass create_render_pass(VkDevice device, VkFormat format);
 VkImageView create_image_view(VkDevice device, VkImage image, VkFormat format);
 
 VkFramebuffer create_framebuffer(VkDevice device, VkRenderPass rp, VkImageView image_view, VkExtent2D extent);
+
+VkSemaphore create_semaphore(VkDevice device);
 } // namespace cs::vk

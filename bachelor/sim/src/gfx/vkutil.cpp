@@ -102,4 +102,15 @@ VkFramebuffer create_framebuffer(VkDevice device, VkRenderPass rp, VkImageView i
 
     return out;
 }
+
+VkSemaphore create_semaphore(VkDevice device)
+{
+    VkSemaphoreCreateInfo create_info = {VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
+
+    VkSemaphore out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateSemaphore(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
 } // namespace cs::vk
