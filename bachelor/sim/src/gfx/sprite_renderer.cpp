@@ -1,6 +1,7 @@
 #include "sprite_renderer.h"
 #include "constants.h"
 #include "glutil.h"
+#include "vkutil.h"
 
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
@@ -9,10 +10,6 @@ namespace cs::gfx
 {
 SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 {
-    init_texture_slots();
-
-    /** Initialize Camera */
-    m_camera.init(glm::vec3(0.f, 0.f, 27.f));
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
@@ -40,6 +37,20 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 
     increment_next_texture_id();
     return textureID;
+}
+
+void SpriteRenderer::init()
+{
+    m_device = volkGetLoadedDevice();
+
+    m_renderpass = vk::create_render_pass(m_device);
+
+    init_texture_slots();
+}
+
+void SpriteRenderer::deinit()
+{
+    vkDestroyRenderPass(m_device, m_renderpass, nullptr);
 }
 
 bool SpriteRenderer::increment_next_texture_id()

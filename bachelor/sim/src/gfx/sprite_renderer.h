@@ -1,10 +1,12 @@
 #pragma once
 
-#include "render_data.h"
 #include "camera.h"
+#include "render_data.h"
 
 #include <string_view>
 #include <vector>
+
+#include <volk.h>
 
 namespace cs::gfx
 {
@@ -12,6 +14,18 @@ class SpriteRenderer
 {
 private:
     Camera& m_camera;
+
+    VkDevice m_device{VK_NULL_HANDLE};
+
+    VkRenderPass m_renderpass{VK_NULL_HANDLE};
+
+    VkFramebuffer m_framebuffer{VK_NULL_HANDLE};
+
+    VkPipeline m_pipeline{VK_NULL_HANDLE};
+
+    VkSemaphore m_aq_sem{VK_NULL_HANDLE};
+
+    VkSemaphore m_rel_sem{VK_NULL_HANDLE};
 
     /** Pointer to GPU memory where the instance variables are */
     SpriteInstanceVertex* m_instance_data{};
@@ -30,6 +44,8 @@ private:
 
 public:
     explicit SpriteRenderer(Camera& camera);
+
+    friend class Renderer;
 
     /**
      * Add a new sprite to the draw list using the given position color and texture
@@ -54,9 +70,13 @@ public:
     SpriteTextureID get_texture(std::string_view rpath);
 
 private:
+    void init();
+
+    void deinit();
+
     bool increment_next_texture_id();
 
     void init_texture_slots();
 };
 
-} // namespace cs
+} // namespace cs::gfx

@@ -11,6 +11,8 @@ namespace cs::gfx
 {
 Renderer::~Renderer() noexcept
 {
+    m_sprite_renderer.deinit();
+
     vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
     vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
     vkDestroyDevice(m_device, nullptr);
@@ -57,11 +59,13 @@ void Renderer::init(const Window& window)
     create_instance(window);
     create_device();
     create_swapchain(window);
+
+    m_sprite_renderer.init();
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
 {
-    m_camera.init({0.f, 0.f, 0.f});
+    m_camera.init({0.f, 0.f, 20.f});
 }
 
 void Renderer::create_instance(const Window& window)
