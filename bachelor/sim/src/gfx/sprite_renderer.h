@@ -10,6 +10,16 @@
 
 namespace cs::gfx
 {
+/**
+ * Vulkan like helper struct to create a sprite renderer
+ */
+struct SpriteRendererCreateInfo
+{
+    const std::vector<VkImageView>& sc_image_views{};
+    VkFormat sc_format{VK_FORMAT_UNDEFINED};
+    uint32_t gfx_queue_idx{};
+};
+
 class SpriteRenderer
 {
 private:
@@ -22,6 +32,8 @@ private:
     std::vector<VkFramebuffer> m_framebuffers{};
 
     VkPipeline m_pipeline{VK_NULL_HANDLE};
+
+    VkCommandPool m_cmd_pool{VK_NULL_HANDLE};
 
     VkSemaphore m_aq_sem{VK_NULL_HANDLE};
 
@@ -70,7 +82,7 @@ public:
     SpriteTextureID get_texture(std::string_view rpath);
 
 private:
-    void init(const std::vector<VkImageView>& sc_image_views, VkFormat sc_format);
+    void init(const SpriteRendererCreateInfo& create_info);
 
     void deinit();
 

@@ -2,6 +2,42 @@
 
 namespace cs::vk
 {
+uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags)
+{
+    /** Get the queues of the device and identify a graphics and present queue */
+    uint32_t count{};
+    vkGetPhysicalDeviceQueueFamilyProperties(pdev, &count, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queue_info(count);
+    vkGetPhysicalDeviceQueueFamilyProperties(pdev, &count, queue_info.data());
+
+    /** Identify all queue families */
+    uint32_t idx = 0u;
+
+    /** Look for dedicated queue that support flag(s) */
+    for (const auto& queue : queue_info)
+    {
+        if ((queue.queueFlags & required_flags) == required_flags && !(queue.queueFlags & ~required_flags))
+        {
+            return idx;
+        }
+        ++idx;
+    }
+
+    /** Look for generic queue that support flag(s) */
+    idx = 0u;
+    for (const auto& queue : queue_info)
+    {
+        if ((queue.queueFlags & required_flags))
+        {
+            return idx;
+        }
+        ++idx;
+    }
+
+    return idx;
+}
+
 VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPresentModeKHR>& avail)
 {
     /* Map of priorities for each present mode when we must fall back */
@@ -149,4 +185,5 @@ void end_one_time_cmd_buffer(VkCommandBuffer buffer)
 {
     vkEndCommandBuffer(buffer);
 }
+
 } // namespace cs::vk

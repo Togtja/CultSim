@@ -19,7 +19,9 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
+    auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pool);
 
+    vk::end_one_time_cmd_buffer(cbuf);
 }
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
@@ -39,22 +41,31 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
     return textureID;
 }
 
-void SpriteRenderer::init(const std::vector<VkImageView>& sc_image_views, VkFormat sc_format)
+void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 {
-    m_device = volkGetLoadedDevice();
+    m_device     = volkGetLoadedDevice();
+    m_renderpass = vk::create_render_pass(m_device, create_info.sc_format);
 
-    m_renderpass = vk::create_render_pass(m_device, sc_format);
-
-    for (auto image : sc_image_views)
+    for (auto image : create_info.sc_image_views)
     {
         m_framebuffers.push_back(vk::create_framebuffer(m_device, m_renderpass, image, {1280, 720}));
     }
+
+    m_aq_sem  = vk::create_semaphore(m_device);
+    m_rel_sem = vk::create_semaphore(m_device);
+
+    m_cmd_pool = vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
 
     init_texture_slots();
 }
 
 void SpriteRenderer::deinit()
 {
+    vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
+
+    vkDestroySemaphore(m_device, m_rel_sem, nullptr);
+    vkDestroySemaphore(m_device, m_aq_sem, nullptr);
+
     for (auto fb : m_framebuffers)
     {
         vkDestroyFramebuffer(m_device, fb, nullptr);

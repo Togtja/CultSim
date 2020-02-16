@@ -66,7 +66,7 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    m_sprite_renderer.init(m_swapchain_views, m_format.format);
+    m_sprite_renderer.init({m_swapchain_views, m_format.format, m_gfx_queue_idx});
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
@@ -132,42 +132,6 @@ VkPhysicalDevice Renderer::pick_physical_device(const std::vector<VkPhysicalDevi
     return VK_NULL_HANDLE;
 }
 
-uint32_t Renderer::get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags)
-{
-    /** Get the queues of the device and identify a graphics and present queue */
-    uint32_t count{};
-    vkGetPhysicalDeviceQueueFamilyProperties(pdev, &count, nullptr);
-
-    std::vector<VkQueueFamilyProperties> queue_info(count);
-    vkGetPhysicalDeviceQueueFamilyProperties(pdev, &count, queue_info.data());
-
-    /** Identify all queue families */
-    uint32_t idx = 0u;
-
-    /** Look for dedicated queue that support flag(s) */
-    for (const auto& queue : queue_info)
-    {
-        if ((queue.queueFlags & required_flags) == required_flags && !(queue.queueFlags & ~required_flags))
-        {
-            return idx;
-        }
-        ++idx;
-    }
-
-    /** Look for generic queue that support flag(s) */
-    idx = 0u;
-    for (const auto& queue : queue_info)
-    {
-        if ((queue.queueFlags & required_flags))
-        {
-            return idx;
-        }
-        ++idx;
-    }
-
-    return idx;
-}
-
 void Renderer::create_device()
 {
     uint32_t pd_count{};
@@ -179,7 +143,7 @@ void Renderer::create_device()
     m_pdevice = pick_physical_device(pdevices);
     assert(m_pdevice);
 
-    m_gfx_queue_idx    = get_queue_index(m_pdevice, VK_QUEUE_GRAPHICS_BIT);
+    m_gfx_queue_idx    = vk::get_queue_index(m_pdevice, VK_QUEUE_GRAPHICS_BIT);
     float priorities[] = {1.f};
 
     VkDeviceQueueCreateInfo queue_info = {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO};

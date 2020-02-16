@@ -8,6 +8,8 @@
 
 namespace cs::vk
 {
+uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
+
 VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPresentModeKHR>& avail);
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail);

@@ -78,8 +78,6 @@ private:
 
     VkPhysicalDevice pick_physical_device(const std::vector<VkPhysicalDevice>& available);
 
-    uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
-
     void create_device();
 
     void create_swapchain(const Window& window);
