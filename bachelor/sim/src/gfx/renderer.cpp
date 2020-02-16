@@ -216,18 +216,36 @@ void Renderer::create_swapchain(const Window& window)
     vkGetPhysicalDeviceSurfaceSupportKHR(m_pdevice, m_gfx_queue_idx, m_surface, &support_presentation);
     assert(support_presentation);
 
-    /** Then swapchain */
+    /** Enumerate surface formats */
+    uint32_t format_count{};
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_pdevice, m_surface, &format_count, nullptr);
+
+    std::vector<VkSurfaceFormatKHR> formats(format_count);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(m_pdevice, m_surface, &format_count, formats.data());
+
+    const auto format = vk::select_surface_format(formats);
+
+    /** Enumerate present modes */
+    uint32_t present_mode_count{};
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_pdevice, m_surface, &present_mode_count, nullptr);
+
+    std::vector<VkPresentModeKHR> present_modes(present_mode_count);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_pdevice, m_surface, &present_mode_count, present_modes.data());
+
+    const auto present_mode = vk::select_present_mode(VK_PRESENT_MODE_FIFO_KHR, present_modes);
+
+    /** Then create swapchain */
     VkSwapchainCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
     create_info.imageUsage               = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
     create_info.surface                  = m_surface;
     create_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    create_info.presentMode              = VK_PRESENT_MODE_FIFO_KHR;
+    create_info.presentMode              = present_mode;
     create_info.imageExtent              = {1280, 720};
-    create_info.imageFormat              = VK_FORMAT_B8G8R8A8_UNORM;
+    create_info.imageFormat              = format.format;
+    create_info.imageColorSpace          = format.colorSpace;
     create_info.minImageCount            = 2;
     create_info.queueFamilyIndexCount    = 1;
     create_info.pQueueFamilyIndices      = &m_gfx_queue_idx;
-    create_info.imageColorSpace          = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
     create_info.compositeAlpha           = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     create_info.imageArrayLayers         = 1;

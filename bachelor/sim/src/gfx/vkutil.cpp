@@ -2,6 +2,40 @@
 
 namespace cs::vk
 {
+VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPresentModeKHR>& avail)
+{
+    /* Map of priorities for each present mode when we must fall back */
+    auto priorities = std::unordered_map<VkPresentModeKHR, int>{{VK_PRESENT_MODE_FIFO_KHR, 10},
+                                                                {VK_PRESENT_MODE_FIFO_RELAXED_KHR, 8},
+                                                                {VK_PRESENT_MODE_MAILBOX_KHR, 9},
+                                                                {VK_PRESENT_MODE_IMMEDIATE_KHR, 5},
+                                                                {VK_PRESENT_MODE_SHARED_DEMAND_REFRESH_KHR, 3},
+                                                                {VK_PRESENT_MODE_SHARED_CONTINUOUS_REFRESH_KHR, 2}};
+
+    /* Ensure the desired mode has highest priority */
+    priorities[desired] = 11;
+
+    /* Sort enough so we know what mode is the best one, then that is the one we should use */
+    std::nth_element(avail.begin(), avail.begin(), avail.end(), [&priorities](auto a, auto b) {
+        return priorities[a] > priorities[b];
+    });
+
+    return avail.front();
+}
+
+VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail)
+{
+    for (auto format : avail)
+    {
+        if (format.format == VK_FORMAT_B8G8R8A8_UNORM && format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR)
+        {
+            return format;
+        }
+    }
+
+    return avail[0];
+}
+
 VkRenderPass create_render_pass(VkDevice device)
 {
     VkAttachmentReference attachment_reference = {0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
