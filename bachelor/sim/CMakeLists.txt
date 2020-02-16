@@ -76,12 +76,23 @@ target_compile_options(
         $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:--coverage>
 )
 
+# Add shader compilation target
+add_custom_target(
+        cultsim_shader_compile ALL
+        COMMAND glslangValidator -V shader/sprite.vert -o shader/sprite.vert.spv
+        COMMAND glslangValidator -V shader/sprite.frag -o shader/sprite.frag.spv
+        WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
+        DEPENDS cultsim
+        BYPRODUCTS shader/sprite.vert.spv shader/sprite.frag.spv
+        COMMENT "Compiling shaders to .spv"
+)
+
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
         cultsim_resource_copy ALL
         COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n sprites fonts
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
-        DEPENDS cultsim
+        DEPENDS cultsim cultsim_shader_compile
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip
         COMMENT "Archiving resource files..."
 )

@@ -7,7 +7,7 @@ layout(location = 1) in vec2 a_texcoord;
 /** Per Instance Attributes */
 layout(location = 2) in vec3 a_offset;
 layout(location = 3) in vec3 a_color;
-layout(location = 4) in uint a_texture; // TODO: Make it 16 bit if we can (and messure)
+layout(location = 4) in uint a_texture;// TODO: Make it 16 bit if we can (and messure)
 
 /** Outputs */
 layout(location = 0) out VertexData
@@ -17,7 +17,11 @@ layout(location = 0) out VertexData
     uint texture;
 } vs_out;
 
-layout(location = 0) uniform mat4 u_projection;
+/** Uniforms */
+layout(binding = 0) uniform PerFrame
+{
+    mat4 u_projection;
+};
 
 void main()
 {
