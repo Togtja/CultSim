@@ -1,4 +1,5 @@
 #include "vkutil.h"
+#include "filesystem/filesystem.h"
 
 namespace cs::vk
 {
@@ -184,6 +185,21 @@ VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool)
 void end_one_time_cmd_buffer(VkCommandBuffer buffer)
 {
     vkEndCommandBuffer(buffer);
+}
+
+VkShaderModule load_shader(VkDevice device, std::string_view rpath)
+{
+    const auto bytevec = fs::read_byte_file(rpath);
+
+    VkShaderModuleCreateInfo create_info = {VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
+    create_info.pCode                    = reinterpret_cast<const uint32_t*>(bytevec.data());
+    create_info.codeSize                 = bytevec.size() / sizeof(uint32_t);
+
+    VkShaderModule out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateShaderModule(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
 }
 
 } // namespace cs::vk

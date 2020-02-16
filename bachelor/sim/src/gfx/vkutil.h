@@ -2,6 +2,7 @@
 #include "glutil.h"
 
 #include <algorithm>
+#include <string_view>
 #include <unordered_map>
 
 #include <volk.h>
@@ -27,4 +28,6 @@ VkCommandPool create_command_pool(VkDevice device, uint32_t queue_index, VkComma
 VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool);
 
 void end_one_time_cmd_buffer(VkCommandBuffer buffer);
+
+VkShaderModule load_shader(VkDevice device, std::string_view rpath);
 } // namespace cs::vk
