@@ -246,8 +246,8 @@ void Application::deinit_physfs()
 
 void Application::deinit_imgui()
 {
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+    //    ImGui_ImplSDL2_Shutdown();
+    //    ImGui::DestroyContext();
 }
 
 void Application::deinit_gl()

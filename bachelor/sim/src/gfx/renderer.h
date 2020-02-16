@@ -23,6 +23,8 @@ private:
 
     VkDevice m_device{VK_NULL_HANDLE};
 
+    uint32_t m_gfx_queue_idx = 0u;
+
     VkQueue m_gfx_queue{VK_NULL_HANDLE};
 
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
@@ -66,6 +68,8 @@ private:
     void create_instance();
 
     VkPhysicalDevice pick_physical_device(const std::vector<VkPhysicalDevice>& available);
+
+    uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
 
     void create_device();
 
