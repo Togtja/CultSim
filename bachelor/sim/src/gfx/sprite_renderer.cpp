@@ -40,6 +40,15 @@ void SpriteRenderer::display()
     /** Draw calls and commands */
     vkCmdBeginRenderPass(cbuf, &rpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
 
+    VkViewport viewport{0, 0, 1280, 720, 0, 1};
+    vkCmdSetViewport(cbuf, 0, 1, &viewport);
+
+    VkRect2D scissor{0, 0, 1280, 720};
+    vkCmdSetScissor(cbuf, 0, 1, &scissor);
+
+    vkCmdBindPipeline(cbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
+    vkCmdDraw(cbuf, 6, 0, 0, 0);
+
     vkCmdEndRenderPass(cbuf);
 
     vk::end_one_time_cmd_buffer(cbuf);
@@ -110,8 +119,16 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 
 void SpriteRenderer::init_pipeline()
 {
+    m_pipeline_layout = vk::create_pipeline_layout(m_device);
+
     VkShaderModule vs = vk::load_shader(m_device, "shader/sprite.vert.spv");
     VkShaderModule fs = vk::load_shader(m_device, "shader/sprite.frag.spv");
+
+    m_pipeline = vk::create_gfx_pipeline(m_device,
+                                         VK_NULL_HANDLE,
+                                         m_renderpass,
+                                         m_pipeline_layout,
+                                         {{vs, VK_SHADER_STAGE_VERTEX_BIT}, {fs, VK_SHADER_STAGE_FRAGMENT_BIT}});
 
     vkDestroyShaderModule(m_device, vs, nullptr);
     vkDestroyShaderModule(m_device, fs, nullptr);
@@ -119,6 +136,8 @@ void SpriteRenderer::init_pipeline()
 
 void SpriteRenderer::deinit()
 {
+    vkDestroyPipeline(m_device, m_pipeline, nullptr);
+    vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
     vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
 
     vkDestroySemaphore(m_device, m_rel_sem, nullptr);

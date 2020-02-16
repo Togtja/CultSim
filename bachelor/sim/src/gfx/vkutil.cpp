@@ -202,7 +202,23 @@ VkShaderModule load_shader(VkDevice device, std::string_view rpath)
 
     return out;
 }
-VkPipeline create_gfx_pipeline(VkDevice device, VkPipelineCache pipecache, const std::vector<ShaderModuleAndStage>& shaders)
+
+VkPipelineLayout create_pipeline_layout(VkDevice device)
+{
+    VkPipelineLayoutCreateInfo create_info = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+
+    VkPipelineLayout out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreatePipelineLayout(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
+
+VkPipeline create_gfx_pipeline(VkDevice device,
+                               VkPipelineCache pipecache,
+                               VkRenderPass render_pass,
+                               VkPipelineLayout layout,
+                               const std::vector<ShaderModuleAndStage>& shaders)
 {
     std::vector<VkPipelineShaderStageCreateInfo> shader_stages{};
     for (auto shader : shaders)
@@ -226,11 +242,48 @@ VkPipeline create_gfx_pipeline(VkDevice device, VkPipelineCache pipecache, const
     vertex_input_info.vertexAttributeDescriptionCount      = vertex_attributes.size();
     vertex_input_info.pVertexAttributeDescriptions         = vertex_attributes.data();
 
+    /** Input Assembly */
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_info = {VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
+    input_assembly_info.topology                               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+
+    /** Viewport Area */
+    VkPipelineViewportStateCreateInfo viewport_state = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
+
+    /** Rasterization */
+    VkPipelineRasterizationStateCreateInfo rasteriszation_state = {VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO};
+    rasteriszation_state.polygonMode                            = VK_POLYGON_MODE_FILL;
+
+    /** Multisample info */
+    VkPipelineMultisampleStateCreateInfo multisample_state = {VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
+    multisample_state.rasterizationSamples                 = VK_SAMPLE_COUNT_1_BIT;
+
+    /** Stencil info */
+    VkPipelineDepthStencilStateCreateInfo depthstencil_state = {VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
+
+    /** Color blend state */
+    VkPipelineColorBlendStateCreateInfo colorblend_state = {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
+
+    /** Dynamic Pipeline state */
+    std::vector<VkDynamicState> active_dynamic_states = {VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT};
+
+    VkPipelineDynamicStateCreateInfo dynamic_state = {VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    dynamic_state.dynamicStateCount                = active_dynamic_states.size();
+    dynamic_state.pDynamicStates                   = active_dynamic_states.data();
+
     /** Put it all together */
     VkGraphicsPipelineCreateInfo create_info = {VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO};
     create_info.pStages                      = shader_stages.data();
     create_info.stageCount                   = shader_stages.size();
     create_info.pVertexInputState            = &vertex_input_info;
+    create_info.pInputAssemblyState          = &input_assembly_info;
+    create_info.pViewportState               = &viewport_state;
+    create_info.pRasterizationState          = &rasteriszation_state;
+    create_info.pMultisampleState            = &multisample_state;
+    create_info.pDepthStencilState           = &depthstencil_state;
+    create_info.pColorBlendState             = &colorblend_state;
+    create_info.pDynamicState                = &dynamic_state;
+    create_info.layout                       = layout;
+    create_info.renderPass                   = render_pass;
 
     VkPipeline out{VK_NULL_HANDLE};
     VK_CHECK(vkCreateGraphicsPipelines(device, pipecache, 1, &create_info, nullptr, &out));
@@ -238,5 +291,4 @@ VkPipeline create_gfx_pipeline(VkDevice device, VkPipelineCache pipecache, const
 
     return out;
 }
-
 } // namespace cs::vk

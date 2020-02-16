@@ -41,5 +41,11 @@ void end_one_time_cmd_buffer(VkCommandBuffer buffer);
 
 VkShaderModule load_shader(VkDevice device, std::string_view rpath);
 
-VkPipeline create_gfx_pipeline(VkDevice device, VkPipelineCache pipecache, const std::vector<ShaderModuleAndStage>& shaders);
+VkPipelineLayout create_pipeline_layout(VkDevice device);
+
+VkPipeline create_gfx_pipeline(VkDevice device,
+                               VkPipelineCache pipecache,
+                               VkRenderPass render_pass,
+                               VkPipelineLayout layout,
+                               const std::vector<ShaderModuleAndStage>& shaders);
 } // namespace cs::vk

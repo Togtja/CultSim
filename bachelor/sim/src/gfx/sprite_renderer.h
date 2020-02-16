@@ -37,6 +37,8 @@ private:
 
     std::vector<VkFramebuffer> m_framebuffers{};
 
+    VkPipelineLayout m_pipeline_layout{VK_NULL_HANDLE};
+
     VkPipeline m_pipeline{VK_NULL_HANDLE};
 
     VkCommandPool m_cmd_pool{VK_NULL_HANDLE};
