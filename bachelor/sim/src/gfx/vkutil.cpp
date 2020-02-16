@@ -227,14 +227,16 @@ VkPipeline create_gfx_pipeline(VkDevice device,
         create_info.module                          = shader.module;
         create_info.stage                           = shader.stage;
         create_info.pName                           = "main";
+
+        shader_stages.push_back(create_info);
     }
 
     /** Vertex Inputs */
-    std::vector<VkVertexInputBindingDescription> vertex_bindings{
-        {0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
-    std::vector<VkVertexInputAttributeDescription> vertex_attributes{{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                     {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                     {2, 0, VK_FORMAT_R32_UINT}};
+    std::vector<VkVertexInputBindingDescription> vertex_bindings{};
+    //{0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
+    std::vector<VkVertexInputAttributeDescription> vertex_attributes{}; /*{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                      {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                      {2, 0, VK_FORMAT_R32_UINT}};*/
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     vertex_input_info.vertexBindingDescriptionCount        = vertex_bindings.size();
@@ -247,11 +249,19 @@ VkPipeline create_gfx_pipeline(VkDevice device,
     input_assembly_info.topology                               = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
     /** Viewport Area */
+    VkViewport viewport                              = {0, 0, 1280, 720, 0, 1};
+    VkRect2D scissors                                = {0, 0, 1280, 720};
     VkPipelineViewportStateCreateInfo viewport_state = {VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO};
+    viewport_state.viewportCount                     = 1;
+    viewport_state.pViewports                        = &viewport;
+    viewport_state.scissorCount                      = 1;
+    viewport_state.pScissors                         = &scissors;
 
     /** Rasterization */
     VkPipelineRasterizationStateCreateInfo rasteriszation_state = {VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO};
     rasteriszation_state.polygonMode                            = VK_POLYGON_MODE_FILL;
+    rasteriszation_state.cullMode                               = VK_CULL_MODE_NONE;
+    rasteriszation_state.lineWidth                              = 1.f;
 
     /** Multisample info */
     VkPipelineMultisampleStateCreateInfo multisample_state = {VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
@@ -261,7 +271,19 @@ VkPipeline create_gfx_pipeline(VkDevice device,
     VkPipelineDepthStencilStateCreateInfo depthstencil_state = {VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
 
     /** Color blend state */
+    VkPipelineColorBlendAttachmentState attachment_state{};
+    attachment_state.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    attachment_state.alphaBlendOp        = VK_BLEND_OP_ADD;
+    attachment_state.colorBlendOp        = VK_BLEND_OP_ADD;
+    attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+    attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+    attachment_state.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    attachment_state.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+
     VkPipelineColorBlendStateCreateInfo colorblend_state = {VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO};
+    colorblend_state.attachmentCount                     = 1;
+    colorblend_state.pAttachments                        = &attachment_state;
 
     /** Dynamic Pipeline state */
     std::vector<VkDynamicState> active_dynamic_states = {VK_DYNAMIC_STATE_SCISSOR, VK_DYNAMIC_STATE_VIEWPORT};

@@ -43,11 +43,11 @@ void SpriteRenderer::display()
     VkViewport viewport{0, 0, 1280, 720, 0, 1};
     vkCmdSetViewport(cbuf, 0, 1, &viewport);
 
-    VkRect2D scissor{0, 0, 1280, 720};
+    VkRect2D scissor{{0, 0}, {1280, 720}};
     vkCmdSetScissor(cbuf, 0, 1, &scissor);
 
     vkCmdBindPipeline(cbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-    vkCmdDraw(cbuf, 6, 0, 0, 0);
+    vkCmdDraw(cbuf, 6, 1, 0, 0);
 
     vkCmdEndRenderPass(cbuf);
 
