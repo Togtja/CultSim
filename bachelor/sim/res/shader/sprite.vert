@@ -1,8 +1,23 @@
 #version 450 core
 
-/** Per Vertex Attributes */
-layout(location = 0) in vec3 a_position;
-layout(location = 1) in vec2 a_texcoord;
+/** Hard Coded Vertex Attributes */
+const vec3 positions[6] = {
+vec3(-0.5f, -0.5f, 0.f),
+vec3(0.5f, -0.5f, 0.f),
+vec3(0.5f, 0.5f, 0.f),
+vec3(0.5f, 0.5f, 0.f),
+vec3(-0.5f, 0.5f, 0.f),
+vec3(-0.5f, -0.5f, 0.f)
+};
+
+const vec2 tex_coords[6] = {
+vec2(0.f, 0.f),
+vec2(1.f, 0.f),
+vec2(1.f, 1.f),
+vec2(1.f, 1.f),
+vec2(0.f, 1.f),
+vec2(0.f, 0.f)
+};
 
 /** Per Instance Attributes */
 layout(location = 2) in vec3 a_offset;
@@ -26,8 +41,8 @@ layout(binding = 0) uniform PerFrame
 void main()
 {
     vs_out.color    = a_color;
-    vs_out.texcoord = a_texcoord;
+    vs_out.texcoord = tex_coords[gl_VertexIndex];
     vs_out.texture  = a_texture;
 
-    gl_Position = u_projection * (vec4(a_position, 1.f) * 10.f + vec4(a_offset, 0.f));
+    gl_Position =  vec4(positions[gl_VertexIndex], 1.f);//u_projection * (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
 }

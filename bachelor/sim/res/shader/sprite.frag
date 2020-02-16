@@ -22,5 +22,5 @@ vec4 sample_sprite()
 
 void main()
 {
-    out_color = sample_sprite() * vec4(vs_in.color, 1.f);
+    out_color = vec4(1.f);// sample_sprite() * vec4(vs_in.color, 1.f);
 }
