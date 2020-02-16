@@ -70,7 +70,7 @@ public:
     SpriteTextureID get_texture(std::string_view rpath);
 
 private:
-    void init(const std::vector<VkImageView>& sc_image_views);
+    void init(const std::vector<VkImageView>& sc_image_views, VkFormat sc_format);
 
     void deinit();
 

@@ -39,11 +39,11 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
     return textureID;
 }
 
-void SpriteRenderer::init(const std::vector<VkImageView>& sc_image_views)
+void SpriteRenderer::init(const std::vector<VkImageView>& sc_image_views, VkFormat sc_format)
 {
     m_device = volkGetLoadedDevice();
 
-    m_renderpass = vk::create_render_pass(m_device);
+    m_renderpass = vk::create_render_pass(m_device, sc_format);
 
     for (auto image : sc_image_views)
     {

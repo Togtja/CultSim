@@ -36,6 +36,8 @@ private:
 
     std::vector<VkImageView> m_swapchain_views{};
 
+    VkSurfaceFormatKHR m_format{};
+
 public:
     friend Renderer& get_renderer();
 

@@ -12,9 +12,9 @@ VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPre
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail);
 
-VkRenderPass create_render_pass(VkDevice device);
+VkRenderPass create_render_pass(VkDevice device, VkFormat format);
 
-VkImageView create_image_view(VkDevice device, VkImage image);
+VkImageView create_image_view(VkDevice device, VkImage image, VkFormat format);
 
 VkFramebuffer create_framebuffer(VkDevice device, VkRenderPass rp, VkImageView image_view, VkExtent2D extent);
 } // namespace cs::vk

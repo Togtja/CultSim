@@ -66,7 +66,7 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    m_sprite_renderer.init(m_swapchain_views);
+    m_sprite_renderer.init(m_swapchain_views, m_format.format);
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
@@ -223,7 +223,7 @@ void Renderer::create_swapchain(const Window& window)
     std::vector<VkSurfaceFormatKHR> formats(format_count);
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_pdevice, m_surface, &format_count, formats.data());
 
-    const auto format = vk::select_surface_format(formats);
+    m_format = vk::select_surface_format(formats);
 
     /** Enumerate present modes */
     uint32_t present_mode_count{};
@@ -241,8 +241,8 @@ void Renderer::create_swapchain(const Window& window)
     create_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     create_info.presentMode              = present_mode;
     create_info.imageExtent              = {1280, 720};
-    create_info.imageFormat              = format.format;
-    create_info.imageColorSpace          = format.colorSpace;
+    create_info.imageFormat              = m_format.format;
+    create_info.imageColorSpace          = m_format.colorSpace;
     create_info.minImageCount            = 2;
     create_info.queueFamilyIndexCount    = 1;
     create_info.pQueueFamilyIndices      = &m_gfx_queue_idx;
@@ -263,7 +263,7 @@ void Renderer::create_swapchain(const Window& window)
 
     for (auto image : m_swapchain_images)
     {
-        m_swapchain_views.push_back(vk::create_image_view(m_device, image));
+        m_swapchain_views.push_back(vk::create_image_view(m_device, image, m_format.format));
     }
 }
 
