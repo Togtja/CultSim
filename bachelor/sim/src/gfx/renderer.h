@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "debug_renderer.h"
 #include "sprite_renderer.h"
+#include "window.h"
 
 #include <volk.h>
 
@@ -30,6 +31,8 @@ private:
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
 
     VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+
+    std::vector<VkImage> m_swapchain_images{};
 
 public:
     friend Renderer& get_renderer();
@@ -62,10 +65,12 @@ public:
 
     void set_camera_bounds(glm::vec2 bounds);
 
+    void init(const Window& window);
+
 private:
     Renderer();
 
-    void create_instance();
+    void create_instance(const Window& window);
 
     VkPhysicalDevice pick_physical_device(const std::vector<VkPhysicalDevice>& available);
 
@@ -73,7 +78,7 @@ private:
 
     void create_device();
 
-    void create_swapchain();
+    void create_swapchain(const Window& window);
 };
 
 /**

@@ -99,6 +99,8 @@ bool Application::init_gl()
         return false;
     }
 
+    gfx::get_renderer().init(m_window);
+
     return true;
 }
 

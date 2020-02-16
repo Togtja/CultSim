@@ -4,12 +4,15 @@
 
 #include <vector>
 
+#include <SDL_vulkan.h>
 #include <spdlog/spdlog.h>
 
 namespace cs::gfx
 {
 Renderer::~Renderer() noexcept
 {
+    vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
     vkDestroyDevice(m_device, nullptr);
     vkDestroyInstance(m_instance, nullptr);
 }
@@ -49,16 +52,19 @@ void Renderer::set_camera_bounds(glm::vec2 bounds)
     m_camera.set_boundaries(bounds);
 }
 
+void Renderer::init(const Window& window)
+{
+    create_instance(window);
+    create_device();
+    create_swapchain(window);
+}
+
 Renderer::Renderer() : m_sprite_renderer(m_camera)
 {
     m_camera.init({0.f, 0.f, 0.f});
-
-    create_instance();
-    create_device();
-    create_swapchain();
 }
 
-void Renderer::create_instance()
+void Renderer::create_instance(const Window& window)
 {
     VK_CHECK(volkInitialize());
 
@@ -74,9 +80,14 @@ void Renderer::create_instance()
     instance_info.ppEnabledLayerNames = layers;
     instance_info.enabledLayerCount   = sizeof(layers) / sizeof(layers[0]);
 
-    const char* extensions[]              = {VK_KHR_SURFACE_EXTENSION_NAME};
-    instance_info.ppEnabledExtensionNames = extensions;
-    instance_info.enabledExtensionCount   = sizeof(extensions) / sizeof(extensions[0]);
+    uint32_t ext_count{};
+    SDL_Vulkan_GetInstanceExtensions(window.get(), &ext_count, nullptr);
+
+    std::vector<const char*> extensions(ext_count);
+    SDL_Vulkan_GetInstanceExtensions(window.get(), &ext_count, extensions.data());
+
+    instance_info.ppEnabledExtensionNames = extensions.data();
+    instance_info.enabledExtensionCount   = ext_count;
 
     VK_CHECK(vkCreateInstance(&instance_info, nullptr, &m_instance));
     volkLoadInstance(m_instance);
@@ -185,8 +196,42 @@ void Renderer::create_device()
     volkLoadDevice(m_device);
 }
 
-void Renderer::create_swapchain()
+void Renderer::create_swapchain(const Window& window)
 {
+    /** First make a surface */
+    SDL_Vulkan_CreateSurface(window.get(), m_instance, &m_surface);
+    assert(m_surface);
+
+    VkBool32 support_presentation = VK_FALSE;
+    vkGetPhysicalDeviceSurfaceSupportKHR(m_pdevice, m_gfx_queue_idx, m_surface, &support_presentation);
+    assert(support_presentation);
+
+    /** Then swapchain */
+    VkSwapchainCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
+    create_info.imageUsage               = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    create_info.surface                  = m_surface;
+    create_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    create_info.presentMode              = VK_PRESENT_MODE_FIFO_KHR;
+    create_info.imageExtent              = {1280, 720};
+    create_info.imageFormat              = VK_FORMAT_B8G8R8A8_UNORM;
+    create_info.minImageCount            = 2;
+    create_info.queueFamilyIndexCount    = 1;
+    create_info.pQueueFamilyIndices      = &m_gfx_queue_idx;
+    create_info.imageColorSpace          = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+    create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
+    create_info.compositeAlpha           = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.imageArrayLayers         = 1;
+
+    VK_CHECK(vkCreateSwapchainKHR(m_device, &create_info, nullptr, &m_swapchain));
+    assert(m_swapchain);
+
+    uint32_t image_count{};
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &image_count, nullptr);
+
+    std::vector<VkImage> images(image_count);
+    vkGetSwapchainImagesKHR(m_device, m_swapchain, &image_count, images.data());
+    m_swapchain_images = std::move(images);
+    assert(image_count);
 }
 
 Renderer& get_renderer()
@@ -194,4 +239,5 @@ Renderer& get_renderer()
     static Renderer r{};
     return r;
 }
+
 } // namespace cs::gfx
