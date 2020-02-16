@@ -57,11 +57,6 @@ void Window::clear()
 {
 }
 
-void Window::display()
-{
-    SDL_GL_SwapWindow(m_window);
-}
-
 void Window::set_background_color(glm::vec3 color)
 {
 }

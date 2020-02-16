@@ -72,8 +72,6 @@ void Application::draw()
     r.sprite().display();
 
     // ImGui::Render();
-
-    m_window.display();
 }
 
 bool Application::init(const std::vector<char*>& args)

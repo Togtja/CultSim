@@ -15,9 +15,11 @@ namespace cs::gfx
  */
 struct SpriteRendererCreateInfo
 {
+    VkSwapchainKHR swapchain{VK_NULL_HANDLE};
     const std::vector<VkImageView>& sc_image_views{};
     VkFormat sc_format{VK_FORMAT_UNDEFINED};
     uint32_t gfx_queue_idx{};
+    VkQueue gfx_queue{VK_NULL_HANDLE};
 };
 
 class SpriteRenderer
@@ -26,6 +28,10 @@ private:
     Camera& m_camera;
 
     VkDevice m_device{VK_NULL_HANDLE};
+
+    VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+
+    VkQueue m_gfx_queue{VK_NULL_HANDLE};
 
     VkRenderPass m_renderpass{VK_NULL_HANDLE};
 

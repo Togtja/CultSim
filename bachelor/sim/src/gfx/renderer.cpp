@@ -66,7 +66,7 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    m_sprite_renderer.init({m_swapchain_views, m_format.format, m_gfx_queue_idx});
+    m_sprite_renderer.init({m_swapchain, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue});
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
@@ -168,6 +168,9 @@ void Renderer::create_device()
     assert(m_device);
 
     volkLoadDevice(m_device);
+
+    vkGetDeviceQueue(m_device, m_gfx_queue_idx, 0, &m_gfx_queue);
+    assert(m_gfx_queue);
 }
 
 void Renderer::create_swapchain(const Window& window)
