@@ -5,4 +5,6 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/requirement.h
 
+        ${CMAKE_CURRENT_LIST_DIR}/interface_requirement.h
+
 )
