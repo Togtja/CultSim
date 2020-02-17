@@ -35,8 +35,10 @@ const Preference& PreferenceManager::get_resolution() const
 
 void PreferenceManager::set_resolution(const glm::ivec2& resolution)
 {
+    auto old = m_resolution;
     m_window.resize(resolution);
     m_resolution.value = resolution;
+    m_preference_changed.publish(old, m_resolution);
 }
 
 const Preference& PreferenceManager::get_fullscreen() const
@@ -46,8 +48,10 @@ const Preference& PreferenceManager::get_fullscreen() const
 
 void PreferenceManager::set_fullscreen(bool fullscreen)
 {
+    auto old = m_fullscreen;
     m_window.set_fullscreen(fullscreen);
     m_fullscreen.value = fullscreen;
+    m_preference_changed.publish(old, m_fullscreen);
 }
 
 const Preference& PreferenceManager::get_language() const
