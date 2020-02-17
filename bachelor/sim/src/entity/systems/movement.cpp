@@ -6,7 +6,6 @@
 #include <execution>
 #include <random>
 
-#include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 
 namespace cs::system
@@ -20,14 +19,20 @@ void Movement::update(float dt)
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
     std::uniform_real_distribution rng(-1.f, 1.f);
+    robin_hood::unordered_flat_map<glm::ivec2, int> occupied{};
     auto view = m_registry.view<component::Movement, component::Position>();
-    view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
+    view.each([dt, &rng, &occupied, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         // Will Never trigger as the code is now
         // if (pos.desired_position.empty())
         //{
         //    return;
         //}
         auto cur_head = mov.desired_position.back();
+        if (occupied[cur_head] > 0)
+        {
+            return;
+        }
+        occupied[cur_head]++;
         glm::vec3 temp = cur_head - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
@@ -35,7 +40,6 @@ void Movement::update(float dt)
         {
             mov.desired_position.pop_back();
             if (mov.desired_position.empty())
-                mov.desired_position.pop_back();
             {
                 // Arrived at final destination
                 m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
