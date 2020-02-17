@@ -1,7 +1,7 @@
 #include "debug_renderer.h"
-#include "vao_builder.h"
-#include "render_data.h"
 #include "glutil.h"
+#include "render_data.h"
+#include "vao_builder.h"
 
 #include <vector>
 
@@ -38,4 +38,4 @@ void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
     glUniform3f(1, color.r, color.g, color.b);
     glDrawArrays(GL_LINES, 0, 2);
 }
-} // namespace cs
+} // namespace cs::gfx
