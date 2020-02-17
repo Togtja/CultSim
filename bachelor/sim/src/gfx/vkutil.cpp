@@ -91,11 +91,19 @@ VkRenderPass create_render_pass(VkDevice device, VkFormat format)
     subpass_info.colorAttachmentCount = 1;
     subpass_info.pipelineBindPoint    = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
+    VkSubpassDependency subpass_dependency{};
+    subpass_dependency.srcSubpass    = VK_SUBPASS_EXTERNAL;
+    subpass_dependency.dstSubpass    = 0;
+    subpass_dependency.srcStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    subpass_dependency.dstStageMask  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    subpass_dependency.srcAccessMask = 0;
+    subpass_dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
     VkAttachmentDescription attachments[1] = {};
     attachments[0].flags                   = 0;
     attachments[0].format                  = format;
     attachments[0].samples                 = VK_SAMPLE_COUNT_1_BIT;
-    attachments[0].initialLayout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    attachments[0].initialLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[0].finalLayout             = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     attachments[0].loadOp                  = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[0].storeOp                 = VK_ATTACHMENT_STORE_OP_STORE;
@@ -107,6 +115,8 @@ VkRenderPass create_render_pass(VkDevice device, VkFormat format)
     render_info.pAttachments           = attachments;
     render_info.pSubpasses             = &subpass_info;
     render_info.subpassCount           = 1;
+    render_info.dependencyCount        = 1;
+    render_info.pDependencies          = &subpass_dependency;
 
     VkRenderPass out{VK_NULL_HANDLE};
     VK_CHECK(vkCreateRenderPass(device, &render_info, nullptr, &out));
@@ -194,6 +204,31 @@ VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool)
 void end_one_time_cmd_buffer(VkCommandBuffer buffer)
 {
     vkEndCommandBuffer(buffer);
+}
+
+VkImageMemoryBarrier create_image_barrier(VkImage image,
+                                          VkAccessFlags srcAccess,
+                                          VkAccessFlags dstAccess,
+                                          VkImageLayout oldLayout,
+                                          VkImageLayout newLayout)
+{
+    VkImageMemoryBarrier barrier{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+    barrier.image                       = image;
+    barrier.oldLayout                   = oldLayout;
+    barrier.newLayout                   = newLayout;
+    barrier.srcAccessMask               = srcAccess;
+    barrier.dstAccessMask               = dstAccess;
+    barrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+    barrier.subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
+
+    return barrier;
+}
+
+void transition_image(VkCommandBuffer buffer, VkImage image, VkPipelineStageFlags srcStage, VkPipelineStageFlags dstStage)
+{
 }
 
 VkShaderModule load_shader(VkDevice device, std::string_view rpath)

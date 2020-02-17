@@ -39,6 +39,14 @@ VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool);
 
 void end_one_time_cmd_buffer(VkCommandBuffer buffer);
 
+VkImageMemoryBarrier create_image_barrier(VkImage image,
+                                          VkAccessFlags srcAccess,
+                                          VkAccessFlags dstAccess,
+                                          VkImageLayout oldLayout,
+                                          VkImageLayout newLayout);
+
+void transition_image(VkCommandBuffer buffer, VkImage image, VkPipelineStageFlags srcStage, VkPipelineStageFlags dstStage);
+
 VkShaderModule load_shader(VkDevice device, std::string_view rpath);
 
 VkPipelineLayout create_pipeline_layout(VkDevice device);

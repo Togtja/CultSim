@@ -67,7 +67,7 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    m_sprite_renderer.init({m_swapchain, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue});
+    m_sprite_renderer.init({m_swapchain, m_swapchain_images, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue});
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)

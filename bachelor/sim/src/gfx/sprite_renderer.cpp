@@ -99,6 +99,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 {
     m_device    = volkGetLoadedDevice();
     m_swapchain = create_info.swapchain;
+    m_sc_images = create_info.sc_images;
     m_gfx_queue = create_info.gfx_queue;
 
     /** Create render pass and frame buffers */
