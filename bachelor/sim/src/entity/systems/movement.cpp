@@ -19,8 +19,7 @@ void Movement::update(float dt)
 {
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
-    std::normal_distribution<float> rng(0.f, 1.f);
-
+    std::uniform_real_distribution rng(-1.f, 1.f);
     auto view = m_registry.view<component::Movement, component::Position>();
     view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         // Will Never trigger as the code is now
@@ -28,18 +27,19 @@ void Movement::update(float dt)
         //{
         //    return;
         //}
-        auto cur_head  = mov.desired_position.back();
+        auto cur_head = mov.desired_position.back();
         glm::vec3 temp = cur_head - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
         if (glm::distance(pos.position, cur_head) < 5.f)
         {
+            mov.desired_position.pop_back();
             if (mov.desired_position.empty())
                 mov.desired_position.pop_back();
             {
                 // Arrived at final destination
                 m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
-                if (path_finding2(pos.position, glm::vec2(rng(seed) * 1500.f, rng(seed) * 1500.f), mov.desired_position))
+                if (path_finding(pos.position, glm::vec2(rng(seed) * 1500.f, rng(seed) * 1500.f), mov.desired_position))
                 {
                     spdlog::info("Pathfinding success");
                 }
