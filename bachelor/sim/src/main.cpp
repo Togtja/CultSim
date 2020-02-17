@@ -27,13 +27,11 @@ int main(int argc, char* argv[])
     }
 
     /** Based on DEBUG or not, set the log level thereafter */
-    if constexpr (CULTSIM_DEBUG)
-    {
-        spdlog::set_level(spdlog::level::debug);
-    } else
-    {
-        spdlog::set_level(spdlog::level::info);
-    }
+#ifndef NDEBUG
+    spdlog::set_level(spdlog::level::debug);
+#else
+    spdlog::set_level(spdlog::level::info);
+#endif
 
     /** Run the program */
     cs::Application cultsim{};

@@ -2,13 +2,18 @@
 
 namespace cs
 {
+struct ApplicationContext;
+
 class IScene
 {
+protected:
+    ApplicationContext* m_context = nullptr;
+
 public:
-    IScene()                                   = default;
-    IScene(const IScene&)                      = delete;
-    IScene(IScene&& other) noexcept            = default;
-    IScene& operator=(const IScene&)           = delete;
+    IScene()                        = default;
+    IScene(const IScene&)           = delete;
+    IScene(IScene&& other) noexcept = default;
+    IScene& operator=(const IScene&) = delete;
     IScene& operator=(IScene&& other) noexcept = default;
     virtual ~IScene() noexcept                 = default;
 
@@ -36,5 +41,15 @@ public:
      * @return if it returns true, scenes below this one still draw
      */
     virtual bool draw() = 0;
+
+    /**
+     * Set the application context for this scene
+     *
+     * @param context The new, updated application context
+     */
+    void set_application_context(ApplicationContext& context)
+    {
+        m_context = &context;
+    }
 };
 } // namespace cs

@@ -8,6 +8,8 @@
 
 namespace cs
 {
+struct ApplicationContext;
+
 /**
  * Manages scene changes and updates of the various scenes that exist in the application
  */
@@ -41,6 +43,8 @@ private:
     std::vector<std::unique_ptr<IScene>> m_scenestack = {};
 
     std::vector<Command> m_pending_commands = {};
+
+    ApplicationContext* m_context = nullptr;
 
 public:
     /**
@@ -98,6 +102,14 @@ public:
      * @warning Do not store the Scene after a pop, it will be invalid
      */
     [[nodiscard]] IScene* get_active_scene() const;
+
+    /**
+     * Set the application context for this scene manager
+     *
+     * @note It will propagate to all created scenes
+     * @param context The new, updated application context
+     */
+    void set_application_context(ApplicationContext& context);
 };
 
 } // namespace cs

@@ -15,6 +15,7 @@ bool init(std::string_view project_name)
     }
 
     PHYSFS_setWriteDir(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()));
+    spdlog::debug("write directory: {}", PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()));
 
     PHYSFS_mount(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()), nullptr, 1);
     PHYSFS_mount("data.zip", nullptr, 1);
@@ -82,11 +83,11 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
         return -1;
     }
 
-    // Note is a u64bit int, where the 64bit is failure
+    /** Note is a u64bit int, where the 64bit is failure */
     auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
     if (write_bytes == data.length())
     {
-        spdlog::info("nothing written to file: '{}'", rpath);
+        spdlog::info("wrote file '{}'", rpath);
         PHYSFS_close(file);
         return write_bytes;
     }
