@@ -1,47 +1,48 @@
 #include "lang_manager.h"
+
+#include <utility>
+
 namespace cs
 {
-namespace lang
-{
-LanguageManager::LanguageManager(sol::state_view lua) : m_lua(lua)
+Locale::Locale(sol::state_view lua) : m_lua(std::move(lua))
 {
     set_locale("en");
 }
 
-LanguageManager::LanguageManager(sol::state_view lua, const std::string& locale) : m_lua(lua)
+Locale::Locale(sol::state_view lua, const std::string& locale) : m_lua(std::move(lua))
 {
     set_locale(locale);
 }
 
-std::vector<std::string> LanguageManager::available_lang()
+std::vector<std::string> Locale::available_lang() const
 {
     return fs::list_directory("l10n");
 }
 
-void LanguageManager::set_locale(const std::string& locale)
+void Locale::set_locale(const std::string& locale)
 {
-    m_langs_map.clear();
-    auto lua_lang = fs::read_file("l10n/" + locale + ".lua");
+    m_strings.clear();
+    const auto lua_lang = fs::read_file("l10n/" + locale + ".lua");
 
-    m_lua.safe_script(lua_lang);
+    m_lua.script(lua_lang);
     sol::table lang_table = m_lua["locale"];
 
-    for (auto it : lang_table)
+    for (auto&& [k, v] : lang_table)
     {
-        m_langs_map.emplace(it.first.as<std::string>(), it.second.as<std::string>());
+        m_strings.emplace(k.as<std::string>(), v.as<std::string>());
     }
-    m_lang = m_langs_map.at("lang");
+
+    m_lang = m_strings.at("lang");
 }
 
-std::string_view LanguageManager::get_locale(std::string_view id)
+std::string_view Locale::get_string(std::string_view id)
 {
-    return m_langs_map.at(id.data());
+    return m_strings.at(id.data());
 }
 
-std::string_view LanguageManager::current_lang()
+std::string_view Locale::current_lang()
 {
     return m_lang;
 }
 
-} // namespace lang
 } // namespace cs
