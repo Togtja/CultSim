@@ -28,7 +28,7 @@ void Movement::update(float dt)
         //{
         //    return;
         //}
-        auto& cur_head = mov.desired_position.back();
+        auto cur_head  = mov.desired_position.back();
         glm::vec3 temp = cur_head - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
