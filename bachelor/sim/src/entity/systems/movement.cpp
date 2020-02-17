@@ -29,7 +29,6 @@ void Movement::update(float dt)
         if (glm::distance(pos.position, pos.desired_position) < 10.f)
         {
             m_dispatcher.enqueue(event::ArrivedAtDestination{e, pos.desired_position});
-            pos.desired_position = {rng(seed) * 150.f, rng(seed) * 150.f, 0.f};
         }
     });
 }
