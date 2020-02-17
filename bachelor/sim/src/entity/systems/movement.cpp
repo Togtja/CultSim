@@ -38,6 +38,7 @@ void Movement::update(float dt)
                 mov.desired_position.pop_back();
             {
                 // Arrived at final destination
+                m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
                 if (path_finding2(pos.position, glm::vec2(rng(seed) * 1500.f, rng(seed) * 1500.f), mov.desired_position))
                 {
                     spdlog::info("Pathfinding success");
