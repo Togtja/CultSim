@@ -49,9 +49,9 @@ void Action::update(float dt)
         }
         else
         {
-            spdlog::error(" Number of remaining requirements:{}",requirements.staged_requirements.size() );
             if (requirements.staged_requirements.back()->predicate)
             {
+                spdlog::error("Predicate = true");
                 requirements.staged_requirements.pop_back();
             }
         }
