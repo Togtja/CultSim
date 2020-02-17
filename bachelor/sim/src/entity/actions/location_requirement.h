@@ -14,16 +14,16 @@ class LocationRequirement : public IRequirement
 {
 private:
     glm::vec3 m_desired_pos{};
-    entt::dispatcher& m_dispatcher{};
+    entt::dispatcher& m_dispatcher;
 
 public:
-    LocationRequirement(std::string name, glm::vec3 pos, entt::dispatcher& dispatcher) :
-        IRequirement(name),
+    LocationRequirement(std::string name, entt::registry& registry, glm::vec3 pos, entt::dispatcher& dispatcher) :
+        IRequirement(name,registry),
         m_desired_pos(pos),
         m_dispatcher(dispatcher){};
-    ~LocationRequirement(){ m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&LocationRequirement::event_listener>(this);};
+    ~LocationRequirement();
 
     void init() override;
-    void event_listener(event::ArrivedAtDestination& event);
+    void event_listener(const event::ArrivedAtDestination& event);
 };
 } // namespace cs::action
