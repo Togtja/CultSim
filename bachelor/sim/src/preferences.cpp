@@ -97,15 +97,32 @@ void PreferenceManager::load_from_lua()
     m_lua.script(script);
 
     sol::table preferences = m_lua["preferences"];
-    set_fullscreen(preferences.get<bool>("fullscreen"));
-    set_language(preferences.get<std::string>("language"));
-    set_resolution({preferences.get<std::vector<int>>("resolution")[0], preferences.get<std::vector<int>>("resolution")[1]});
+    set_fullscreen(preferences.get<bool>("Fullscreen"));
+    set_language(preferences.get<std::string>("Language"));
+    set_resolution({preferences.get<std::vector<int>>("Resolution")[0], preferences.get<std::vector<int>>("Resolution")[1]});
 }
+
+bool PreferenceManager::read_preference(Preference& preference)
+{
+    /* clang-format off */
+    return std::visit(Overloaded {
+        [this, &preference](auto arg) {
+            preference.value = m_lua["preferences"][preference.name].get<std::decay_t<decltype(arg)>>();
+            return true;
+        },
+        [this, &preference](glm::ivec2 arg) {
+            auto vec         = m_lua["preferences"][preference.name].get<std::vector<int>>();
+            preference.value = glm::ivec2(vec[0], vec[1]);
+            return true;
+        }},
+        preference.value);
+    /* clang-format on */
+} // namespace cs
 
 std::string PreferenceManager::write_preference(const Preference& preference)
 {
     /* clang-format off */
-    return std::visit(Overloaded{
+    return std::visit(Overloaded {
         [&preference](auto arg) { return fmt::format("\t{} = {},\n", preference.name, arg); },
         [&preference](glm::ivec2 arg) { return fmt::format("\t{} = {{{}, {}}},\n", preference.name, arg.x, arg.y); }},
         preference.value);
