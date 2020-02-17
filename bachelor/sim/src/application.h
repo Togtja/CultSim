@@ -62,6 +62,8 @@ private:
 
     bool init_lua();
 
+    bool init_preferences();
+
     /**
      * Initialize OpenGL, SDL and the Window
      */
@@ -73,6 +75,8 @@ private:
     bool init_imgui();
 
     void deinit();
+
+    void deinit_preferences();
 
     void deinit_imgui();
 

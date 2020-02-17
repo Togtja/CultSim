@@ -29,14 +29,6 @@ public:
     explicit Locale(sol::state_view lua);
 
     /**
-     * Creates a Language Manager to do localizations
-     *
-     * @param lua takes in a lua state_view to run lua script
-     * @param locale initialize it with a language locale
-     */
-    Locale(sol::state_view lua, const std::string& locale);
-
-    /**
      * Get a vector list of all avaliable langauges
      *
      * @note It checks for files in the l10n folder

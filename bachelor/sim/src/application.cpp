@@ -85,11 +85,12 @@ void Application::draw()
 
 bool Application::init(const std::vector<char*>& args)
 {
-    return init_subsystem(&Application::init_physfs, "PhysFS", args) && // Init PhysFS
-           init_subsystem(&Application::init_input, "Input Manager") && // Init Input Manager
-           init_subsystem(&Application::init_lua, "Lua") &&             // Init Lua
-           init_subsystem(&Application::init_gl, "OpenGL") &&           // Init OpenGL
-           init_subsystem(&Application::init_imgui, "ImGui");           // Init ImGui
+    return init_subsystem(&Application::init_physfs, "PhysFS", args) &&     // Init PhysFS
+           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
+           init_subsystem(&Application::init_lua, "Lua") &&                 // Init Lua
+           init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
+           init_subsystem(&Application::init_gl, "OpenGL") &&               // Init OpenGL
+           init_subsystem(&Application::init_imgui, "ImGui");               // Init ImGui
 }
 
 bool Application::init_physfs(std::vector<char*> args)
@@ -137,6 +138,12 @@ bool Application::init_lua()
     log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
     log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
 
+    return true;
+}
+
+bool Application::init_preferences()
+{
+    m_preferences.init();
     return true;
 }
 
@@ -248,9 +255,15 @@ bool Application::init_imgui()
 
 void Application::deinit()
 {
+    deinit_preferences();
     deinit_imgui();
     deinit_gl();
     deinit_physfs();
+}
+
+void Application::deinit_preferences()
+{
+    m_preferences.deinit();
 }
 
 void Application::deinit_imgui()

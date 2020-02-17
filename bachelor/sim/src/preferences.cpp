@@ -1,8 +1,10 @@
 #include "preferences.h"
+#include "constants.h"
 #include "filesystem/filesystem.h"
 
 #include <gfx/ImGUI/imgui.h>
 #include <glad/glad.h>
+#include <spdlog/fmt/bundled/format.h>
 
 namespace cs
 {
@@ -32,6 +34,17 @@ void PreferenceManager::show_debug_ui()
     }
 
     ImGui::End();
+}
+
+void PreferenceManager::init()
+{
+    load_from_lua();
+    m_locale.set_locale(std::get<std::string>(m_language.value));
+}
+
+void PreferenceManager::deinit()
+{
+    save_to_lua();
 }
 
 const Preference& PreferenceManager::get_resolution() const
@@ -67,7 +80,46 @@ const Preference& PreferenceManager::get_language() const
 
 void PreferenceManager::set_language(std::string_view language)
 {
-    /** TODO: Interact with Locale, or integrate it */
+    auto old = m_language;
+    m_locale.set_locale(std::string(language));
     m_language.value = std::string(language);
+    m_preference_changed.publish(old, m_language);
+}
+
+std::string_view PreferenceManager::get_string(std::string_view id)
+{
+    return m_locale.get_string(id);
+}
+
+void PreferenceManager::load_from_lua()
+{
+    const auto script = fs::read_file(PATH_PREFERENCE_FILE);
+    m_lua.script(script);
+
+    sol::table preferences = m_lua["preferences"];
+    set_fullscreen(preferences.get<bool>("fullscreen"));
+    set_language(preferences.get<std::string>("language"));
+    set_resolution({preferences.get<std::vector<int>>("resolution")[0], preferences.get<std::vector<int>>("resolution")[1]});
+}
+
+std::string PreferenceManager::write_preference(const Preference& preference)
+{
+    /* clang-format off */
+    return std::visit(Overloaded{
+        [&preference](auto arg) { return fmt::format("\t{} = {},\n", preference.name, arg); },
+        [&preference](glm::ivec2 arg) { return fmt::format("\t{} = {{{}, {}}},\n", preference.name, arg.x, arg.y); }},
+        preference.value);
+    /* clang-format on */
+}
+
+void PreferenceManager::save_to_lua()
+{
+    auto output = std::string("preferences = {\n");
+    output += write_preference(m_resolution);
+    output += write_preference(m_fullscreen);
+    output += write_preference(m_language);
+    output += "}\n";
+
+    fs::write_file(PATH_PREFERENCE_FILE, output);
 }
 } // namespace cs

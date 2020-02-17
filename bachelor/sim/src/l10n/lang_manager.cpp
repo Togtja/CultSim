@@ -6,12 +6,6 @@ namespace cs
 {
 Locale::Locale(sol::state_view lua) : m_lua(std::move(lua))
 {
-    set_locale("en");
-}
-
-Locale::Locale(sol::state_view lua, const std::string& locale) : m_lua(std::move(lua))
-{
-    set_locale(locale);
 }
 
 std::vector<std::string> Locale::available_lang() const

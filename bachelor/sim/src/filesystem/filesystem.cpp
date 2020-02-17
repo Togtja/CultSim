@@ -15,6 +15,7 @@ bool init(std::string_view project_name)
     }
 
     PHYSFS_setWriteDir(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()));
+    spdlog::debug("write directory: {}", PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()));
 
     PHYSFS_mount(PHYSFS_getPrefDir(PROGRAM_TEAM.data(), PROGRAM_NAME.data()), nullptr, 1);
     PHYSFS_mount("data.zip", nullptr, 1);
