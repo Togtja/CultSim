@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "glm/gtc/epsilon.hpp"
+#include "glm/glm.hpp"
 
 namespace cs
 {
