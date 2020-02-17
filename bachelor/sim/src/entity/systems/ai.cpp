@@ -1,4 +1,5 @@
 #include "ai.h"
+#include "ai/path_finding.h"
 #include "constants.h"
 #include "entity/components/components.h"
 
@@ -20,19 +21,6 @@ bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
 bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 {
     return is_visible(pos, pos2, size + size2);
-}
-
-glm::vec2 AI::path_finding()
-{
-    static std::random_device rd{};
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution dist(-360, 360);
-    return glm::vec2(dist(gen), dist(gen));
-}
-
-glm::ivec2 AI::world_to_grid(glm::vec2 pos)
-{
-    return {static_cast<int>(pos.x) / static_cast<int>(SIM_GRID_SIZE), static_cast<int>(pos.y) / static_cast<int>(SIM_GRID_SIZE)};
 }
 
 void AI::update(float dt)
