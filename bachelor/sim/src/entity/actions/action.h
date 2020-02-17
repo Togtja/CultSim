@@ -37,7 +37,13 @@ struct Action
         failure(std::move(p_failure)){};
 
     ~Action() = default;
-    Action(const Action& other) : name(other.name), time_to_complete(other.time_to_complete), time_spent(other.time_spent)
+    Action(const Action& other) :
+        name(other.name),
+        time_to_complete(other.time_to_complete),
+        time_spent(other.time_spent),
+        abort(other.abort),
+        success(other.success),
+        failure(other.failure)
     {
         for (const auto& i : other.requirements)
         {

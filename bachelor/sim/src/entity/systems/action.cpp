@@ -10,7 +10,7 @@ namespace cs::system
 void Action::update(float dt)
 {
     auto view = m_registry.view<component::Strategies, component::Requirement>();
-    view.each([this, dt](component::Strategies& strategies, component::Requirement& requirements) {
+    view.each([this, dt](entt::entity e, component::Strategies& strategies, component::Requirement& requirements) {
         if (requirements.staged_requirements.empty())
         {
             for (auto& strategy : strategies.staged_strategies)
@@ -22,7 +22,7 @@ void Action::update(float dt)
                     {
                         spdlog::warn("Pushing back requirement {}", action.requirements.back()->name);
                         requirements.staged_requirements.push_back(std::move(action.requirements.back()));
-                        requirements.staged_requirements.back()->init();
+                        requirements.staged_requirements.back()->init(e);
                         action.requirements.pop_back();
                     }
                     else
@@ -49,7 +49,7 @@ void Action::update(float dt)
         }
         else
         {
-            spdlog::error("We are in the requirements");
+            spdlog::error(" Number of remaining requirements:{}",requirements.staged_requirements.size() );
             if (requirements.staged_requirements.back()->predicate)
             {
                 requirements.staged_requirements.pop_back();
