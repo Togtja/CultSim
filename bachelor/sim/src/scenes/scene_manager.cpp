@@ -24,8 +24,8 @@ void SceneManager::update(float dt)
         switch (command.command_type)
         {
             case ECommandType::Push:
-                command.new_scene->on_enter();
                 command.new_scene->set_application_context(*m_context);
+                command.new_scene->on_enter();
                 m_scenestack.emplace_back(std::move(command.new_scene));
                 break;
             case ECommandType::Pop:
