@@ -25,6 +25,7 @@ void SceneManager::update(float dt)
         {
             case ECommandType::Push:
                 command.new_scene->on_enter();
+                command.new_scene->set_application_context(*m_context);
                 m_scenestack.emplace_back(std::move(command.new_scene));
                 break;
             case ECommandType::Pop:
@@ -79,6 +80,15 @@ IScene* SceneManager::get_active_scene() const
     else
     {
         return m_scenestack.back().get();
+    }
+}
+
+void SceneManager::set_application_context(ApplicationContext& context)
+{
+    m_context = &context;
+    for (auto&& scene : m_scenestack)
+    {
+        scene->set_application_context(context);
     }
 }
 } // namespace cs

@@ -19,6 +19,10 @@ void Application::run(const std::vector<char*>& args)
 {
     init(args);
 
+    /** Create application context for scenes */
+    ApplicationContext context = {m_lua.lua_state(), &m_scene_manager, &m_preferences};
+    m_scene_manager.set_application_context(context);
+
     /** Add default scene */
     m_scene_manager.push<ScenarioScene>("basic_needs");
 
