@@ -9,7 +9,7 @@ namespace cs::action
 class IRequirement
 {
 protected:
-    entt::registry& m_registry{};
+    entt::registry& m_registry;
     entt::entity owner{entt::null};
 
 public:

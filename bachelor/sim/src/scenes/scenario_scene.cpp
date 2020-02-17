@@ -1,6 +1,6 @@
 #include "scenario_scene.h"
 #include "entity/actions/action.h"
-#include "entity/actions/requirement.h"
+#include "entity/actions/location_requirement.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
@@ -13,8 +13,8 @@
 #include "gfx/renderer.h"
 
 #include <functional>
-#include <random>
 #include <memory>
+#include <random>
 
 #include "gfx/ImGUI/imgui.h"
 #include "spdlog/spdlog.h"
@@ -28,13 +28,7 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 void ScenarioScene::on_enter()
 {
     ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
-    action::Requirement requirement{static_cast<std::string>("Goto"),
-                                    false,
-                                    []() {},
-                                    m_dispatcher,
-                                    []() {
-
-                                    }};
+    action::LocationRequirement moveto_requirement{static_cast<std::string>("Goto"), m_registry, glm::vec3(20.f,20.f,20.f),m_dispatcher};
 
     action::Action action{static_cast<std::string>("eat"),
                           std::vector<action::IRequirement*>{},
