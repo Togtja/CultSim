@@ -24,6 +24,8 @@ public:
     ~LocationRequirement();
 
     void init() override;
+
+    IRequirement* clone() override;
     void event_listener(const event::ArrivedAtDestination& event);
 };
 } // namespace cs::action

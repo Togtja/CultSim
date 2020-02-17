@@ -20,6 +20,12 @@ public:
 
     void set_entity(entt::entity entity);
 
-    virtual void init() = 0;
+
+    virtual IRequirement* clone()
+    {
+        return new IRequirement(name, m_registry);
+    }
+
+    virtual void init(){};
 };
 } // namespace cs::action

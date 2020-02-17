@@ -16,6 +16,11 @@ void LocationRequirement::init()
     pos.desired_position = m_desired_pos;
     m_dispatcher.sink<event::ArrivedAtDestination>().connect<&LocationRequirement::event_listener>(this);
 }
+IRequirement* LocationRequirement::clone()
+{
+    auto copy = new LocationRequirement(name, m_registry, m_desired_pos, m_dispatcher);
+    return copy;
+}
 void LocationRequirement::event_listener(const event::ArrivedAtDestination& event)
 {
     if (event.entity == owner && cs::close_enough(event.position, m_desired_pos, 2.f))
