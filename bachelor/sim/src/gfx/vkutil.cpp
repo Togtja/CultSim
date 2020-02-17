@@ -65,6 +65,12 @@ VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPre
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail)
 {
+    /** Everything is supported */
+    if (avail.size() == 1 && avail.front().format == VK_FORMAT_UNDEFINED)
+    {
+        return {VK_FORMAT_R8G8B8A8_UNORM, VK_COLORSPACE_SRGB_NONLINEAR_KHR};
+    }
+
     for (auto format : avail)
     {
         if (format.format == VK_FORMAT_B8G8R8A8_UNORM && format.colorSpace == VK_COLORSPACE_SRGB_NONLINEAR_KHR)
@@ -106,7 +112,7 @@ VkDebugReportCallbackEXT register_debug_callback(VkInstance instance)
     create_info.pfnCallback = default_debug_callback;
 
     auto function = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
-    if(!function)
+    if (!function)
     {
         spdlog::error("does not support debug callback ext");
         return VK_NULL_HANDLE;
