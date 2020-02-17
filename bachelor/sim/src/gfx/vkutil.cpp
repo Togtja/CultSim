@@ -105,8 +105,15 @@ VkDebugReportCallbackEXT register_debug_callback(VkInstance instance)
                         VK_DEBUG_REPORT_PERFORMANCE_WARNING_BIT_EXT | VK_DEBUG_REPORT_ERROR_BIT_EXT;
     create_info.pfnCallback = default_debug_callback;
 
+    auto function = (PFN_vkCreateDebugReportCallbackEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugReportCallbackEXT");
+    if(!function)
+    {
+        spdlog::error("does not support debug callback ext");
+        return VK_NULL_HANDLE;
+    }
+
     VkDebugReportCallbackEXT out{VK_NULL_HANDLE};
-    VK_CHECK(vkCreateDebugReportCallbackEXT(instance, &create_info, nullptr, &out));
+    VK_CHECK(function(instance, &create_info, nullptr, &out));
     assert(out);
 
     return out;
