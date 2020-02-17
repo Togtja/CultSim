@@ -18,14 +18,12 @@ public:
 
     IRequirement(std::string p_name, entt::registry& registry) : name(p_name), m_registry(registry){};
 
-    void set_entity(entt::entity entity);
-
 
     virtual IRequirement* clone()
     {
         return new IRequirement(name, m_registry);
     }
 
-    virtual void init(){};
+    virtual void init(entt::entity entity){};
 };
 } // namespace cs::action
