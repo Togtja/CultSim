@@ -25,11 +25,11 @@ private:
      */
     Window m_window;
 
-    PreferenceManager m_preferences{m_window};
+    sol::state m_lua{};
+
+    PreferenceManager m_preferences{m_window, m_lua.lua_state()};
 
     SceneManager m_scene_manager{};
-
-    sol::state m_lua{};
 
     bool m_running = true;
 
@@ -52,6 +52,17 @@ private:
     bool init(const std::vector<char*>& args);
 
     /**
+     * Initialize PhysFS' filesystem
+     *
+     * @param args Command line arguments to the program
+     */
+    bool init_physfs(std::vector<char*> args);
+
+    bool init_input();
+
+    bool init_lua();
+
+    /**
      * Initialize OpenGL, SDL and the Window
      */
     bool init_gl();
@@ -61,28 +72,13 @@ private:
      */
     bool init_imgui();
 
-    /**
-     * Initialize PhysFS' filesystem
-     *
-     * @param args Command line arguments to the program
-     */
-    bool init_physfs(std::vector<char*> args);
-
-    bool init_lua();
-
-    bool init_input();
-
     void deinit();
-
-    void deinit_input();
-
-    void deinit_lua();
-
-    void deinit_physfs();
 
     void deinit_imgui();
 
     void deinit_gl();
+
+    void deinit_physfs();
 
     /**
      * Initialize the subsystem with one of the Application's init_ functions and log on error
