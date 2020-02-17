@@ -1,9 +1,10 @@
 #pragma once
-#include "requirement.h"
 #include "entity/events.h"
+#include "requirement.h"
 
 #include <functional>
 #include <string>
+#include <utility>
 
 #include "entt/signal/dispatcher.hpp"
 #include "glm/vec3.hpp"
@@ -18,7 +19,7 @@ private:
 
 public:
     LocationRequirement(std::string name, entt::registry& registry, glm::vec3 pos, entt::dispatcher& dispatcher) :
-        IRequirement(name,registry),
+        IRequirement(std::move(name), registry),
         m_desired_pos(pos),
         m_dispatcher(dispatcher){};
     ~LocationRequirement();

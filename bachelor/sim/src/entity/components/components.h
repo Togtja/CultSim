@@ -118,13 +118,27 @@ struct Requirement
     ~Requirement() = default;
     Requirement(const Requirement& other)
     {
-        for (int i = 0; i < other.staged_requirements.size(); i++)
+        for (const auto& staged_requirement : other.staged_requirements)
         {
-            auto requirement = other.staged_requirements[i].get()->clone();
+            auto requirement = staged_requirement->clone();
+            staged_requirements.emplace_back(requirement);
+        }
+    }
+    Requirement& operator=(const Requirement& rhs)
+    {
+        if (this == &rhs)
+        {
+            return *this;
+        }
+
+        staged_requirements.clear();
+        for (const auto& staged_requirement : rhs.staged_requirements)
+        {
+            auto requirement = staged_requirement->clone();
             staged_requirements.emplace_back(requirement);
         }
 
-
+        return *this;
     }
 };
 
