@@ -124,6 +124,7 @@ std::string PreferenceManager::write_preference(const Preference& preference)
     /* clang-format off */
     return std::visit(Overloaded {
         [&preference](auto arg) { return fmt::format("\t{} = {},\n", preference.name, arg); },
+        [&preference](std::string arg) { return fmt::format("\t{} = \"{}\",\n", preference.name, arg); },
         [&preference](glm::ivec2 arg) { return fmt::format("\t{} = {{{}, {}}},\n", preference.name, arg.x, arg.y); }},
         preference.value);
     /* clang-format on */
