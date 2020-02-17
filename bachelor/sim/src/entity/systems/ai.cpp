@@ -63,22 +63,23 @@ void AI::update(float dt)
                         vis.seen.push_back(e2);
 
                         // Collision avoidance
-                        if (is_visible(pos.position, pos2.position, vis.vision_radius * 0.5f))
-                        {
-                            auto move = m_registry.try_get<component::Movement>(e);
-                            if (move == nullptr)
-                            {
-                                continue;
-                            }
-                            // How much ahead we see
-                            auto ahead = glm::vec2(pos.position.x, pos.position.y) + move->direction * (vis.vision_radius / 2);
-                            // 5 should be the size of the entt on pos2
-                            if (is_visible(ahead, pos2.position, 5 + 4))
-                            {
-                                auto avoid_force = ahead - glm::vec2(pos2.position.x, pos2.position.y);
-                                move->desired_position.push_back(pos.position + glm::normalize(glm::vec3(avoid_force, 0)) * 2.f);
-                            }
-                        }
+                        // if (is_visible(pos.position, pos2.position, vis.vision_radius * 0.5f))
+                        //{
+                        //    auto move = m_registry.try_get<component::Movement>(e);
+                        //    if (move == nullptr)
+                        //    {
+                        //        continue;
+                        //    }
+                        //    // How much ahead we see
+                        //    auto ahead = glm::vec2(pos.position.x, pos.position.y) + move->direction * (vis.vision_radius / 2);
+                        //    // 5 should be the size of the entt on pos2
+                        //    if (is_visible(ahead, pos2.position, 5 + 4))
+                        //    {
+                        //        auto avoid_force = ahead - glm::vec2(pos2.position.x, pos2.position.y);
+                        //        move->desired_position.push_back(pos.position + glm::normalize(glm::vec3(avoid_force, 0))
+                        //        * 2.f);
+                        //    }
+                        //}
                     }
                 }
             }
