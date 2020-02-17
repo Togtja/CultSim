@@ -7,18 +7,18 @@ glm::ivec2 world_to_grid(glm::vec2 pos, int grid)
     return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
 }
 
-int path_heuristic(PathGrid start, PathGrid goal)
+int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
 {
     auto p = start - goal;
     return p.x * p.x + p.y * p.y;
 }
 
-void reconstruct_path(const PathGrid& start,
-                      const PathGrid& goal,
+void reconstruct_path(const glm::ivec2& start,
+                      const glm::ivec2& goal,
                       std::vector<glm::vec3>& pos,
-                      const robin_hood::unordered_flat_map<PathGrid, PathGrid>& a_star_grid)
+                      const robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2>& a_star_grid)
 {
-    PathGrid curr = goal;
+    glm::ivec2 curr = goal;
     do
     {
         pos.emplace_back(glm::vec3(curr.x * 32, curr.y * 32, 0));
@@ -29,19 +29,18 @@ void reconstruct_path(const PathGrid& start,
 bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss)
 {
     int SIZE_OF_GRID = 32;
-    robin_hood::unordered_flat_map<PathGrid, PathGrid> a_star_grid{};
-    robin_hood::unordered_flat_map<PathGrid, int> a_star_cost{};
+    robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
+    robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
     auto start_grid = world_to_grid(start_vec, SIZE_OF_GRID);
     auto goal_grid  = world_to_grid(goal_vec, SIZE_OF_GRID);
-    PathGrid start{start_grid.x, start_grid.y};
-    PathGrid goal{goal_grid.x, goal_grid.y};
+    glm::ivec2 start{start_grid.x, start_grid.y};
+    glm::ivec2 goal{goal_grid.x, goal_grid.y};
 
-    using pair = std::pair<int, PathGrid>;
-
-    auto priority_func = [](const pair& a, const pair& b) {
+    auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
         return a.first > b.first;
     };
-    std::priority_queue<pair, std::vector<pair>, decltype(priority_func)> open(priority_func);
+    std::priority_queue<std::pair<int, glm::ivec2>, std::vector<std::pair<int, glm::ivec2>>, decltype(priority_func)> open(
+        priority_func);
 
     open.emplace(0.f, start);
     a_star_grid[start] = start;
@@ -49,17 +48,17 @@ bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec
 
     while (!open.empty())
     {
-        PathGrid curr = open.top().second;
+        glm::ivec2 curr = open.top().second;
         open.pop();
         if (curr == goal)
         {
             reconstruct_path(start, goal, poss, a_star_grid);
             return true;
         }
-        PathGrid next{};
+        glm::ivec2 next{};
 
-        const auto max = PathGrid{curr.x + 1, curr.y + 1};
-        const auto min = PathGrid{curr.x - 1, curr.y - 1};
+        const auto max = glm::ivec2{curr.x + 1, curr.y + 1};
+        const auto min = glm::ivec2{curr.x - 1, curr.y - 1};
 
         for (int x = min.x; x <= max.x; x++)
         {
