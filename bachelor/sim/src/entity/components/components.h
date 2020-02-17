@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/actions/requirement.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "strategy.h"
@@ -106,6 +107,11 @@ struct Strategies
     std::vector<ai::Strategy> strategies{};
 
     std::vector<ai::Strategy> staged_strategies{};
+};
+
+struct Requirement
+{
+    std::vector<action::Requirement> staged_requirements{};
 };
 
 struct Tags

@@ -1,8 +1,8 @@
 #include "application.h"
 #include "constants.h"
 #include "delta_clock.h"
-#include "entity/systems/ai.h"
 #include "entity/components/components.h"
+#include "entity/systems/ai.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
@@ -66,6 +66,7 @@ void Application::handle_input()
 void Application::update(float dt)
 {
     m_scene_manager.update(dt);
+    m_preferences.show_debug_ui();
 }
 
 void Application::draw()

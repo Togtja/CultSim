@@ -35,7 +35,6 @@ int main(int argc, char* argv[])
         spdlog::set_level(spdlog::level::info);
     }
 
-
     /** Run the program */
     cs::Application cultsim{};
     cultsim.run(args);

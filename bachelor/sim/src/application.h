@@ -1,5 +1,6 @@
 #pragma once
 #include "gfx/window.h"
+#include "preferences.h"
 #include "scenes/scene_manager.h"
 
 #include <vector>
@@ -23,6 +24,8 @@ private:
      * @warning Do not use until initialized
      */
     Window m_window;
+
+    PreferenceManager m_preferences{m_window};
 
     SceneManager m_scene_manager{};
 

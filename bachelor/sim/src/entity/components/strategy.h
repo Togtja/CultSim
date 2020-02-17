@@ -1,6 +1,6 @@
 #pragma once
 
-#include "action.h"
+#include "entity/actions/action.h"
 #include "tags.h"
 
 #include <string>
@@ -19,7 +19,7 @@ struct Strategy
     tags::ETag tags{};
     // TODO: Actual functionality
 
-    std::vector<ai::Action> actions{};
+    std::vector<action::Action> actions{};
 };
 
 inline bool operator==(Strategy const& lhs, Strategy const& rhs)
