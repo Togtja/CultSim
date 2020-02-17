@@ -7,7 +7,6 @@
 
 namespace cs::system
 {
-Action::Action(entt::registry& registry) : ISystem(registry){};
 
 void Action::update(float dt)
 {
@@ -52,7 +51,7 @@ void Action::update(float dt)
         else
         {
             spdlog::error("We are in the requirements");
-            if (requirements.staged_requirements.back->predicate)
+            if (requirements.staged_requirements.back()->predicate)
             {
                 requirements.staged_requirements.pop_back();
             }

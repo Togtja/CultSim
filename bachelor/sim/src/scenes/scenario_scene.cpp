@@ -14,6 +14,7 @@
 
 #include <functional>
 #include <random>
+#include <memory>
 
 #include "gfx/ImGUI/imgui.h"
 #include "spdlog/spdlog.h"
@@ -27,8 +28,16 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 void ScenarioScene::on_enter()
 {
     ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
+    action::Requirement requirement{static_cast<std::string>("Goto"),
+                                    false,
+                                    []() {},
+                                    m_dispatcher,
+                                    []() {
+
+                                    }};
+
     action::Action action{static_cast<std::string>("eat"),
-                          std::vector<action::Requirement>{},
+                          std::vector<action::IRequirement*>{},
                           5.f,
                           0.f,
                           {},
@@ -54,14 +63,14 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
-        m_registry.assign<component::Requirement>(agent, std::vector<action::Requirement>({}));
+        m_registry.assign<component::Requirement>(agent, std::vector<action::IRequirement*>({}));
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
-    m_active_systems.emplace_back(new system::Action(m_registry, m_dispatcher));
+    m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
