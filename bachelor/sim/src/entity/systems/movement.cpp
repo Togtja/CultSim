@@ -21,7 +21,7 @@ void Movement::update(float dt)
     static auto gen  = std::mt19937{seed()};
     std::normal_distribution<float> rng(0.f, 1.f);
 
-    auto view = m_registry.group<component::Movement, component::Position>();
+    auto view = m_registry.view<component::Movement, component::Position>();
     view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         // Will Never trigger as the code is now
         // if (pos.desired_position.empty())
