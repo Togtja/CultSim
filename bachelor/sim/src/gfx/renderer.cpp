@@ -202,6 +202,12 @@ void Renderer::create_swapchain(const Window& window)
     std::vector<VkPresentModeKHR> present_modes(present_mode_count);
     vkGetPhysicalDeviceSurfacePresentModesKHR(m_pdevice, m_surface, &present_mode_count, present_modes.data());
 
+    /** Get surface capabilities */
+    VkSurfaceCapabilitiesKHR surface_capabilities{};
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_pdevice, m_surface, &surface_capabilities);
+    assert(surface_capabilities.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR);
+    assert(surface_capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR);
+
     const auto present_mode = vk::select_present_mode(VK_PRESENT_MODE_FIFO_KHR, present_modes);
 
     /** Then create swapchain */
@@ -210,10 +216,10 @@ void Renderer::create_swapchain(const Window& window)
     create_info.surface                  = m_surface;
     create_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     create_info.presentMode              = present_mode;
-    create_info.imageExtent              = {1280, 720};
+    create_info.imageExtent              = surface_capabilities.currentExtent;
     create_info.imageFormat              = m_format.format;
     create_info.imageColorSpace          = m_format.colorSpace;
-    create_info.minImageCount            = 2;
+    create_info.minImageCount            = glm::max(2u, surface_capabilities.minImageCount);
     create_info.queueFamilyIndexCount    = 1;
     create_info.pQueueFamilyIndices      = &m_gfx_queue_idx;
     create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
