@@ -28,9 +28,9 @@ void reconstruct_path(PathGrid start, PathGrid goal, std::vector<glm::vec3>& pos
 bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss)
 {
     int SIZE_OF_GRID = 32;
-    auto pos         = world_to_grid(start_vec, SIZE_OF_GRID);
-    auto goal_grid   = world_to_grid(goal_vec, SIZE_OF_GRID);
-    PathGrid start{pos.x, pos.y};
+    auto start_grid = world_to_grid(start_vec, SIZE_OF_GRID);
+    auto goal_grid  = world_to_grid(goal_vec, SIZE_OF_GRID);
+    PathGrid start{start_grid.x, start_grid.y};
     PathGrid goal{goal_grid.x, goal_grid.y};
 
     using pair = std::pair<int, PathGrid>;
@@ -48,6 +48,11 @@ bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec
     {
         PathGrid curr = open.top().second;
         open.pop();
+        if (curr == goal)
+        {
+            reconstruct_path(start, goal, poss);
+            return true;
+        }
         PathGrid next{};
         // TODO: Improve by first checking in the heuristic direction
         auto max = PathGrid{curr.x + 1, curr.y + 1};
@@ -69,13 +74,6 @@ bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec
                     open.emplace(priority, next);
                 }
             }
-        }
-
-        if (curr == goal)
-        {
-            spdlog::warn("Found path");
-            reconstruct_path(start, goal, poss);
-            return true;
         }
     }
     return false;
