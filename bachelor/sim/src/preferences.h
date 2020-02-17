@@ -119,14 +119,6 @@ private:
     void load_from_lua();
 
     /**
-     * Read the given preference from the lua state
-     *
-     * @param preference The preference to read into
-     * @return true if successful
-     */
-    bool read_preference(Preference& preference);
-
-    /**
      * Writes the preference to a valid line for used in save_to_lua
      *
      * @param preference The Preference to serialize
