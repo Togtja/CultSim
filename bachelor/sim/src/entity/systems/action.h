@@ -9,16 +9,12 @@ namespace cs::system
 class Action : public ISystem
 {
 private:
-    entt::dispatcher& m_dispatcher;
 
 public:
-    Action(entt::registry& registry, entt::dispatcher& dispatcher);
+    Action(entt::registry& registry);
 
-    ~Action() noexcept;
 
     void update(float dt) override;
 
-private:
-    void respond_arrive(const event::ArrivedAtDestination& data);
 };
 } // namespace cs::system

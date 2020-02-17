@@ -7,15 +7,7 @@
 
 namespace cs::system
 {
-Action::Action(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
-{
-    m_dispatcher.sink<event::ArrivedAtDestination>().connect<&Action::respond_arrive>(this);
-}
-
-Action::~Action() noexcept
-{
-    m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&Action::respond_arrive>(this);
-}
+Action::Action(entt::registry& registry) : ISystem(registry){};
 
 void Action::update(float dt)
 {
@@ -30,9 +22,9 @@ void Action::update(float dt)
                     auto& action = strategy.actions.back();
                     if (!action.requirements.empty())
                     {
-                        spdlog::warn("Pushing back requirement {}", action.requirements.back().name);
+                        spdlog::warn("Pushing back requirement {}", action.requirements.back()->name);
                         requirements.staged_requirements.push_back(action.requirements.back());
-                        action.requirements.back().init();
+                        action.requirements.back()->init();
                         action.requirements.pop_back();
                     }
                     else
@@ -60,7 +52,7 @@ void Action::update(float dt)
         else
         {
             spdlog::error("We are in the requirements");
-            if (requirements.staged_requirements.back().predicate())
+            if (requirements.staged_requirements.back->predicate)
             {
                 requirements.staged_requirements.pop_back();
             }
@@ -68,8 +60,4 @@ void Action::update(float dt)
     });
 }
 
-void Action::respond_arrive(const event::ArrivedAtDestination& data)
-{
-    spdlog::info("{} arrived at X:{} Y:{}", static_cast<uint32_t>(data.entity), data.position.x, data.position.y);
-}
 } // namespace cs::system

@@ -112,7 +112,7 @@ struct Strategies
 
 struct Requirement
 {
-    std::vector<action::Requirement> staged_requirements{};
+    std::vector<action::IRequirement*> staged_requirements{};
 };
 
 struct Tags
