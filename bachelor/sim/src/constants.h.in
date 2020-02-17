@@ -20,4 +20,7 @@ constexpr int SIM_GRID_SIZE = 64;
 /** True when compiled in debug mode, otherwise false */
 constexpr bool CULTSIM_DEBUG = @CULTSIM_DEBUG@;
 
+/** File path related constants */
+constexpr std::string_view PATH_PREFERENCE_FILE = "config.lua";
+
 /* clang-format on */

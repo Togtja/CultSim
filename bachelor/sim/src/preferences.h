@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common_helpers.h"
 #include "gfx/window.h"
 #include "l10n/lang_manager.h"
 
@@ -12,6 +13,7 @@
 #include "robin_hood.h"
 #include <entt/signal/sigh.hpp>
 #include <glm/vec2.hpp>
+#include <sol/state_view.hpp>
 
 namespace cs
 {
@@ -37,8 +39,12 @@ struct Preference
 class PreferenceManager
 {
 private:
+    Locale m_locale;
+
     /** Application window */
     Window& m_window;
+
+    sol::state_view m_lua;
 
     /** Window resolution */
     Preference m_resolution{"Resolution", "The resolution of your game window", glm::ivec2{1280, 720}};
@@ -55,8 +61,8 @@ private:
     entt::sigh<void(const Preference&, const Preference&)> m_preference_changed{};
 
 public:
-    explicit PreferenceManager(Window& window);
-    explicit PreferenceManager(Window& window, std::string_view from_file);
+    explicit PreferenceManager(Window& window, sol::state_view lua_state);
+    explicit PreferenceManager(Window& window, sol::state_view lua_state, std::string_view from_file);
 
     void show_debug_ui();
 
@@ -78,5 +84,16 @@ public:
     [[nodiscard]] const Preference& get_language() const;
 
     void set_language(std::string_view language);
+
+private:
+    /**
+     * Load preferences from lua file
+     */
+    void load_from_lua();
+
+    /**
+     * Save preferences to lua file
+     */
+    void save_to_lua();
 };
 } // namespace cs
