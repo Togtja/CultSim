@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "entity/components/components.h"
+#include "entity/events.h"
 
 #include <execution>
 #include <random>
@@ -8,6 +9,10 @@
 
 namespace cs::system
 {
+Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
+{
+}
+
 void Movement::update(float dt)
 {
     static auto seed = std::random_device{};
@@ -31,6 +36,7 @@ void Movement::update(float dt)
             if (mov.desired_position.empty())
             {
                 // Arrived at final destination
+                m_dispatcher.enqueue(event::ArrivedAtDestination{e, pos.desired_position});
                 mov.desired_position.push_back({rng(seed) * 1500.f, rng(seed) * 1500.f, 0.f});
             }
         }
