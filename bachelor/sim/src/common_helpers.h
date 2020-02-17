@@ -19,13 +19,13 @@ struct ApplicationContext
     PreferenceManager* preferences{nullptr};
 };
 
-int count_set_bits(uint64_t x)
+inline unsigned count_set_bits(uint64_t x)
 {
-    int sum{};
+    unsigned sum{};
     while (x != 0)
     {
-        sum += x & 1;
-        x >>= 1;
+        sum += x & 1u;
+        x >>= 1u;
     }
     return sum;
 }
