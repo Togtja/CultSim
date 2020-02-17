@@ -2,9 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-static robin_hood::unordered_flat_map<PathGrid, PathGrid> a_star_grid{};
-static robin_hood::unordered_flat_map<PathGrid, float> a_star_cost{};
-
 glm::ivec2 world_to_grid(glm::vec2 pos, int grid)
 {
     return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
@@ -15,19 +12,25 @@ int path_heuristic(PathGrid start, PathGrid goal)
     auto p = start - goal;
     return p.x * p.x + p.y * p.y;
 }
-void reconstruct_path(PathGrid start, PathGrid goal, std::vector<glm::vec3>& pos)
+
+void reconstruct_path(const PathGrid& start,
+                      const PathGrid& goal,
+                      std::vector<glm::vec3>& pos,
+                      const robin_hood::unordered_flat_map<PathGrid, PathGrid>& a_star_grid)
 {
     PathGrid curr = goal;
     do
     {
         pos.emplace_back(glm::vec3(curr.x * 32, curr.y * 32, 0));
-        curr = a_star_grid[curr];
+        curr = a_star_grid.at(curr);
     } while (curr != start);
 }
 
 bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss)
 {
     int SIZE_OF_GRID = 32;
+    robin_hood::unordered_flat_map<PathGrid, PathGrid> a_star_grid{};
+    robin_hood::unordered_flat_map<PathGrid, int> a_star_cost{};
     auto start_grid = world_to_grid(start_vec, SIZE_OF_GRID);
     auto goal_grid  = world_to_grid(goal_vec, SIZE_OF_GRID);
     PathGrid start{start_grid.x, start_grid.y};
@@ -50,7 +53,7 @@ bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec
         open.pop();
         if (curr == goal)
         {
-            reconstruct_path(start, goal, poss);
+            reconstruct_path(start, goal, poss, a_star_grid);
             return true;
         }
         PathGrid next{};
