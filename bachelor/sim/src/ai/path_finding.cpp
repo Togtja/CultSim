@@ -54,15 +54,20 @@ bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec
             return true;
         }
         PathGrid next{};
-        // TODO: Improve by first checking in the heuristic direction
-        auto max = PathGrid{curr.x + 1, curr.y + 1};
-        auto min = PathGrid{curr.x - 1, curr.y - 1};
-        for (int x = min.x; x < max.x; x++)
+
+        const auto max = PathGrid{curr.x + 1, curr.y + 1};
+        const auto min = PathGrid{curr.x - 1, curr.y - 1};
+
+        for (int x = min.x; x <= max.x; x++)
         {
-            for (int y = min.y; y < max.y; y++)
+            for (int y = min.y; y <= max.y; y++)
             {
-                next.x       = x;
-                next.y       = y;
+                next.x = x;
+                next.y = y;
+                if (next == curr)
+                {
+                    continue;
+                }
                 int new_cost = a_star_cost[curr] + 1; // + cost of graph node needs to be computed
                 if (a_star_cost.find(next) == a_star_cost.end() || new_cost < a_star_cost[next])
                 {
