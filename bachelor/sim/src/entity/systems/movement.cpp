@@ -1,10 +1,12 @@
 #include "movement.h"
+#include "ai/path_finding.h"
 #include "entity/components/components.h"
 
 #include <execution>
 #include <random>
 
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
@@ -27,11 +29,18 @@ void Movement::update(float dt)
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
         if (glm::distance(pos.position, cur_head) < 5.f)
         {
-            mov.desired_position.pop_back();
             if (mov.desired_position.empty())
+                mov.desired_position.pop_back();
             {
                 // Arrived at final destination
-                mov.desired_position.push_back({rng(seed) * 1500.f, rng(seed) * 1500.f, 0.f});
+                if (path_finding2(pos.position, glm::vec2(rng(seed) * 1500.f, rng(seed) * 1500.f), mov.desired_position))
+                {
+                    spdlog::info("Pathfinding success");
+                }
+                else
+                {
+                    spdlog::critical("Could not find path");
+                }
             }
         }
     });
