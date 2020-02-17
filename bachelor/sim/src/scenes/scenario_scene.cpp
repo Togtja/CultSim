@@ -27,7 +27,7 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, tags::TAG_Food};
+    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
 
     action::Action action{static_cast<std::string>("eat"),
                           std::vector<std::unique_ptr<action::IRequirement>>{},
@@ -38,7 +38,7 @@ void ScenarioScene::on_enter()
                               spdlog::warn("We failed to finish action: eat");
                           }};
     action.requirements.emplace_back(
-        new action::LocationRequirement("Goto", m_registry, glm::vec3(20.f, 20.f, 20.f), m_dispatcher));
+        new action::LocationRequirement("Goto", m_registry, glm::vec3(200.f, 200.f, 0.f), m_dispatcher));
 
     ai::Strategy strategy = {static_cast<std::string>("eat food"),
                              0,
