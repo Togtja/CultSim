@@ -26,7 +26,7 @@ void reconstruct_path(const glm::ivec2& start,
     } while (curr != start);
 }
 
-bool path_finding2(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss)
+bool path_finding(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss)
 {
     int SIZE_OF_GRID = 32;
     robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
