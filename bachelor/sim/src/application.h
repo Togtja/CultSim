@@ -62,12 +62,12 @@ private:
 
     bool init_lua();
 
-    bool init_preferences();
-
     /**
      * Initialize OpenGL, SDL and the Window
      */
     bool init_gl();
+
+    bool init_preferences();
 
     /**
      * Initialize ImGui so we can use it to draw Debug GUI's

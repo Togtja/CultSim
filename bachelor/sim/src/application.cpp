@@ -92,8 +92,8 @@ bool Application::init(const std::vector<char*>& args)
     return init_subsystem(&Application::init_physfs, "PhysFS", args) &&     // Init PhysFS
            init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_lua, "Lua") &&                 // Init Lua
-           init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
            init_subsystem(&Application::init_gl, "OpenGL") &&               // Init OpenGL
+           init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
            init_subsystem(&Application::init_imgui, "ImGui");               // Init ImGui
 }
 
@@ -145,12 +145,6 @@ bool Application::init_lua()
     return true;
 }
 
-bool Application::init_preferences()
-{
-    m_preferences.init();
-    return true;
-}
-
 bool Application::init_gl()
 {
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
@@ -180,6 +174,12 @@ bool Application::init_gl()
     gfx::create_debug_callback();
 #endif
 
+    return true;
+}
+
+bool Application::init_preferences()
+{
+    m_preferences.init();
     return true;
 }
 

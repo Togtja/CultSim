@@ -97,9 +97,9 @@ void PreferenceManager::load_from_lua()
     m_lua.script(script);
 
     sol::table preferences = m_lua["preferences"];
+    set_resolution({preferences.get<std::vector<int>>("Resolution")[0], preferences.get<std::vector<int>>("Resolution")[1]});
     set_fullscreen(preferences.get<bool>("Fullscreen"));
     set_language(preferences.get<std::string>("Language"));
-    set_resolution({preferences.get<std::vector<int>>("Resolution")[0], preferences.get<std::vector<int>>("Resolution")[1]});
 }
 
 std::string PreferenceManager::write_preference(const Preference& preference)
