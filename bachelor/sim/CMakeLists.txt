@@ -22,6 +22,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/entity/systems/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/filesystem/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/scenes/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/ai/CMakeLists.txt)
 
 
 # Discover tests written by the executable
