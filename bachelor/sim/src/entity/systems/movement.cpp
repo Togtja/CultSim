@@ -20,7 +20,7 @@ void Movement::update(float dt)
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto view = m_registry.group<component::Movement, component::Position>();
-    view.each([dt, &rng](component::Movement& mov, component::Position& pos) {
+    view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         // Will Never trigger as the code is now
         // if (pos.desired_position.empty())
         //{
@@ -36,7 +36,7 @@ void Movement::update(float dt)
             if (mov.desired_position.empty())
             {
                 // Arrived at final destination
-                m_dispatcher.enqueue(event::ArrivedAtDestination{e, pos.desired_position});
+                m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
                 mov.desired_position.push_back({rng(seed) * 1500.f, rng(seed) * 1500.f, 0.f});
             }
         }
