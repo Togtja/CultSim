@@ -24,7 +24,7 @@ public:
         m_dispatcher(dispatcher){};
     ~LocationRequirement();
 
-    void init() override;
+    void init(entt::entity entity) override;
 
     IRequirement* clone() override;
     void event_listener(const event::ArrivedAtDestination& event);
