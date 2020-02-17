@@ -12,7 +12,7 @@ struct Action
 {
     std::string name{};
 
-    std::vector<IRequirement*> requirements{};
+    std::vector<std::unique_ptr<IRequirement>> requirements{};
 
     float time_to_complete{};
     float time_spent{};

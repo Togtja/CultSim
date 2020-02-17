@@ -31,7 +31,7 @@ void ScenarioScene::on_enter()
     action::LocationRequirement moveto_requirement{static_cast<std::string>("Goto"), m_registry, glm::vec3(20.f,20.f,20.f),m_dispatcher};
 
     action::Action action{static_cast<std::string>("eat"),
-                          std::vector<action::IRequirement*>{},
+                          std::vector<std::unique_ptr<action::IRequirement>>{std::make_unique<action::LocationRequirement>(moveto_requirement)},
                           5.f,
                           0.f,
                           {},
@@ -39,7 +39,7 @@ void ScenarioScene::on_enter()
                           []() {
                               spdlog::warn("We failed to finish action: eat");
                           }};
-    ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>({action})};
+    ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>{std::move(action)}};
 
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
@@ -55,9 +55,9 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>({need}), std::vector<ai::Need>({}));
-        m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>({}));
-        m_registry.assign<component::Requirement>(agent, std::vector<action::IRequirement*>({}));
+        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
+        m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
+        m_registry.assign<component::Requirement>(agent, std::vector<std::unique_ptr<action::IRequirement>>{});
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 

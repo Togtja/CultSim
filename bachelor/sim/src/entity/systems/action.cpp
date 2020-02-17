@@ -7,7 +7,6 @@
 
 namespace cs::system
 {
-
 void Action::update(float dt)
 {
     auto view = m_registry.view<component::Strategies, component::Requirement>();
@@ -22,8 +21,8 @@ void Action::update(float dt)
                     if (!action.requirements.empty())
                     {
                         spdlog::warn("Pushing back requirement {}", action.requirements.back()->name);
-                        requirements.staged_requirements.push_back(action.requirements.back());
-                        action.requirements.back()->init();
+                        requirements.staged_requirements.push_back(std::move(action.requirements.back()));
+                        requirements.staged_requirements.back()->init();
                         action.requirements.pop_back();
                     }
                     else
@@ -58,5 +57,4 @@ void Action::update(float dt)
         }
     });
 }
-
 } // namespace cs::system

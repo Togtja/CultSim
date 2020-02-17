@@ -11,8 +11,7 @@ class Action : public ISystem
 private:
 
 public:
-    Action(entt::registry& registry);
-
+    using ISystem::ISystem;
 
     void update(float dt) override;
 
