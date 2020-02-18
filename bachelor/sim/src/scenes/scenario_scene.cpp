@@ -99,6 +99,11 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
+    for (int i = -5; i <= 5; i++)
+    {
+        gfx::get_renderer().debug().draw_line(glm::vec3(-32 * 5, i * 32, 0), glm::vec3(32 * 5, i * 32, 0), glm::vec3(1, 0.5f, 1));
+        gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * 5, 0), glm::vec3(i * 32, 32 * 5, 0), glm::vec3(1, 0.5f, 1));
+    }
     return false;
 }
 
