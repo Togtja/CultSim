@@ -14,6 +14,7 @@ Renderer::~Renderer() noexcept
 {
     VK_CHECK(vkDeviceWaitIdle(m_device));
     m_sprite_renderer.deinit();
+    vmaDestroyAllocator(m_allocator);
 
     for (auto view : m_swapchain_views)
     {
@@ -66,6 +67,16 @@ void Renderer::init(const Window& window)
     create_instance(window);
     create_device();
     create_swapchain(window);
+
+    /** Create Allocator */
+    VmaAllocatorCreateInfo allocator_create_info{};
+    allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_1;
+    allocator_create_info.instance         = m_instance;
+    allocator_create_info.device           = m_device;
+    allocator_create_info.physicalDevice   = m_pdevice;
+
+    VK_CHECK(vmaCreateAllocator(&allocator_create_info, &m_allocator));
+    assert(m_allocator);
 
     m_sprite_renderer.init({m_swapchain, m_swapchain_images, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue});
 }

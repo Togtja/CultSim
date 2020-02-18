@@ -101,6 +101,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     m_swapchain = create_info.swapchain;
     m_sc_images = create_info.sc_images;
     m_gfx_queue = create_info.gfx_queue;
+    m_allocator = create_info.allocator;
 
     /** Create render pass and frame buffers */
     m_renderpass = vk::create_render_pass(m_device, create_info.sc_format);

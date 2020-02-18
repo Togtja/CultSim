@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include <vma.h>
 #include <volk.h>
 
 namespace cs::gfx
@@ -21,6 +22,7 @@ struct SpriteRendererCreateInfo
     VkFormat sc_format{VK_FORMAT_UNDEFINED};
     uint32_t gfx_queue_idx{};
     VkQueue gfx_queue{VK_NULL_HANDLE};
+    VmaAllocator allocator{VK_NULL_HANDLE};
 };
 
 class SpriteRenderer
@@ -35,6 +37,8 @@ private:
     std::vector<VkImage> m_sc_images;
 
     VkQueue m_gfx_queue{VK_NULL_HANDLE};
+
+    VmaAllocator m_allocator{VK_NULL_HANDLE};
 
     VkRenderPass m_renderpass{VK_NULL_HANDLE};
 

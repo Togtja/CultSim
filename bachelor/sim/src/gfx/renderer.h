@@ -5,6 +5,7 @@
 #include "sprite_renderer.h"
 #include "window.h"
 
+#include <vma.h>
 #include <volk.h>
 
 namespace cs::gfx
@@ -37,6 +38,8 @@ private:
     std::vector<VkImageView> m_swapchain_views{};
 
     VkSurfaceFormatKHR m_format{};
+
+    VmaAllocator m_allocator{VK_NULL_HANDLE};
 
 public:
     friend Renderer& get_renderer();
