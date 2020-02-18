@@ -6,8 +6,6 @@
 #include <execution>
 #include <random>
 
-#include <spdlog/spdlog.h>
-
 namespace cs::system
 {
 Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
@@ -21,7 +19,6 @@ void Movement::update(float dt)
     std::uniform_real_distribution rng(-1.f, 1.f);
     auto view = m_registry.view<component::Movement, component::Position>();
     view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
-        // Will Never trigger as the code is now
         if (mov.desired_position.empty())
         {
             return;
