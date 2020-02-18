@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include <vma.h>
 #include <volk.h>
 
 namespace cs::vk
@@ -17,6 +18,15 @@ struct ShaderModuleAndStage
 {
     VkShaderModule module{VK_NULL_HANDLE};
     VkShaderStageFlagBits stage{VK_SHADER_STAGE_ALL};
+};
+
+/**
+ * Represents a buffer resource with a memory handle
+ */
+struct Buffer
+{
+    VkBuffer buffer{VK_NULL_HANDLE};
+    VmaAllocation allocation{VK_NULL_HANDLE};
 };
 
 uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
@@ -56,4 +66,6 @@ VkPipeline create_gfx_pipeline(VkDevice device,
                                VkRenderPass render_pass,
                                VkPipelineLayout layout,
                                const std::vector<ShaderModuleAndStage>& shaders);
+
+Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage);
 } // namespace cs::vk

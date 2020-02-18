@@ -356,4 +356,21 @@ VkPipeline create_gfx_pipeline(VkDevice device,
 
     return out;
 }
+
+Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage)
+{
+    VkBufferCreateInfo create_info = {VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};
+    create_info.size               = size;
+    create_info.usage              = buffer_usage;
+    create_info.sharingMode        = VK_SHARING_MODE_EXCLUSIVE;
+
+    VmaAllocationCreateInfo allocation_info{};
+    allocation_info.usage = memory_usage;
+
+    Buffer out{};
+    VK_CHECK(vmaCreateBuffer(allocator, &create_info, &allocation_info, &out.buffer, &out.allocation, nullptr));
+    assert(out.buffer && out.allocation);
+
+    return out;
+}
 } // namespace cs::vk
