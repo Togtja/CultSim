@@ -2,9 +2,7 @@
 
 #include "requirement.h"
 #include "entity/events.h"
-
-#include <string>
-#include <vector>
+#include "entity/components/tags.h"
 
 #include "entt/signal/dispatcher.hpp"
 namespace cs::action
@@ -12,11 +10,11 @@ namespace cs::action
 class VisionRequirement : public IRequirement
 {
 private:
-    std::vector<std::string> m_tags{}; 
+    tags::ETag m_tags{}; 
     entt::dispatcher& m_dispatcher;
 
 public:
-    VisionRequirement(std::string name, entt::registry& registry, std::vector<std::string> tags, entt::dispatcher& dispatcher) :
+    VisionRequirement(std::string name, entt::registry& registry, tags::ETag tags, entt::dispatcher& dispatcher) :
         IRequirement(std::move(name), registry),
         m_tags(tags),
         m_dispatcher(dispatcher){};
