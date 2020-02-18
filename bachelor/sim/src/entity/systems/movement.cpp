@@ -22,6 +22,10 @@ void Movement::update(float dt)
 
     auto view = m_registry.view<component::Position, component::Movement>();
     view.each([dt, &rng, this](entt::entity e, component::Position& pos, component::Movement& mov) {
+        if (pos.position == pos.desired_position) 
+        {
+            return;
+        }
         glm::vec3 temp = pos.desired_position - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);

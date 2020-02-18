@@ -11,7 +11,7 @@ void Action::update(float dt)
 {
     auto view = m_registry.view<component::Strategies, component::Requirement>();
     view.each([this, dt](entt::entity e, component::Strategies& strategies, component::Requirement& requirements) {
-        if (requirements.staged_requirements.empty())
+        if (requirements.staged_requirements.empty() && !strategies.staged_strategies.empty())
         {
             for (auto& strategy : strategies.staged_strategies)
             {
@@ -24,6 +24,7 @@ void Action::update(float dt)
                         requirements.staged_requirements.push_back(std::move(action.requirements.back()));
                         requirements.staged_requirements.back()->init(e);
                         action.requirements.pop_back();
+                        break;
                     }
                     else
                     {
@@ -42,12 +43,17 @@ void Action::update(float dt)
                                 action.failure();
                             }
                             strategy.actions.pop_back();
+                            break;
                         }
                     }
                 }
+                else
+                {
+                    continue;
+                }
             }
         }
-        else
+        else if (!requirements.staged_requirements.empty())
         {
             if (requirements.staged_requirements.back()->predicate)
             {

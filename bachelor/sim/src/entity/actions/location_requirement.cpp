@@ -24,7 +24,7 @@ IRequirement* LocationRequirement::clone()
 }
 void LocationRequirement::event_listener(const event::ArrivedAtDestination& event)
 {
-    if (event.entity == owner && cs::close_enough(event.position, m_desired_pos, 5.f))
+    if (event.entity == owner && cs::close_enough(event.position, m_desired_pos, 10.f))
     {
         predicate = true;
     }
