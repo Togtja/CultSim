@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common_helpers.h"
 #include "gfx/window.h"
 #include "l10n/lang_manager.h"
 
@@ -12,6 +13,7 @@
 #include "robin_hood.h"
 #include <entt/signal/sigh.hpp>
 #include <glm/vec2.hpp>
+#include <sol/state_view.hpp>
 
 namespace cs
 {
@@ -28,6 +30,15 @@ struct Preference
     PreferenceVariant value{};
 };
 
+/** Helper for creating visitors efficiently */
+template<class... Ts>
+struct Overloaded : Ts...
+{
+    using Ts::operator()...;
+};
+template<class... Ts>
+Overloaded(Ts...)->Overloaded<Ts...>;
+
 /**
  * General store and management for changing preferences in the application
  *
@@ -37,8 +48,12 @@ struct Preference
 class PreferenceManager
 {
 private:
+    Locale m_locale;
+
     /** Application window */
     Window& m_window;
+
+    sol::state_view m_lua;
 
     /** Window resolution */
     Preference m_resolution{"Resolution", "The resolution of your game window", glm::ivec2{1280, 720}};
@@ -55,10 +70,20 @@ private:
     entt::sigh<void(const Preference&, const Preference&)> m_preference_changed{};
 
 public:
-    explicit PreferenceManager(Window& window);
-    explicit PreferenceManager(Window& window, std::string_view from_file);
+    explicit PreferenceManager(Window& window, sol::state_view lua_state);
+    explicit PreferenceManager(Window& window, sol::state_view lua_state, std::string_view from_file);
 
     void show_debug_ui();
+
+    /**
+     * Initialize and load preferences
+     */
+    void init();
+
+    /**
+     * Deinitialize and save preferences
+     */
+    void deinit();
 
     /**
      * Sink for subscribing to preference changes
@@ -78,5 +103,32 @@ public:
     [[nodiscard]] const Preference& get_language() const;
 
     void set_language(std::string_view language);
+
+    /**
+     * Get a string from the current locale
+     *
+     * @param id The key of the string to get from the locale
+     * @return The string in the current locale
+     */
+    std::string_view get_string(std::string_view id);
+
+private:
+    /**
+     * Load preferences from lua file
+     */
+    void load_from_lua();
+
+    /**
+     * Writes the preference to a valid line for used in save_to_lua
+     *
+     * @param preference The Preference to serialize
+     * @return The preference set as a lua variable
+     */
+    std::string write_preference(const Preference& preference);
+
+    /**
+     * Save preferences to lua file
+     */
+    void save_to_lua();
 };
 } // namespace cs

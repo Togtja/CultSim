@@ -111,7 +111,34 @@ struct Strategies
 
 struct Requirement
 {
-    std::vector<action::Requirement> staged_requirements{};
+    std::vector<std::unique_ptr<action::IRequirement>> staged_requirements{};
+
+    Requirement()  = default;
+    ~Requirement() = default;
+    Requirement(const Requirement& other)
+    {
+        for (const auto& staged_requirement : other.staged_requirements)
+        {
+            auto requirement = staged_requirement->clone();
+            staged_requirements.emplace_back(requirement);
+        }
+    }
+    Requirement& operator=(const Requirement& rhs)
+    {
+        if (this == &rhs)
+        {
+            return *this;
+        }
+
+        staged_requirements.clear();
+        for (const auto& staged_requirement : rhs.staged_requirements)
+        {
+            auto requirement = staged_requirement->clone();
+            staged_requirements.emplace_back(requirement);
+        }
+
+        return *this;
+    }
 };
 
 struct Tags

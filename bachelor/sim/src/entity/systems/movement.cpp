@@ -37,14 +37,6 @@ void Movement::update(float dt)
             {
                 // Arrived at final destination
                 m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
-                if (path_finding(pos.position, glm::vec2(rng(seed) * 1500.f, rng(seed) * 1500.f), mov.desired_position))
-                {
-                    spdlog::info("Pathfinding success");
-                }
-                else
-                {
-                    spdlog::critical("Could not find path");
-                }
             }
         }
     });
