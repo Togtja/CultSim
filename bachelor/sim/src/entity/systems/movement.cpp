@@ -22,6 +22,10 @@ void Movement::update(float dt)
 
     auto view = m_registry.view<component::Position, component::Movement>();
     view.each([dt, &rng, this](entt::entity e, component::Position& pos, component::Movement& mov) {
+        if (pos.position == pos.desired_position) 
+        {
+            return;
+        }
         glm::vec3 temp = pos.desired_position - pos.position;
         mov.direction  = glm::normalize(temp);
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
@@ -29,7 +33,6 @@ void Movement::update(float dt)
         if (glm::distance(pos.position, pos.desired_position) < 10.f)
         {
             m_dispatcher.enqueue(event::ArrivedAtDestination{e, pos.desired_position});
-            pos.desired_position = {rng(seed) * 150.f, rng(seed) * 150.f, 0.f};
         }
     });
 }
