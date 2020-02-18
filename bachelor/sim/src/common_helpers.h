@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include "glm/gtc/epsilon.hpp"
+#include "glm/glm.hpp"
 
 #include <sol/state_view.hpp>
 
@@ -28,5 +30,11 @@ inline unsigned count_set_bits(uint64_t x)
         x >>= 1u;
     }
     return sum;
+}
+
+inline bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
+{
+    glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
+    return boolvec.x && boolvec.y;
 }
 } // namespace cs

@@ -5,4 +5,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/requirement.h
 
+        ${CMAKE_CURRENT_LIST_DIR}/location_requirement.h
+        ${CMAKE_CURRENT_LIST_DIR}/location_requirement.cpp
+
 )

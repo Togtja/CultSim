@@ -7,21 +7,11 @@
 
 namespace cs::system
 {
-Action::Action(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
-{
-    m_dispatcher.sink<event::ArrivedAtDestination>().connect<&Action::respond_arrive>(this);
-}
-
-Action::~Action() noexcept
-{
-    m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&Action::respond_arrive>(this);
-}
-
 void Action::update(float dt)
 {
     auto view = m_registry.view<component::Strategies, component::Requirement>();
-    view.each([this, dt](component::Strategies& strategies, component::Requirement& requirements) {
-        if (requirements.staged_requirements.empty())
+    view.each([this, dt](entt::entity e, component::Strategies& strategies, component::Requirement& requirements) {
+        if (requirements.staged_requirements.empty() && !strategies.staged_strategies.empty())
         {
             for (auto& strategy : strategies.staged_strategies)
             {
@@ -30,10 +20,11 @@ void Action::update(float dt)
                     auto& action = strategy.actions.back();
                     if (!action.requirements.empty())
                     {
-                        spdlog::warn("Pushing back requirement {}", action.requirements.back().name);
-                        requirements.staged_requirements.push_back(action.requirements.back());
-                        action.requirements.back().init();
+                        spdlog::warn("Pushing back requirement {}", action.requirements.back()->name);
+                        requirements.staged_requirements.push_back(std::move(action.requirements.back()));
+                        requirements.staged_requirements.back()->init(e);
                         action.requirements.pop_back();
+                        break;
                     }
                     else
                     {
@@ -52,24 +43,24 @@ void Action::update(float dt)
                                 action.failure();
                             }
                             strategy.actions.pop_back();
+                            break;
                         }
                     }
                 }
+                else
+                {
+                    continue;
+                }
             }
         }
-        else
+        else if (!requirements.staged_requirements.empty())
         {
-            spdlog::error("We are in the requirements");
-            if (requirements.staged_requirements.back().predicate())
+            if (requirements.staged_requirements.back()->predicate)
             {
+                spdlog::error("Predicate = true");
                 requirements.staged_requirements.pop_back();
             }
         }
     });
-}
-
-void Action::respond_arrive(const event::ArrivedAtDestination& data)
-{
-    spdlog::info("{} arrived at X:{} Y:{}", static_cast<uint32_t>(data.entity), data.position.x, data.position.y);
 }
 } // namespace cs::system
