@@ -1,10 +1,11 @@
 #include "location_requirement.h"
+#include "ai/path_finding.h"
 #include "common_helpers.h"
 #include "entity/components/components.h"
+
+#include <spdlog/spdlog.h>
 namespace cs::action
 {
-
-
 LocationRequirement::~LocationRequirement()
 {
     m_dispatcher.sink<event::ArrivedAtDestination>().disconnect<&LocationRequirement::event_listener>(this);
@@ -12,9 +13,13 @@ LocationRequirement::~LocationRequirement()
 
 void LocationRequirement::init(entt::entity entity)
 {
-    owner                = entity;
-    auto& pos             = m_registry.get<component::Position>(owner);
-    pos.desired_position = m_desired_pos;
+    owner     = entity;
+    auto& mov = m_registry.get<component::Movement>(owner);
+    auto& pos = m_registry.get<component::Position>(owner);
+    if (!path_finding(pos.position, m_desired_pos, mov.desired_position))
+    {
+        spdlog::warn("failed to find path");
+    }
     m_dispatcher.sink<event::ArrivedAtDestination>().connect<&LocationRequirement::event_listener>(this);
 }
 IRequirement* LocationRequirement::clone()

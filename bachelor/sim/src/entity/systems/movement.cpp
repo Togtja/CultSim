@@ -22,10 +22,10 @@ void Movement::update(float dt)
     auto view = m_registry.view<component::Movement, component::Position>();
     view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         // Will Never trigger as the code is now
-        // if (pos.desired_position.empty())
-        //{
-        //    return;
-        //}
+        if (mov.desired_position.empty())
+        {
+            return;
+        }
         auto cur_head  = mov.desired_position.back();
         glm::vec3 temp = cur_head - pos.position;
         mov.direction  = glm::normalize(temp);
