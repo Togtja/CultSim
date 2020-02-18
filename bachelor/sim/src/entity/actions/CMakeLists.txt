@@ -8,4 +8,7 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/location_requirement.h
         ${CMAKE_CURRENT_LIST_DIR}/location_requirement.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/vision_requirement.h
+        ${CMAKE_CURRENT_LIST_DIR}/vision_requirement.cpp
+
 )
