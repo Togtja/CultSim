@@ -2,15 +2,30 @@
 
 #include <cstdint>
 
+#include <sol/state_view.hpp>
+
 namespace cs
 {
-int count_set_bits(uint64_t x)
+class SceneManager;
+class PreferenceManager;
+
+/**
+ * The application context struct give other sections of the program access to application wide data
+ */
+struct ApplicationContext
 {
-    int sum{};
+    sol::state_view lua_state;
+    SceneManager* scene_manager{nullptr};
+    PreferenceManager* preferences{nullptr};
+};
+
+inline unsigned count_set_bits(uint64_t x)
+{
+    unsigned sum{};
     while (x != 0)
     {
-        sum += x & 1;
-        x >>= 1;
+        sum += x & 1u;
+        x >>= 1u;
     }
     return sum;
 }

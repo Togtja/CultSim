@@ -1,8 +1,8 @@
 -- Lua configuration file for the application
 
 preferences = {
-    resolution = { 1280, 720 },
-    fullscreen = false,
-    language = "en",
+    Resolution = { 1280, 720 },
+    Fullscreen = false,
+    Language = "en",
     savedVariables = {}
 }
