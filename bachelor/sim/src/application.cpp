@@ -71,8 +71,8 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    m_scene_manager.draw();
     m_window.clear();
+    m_scene_manager.draw();
 
     auto& r = gfx::get_renderer();
     r.sprite().display();
