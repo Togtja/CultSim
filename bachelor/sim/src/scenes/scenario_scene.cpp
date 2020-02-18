@@ -11,7 +11,9 @@
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
 #include "gfx/renderer.h"
+#include "preferences.h"
 
+#include <common_helpers.h>
 #include <functional>
 #include <memory>
 #include <random>
@@ -21,6 +23,11 @@
 
 namespace cs
 {
+static void response(const Preference& before, const Preference& after)
+{
+    spdlog::info("preference changed [{}]", before.name);
+}
+
 ScenarioScene::ScenarioScene(std::string_view scenario)
 {
 }
@@ -73,10 +80,13 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
+
+    m_context->preferences->on_preference_changed.connect<&response>();
 }
 
 void ScenarioScene::on_exit()
 {
+    m_context->preferences->on_preference_changed.disconnect<&response>();
 }
 
 bool ScenarioScene::update(float dt)
