@@ -45,6 +45,7 @@ target_link_libraries(
         ${EXEC_NAME}
         PRIVATE
         Vulkan::Vulkan
+        vma::vma
         volk
         $<$<PLATFORM_ID:Linux>:dl>
         ${PHYSFS_LIBRARY}
