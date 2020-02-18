@@ -5,7 +5,7 @@
 #include "sprite_renderer.h"
 #include "window.h"
 
-#include <vma.h>
+#include "vma.h"
 #include <volk.h>
 
 namespace cs::gfx

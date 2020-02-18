@@ -2,11 +2,12 @@
 
 #include "camera.h"
 #include "render_data.h"
+#include "vkutil.h"
 
 #include <string_view>
 #include <vector>
 
-#include <vma.h>
+#include "vma.h"
 #include <volk.h>
 
 namespace cs::gfx
@@ -53,6 +54,8 @@ private:
     VkSemaphore m_aq_sem{VK_NULL_HANDLE};
 
     VkSemaphore m_rel_sem{VK_NULL_HANDLE};
+
+    vk::Buffer m_instance_buffer{};
 
     /** Pointer to GPU memory where the instance variables are */
     SpriteInstanceVertex* m_instance_data{};

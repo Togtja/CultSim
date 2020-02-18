@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <vma.h>
+#include "vma.h"
 #include <volk.h>
 
 namespace cs::vk
@@ -27,6 +27,7 @@ struct Buffer
 {
     VkBuffer buffer{VK_NULL_HANDLE};
     VmaAllocation allocation{VK_NULL_HANDLE};
+    void* data = nullptr;
 };
 
 uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
@@ -67,5 +68,9 @@ VkPipeline create_gfx_pipeline(VkDevice device,
                                VkPipelineLayout layout,
                                const std::vector<ShaderModuleAndStage>& shaders);
 
+VmaAllocator create_allocator(VkInstance instance, VkDevice device, VkPhysicalDevice pdevice);
+
 Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage);
+
+void destroy_buffer(VmaAllocator allocator, const Buffer& buffer);
 } // namespace cs::vk

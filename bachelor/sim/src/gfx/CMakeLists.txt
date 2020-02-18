@@ -14,6 +14,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.h
         ${CMAKE_CURRENT_LIST_DIR}/sprite_renderer.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/vma.h
+        ${CMAKE_CURRENT_LIST_DIR}/vma.cpp
+
         ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.h
         ${CMAKE_CURRENT_LIST_DIR}/debug_renderer.cpp
 

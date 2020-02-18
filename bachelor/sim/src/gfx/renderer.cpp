@@ -68,17 +68,10 @@ void Renderer::init(const Window& window)
     create_device();
     create_swapchain(window);
 
-    /** Create Allocator */
-    VmaAllocatorCreateInfo allocator_create_info{};
-    allocator_create_info.vulkanApiVersion = VK_API_VERSION_1_1;
-    allocator_create_info.instance         = m_instance;
-    allocator_create_info.device           = m_device;
-    allocator_create_info.physicalDevice   = m_pdevice;
+    m_allocator = vk::create_allocator(m_instance, m_device, m_pdevice);
 
-    VK_CHECK(vmaCreateAllocator(&allocator_create_info, &m_allocator));
-    assert(m_allocator);
-
-    m_sprite_renderer.init({m_swapchain, m_swapchain_images, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue});
+    m_sprite_renderer.init(
+        {m_swapchain, m_swapchain_images, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue, m_allocator});
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)
@@ -107,6 +100,7 @@ void Renderer::create_instance(const Window& window)
 
     std::vector<const char*> extensions(ext_count);
     SDL_Vulkan_GetInstanceExtensions(window.get(), &ext_count, extensions.data());
+    extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
     instance_info.ppEnabledExtensionNames = extensions.data();
     instance_info.enabledExtensionCount   = ext_count;
@@ -163,7 +157,9 @@ void Renderer::create_device()
     queue_info.queueCount              = 1;
     queue_info.pQueuePriorities        = priorities;
 
-    const char* extensions[] = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    std::vector<const char*> extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    extensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
+    extensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
 
     VkPhysicalDeviceFeatures features{};
     features.wideLines         = VK_TRUE;
@@ -172,8 +168,8 @@ void Renderer::create_device()
     VkDeviceCreateInfo create_info      = {VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
     create_info.pQueueCreateInfos       = &queue_info;
     create_info.queueCreateInfoCount    = 1;
-    create_info.ppEnabledExtensionNames = extensions;
-    create_info.enabledExtensionCount   = 1;
+    create_info.ppEnabledExtensionNames = extensions.data();
+    create_info.enabledExtensionCount   = extensions.size();
     create_info.pEnabledFeatures        = &features;
 
     VK_CHECK(vkCreateDevice(m_pdevice, &create_info, nullptr, &m_device));

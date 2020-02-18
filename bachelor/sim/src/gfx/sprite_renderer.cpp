@@ -14,7 +14,7 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
-    // m_instance_data[m_nsprites++] = {pos, color, tex};
+    reinterpret_cast<SpriteInstanceVertex*>(m_instance_buffer.data)[m_nsprites++] = {pos, color, tex};
 }
 
 void SpriteRenderer::display()
@@ -46,8 +46,11 @@ void SpriteRenderer::display()
     VkRect2D scissor{{0, 0}, {1280, 720}};
     vkCmdSetScissor(cbuf, 0, 1, &scissor);
 
+    VkDeviceSize offsets[] = {0};
+
     vkCmdBindPipeline(cbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-    vkCmdDraw(cbuf, 6, 1, 0, 0);
+    vkCmdBindVertexBuffers(cbuf, 0, 1, &m_instance_buffer.buffer, offsets);
+    vkCmdDraw(cbuf, 6, m_nsprites, 0, 0);
 
     vkCmdEndRenderPass(cbuf);
 
@@ -116,6 +119,15 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     m_cmd_pool = vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
 
     init_pipeline();
+
+    m_instance_buffer = vk::create_buffer(m_allocator,
+                                          sizeof(SpriteInstanceVertex) * SIM_MAX_AGENTS,
+                                          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                          VMA_MEMORY_USAGE_CPU_ONLY);
+
+    VK_CHECK(vmaMapMemory(m_allocator, m_instance_buffer.allocation, &m_instance_buffer.data));
+    assert(m_instance_buffer.data);
+
     init_texture_slots();
 }
 
@@ -138,6 +150,8 @@ void SpriteRenderer::init_pipeline()
 
 void SpriteRenderer::deinit()
 {
+    vk::destroy_buffer(m_allocator, m_instance_buffer);
+
     vkDestroyPipeline(m_device, m_pipeline, nullptr);
     vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
     vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);

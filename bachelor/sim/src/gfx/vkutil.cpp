@@ -2,8 +2,6 @@
 #include "filesystem/filesystem.h"
 #include "render_data.h"
 
-#include <spdlog/spdlog.h>
-
 namespace cs::vk
 {
 uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags)
@@ -275,11 +273,12 @@ VkPipeline create_gfx_pipeline(VkDevice device,
     }
 
     /** Vertex Inputs */
-    std::vector<VkVertexInputBindingDescription> vertex_bindings{};
-    //{0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
-    std::vector<VkVertexInputAttributeDescription> vertex_attributes{}; /*{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                      {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                      {2, 0, VK_FORMAT_R32_UINT}};*/
+    std::vector<VkVertexInputBindingDescription> vertex_bindings{
+        {0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
+
+    std::vector<VkVertexInputAttributeDescription> vertex_attributes{{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                     {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
+                                                                     {2, 0, VK_FORMAT_R32_UINT}};
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     vertex_input_info.vertexBindingDescriptionCount        = vertex_bindings.size();
@@ -355,6 +354,52 @@ VkPipeline create_gfx_pipeline(VkDevice device,
     assert(out);
 
     return out;
+} // namespace cs::vk
+
+VmaAllocator create_allocator(VkInstance instance, VkDevice device, VkPhysicalDevice pdevice)
+{
+    VolkDeviceTable function_table{};
+    volkLoadDeviceTable(&function_table, device);
+
+    /** Create Allocator */
+    VmaVulkanFunctions vulkan_functions{};
+    vulkan_functions.vkBindBufferMemory                = function_table.vkBindBufferMemory;
+    vulkan_functions.vkBindBufferMemory2KHR            = function_table.vkBindBufferMemory2KHR;
+    vulkan_functions.vkBindImageMemory2KHR             = function_table.vkBindImageMemory2KHR;
+    vulkan_functions.vkBindImageMemory                 = function_table.vkBindImageMemory;
+    vulkan_functions.vkAllocateMemory                  = function_table.vkAllocateMemory;
+    vulkan_functions.vkDestroyBuffer                   = function_table.vkDestroyBuffer;
+    vulkan_functions.vkFreeMemory                      = function_table.vkFreeMemory;
+    vulkan_functions.vkCmdCopyBuffer                   = function_table.vkCmdCopyBuffer;
+    vulkan_functions.vkCreateBuffer                    = function_table.vkCreateBuffer;
+    vulkan_functions.vkCreateImage                     = function_table.vkCreateImage;
+    vulkan_functions.vkMapMemory                       = function_table.vkMapMemory;
+    vulkan_functions.vkUnmapMemory                     = function_table.vkUnmapMemory;
+    vulkan_functions.vkGetBufferMemoryRequirements     = function_table.vkGetBufferMemoryRequirements;
+    vulkan_functions.vkGetBufferMemoryRequirements2KHR = function_table.vkGetBufferMemoryRequirements2KHR;
+    vulkan_functions.vkGetImageMemoryRequirements      = function_table.vkGetImageMemoryRequirements;
+    vulkan_functions.vkGetImageMemoryRequirements2KHR  = function_table.vkGetImageMemoryRequirements2KHR;
+    vulkan_functions.vkFlushMappedMemoryRanges         = function_table.vkFlushMappedMemoryRanges;
+    vulkan_functions.vkInvalidateMappedMemoryRanges    = function_table.vkInvalidateMappedMemoryRanges;
+    vulkan_functions.vkDestroyImage                    = function_table.vkDestroyImage;
+    vulkan_functions.vkGetPhysicalDeviceProperties =
+        (PFN_vkGetPhysicalDeviceProperties)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceProperties");
+    vulkan_functions.vkGetPhysicalDeviceMemoryProperties =
+        (PFN_vkGetPhysicalDeviceMemoryProperties)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceMemoryProperties");
+    vulkan_functions.vkGetPhysicalDeviceMemoryProperties2KHR =
+        (PFN_vkGetPhysicalDeviceMemoryProperties2KHR)vkGetInstanceProcAddr(instance, "vkGetPhysicalDeviceMemoryProperties2KHR");
+
+    VmaAllocatorCreateInfo allocator_create_info{};
+    allocator_create_info.instance         = instance;
+    allocator_create_info.device           = device;
+    allocator_create_info.physicalDevice   = pdevice;
+    allocator_create_info.pVulkanFunctions = &vulkan_functions;
+
+    VmaAllocator out{VK_NULL_HANDLE};
+    VK_CHECK(vmaCreateAllocator(&allocator_create_info, &out));
+    assert(out);
+
+    return out;
 }
 
 Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage)
@@ -372,5 +417,10 @@ Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buf
     assert(out.buffer && out.allocation);
 
     return out;
+}
+
+void destroy_buffer(VmaAllocator allocator, const Buffer& buffer)
+{
+    vmaDestroyBuffer(allocator, buffer.buffer, buffer.allocation);
 }
 } // namespace cs::vk

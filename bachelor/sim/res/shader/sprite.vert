@@ -20,9 +20,9 @@ vec2(0.f, 0.f)
 };
 
 /** Per Instance Attributes */
-//layout(location = 0) in vec3 a_offset;
-//layout(location = 1) in vec3 a_color;
-//layout(location = 2) in uint a_texture;// TODO: Make it 16 bit if we can (and messure)
+layout(location = 0) in vec3 a_offset;
+layout(location = 1) in vec3 a_color;
+layout(location = 2) in uint a_texture;// TODO: Make it 16 bit if we can (and messure)
 
 /** Outputs */
 layout(location = 0) out VertexData
@@ -44,5 +44,5 @@ void main()
     vs_out.texcoord = tex_coords[gl_VertexIndex];
     vs_out.texture  = 2u;
 
-    gl_Position =  vec4(positions[gl_VertexIndex], 1.f);//u_projection * (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
+    gl_Position = /*u_projection */ (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
 }
