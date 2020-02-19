@@ -17,6 +17,7 @@ TEST_CASE("attempting to create a key and use it")
     CHECK(success);
     input.clear();
 }
+
 TEST_CASE("attempting to use keybinding after clear")
 {
     auto& input = get_input();
@@ -28,4 +29,23 @@ TEST_CASE("attempting to use keybinding after clear")
     input.clear();
     input.handle_input(SDL_SCANCODE_F12);
     CHECK(times == 2);
+}
+
+TEST_CASE("attemting to use keybinding after unbind")
+{
+    auto& input = get_input();
+    int times1 = 0, times2 = 0;
+    // Binding 2 key to make sure that no other key also get unbinding
+    // AKA somebody just "cleared" all
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F11, [&times1]() { times1++; });
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F12, [&times2]() { times2++; });
+    input.handle_input(SDL_SCANCODE_F11);
+    input.handle_input(SDL_SCANCODE_F12);
+    CHECK(times1 == 1);
+    CHECK(times2 == 1);
+    input.unbind_key(KeyContext::DefaultContext, SDL_SCANCODE_F12);
+    input.handle_input(SDL_SCANCODE_F11);
+    input.handle_input(SDL_SCANCODE_F12);
+    CHECK(times1 == 2);
+    CHECK(times2 == 1);
 }
