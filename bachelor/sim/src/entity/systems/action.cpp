@@ -9,7 +9,7 @@ namespace cs::system
 {
 void Action::update(float dt)
 {
-    auto view = m_registry.view<component::Strategies, component::Requirement>();
+    auto view = m_registry.view<component::Strategies, component::Requirement>(entt::exclude<component::LocationRequirement()>);
     view.each([this, dt](entt::entity e, component::Strategies& strategies, component::Requirement& requirements) {
         if (requirements.staged_requirements.empty() && !strategies.staged_strategies.empty())
         {
@@ -18,12 +18,13 @@ void Action::update(float dt)
                 if (!strategy.actions.empty())
                 {
                     auto& action = strategy.actions.back();
-                    if (!action.requirements.empty())
+                    if (!action.requirements != 0)
                     {
-                        spdlog::warn("Pushing back requirement {}", action.requirements.back()->name);
-                        requirements.staged_requirements.push_back(std::move(action.requirements.back()));
-                        requirements.staged_requirements.back()->init(e);
-                        action.requirements.pop_back();
+                        spdlog::warn("Pushing back requirement {}", action.requirements);
+                        switch (action.requirements)
+                        {
+                            case tags::TAG_Location: m_registry.assign<component::LocationRequirement>(e, glm::vec3{20.f,20.f,0.f});
+                        }
                         break;
                     }
                     else
@@ -51,14 +52,6 @@ void Action::update(float dt)
                 {
                     continue;
                 }
-            }
-        }
-        else if (!requirements.staged_requirements.empty())
-        {
-            if (requirements.staged_requirements.back()->predicate)
-            {
-                spdlog::error("Predicate = true");
-                requirements.staged_requirements.pop_back();
             }
         }
     });
