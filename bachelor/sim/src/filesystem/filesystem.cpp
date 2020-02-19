@@ -214,15 +214,12 @@ std::vector<std::string> list_directory(std::string_view rpath)
         return {};
     }
     std::vector<std::string> files;
-    auto files_raw = PHYSFS_enumerateFiles(rpath.data());
-    if (files_raw == nullptr)
+    auto* files_raw = PHYSFS_enumerateFiles(rpath.data());
+    for (char** file = files_raw; *file != nullptr; ++file)
     {
-        return {};
+        files.emplace_back(*file);
     }
-    for (char* file = *files_raw; file; file = *++files_raw)
-    {
-        files.emplace_back(file);
-    }
+
     PHYSFS_freeList(files_raw);
     return files;
 }
