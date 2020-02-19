@@ -15,5 +15,6 @@ TEST_CASE("attempting to create a key and use it")
     input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_A, [&success]() { success = true; });
     input.handle_input(SDL_SCANCODE_A);
     CHECK(success);
+    input.clear();
 }
 
