@@ -149,6 +149,10 @@ void ContextHandler::handle_input(const SDL_Scancode event)
     }
     spdlog::debug("could not find anything for the {} event", event);
 }
+bool ContextHandler::has_context(KeyContext context)
+{
+    return m_input_map.contains(context);
+}
 
 void ContextHandler::clear()
 {

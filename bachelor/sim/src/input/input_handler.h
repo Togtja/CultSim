@@ -124,6 +124,15 @@ public:
     void handle_input(SDL_Scancode event);
 
     /**
+     * Checks if the context have a mapping to an InputHandler
+     *
+     * @param KeyContext to check if exist in the mapping
+     *
+     * @return true if the context exist in the map, else false
+     */
+    bool has_context(KeyContext context);
+
+    /**
      * Clears KeyContext stack, and the mappings
      */
     void clear();
