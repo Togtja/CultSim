@@ -104,3 +104,36 @@ TEST_CASE("attempting to write_file on a directory")
 
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting copying file")
+{
+    std::string name_og("original.txt");
+    std::string data("I will be copied");
+    std::string name_cpy("copy.txt");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+
+    CHECK(!cs::fs::exists(name_og));
+    CHECK(!cs::fs::exists(name_cpy));
+    // Creating the original
+    CHECK(cs::fs::write_file(name_og, data) == data.length());
+    CHECK(cs::fs::exists(name_og));
+    CHECK(!cs::fs::exists(name_cpy));
+    // Copying it
+    CHECK(cs::fs::copy_file(name_og, name_cpy));
+    CHECK(cs::fs::exists(name_og));
+    CHECK(cs::fs::exists(name_cpy));
+    // Making sure they are equal
+    CHECK(cs::fs::read_file(name_og) == cs::fs::read_file(name_cpy));
+    // Delete the original
+    CHECK(cs::fs::delete_file(name_og));
+    CHECK(!cs::fs::exists(name_og));
+    CHECK(cs::fs::exists(name_cpy));
+    // Delete the copy
+    CHECK(cs::fs::delete_file(name_cpy));
+    CHECK(!cs::fs::exists(name_og));
+    CHECK(!cs::fs::exists(name_cpy));
+
+    cs::fs::deinit();
+}
+
