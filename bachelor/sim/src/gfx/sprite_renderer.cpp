@@ -25,6 +25,9 @@ void SpriteRenderer::display()
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
     VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
+    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, ~0ull);
+    vkResetFences(m_device, 1, &m_fences[next_image]);
+
     auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pools[next_image]);
 
     VkClearColorValue color_clear_value = {48.f / 255.f, 10.f / 255.f, 36.f / 255.f, 1.f};
@@ -87,8 +90,6 @@ void SpriteRenderer::display()
 
     VK_CHECK(vkQueuePresentKHR(m_gfx_queue, &present_info));
 
-    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, ~0ull);
-
     m_nsprites = 0u;
 }
 
@@ -131,7 +132,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     for (int i = 0; i < create_info.sc_image_views.size(); ++i)
     {
         m_cmd_pools.push_back(vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
-        m_fences.push_back(vk::create_fence(m_device, false));
+        m_fences.push_back(vk::create_fence(m_device, true));
     }
 
     init_pipeline();
