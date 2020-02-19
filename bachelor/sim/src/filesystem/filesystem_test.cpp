@@ -254,3 +254,37 @@ TEST_CASE("attempting to move file")
 
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting to use move_file as overwrite")
+{
+    std::string name("overwrite2.txt");
+    std::string data("I will try to overwrite target");
+    std::string target("target2.txt");
+    std::string t_data("I am an innocent file");
+    REQUIRE(cs::fs::init("cultsim_test"));
+    CHECK(!cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+    // Creating the name (overwriting file)
+    CHECK(cs::fs::write_file(name, data) == data.length());
+    CHECK(cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+    // Creating the target file
+    CHECK(cs::fs::write_file(target, t_data) == t_data.length());
+    CHECK(cs::fs::exists(name));
+    CHECK(cs::fs::exists(target));
+
+    // Trying to overwrite the target file
+    CHECK(!cs::fs::move_file(name, target));
+
+    // Making sure nothing got overwritten
+    CHECK(cs::fs::exists(name));
+    CHECK(cs::fs::exists(target));
+    CHECK(cs::fs::read_file(name) != cs::fs::read_file(target));
+    // Clean up after us
+    CHECK(cs::fs::delete_file(name));
+    CHECK(cs::fs::delete_file(target));
+    CHECK(!cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+
+    cs::fs::deinit();
+}
