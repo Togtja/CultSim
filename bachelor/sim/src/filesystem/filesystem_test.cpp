@@ -19,7 +19,7 @@ TEST_CASE("testing the file system")
     cs::fs::deinit();
 }
 
-TEST_CASE("fail to initialize twice")
+TEST_CASE("attempting to initialize twice")
 {
     REQUIRE(cs::fs::init("app"));
     REQUIRE(!cs::fs::init("app"));
