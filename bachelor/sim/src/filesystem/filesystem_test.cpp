@@ -25,3 +25,16 @@ TEST_CASE("attempting to initialize twice")
     REQUIRE(!cs::fs::init("app"));
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting to find path non-existing file")
+{
+    std::string file("fake.txt");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    CHECK(!cs::fs::exists(file));
+    CHECK(cs::fs::read_file(file) == "");
+    CHECK(!cs::fs::delete_file(file));
+
+    cs::fs::deinit();
+}
+
