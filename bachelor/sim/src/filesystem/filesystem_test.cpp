@@ -87,3 +87,20 @@ TEST_CASE("attempting to read_file of directory")
     CHECK(cs::fs::delete_file(dir));
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting to write_file on a directory")
+{
+    std::string dir("directory3");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    // Making sure it is not there
+    CHECK(!cs::fs::is_directory(dir));
+    // Creating it
+    CHECK(cs::fs::mkdir(dir));
+    CHECK(cs::fs::is_directory(dir));
+    // Note the 64th bit is assigned as error from PhysFS
+    CHECK(cs::fs::write_file(dir, "this should fail") == static_cast<uint64_t>(-1));
+    CHECK(cs::fs::delete_file(dir));
+
+    cs::fs::deinit();
+}
