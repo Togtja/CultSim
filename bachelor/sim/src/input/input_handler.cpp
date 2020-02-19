@@ -48,8 +48,7 @@ void InputHandler::handle_input(const SDL_Scancode event)
 
 bool InputHandler::has_event(const SDL_Scancode event)
 {
-    auto key_it = m_key_binding.find(event);
-    return key_it != m_key_binding.end();
+    return m_key_binding.contains(event);
 }
 
 void InputHandler::clear()
@@ -141,11 +140,11 @@ void ContextHandler::handle_input(const SDL_Scancode event)
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (m_input_map.at(*it).has_event(event))
+        if (has_context(*it))
         {
             m_input_map.at(*it).handle_input(event);
-            return;
         }
+        return;
     }
     spdlog::debug("could not find anything for the {} event", event);
 }
