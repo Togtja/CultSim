@@ -142,6 +142,11 @@ struct Requirement
     }
 };
 
+struct LocationRequirement
+{
+    glm::vec3 desired_position{};
+};
+
 struct Tags
 {
     tags::ETag tags{};
