@@ -1,7 +1,7 @@
 #include <functional>
-#include <unordered_map>
 #include <vector>
 
+#include "robin_hood.h"
 #include <SDL_events.h>
 namespace cs::input
 {
@@ -17,7 +17,7 @@ namespace detail
 class InputHandler
 {
 private:
-    std::unordered_map<SDL_Scancode, std::function<void()>> m_key_binding;
+    robin_hood::unordered_map<SDL_Scancode, std::function<void()>> m_key_binding;
     KeyContext m_context_type;
 
 public:
@@ -49,6 +49,7 @@ public:
      * @param event the key even you want to trigger
      */
     void handle_input(SDL_Scancode event);
+
     /**
      * Given an event, checks if this context has that event
      *
@@ -66,7 +67,7 @@ class ContextHandler
 {
 private:
     std::vector<KeyContext> m_active_stack;
-    std::unordered_map<KeyContext, detail::InputHandler> m_input_map;
+    robin_hood::unordered_map<KeyContext, detail::InputHandler> m_input_map;
 
 public:
     friend ContextHandler& get_input();
@@ -125,4 +126,4 @@ private:
  * @return The input manager singleton
  */
 ContextHandler& get_input();
-} // namespace cs
+} // namespace cs::input
