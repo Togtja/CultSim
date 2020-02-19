@@ -228,6 +228,30 @@ TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
     cs::fs::deinit();
 }
 
+TEST_CASE("attempting to use copy_file to copy directory")
+{
+    std::string dir("og_dir");
+    std::string fake_dir("fake_dir");
+    REQUIRE(cs::fs::init("cultsim_test"));
+
+    REQUIRE(!cs::fs::exists(dir));
+    REQUIRE(!cs::fs::exists(fake_dir));
+
+    // Create the directory
+    CHECK(cs::fs::mkdir(dir));
+    CHECK(cs::fs::exists(dir));
+    // Attempting to copy the directory
+    CHECK(!cs::fs::copy_file(dir, "should_fail"));
+    CHECK(cs::fs::exists(dir));
+    CHECK(!cs::fs::exists(fake_dir));
+
+    // Clean up
+    CHECK(cs::fs::delete_file(dir));
+    CHECK(!cs::fs::exists(dir));
+
+    cs::fs::deinit();
+}
+
 TEST_CASE("attempting to move file")
 {
     std::string from("from.txt");
