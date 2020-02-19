@@ -33,21 +33,25 @@ void Requirement::update(float dt)
         }
     });
 
-    auto view_find = m_registry.view<component::FindRequirement, component::Vision>();
-    view_find.each([this, dt](entt::entity e,
-                         component::FindRequirement findreqs,
-                         component::Vision vision) {
+    auto view_find = m_registry.view<component::FindRequirement, component::Vision, component::Position>();
+    view_find.each([this,
+                    dt](entt::entity e, component::FindRequirement findreqs, component::Vision vision, component::Position& pos) {
         for (auto& entity : vision.seen)
         {
             if ((m_registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
             {
                 m_registry.assign<component::LocationRequirement>(e, m_registry.get<component::Position>(entity).position);
                 m_registry.remove<component::FindRequirement>(e);
+                return;
             }
-            else
-            {
-                m_registry.assign_or_replace<component::FindRequirement>(e, findreqs.tags, glm::vec3(m_rng.uniform(-500.f,500.f)));
-            }
+        }
+        if (close_enough(pos.position, findreqs.desired_position,10.f))
+        {
+            m_registry.assign_or_replace<component::FindRequirement>(e, findreqs.tags, glm::vec3(m_rng.uniform(-500.f, 500.f)));
+        }
+        else
+        {
+            pos.desired_position = findreqs.desired_position;
         }
     });
 }
