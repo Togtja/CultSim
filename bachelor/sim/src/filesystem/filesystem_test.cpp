@@ -26,6 +26,12 @@ TEST_CASE("attempting to initialize twice")
     REQUIRE(!cs::fs::init("app"));
     REQUIRE(cs::fs::deinit());
 }
+TEST_CASE("attempting to deinitialize twice")
+{
+    REQUIRE(cs::fs::init("app"));
+    REQUIRE(cs::fs::deinit());
+    REQUIRE(!cs::fs::deinit());
+}
 
 TEST_CASE("attempting to find path non-existing file")
 {
