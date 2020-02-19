@@ -10,6 +10,7 @@
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/requirement.h"
 #include "gfx/renderer.h"
 #include "preferences.h"
 
@@ -37,15 +38,12 @@ void ScenarioScene::on_enter()
     ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
 
     action::Action action{static_cast<std::string>("eat"),
-                          std::vector<std::unique_ptr<action::IRequirement>>{},
+                          tags::TAG_Location,
                           5.f,
-                          {},
+                          0.f,
+                          []() { spdlog::warn("We failed to finish action: eat"); },
                           []() { spdlog::warn("We finished action: eat"); },
-                          []() {
-                              spdlog::warn("We failed to finish action: eat");
-                          }};
-    action.requirements.emplace_back(
-        new action::LocationRequirement("Goto", m_registry, glm::vec3(200.f, 200.f, 0.f), m_dispatcher));
+                          {}};
 
     ai::Strategy strategy = {static_cast<std::string>("eat food"),
                              0,
@@ -77,6 +75,7 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
+    m_active_systems.emplace_back(new system::Requirement(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));

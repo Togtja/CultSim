@@ -1,6 +1,7 @@
 #pragma once
 #include "entity/events.h"
 #include "system.h"
+#include "random_engine.h"
 
 #include <entt/signal/dispatcher.hpp>
 
@@ -9,6 +10,7 @@ namespace cs::system
 class Action : public ISystem
 {
 private:
+    RandomEngine m_rng{};
 
 public:
     using ISystem::ISystem;
