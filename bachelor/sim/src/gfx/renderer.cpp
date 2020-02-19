@@ -12,19 +12,7 @@ namespace cs::gfx
 {
 Renderer::~Renderer() noexcept
 {
-    VK_CHECK(vkDeviceWaitIdle(m_device));
-    m_sprite_renderer.deinit();
-    vmaDestroyAllocator(m_allocator);
-
-    for (auto view : m_swapchain_views)
-    {
-        vkDestroyImageView(m_device, view, nullptr);
-    }
-
-    vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
-    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
-    vkDestroyDevice(m_device, nullptr);
-    vkDestroyInstance(m_instance, nullptr);
+    deinit();
 }
 
 DebugRenderer& Renderer::debug()
@@ -72,6 +60,24 @@ void Renderer::init(const Window& window)
 
     m_sprite_renderer.init(
         {m_swapchain, m_swapchain_images, m_swapchain_views, m_format.format, m_gfx_queue_idx, m_gfx_queue, m_allocator});
+}
+
+void Renderer::deinit() noexcept
+{
+    VK_CHECK(vkQueueWaitIdle(m_gfx_queue));
+    VK_CHECK(vkDeviceWaitIdle(m_device));
+    m_sprite_renderer.deinit();
+    vmaDestroyAllocator(m_allocator);
+
+    for (auto view : m_swapchain_views)
+    {
+        vkDestroyImageView(m_device, view, nullptr);
+    }
+
+    vkDestroySwapchainKHR(m_device, m_swapchain, nullptr);
+    vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
+    vkDestroyDevice(m_device, nullptr);
+    vkDestroyInstance(m_instance, nullptr);
 }
 
 Renderer::Renderer() : m_sprite_renderer(m_camera)

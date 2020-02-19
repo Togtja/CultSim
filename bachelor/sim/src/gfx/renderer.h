@@ -74,6 +74,8 @@ public:
 
     void init(const Window& window);
 
+    void deinit() noexcept;
+
 private:
     Renderer();
 

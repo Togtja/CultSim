@@ -49,7 +49,7 @@ private:
 
     VkPipeline m_pipeline{VK_NULL_HANDLE};
 
-    VkCommandPool m_cmd_pool{VK_NULL_HANDLE};
+    std::vector<VkCommandPool> m_cmd_pools{};
 
     VkSemaphore m_aq_sem{VK_NULL_HANDLE};
 

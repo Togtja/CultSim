@@ -23,9 +23,9 @@ void SpriteRenderer::display()
     /** Setup */
     uint32_t next_image{};
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
-    VK_CHECK(vkResetCommandPool(m_device, m_cmd_pool, 0u));
+    VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
-    auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pool);
+    auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pools[next_image]);
 
     VkClearColorValue color_clear_value = {48.f / 255.f, 10.f / 255.f, 36.f / 255.f, 1.f};
     VkClearValue clear_value{};
@@ -86,7 +86,7 @@ void SpriteRenderer::display()
     present_info.pImageIndices      = &next_image;
 
     VK_CHECK(vkQueuePresentKHR(m_gfx_queue, &present_info));
-    VK_CHECK(vkDeviceWaitIdle(m_device));
+    //    VK_CHECK(vkDeviceWaitIdle(m_device));
 
     m_nsprites = 0u;
 }
@@ -124,9 +124,13 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     }
 
     /** Create synchronization prim's and command pool */
-    m_aq_sem   = vk::create_semaphore(m_device);
-    m_rel_sem  = vk::create_semaphore(m_device);
-    m_cmd_pool = vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT);
+    m_aq_sem  = vk::create_semaphore(m_device);
+    m_rel_sem = vk::create_semaphore(m_device);
+
+    for (int i = 0; i < create_info.sc_image_views.size(); ++i)
+    {
+        m_cmd_pools.push_back(vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
+    }
 
     init_pipeline();
 
@@ -165,7 +169,11 @@ void SpriteRenderer::deinit()
 
     vkDestroyPipeline(m_device, m_pipeline, nullptr);
     vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
-    vkDestroyCommandPool(m_device, m_cmd_pool, nullptr);
+
+    for (auto pool : m_cmd_pools)
+    {
+        vkDestroyCommandPool(m_device, pool, nullptr);
+    }
 
     vkDestroySemaphore(m_device, m_rel_sem, nullptr);
     vkDestroySemaphore(m_device, m_aq_sem, nullptr);

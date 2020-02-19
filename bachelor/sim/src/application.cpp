@@ -252,8 +252,8 @@ void Application::deinit_imgui()
 
 void Application::deinit_gl()
 {
+    gfx::get_renderer().deinit();
     m_window.deinit();
-
     SDL_Quit();
 }
 } // namespace cs
