@@ -137,3 +137,22 @@ TEST_CASE("attempting copying file")
     cs::fs::deinit();
 }
 
+TEST_CASE("attempting to copy to same file")
+{
+    std::string name("same_place.txt");
+    std::string data("I will try to be copied to same spot");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    CHECK(!cs::fs::exists(name));
+    // Creating name
+    CHECK(cs::fs::write_file(name, data) == data.length());
+    CHECK(cs::fs::exists(name));
+    // Trying to copy to the same place
+    CHECK(!cs::fs::copy_file(name, name));
+
+    CHECK(cs::fs::exists(name));
+    CHECK(cs::fs::delete_file(name));
+    CHECK(!cs::fs::exists(name));
+
+    cs::fs::deinit();
+}
