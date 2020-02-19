@@ -38,3 +38,52 @@ TEST_CASE("attempting to find path non-existing file")
     cs::fs::deinit();
 }
 
+TEST_CASE("attempting directory creation and deletion")
+{
+    std::string dir("directory");
+    std::string file_in_dir(dir + "/test.txt");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    // Checking that it does not exist
+    CHECK(!cs::fs::is_directory(dir));
+    CHECK(cs::fs::list_directory(dir).size() == 0);
+    // Making the directory
+    CHECK(cs::fs::mkdir(dir));
+    CHECK(cs::fs::is_directory(dir));
+    // Should still be empty
+    CHECK(cs::fs::list_directory(dir).size() == 0);
+    // Creating an empty file
+    CHECK(cs::fs::write_file(file_in_dir, "") == 0);
+    CHECK(cs::fs::exists(file_in_dir));
+    CHECK(cs::fs::list_directory(dir).size() == 1);
+
+    // Directory not empty so delete fails
+    CHECK(!cs::fs::delete_file(dir));
+    CHECK(cs::fs::is_directory(dir));
+    // Emptying the directory
+    CHECK(cs::fs::delete_file(file_in_dir));
+    CHECK(cs::fs::delete_file(dir));
+    // Making sure it is gone
+    CHECK(!cs::fs::is_directory(dir));
+    CHECK(!cs::fs::exists(file_in_dir));
+    CHECK(cs::fs::list_directory(dir).size() == 0);
+
+    cs::fs::deinit();
+}
+
+TEST_CASE("attempting to read_file of directory")
+{
+    std::string dir("directory2");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    // Making sure it is not there
+    CHECK(!cs::fs::is_directory(dir));
+    // Creating it
+    CHECK(cs::fs::mkdir(dir));
+    CHECK(cs::fs::is_directory(dir));
+    // Trying to read it
+    CHECK(cs::fs::read_file(dir) == "");
+    // Delete it
+    CHECK(cs::fs::delete_file(dir));
+    cs::fs::deinit();
+}
