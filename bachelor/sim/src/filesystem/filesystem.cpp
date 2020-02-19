@@ -112,12 +112,12 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
 
 bool exists(std::string_view rpath)
 {
-    return PHYSFS_exists(rpath.data());
+    return static_cast<bool>(PHYSFS_exists(rpath.data()));
 }
 
 bool mkdir(std::string_view rpath)
 {
-    return PHYSFS_mkdir(rpath.data());
+    return static_cast<bool>(PHYSFS_mkdir(rpath.data()));
 }
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
