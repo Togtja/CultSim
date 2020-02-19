@@ -52,8 +52,12 @@ bool InputHandler::has_event(const SDL_Scancode event)
     return key_it != m_key_binding.end();
 }
 
-InputHandler::~InputHandler()
-= default;
+void InputHandler::clear()
+{
+    m_key_binding.clear();
+}
+
+InputHandler::~InputHandler() = default;
 
 } // namespace detail
 
@@ -146,6 +150,14 @@ void ContextHandler::handle_input(const SDL_Scancode event)
     spdlog::debug("could not find anything for the {} event", event);
 }
 
+void ContextHandler::clear()
+{
+    m_input_map.clear();
+    m_active_stack.clear();
+    // There always need to be a DefaultContext at the bottom of the stack
+    add_context(KeyContext::DefaultContext);
+}
+
 ContextHandler::ContextHandler()
 {
     add_context(KeyContext::DefaultContext);
@@ -157,4 +169,4 @@ ContextHandler& get_input()
     return instance;
 }
 
-} // namespace cs
+} // namespace cs::input

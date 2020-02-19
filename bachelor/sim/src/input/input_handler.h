@@ -58,6 +58,12 @@ public:
      * @return true if the event is in the context else false
      */
     bool has_event(SDL_Scancode event);
+
+    /**
+     * Clears the key bindings
+     */
+    void clear();
+
     ~InputHandler();
 };
 
@@ -116,6 +122,11 @@ public:
      * @param event The event you want to run
      */
     void handle_input(SDL_Scancode event);
+
+    /**
+     * Clears KeyContext stack, and the mappings
+     */
+    void clear();
 
 private:
     ContextHandler();
