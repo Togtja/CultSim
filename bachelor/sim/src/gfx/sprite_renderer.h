@@ -51,6 +51,8 @@ private:
 
     std::vector<VkCommandPool> m_cmd_pools{};
 
+    std::vector<VkFence> m_fences{};
+
     VkSemaphore m_aq_sem{VK_NULL_HANDLE};
 
     VkSemaphore m_rel_sem{VK_NULL_HANDLE};

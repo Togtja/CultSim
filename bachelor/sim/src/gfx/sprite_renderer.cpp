@@ -76,7 +76,7 @@ void SpriteRenderer::display()
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores    = &m_rel_sem;
 
-    vkQueueSubmit(m_gfx_queue, 1, &submit_info, VK_NULL_HANDLE);
+    vkQueueSubmit(m_gfx_queue, 1, &submit_info, m_fences[next_image]);
 
     VkPresentInfoKHR present_info   = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
     present_info.pWaitSemaphores    = &m_rel_sem;
@@ -86,7 +86,8 @@ void SpriteRenderer::display()
     present_info.pImageIndices      = &next_image;
 
     VK_CHECK(vkQueuePresentKHR(m_gfx_queue, &present_info));
-    //    VK_CHECK(vkDeviceWaitIdle(m_device));
+
+    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, ~0ull);
 
     m_nsprites = 0u;
 }
@@ -130,6 +131,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     for (int i = 0; i < create_info.sc_image_views.size(); ++i)
     {
         m_cmd_pools.push_back(vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
+        m_fences.push_back(vk::create_fence(m_device, false));
     }
 
     init_pipeline();
@@ -173,6 +175,11 @@ void SpriteRenderer::deinit()
     for (auto pool : m_cmd_pools)
     {
         vkDestroyCommandPool(m_device, pool, nullptr);
+    }
+
+    for (auto fence : m_fences)
+    {
+        vkDestroyFence(m_device, fence, nullptr);
     }
 
     vkDestroySemaphore(m_device, m_rel_sem, nullptr);
