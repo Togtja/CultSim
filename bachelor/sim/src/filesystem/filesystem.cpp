@@ -23,12 +23,14 @@ bool init(std::string_view project_name)
     return true;
 }
 
-void deinit()
+bool deinit()
 {
-    if (!PHYSFS_deinit())
+    if (static_cast<bool>(PHYSFS_deinit()))
     {
-        spdlog::error("failed to deinitialize PhysFS, {}", get_errorstring());
+        return true;
     }
+    spdlog::error("failed to deinitialize PhysFS, {}", get_errorstring());
+    return false;
 }
 
 std::string read_file(std::string_view rpath)

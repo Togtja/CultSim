@@ -21,7 +21,7 @@ bool init(std::string_view project_name);
  *
  * @warning Always call this function once before terminating the program, after having called init
  */
-void deinit();
+bool deinit();
 
 /**
  * Read the entire file at the relative file path
