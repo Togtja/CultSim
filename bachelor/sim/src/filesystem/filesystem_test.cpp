@@ -191,3 +191,39 @@ TEST_CASE("attempting to copy to overwrite without sufficient permissions")
 
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
+{
+    std::string name("overwrite2.txt");
+    std::string data("I will try to overwrite target");
+    std::string target("target2.txt");
+    std::string t_data("I am an innocent file");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    CHECK(!cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+    // Creating the name (overwriting file)
+    CHECK(cs::fs::write_file(name, data) == data.length());
+    CHECK(cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+    // Creating the target file
+    CHECK(cs::fs::write_file(target, t_data) == t_data.length());
+    CHECK(cs::fs::exists(name));
+    CHECK(cs::fs::exists(target));
+    CHECK(cs::fs::read_file(name) != cs::fs::read_file(target));
+
+    // Trying to overwrite the target file
+    CHECK(cs::fs::copy_file(name, target, true));
+
+    // Making sure we overwrote
+    CHECK(cs::fs::exists(name));
+    CHECK(cs::fs::exists(target));
+    CHECK(cs::fs::read_file(name) == cs::fs::read_file(target));
+    // Clean up after us
+    CHECK(cs::fs::delete_file(name));
+    CHECK(cs::fs::delete_file(target));
+    CHECK(!cs::fs::exists(name));
+    CHECK(!cs::fs::exists(target));
+
+    cs::fs::deinit();
+}
