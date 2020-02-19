@@ -10,6 +10,7 @@ TEST_CASE("testing the file system")
     std::string data("This is a test");
 
     REQUIRE(cs::fs::init("cultsim_test"));
+    REQUIRE(!cs::fs::exists(name));
     CHECK(cs::fs::write_file(name, data) == data.length());
     CHECK(cs::fs::exists(name));
     CHECK(cs::fs::read_file(name) == data);
@@ -31,7 +32,7 @@ TEST_CASE("attempting to find path non-existing file")
     std::string file("fake.txt");
 
     REQUIRE(cs::fs::init("cultsim_test"));
-    CHECK(!cs::fs::exists(file));
+    REQUIRE(!cs::fs::exists(file));
     CHECK(cs::fs::read_file(file) == "");
     CHECK(!cs::fs::delete_file(file));
 
@@ -45,7 +46,7 @@ TEST_CASE("attempting directory creation and deletion")
 
     REQUIRE(cs::fs::init("cultsim_test"));
     // Checking that it does not exist
-    CHECK(!cs::fs::is_directory(dir));
+    REQUIRE(!cs::fs::is_directory(dir));
     CHECK(cs::fs::list_directory(dir).size() == 0);
     // Making the directory
     CHECK(cs::fs::mkdir(dir));
@@ -77,7 +78,7 @@ TEST_CASE("attempting to read_file of directory")
 
     REQUIRE(cs::fs::init("cultsim_test"));
     // Making sure it is not there
-    CHECK(!cs::fs::is_directory(dir));
+    REQUIRE(!cs::fs::is_directory(dir));
     // Creating it
     CHECK(cs::fs::mkdir(dir));
     CHECK(cs::fs::is_directory(dir));
@@ -94,7 +95,7 @@ TEST_CASE("attempting to write_file on a directory")
 
     REQUIRE(cs::fs::init("cultsim_test"));
     // Making sure it is not there
-    CHECK(!cs::fs::is_directory(dir));
+    REQUIRE(!cs::fs::is_directory(dir));
     // Creating it
     CHECK(cs::fs::mkdir(dir));
     CHECK(cs::fs::is_directory(dir));
@@ -113,8 +114,8 @@ TEST_CASE("attempting copying file")
 
     REQUIRE(cs::fs::init("cultsim_test"));
 
-    CHECK(!cs::fs::exists(name_og));
-    CHECK(!cs::fs::exists(name_cpy));
+    REQUIRE(!cs::fs::exists(name_og));
+    REQUIRE(!cs::fs::exists(name_cpy));
     // Creating the original
     CHECK(cs::fs::write_file(name_og, data) == data.length());
     CHECK(cs::fs::exists(name_og));
@@ -143,7 +144,7 @@ TEST_CASE("attempting to copy to same file")
     std::string data("I will try to be copied to same spot");
 
     REQUIRE(cs::fs::init("cultsim_test"));
-    CHECK(!cs::fs::exists(name));
+    REQUIRE(!cs::fs::exists(name));
     // Creating name
     CHECK(cs::fs::write_file(name, data) == data.length());
     CHECK(cs::fs::exists(name));
@@ -165,8 +166,8 @@ TEST_CASE("attempting to copy to overwrite without sufficient permissions")
     std::string t_data("I am an innocent file");
 
     REQUIRE(cs::fs::init("cultsim_test"));
-    CHECK(!cs::fs::exists(name));
-    CHECK(!cs::fs::exists(target));
+    REQUIRE(!cs::fs::exists(name));
+    REQUIRE(!cs::fs::exists(target));
     // Creating the name (overwriting file)
     CHECK(cs::fs::write_file(name, data) == data.length());
     CHECK(cs::fs::exists(name));
@@ -200,8 +201,8 @@ TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
     std::string t_data("I am an innocent file");
 
     REQUIRE(cs::fs::init("cultsim_test"));
-    CHECK(!cs::fs::exists(name));
-    CHECK(!cs::fs::exists(target));
+    REQUIRE(!cs::fs::exists(name));
+    REQUIRE(!cs::fs::exists(target));
     // Creating the name (overwriting file)
     CHECK(cs::fs::write_file(name, data) == data.length());
     CHECK(cs::fs::exists(name));
@@ -259,8 +260,8 @@ TEST_CASE("attempting to move file")
     std::string to("to.txt");
 
     REQUIRE(cs::fs::init("cultsim_test"));
-    CHECK(!cs::fs::exists(from));
-    CHECK(!cs::fs::exists(to));
+    REQUIRE(!cs::fs::exists(from));
+    REQUIRE(!cs::fs::exists(to));
     // Creating the original from
     CHECK(cs::fs::write_file(from, data) == data.length());
     CHECK(cs::fs::read_file(from) == data); // Making sure it has the correct data
