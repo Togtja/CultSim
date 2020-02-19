@@ -2,11 +2,11 @@ image: gcc:latest
 
 # Install dependencies for build up front
 before_script:
-  - apt get update
-  - apt get upgrade
-  - apt get install git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
-  - apt get install cppcheck physfs physfs-dev physfs-static
-  - apt get install libtbb libtbb-dev
+  - apt update
+  - apt upgrade
+  - apt install git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
+  - apt install cppcheck physfs physfs-dev physfs-static
+  - apt install libtbb libtbb-dev
 
 # Run unit tests (soon -> run linter and formatting)
 test:
