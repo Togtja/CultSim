@@ -75,6 +75,11 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
         spdlog::debug("file: '{}' does not exist", rpath);
         spdlog::info("creating file: '{}'", rpath);
     }
+    else if (!is_file(rpath))
+    {
+        spdlog::warn("file: {} is not a file , but directory", rpath);
+        return -1;
+    }
 
     auto file = PHYSFS_openWrite(rpath.data());
     if (file == nullptr)
