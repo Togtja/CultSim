@@ -17,14 +17,14 @@ TEST_CASE("testing the file system")
     CHECK(cs::fs::delete_file(name));
     CHECK(!cs::fs::exists(name));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to initialize twice")
 {
     REQUIRE(cs::fs::init("app"));
     REQUIRE(!cs::fs::init("app"));
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to find path non-existing file")
@@ -36,7 +36,7 @@ TEST_CASE("attempting to find path non-existing file")
     CHECK(cs::fs::read_file(file) == "");
     CHECK(!cs::fs::delete_file(file));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting directory creation and deletion")
@@ -69,7 +69,7 @@ TEST_CASE("attempting directory creation and deletion")
     CHECK(!cs::fs::exists(file_in_dir));
     CHECK(cs::fs::list_directory(dir).size() == 0);
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to read_file of directory")
@@ -86,7 +86,7 @@ TEST_CASE("attempting to read_file of directory")
     CHECK(cs::fs::read_file(dir) == "");
     // Delete it
     CHECK(cs::fs::delete_file(dir));
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to write_file on a directory")
@@ -103,7 +103,7 @@ TEST_CASE("attempting to write_file on a directory")
     CHECK(cs::fs::write_file(dir, "this should fail") == static_cast<uint64_t>(-1));
     CHECK(cs::fs::delete_file(dir));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting copying file")
@@ -135,7 +135,7 @@ TEST_CASE("attempting copying file")
     CHECK(!cs::fs::exists(name_og));
     CHECK(!cs::fs::exists(name_cpy));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to copy to same file")
@@ -155,7 +155,7 @@ TEST_CASE("attempting to copy to same file")
     CHECK(cs::fs::delete_file(name));
     CHECK(!cs::fs::exists(name));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to copy to overwrite without sufficient permissions")
@@ -190,7 +190,7 @@ TEST_CASE("attempting to copy to overwrite without sufficient permissions")
     CHECK(!cs::fs::exists(name));
     CHECK(!cs::fs::exists(target));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
@@ -226,7 +226,7 @@ TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
     CHECK(!cs::fs::exists(name));
     CHECK(!cs::fs::exists(target));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to use copy_file to copy directory")
@@ -250,7 +250,7 @@ TEST_CASE("attempting to use copy_file to copy directory")
     CHECK(cs::fs::delete_file(dir));
     CHECK(!cs::fs::exists(dir));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to move file")
@@ -277,7 +277,7 @@ TEST_CASE("attempting to move file")
     CHECK(cs::fs::delete_file(to));
     CHECK(!cs::fs::exists(to));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
 
 TEST_CASE("attempting to use move_file as overwrite")
@@ -311,5 +311,5 @@ TEST_CASE("attempting to use move_file as overwrite")
     CHECK(!cs::fs::exists(name));
     CHECK(!cs::fs::exists(target));
 
-    cs::fs::deinit();
+    REQUIRE(cs::fs::deinit());
 }
