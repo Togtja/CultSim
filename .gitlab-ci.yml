@@ -2,6 +2,7 @@ image: gcc:latest
 
 # Install dependencies for build up front
 before_script:
+  - git lfs pull
   - apt update -qq
   - apt install -y -qq git make cmake lua5.3 lua5.3-dev libx11-dev libxext-dev clang
   - apt install -y -qq cppcheck physfs physfs-dev physfs-static
