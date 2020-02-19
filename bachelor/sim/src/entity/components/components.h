@@ -147,6 +147,17 @@ struct LocationRequirement
     glm::vec3 desired_position{};
 };
 
+struct VisionRequirement
+{
+    tags::ETag tags{};
+};
+
+struct FindRequirement
+{
+    tags::ETag tags{};
+    glm::vec3 desired_position{};
+};
+
 struct Tags
 {
     tags::ETag tags{};
