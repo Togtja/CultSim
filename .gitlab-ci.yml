@@ -3,7 +3,7 @@ image: gcc:latest
 # Install dependencies for build up front
 before_script:
   - apt update -qq
-  - apt install -y -qq git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
+  - apt install -y -qq git make cmake lua5.3 lua5.3-dev libx11-dev libxext-dev clang
   - apt install -y -qq cppcheck physfs physfs-dev physfs-static
   - apt install -y -qq libtbb libtbb-dev
 
