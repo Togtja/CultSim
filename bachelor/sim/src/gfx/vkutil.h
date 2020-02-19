@@ -44,6 +44,8 @@ VkFramebuffer create_framebuffer(VkDevice device, VkRenderPass rp, VkImageView i
 
 VkSemaphore create_semaphore(VkDevice device);
 
+VkFence create_fence(VkDevice device, VkBool32 start_signalled);
+
 VkCommandPool create_command_pool(VkDevice device, uint32_t queue_index, VkCommandPoolCreateFlags flags);
 
 VkCommandBuffer begin_one_time_cmd_buffer(VkDevice device, VkCommandPool pool);

@@ -168,6 +168,21 @@ VkSemaphore create_semaphore(VkDevice device)
     return out;
 }
 
+VkFence create_fence(VkDevice device, VkBool32 start_signalled)
+{
+    VkFenceCreateInfo create_info = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
+    if (start_signalled)
+    {
+        create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+    }
+
+    VkFence out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateFence(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
+
 VkCommandPool create_command_pool(VkDevice device, uint32_t queue_index, VkCommandPoolCreateFlags flags)
 {
     VkCommandPoolCreateInfo create_info = {VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
