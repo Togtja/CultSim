@@ -78,7 +78,9 @@ void SpriteRenderer::display()
     present_info.pImageIndices      = &next_image;
 
     VK_CHECK(vkQueuePresentKHR(m_gfx_queue, &present_info));
-    VK_CHECK(vkDeviceWaitIdle(m_device));
+    //    VK_CHECK(vkDeviceWaitIdle(m_device));
+
+    m_nsprites = 0u;
 }
 
 SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
@@ -150,6 +152,7 @@ void SpriteRenderer::init_pipeline()
 
 void SpriteRenderer::deinit()
 {
+    vmaUnmapMemory(m_allocator, m_instance_buffer.allocation);
     vk::destroy_buffer(m_allocator, m_instance_buffer);
 
     vkDestroyPipeline(m_device, m_pipeline, nullptr);
