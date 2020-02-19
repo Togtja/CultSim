@@ -26,11 +26,13 @@ void InputHandler::bind_key(const SDL_Scancode event, const std::function<void()
 }
 void InputHandler::unbind_key(const SDL_Scancode event)
 {
-    // erase returns how many elements it erased
-    if (m_key_binding.erase(event) == 0)
+    auto&& it = m_key_binding.find(event);
+    if (it == m_key_binding.end())
     {
-        spdlog::debug("this context (id: {}) doesnot have a binding for this event ({})", m_context_type, event);
+        spdlog::debug("this context (id: {}) does not have a binding for this event ({})", m_context_type, event);
+        return;
     }
+    m_key_binding.erase(it);
 }
 
 void InputHandler::handle_input(const SDL_Scancode event)
