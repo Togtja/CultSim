@@ -38,7 +38,7 @@ void ScenarioScene::on_enter()
     ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
 
     action::Action action{static_cast<std::string>("eat"),
-                          tags::TAG_Location,
+                          tags::TAG_Find,
                           5.f,
                           0.f,
                           []() { spdlog::warn("We failed to finish action: eat"); },
