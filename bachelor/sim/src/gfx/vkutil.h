@@ -60,7 +60,7 @@ void transition_image(VkCommandBuffer buffer, VkImage image, VkPipelineStageFlag
 
 VkShaderModule load_shader(VkDevice device, std::string_view rpath);
 
-VkPipelineLayout create_pipeline_layout(VkDevice device);
+VkPipelineLayout create_pipeline_layout(VkDevice device, const std::vector<VkDescriptorSetLayout>& descriptor_layouts);
 
 VkPipeline create_gfx_pipeline(VkDevice device,
                                VkPipelineCache pipecache,

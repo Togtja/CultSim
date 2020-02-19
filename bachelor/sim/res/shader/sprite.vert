@@ -33,7 +33,7 @@ layout(location = 0) out VertexData
 } vs_out;
 
 /** Uniforms */
-layout(binding = 0) uniform PerFrame
+layout(push_constant) uniform PerFrame
 {
     mat4 u_projection;
 };
@@ -44,5 +44,5 @@ void main()
     vs_out.texcoord = tex_coords[gl_VertexIndex];
     vs_out.texture  = 2u;
 
-    gl_Position = /*u_projection */ (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
+    gl_Position = u_projection * (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
 }

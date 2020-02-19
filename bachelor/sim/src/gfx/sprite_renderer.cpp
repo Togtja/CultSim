@@ -4,6 +4,7 @@
 #include "vkutil.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
 namespace cs::gfx
@@ -39,6 +40,13 @@ void SpriteRenderer::display()
 
     /** Draw calls and commands */
     vkCmdBeginRenderPass(cbuf, &rpass_begin_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    vkCmdPushConstants(cbuf,
+                       m_pipeline_layout,
+                       VK_SHADER_STAGE_VERTEX_BIT,
+                       0,
+                       sizeof(float) * 16,
+                       glm::value_ptr(m_camera.get_view_matrix()));
 
     VkViewport viewport{0, 0, 1280, 720, 0, 1};
     vkCmdSetViewport(cbuf, 0, 1, &viewport);
@@ -135,7 +143,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 
 void SpriteRenderer::init_pipeline()
 {
-    m_pipeline_layout = vk::create_pipeline_layout(m_device);
+    m_pipeline_layout = vk::create_pipeline_layout(m_device, {});
 
     VkShaderModule vs = vk::load_shader(m_device, "shader/sprite.vert.spv");
     VkShaderModule fs = vk::load_shader(m_device, "shader/sprite.frag.spv");

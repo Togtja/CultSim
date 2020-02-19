@@ -244,9 +244,17 @@ VkShaderModule load_shader(VkDevice device, std::string_view rpath)
     return out;
 }
 
-VkPipelineLayout create_pipeline_layout(VkDevice device)
+VkPipelineLayout create_pipeline_layout(VkDevice device, const std::vector<VkDescriptorSetLayout>& descriptor_layouts)
 {
+    /** Matrix push constant */
+    VkPushConstantRange push_constant{};
+    push_constant.size       = sizeof(float) * 16;
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    push_constant.offset     = 0u;
+
     VkPipelineLayoutCreateInfo create_info = {VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO};
+    create_info.pPushConstantRanges        = &push_constant;
+    create_info.pushConstantRangeCount     = 1;
 
     VkPipelineLayout out{VK_NULL_HANDLE};
     VK_CHECK(vkCreatePipelineLayout(device, &create_info, nullptr, &out));
