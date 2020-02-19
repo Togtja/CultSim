@@ -150,15 +150,6 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new)
         }
         return true;
     }
-
-    /** At this point a new file is created, but is incomplete, so delete to restore fs state */
-    if (exists(rpath_new))
-    {
-        if (!delete_file(rpath_new))
-        {
-            spdlog::error("failed to delete new file during move");
-        }
-    }
     return false;
 }
 
@@ -202,7 +193,19 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
         spdlog::info("successfully copied file");
         return true;
     }
-    spdlog::error("could not copy file");
+    /** At this point a new file should have failed to be created,
+     * if it has been created we delete to restore fs state */
+    if (exists(rpath_new))
+    {
+        if (!delete_file(rpath_new))
+        {
+            spdlog::error("fail to delete new file during failed copy");
+        }
+    }
+    else
+    {
+        spdlog::error("fail to create new file");
+    }
     return false;
 }
 
