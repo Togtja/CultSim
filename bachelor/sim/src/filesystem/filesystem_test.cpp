@@ -227,3 +227,30 @@ TEST_CASE("attempting to copy to overwrite WITH sufficient permissions")
 
     cs::fs::deinit();
 }
+
+TEST_CASE("attempting to move file")
+{
+    std::string from("from.txt");
+    std::string data("I will be moved");
+    std::string to("to.txt");
+
+    REQUIRE(cs::fs::init("cultsim_test"));
+    CHECK(!cs::fs::exists(from));
+    CHECK(!cs::fs::exists(to));
+    // Creating the original from
+    CHECK(cs::fs::write_file(from, data) == data.length());
+    CHECK(cs::fs::read_file(from) == data); // Making sure it has the correct data
+    CHECK(cs::fs::exists(from));
+    CHECK(!cs::fs::exists(to));
+    // Moving the file
+    CHECK(cs::fs::move_file(from, to));
+    CHECK(!cs::fs::exists(from));
+    CHECK(cs::fs::exists(to));
+    // Checking the new file data
+    CHECK(cs::fs::read_file(to) == data);
+    // Clean up
+    CHECK(cs::fs::delete_file(to));
+    CHECK(!cs::fs::exists(to));
+
+    cs::fs::deinit();
+}
