@@ -423,4 +423,27 @@ void destroy_buffer(VmaAllocator allocator, const Buffer& buffer)
 {
     vmaDestroyBuffer(allocator, buffer.buffer, buffer.allocation);
 }
+
+VkDescriptorSetLayout create_descriptor_set_layout(VkDevice device)
+{
+    std::vector<VkDescriptorSetLayoutBinding> bindings{
+        {0, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 8, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr},
+        {8, VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 8, VK_SHADER_STAGE_FRAGMENT_BIT, nullptr}};
+
+    VkDescriptorSetLayoutCreateInfo create_info = {VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO};
+    create_info.pBindings                       = bindings.data();
+    create_info.bindingCount                    = bindings.size();
+
+    VkDescriptorSetLayout out{VK_NULL_HANDLE};
+    VK_CHECK(vkCreateDescriptorSetLayout(device, &create_info, nullptr, &out));
+    assert(out);
+
+    return out;
+}
+
+VkDescriptorPool create_descriptor_pool(VkDevice device)
+{
+    VkDescriptorPoolCreateInfo create_info = {VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO};
+    return VK_NULL_HANDLE; // TODO
+}
 } // namespace cs::vk

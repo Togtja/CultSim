@@ -73,4 +73,9 @@ VmaAllocator create_allocator(VkInstance instance, VkDevice device, VkPhysicalDe
 Buffer create_buffer(VmaAllocator allocator, size_t size, VkBufferUsageFlags buffer_usage, VmaMemoryUsage memory_usage);
 
 void destroy_buffer(VmaAllocator allocator, const Buffer& buffer);
+
+VkDescriptorSetLayout create_descriptor_set_layout(VkDevice device);
+
+VkDescriptorPool create_descriptor_pool(VkDevice device);
+
 } // namespace cs::vk
