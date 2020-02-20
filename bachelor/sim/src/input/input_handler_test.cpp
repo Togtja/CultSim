@@ -103,4 +103,27 @@ TEST_CASE("attempting to unbind something that is already unbound")
     CHECK(times == 1);
     input.clear();
 }
+
+TEST_CASE("attempting to add default context on top of something else")
+{
+    auto& input = get_input();
+    int times1 = 0, times0 = 0;
+
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F13, [&times1]() { times1++; });
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F13, [&times0]() { times0++; });
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 0);
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 1);
+    // Adding default is not allowed, and it is always at the bottom of the context stack
+    input.add_context(KeyContext::DefaultContext);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 2);
+    input.clear();
+}
+
 }
