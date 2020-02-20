@@ -136,6 +136,11 @@ public:
     bool has_context(const KeyContext& context);
 
     /**
+     * Clears all keybinding to a certain context
+     */
+    void clear_context(const KeyContext& context);
+
+    /**
      * Clears KeyContext stack, and the mappings
      */
     void clear();

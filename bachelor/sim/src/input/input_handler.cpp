@@ -163,6 +163,17 @@ bool ContextHandler::has_context(const KeyContext& context)
     return m_input_map.contains(context);
 }
 
+void ContextHandler::clear_context(const KeyContext& context)
+{
+    if (has_context(context))
+    {
+        m_input_map.at(context).clear();
+    }
+    else
+    {
+        spdlog::debug("the context {} has no bindings", context);
+    }
+}
 void ContextHandler::clear()
 {
     m_input_map.clear();
