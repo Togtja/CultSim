@@ -34,18 +34,18 @@ TEST_CASE("attempting to use keybinding after clear")
 TEST_CASE("attemting to use keybinding after unbind")
 {
     auto& input = get_input();
-    int times1 = 0, times2 = 0;
+    int times1 = 0, times0 = 0;
     // Binding 2 key to make sure that no other key also get unbinding
     // AKA somebody just "cleared" all
     input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F11, [&times1]() { times1++; });
-    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F12, [&times2]() { times2++; });
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F10, [&times0]() { times0++; });
     input.handle_input(SDL_SCANCODE_F11);
-    input.handle_input(SDL_SCANCODE_F12);
+    input.handle_input(SDL_SCANCODE_F10);
     CHECK(times1 == 1);
-    CHECK(times2 == 1);
-    input.unbind_key(KeyContext::DefaultContext, SDL_SCANCODE_F12);
+    CHECK(times0 == 1);
+    input.unbind_key(KeyContext::DefaultContext, SDL_SCANCODE_F10);
     input.handle_input(SDL_SCANCODE_F11);
-    input.handle_input(SDL_SCANCODE_F12);
+    input.handle_input(SDL_SCANCODE_F10);
     CHECK(times1 == 2);
-    CHECK(times2 == 1);
+    CHECK(times0 == 1);
 }
