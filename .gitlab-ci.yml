@@ -1,4 +1,4 @@
-image: gcc:latest
+image: gcc:9.2.0
 
 # Install dependencies for build up front
 before_script:
@@ -19,5 +19,5 @@ test:
     - mkdir build
     - cd build
     - ../cmakebin/bin/cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
-    - make -j4
+    - make
     - ctest
