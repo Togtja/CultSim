@@ -54,7 +54,7 @@ void ScenarioScene::on_enter()
     static auto gen  = std::mt19937{seed()};
     std::normal_distribution<float> rng(0.f, 1.f);
 
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
     for (int i = 0; i < 100; i++)
@@ -83,8 +83,8 @@ void ScenarioScene::on_enter()
     m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
     m_registry.assign<component::Tags>(food, tags::TAG_Food);
 
-        /** Add required systems */
-        m_active_systems.emplace_back(new system::Need(m_registry));
+    /** Add required systems */
+    m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
@@ -121,10 +121,16 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    for (int i = -5; i <= 5; i++)
+    constexpr int grid_size = 25;
+    for (int i = -grid_size; i <= grid_size; i++)
     {
-        gfx::get_renderer().debug().draw_line(glm::vec3(-32 * 5, i * 32, 0), glm::vec3(32 * 5, i * 32, 0), glm::vec3(1, 0.5f, 1));
-        gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * 5, 0), glm::vec3(i * 32, 32 * 5, 0), glm::vec3(1, 0.5f, 1));
+        gfx::get_renderer().debug().draw_line(glm::vec3(-32 * grid_size, i * 32, 0),
+                                              glm::vec3(32 * grid_size, i * 32, 0),
+                                              glm::vec3(0.4f));
+
+        gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * grid_size, 0),
+                                              glm::vec3(i * 32, 32 * grid_size, 0),
+                                              glm::vec3(0.4f));
     }
     return false;
 }
