@@ -18,7 +18,11 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.h
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/mitigation_test.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/action.h
         ${CMAKE_CURRENT_LIST_DIR}/action.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/requirement.h
+        ${CMAKE_CURRENT_LIST_DIR}/requirement.cpp
 )

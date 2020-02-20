@@ -1,6 +1,5 @@
 #pragma once
 
-#include "entity/actions/requirement.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "strategy.h"
@@ -109,36 +108,20 @@ struct Strategies
     std::vector<ai::Strategy> staged_strategies{};
 };
 
-struct Requirement
+struct LocationRequirement
 {
-    std::vector<std::unique_ptr<action::IRequirement>> staged_requirements{};
+    glm::vec3 desired_position{};
+};
 
-    Requirement()  = default;
-    ~Requirement() = default;
-    Requirement(const Requirement& other)
-    {
-        for (const auto& staged_requirement : other.staged_requirements)
-        {
-            auto requirement = staged_requirement->clone();
-            staged_requirements.emplace_back(requirement);
-        }
-    }
-    Requirement& operator=(const Requirement& rhs)
-    {
-        if (this == &rhs)
-        {
-            return *this;
-        }
+struct VisionRequirement
+{
+    tags::ETag tags{};
+};
 
-        staged_requirements.clear();
-        for (const auto& staged_requirement : rhs.staged_requirements)
-        {
-            auto requirement = staged_requirement->clone();
-            staged_requirements.emplace_back(requirement);
-        }
-
-        return *this;
-    }
+struct FindRequirement
+{
+    tags::ETag tags{};
+    glm::vec3 desired_position{};
 };
 
 struct Tags

@@ -1,6 +1,5 @@
 #include "scenario_scene.h"
 #include "entity/actions/action.h"
-#include "entity/actions/location_requirement.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
@@ -10,6 +9,7 @@
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/requirement.h"
 #include "gfx/renderer.h"
 #include "preferences.h"
 
@@ -37,15 +37,12 @@ void ScenarioScene::on_enter()
     ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
 
     action::Action action{static_cast<std::string>("eat"),
-                          std::vector<std::unique_ptr<action::IRequirement>>{},
+                          tags::TAG_Find,
                           5.f,
-                          {},
+                          0.f,
+                          []() { spdlog::warn("We failed to finish action: eat"); },
                           []() { spdlog::warn("We finished action: eat"); },
-                          []() {
-                              spdlog::warn("We failed to finish action: eat");
-                          }};
-    action.requirements.emplace_back(
-        new action::LocationRequirement("Goto", m_registry, glm::vec3(200.f, 200.f, 0.f), m_dispatcher));
+                          {}};
 
     ai::Strategy strategy = {static_cast<std::string>("eat food"),
                              0,
@@ -76,7 +73,6 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Requirement>(agent);
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 
@@ -84,6 +80,7 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
+    m_active_systems.emplace_back(new system::Requirement(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
