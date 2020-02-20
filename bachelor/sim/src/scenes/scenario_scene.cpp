@@ -98,6 +98,11 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Tags>(food, tags::TAG_Food);
     }
 
+    auto food = m_registry.create();
+    m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
+    m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
+    m_registry.assign<component::Tags>(food, tags::TAG_Food);
+
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
@@ -118,7 +123,6 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
-    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {

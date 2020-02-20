@@ -1,5 +1,6 @@
 #include "application.h"
 #include "constants.h"
+#include "debug/auto_timer.h"
 #include "debug/debug_timer_manager.h"
 #include "delta_clock.h"
 #include "entity/systems/rendering.h"
@@ -33,6 +34,7 @@ void Application::run(const std::vector<char*>& args)
     /** Main Loop */
     while (m_running)
     {
+        CS_AUTOTIMER(Frame Time);
         handle_input();
 
         ImGui_ImplOpenGL3_NewFrame();
