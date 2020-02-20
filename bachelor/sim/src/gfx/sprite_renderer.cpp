@@ -83,7 +83,7 @@ void SpriteRenderer::display()
     VkDeviceSize offsets[] = {0};
 
     vkCmdBindPipeline(cbuf, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
-    vkCmdBindVertexBuffers(cbuf, 0, 1, &m_instance_buffer.buffer, offsets);
+    vkCmdBindVertexBuffers(cbuf, 0, 1, &m_instance_frame_buffers[next_image].buffer, offsets);
     vkCmdDraw(cbuf, 6, m_nsprites, 0, 0);
 
     vkCmdEndRenderPass(cbuf);
@@ -166,7 +166,7 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 
     m_instance_buffer = vk::create_buffer(m_allocator,
                                           sizeof(SpriteInstanceVertex) * SIM_MAX_AGENTS,
-                                          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
+                                          VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                           VMA_MEMORY_USAGE_CPU_ONLY);
 
     VK_CHECK(vmaMapMemory(m_allocator, m_instance_buffer.allocation, &m_instance_buffer.data));
