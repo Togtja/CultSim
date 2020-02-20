@@ -40,8 +40,8 @@ void ScenarioScene::on_enter()
                           tags::TAG_Find,
                           5.f,
                           0.f,
-                          []() { spdlog::warn("We failed to finish action: eat"); },
                           []() { spdlog::warn("We finished action: eat"); },
+                          []() { spdlog::warn("We failed to finish action: eat"); },
                           {}};
 
     ai::Strategy strategy = {static_cast<std::string>("eat food"),
@@ -55,7 +55,9 @@ void ScenarioScene::on_enter()
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 1; i++)
+    auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
+
+    for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -68,16 +70,21 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent,
                                                std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
                                                glm::normalize(glm::vec2(1.f, 1.f)),
-                                               50.f);
+                                               500.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Tags>(agent, tags::TAG_Food);
+        m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
     }
 
-    /** Add required systems */
-    m_active_systems.emplace_back(new system::Need(m_registry));
+    auto food = m_registry.create();
+    m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
+    m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
+    m_registry.assign<component::Tags>(food, tags::TAG_Food);
+
+        /** Add required systems */
+        m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
