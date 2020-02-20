@@ -1,4 +1,5 @@
 #include "need.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "spdlog/spdlog.h"
 
@@ -6,6 +7,8 @@ namespace cs::system
 {
 void Need::update(float dt)
 {
+    CS_AUTOTIMER(Need System);
+
     auto view = m_registry.view<component::Needs>();
     view.each([dt](component::Needs& needs) {
         for (auto& need : needs.needs)

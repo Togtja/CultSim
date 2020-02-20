@@ -1,4 +1,5 @@
 #include "action.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
 #include <random>
@@ -9,6 +10,8 @@ namespace cs::system
 {
 void Action::update(float dt)
 {
+    CS_AUTOTIMER(Action System);
+
     auto group = m_registry.group<component::Strategies>(
         entt::exclude<component::LocationRequirement, component::VisionRequirement, component::FindRequirement>);
     group.each([this, dt](entt::entity e, component::Strategies& strategies) {

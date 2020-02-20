@@ -1,5 +1,6 @@
 #include "mitigation.h"
 #include "common_helpers.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
@@ -10,6 +11,8 @@ namespace cs::system
 {
 void Mitigation::update(float dt)
 {
+    CS_AUTOTIMER(Mitigation System);
+
     auto view = m_registry.view<component::Needs, component::Strategies, component::Tags>();
     view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
         if (!needs.pressing_needs.empty())
