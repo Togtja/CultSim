@@ -44,20 +44,16 @@ void ScenarioScene::on_enter()
                           []() { spdlog::warn("We failed to finish action: eat"); },
                           {}};
 
-    ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                             0,
-                             {},
-                             tags::TAG_Food,
-                             std::vector<action::Action>{std::move(action)}};
+    ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>{action}};
 
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
     std::normal_distribution<float> rng(0.f, 1.f);
 
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 1; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -70,7 +66,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent,
                                                std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
                                                glm::normalize(glm::vec2(1.f, 1.f)),
-                                               500.f);
+                                               50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
@@ -83,8 +79,8 @@ void ScenarioScene::on_enter()
     m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
     m_registry.assign<component::Tags>(food, tags::TAG_Food);
 
-        /** Add required systems */
-        m_active_systems.emplace_back(new system::Need(m_registry));
+    /** Add required systems */
+    m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
