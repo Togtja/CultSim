@@ -29,7 +29,7 @@ void AI::update(float dt)
 
     /** Construct collision grid */
     m_registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
-        auto min = world_to_grid(pos.position);
+        auto min = ai::world_to_grid(pos.position);
         collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
     });
 
@@ -40,8 +40,8 @@ void AI::update(float dt)
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
-        auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)

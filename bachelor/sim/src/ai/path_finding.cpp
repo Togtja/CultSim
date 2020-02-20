@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+namespace cs::ai
+{
 glm::ivec2 world_to_grid(glm::vec2 pos, int grid)
 {
     return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
@@ -85,3 +87,4 @@ bool path_finding(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3
     }
     return false;
 }
+} // namespace cs::ai

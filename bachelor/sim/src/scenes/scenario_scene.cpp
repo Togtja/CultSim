@@ -55,7 +55,7 @@ void ScenarioScene::on_enter()
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 1; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -68,7 +68,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent,
                                                std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
                                                glm::normalize(glm::vec2(1.f, 1.f)),
-                                               500.f);
+                                               50.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
