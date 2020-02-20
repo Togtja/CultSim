@@ -288,9 +288,9 @@ TEST_CASE("attempting to move file")
 
 TEST_CASE("attempting to use move_file as overwrite")
 {
-    std::string name("overwrite2.txt");
+    std::string name("overwrite3.txt");
     std::string data("I will try to overwrite target");
-    std::string target("target2.txt");
+    std::string target("target3.txt");
     std::string t_data("I am an innocent file");
     REQUIRE(cs::fs::init("cultsim_test"));
     CHECK(!cs::fs::exists(name));
