@@ -120,7 +120,7 @@ void ContextHandler::bind_key(const KeyContext& context,
                               const std::function<void()>& function,
                               bool overwrite)
 {
-    auto input_it = m_input_map.find(context);
+    const auto& input_it = m_input_map.find(context);
     if (input_it != m_input_map.end())
     {
         m_input_map.at(context).bind_key(event, function, overwrite);
@@ -150,14 +150,15 @@ void ContextHandler::handle_input(const SDL_Scancode& event)
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it))
+        if (has_context(*it) && m_input_map.at(*it).has_event(event))
         {
             m_input_map.at(*it).handle_input(event);
+            return;
         }
-        return;
     }
     spdlog::debug("could not find anything for the {} event", event);
 }
+
 bool ContextHandler::has_context(const KeyContext& context)
 {
     return m_input_map.contains(context);
