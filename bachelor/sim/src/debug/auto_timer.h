@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug_timer_manager.h"
+
 #include <chrono>
 #include <string_view>
 
@@ -38,7 +40,7 @@ public:
     ~AutoTimer() noexcept
     {
         TimeUnit timed = std::chrono::steady_clock::now() - m_start_time;
-        spdlog::info("{}: {}ms", m_name, timed.count());
+        getDebugTimerResults().add_entry(m_name, timed.count());
     }
 };
 } // namespace cs
