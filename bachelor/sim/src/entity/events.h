@@ -14,4 +14,9 @@ struct ArrivedAtDestination
     entt::entity entity{};
     glm::vec3 position{};
 };
+
+struct SensedEntity
+{
+    entt::entity entity{};
+};
 } // namespace cs::event

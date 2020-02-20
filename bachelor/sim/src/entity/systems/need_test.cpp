@@ -151,4 +151,13 @@ TEST_CASE("pressing needs are correctly updated")
         }
         REQUIRE(needs.pressing_needs.size() == 4);
     });
+
+    need_system->update(-50.f);
+    view.each([](cs::component::Needs& needs) {
+        for (auto need : needs.needs) 
+        {
+            REQUIRE(need.status == 100.f);
+        }
+        REQUIRE(needs.pressing_needs.size() == 0);
+    });
 }
