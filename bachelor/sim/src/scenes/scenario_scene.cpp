@@ -58,13 +58,20 @@ void ScenarioScene::on_enter()
     std::normal_distribution<float> rng(0.f, 1.f);
 
     auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 10; i++)
     {
         auto agent = m_registry.create();
-        glm::vec2 pos(i * 15.f, 0.f);
-
-        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0), glm::vec3(0, 0, 0));
-        m_registry.assign<component::Movement>(agent, glm::vec2(0.f, 0.f), glm::normalize(glm::vec2(1.f, 1.f)), 50.f);
+        int i1     = i;
+        if (i % 2 == 1)
+        {
+            i1 = -i;
+        }
+        glm::vec2 pos(i1 * 15.f, 0.f);
+        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
+        m_registry.assign<component::Movement>(agent,
+                                               std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
+                                               glm::normalize(glm::vec2(1.f, 1.f)),
+                                               500.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
@@ -110,6 +117,11 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
+    for (int i = -5; i <= 5; i++)
+    {
+        gfx::get_renderer().debug().draw_line(glm::vec3(-32 * 5, i * 32, 0), glm::vec3(32 * 5, i * 32, 0), glm::vec3(1, 0.5f, 1));
+        gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * 5, 0), glm::vec3(i * 32, 32 * 5, 0), glm::vec3(1, 0.5f, 1));
+    }
     return false;
 }
 
