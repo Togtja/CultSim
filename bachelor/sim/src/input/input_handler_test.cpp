@@ -154,4 +154,19 @@ TEST_CASE("attempting to add non default context on top of another one")
     input.clear();
 }
 
+TEST_CASE("attempting to remove default context from stack")
+{
+    auto& input = get_input();
+    int times   = 0;
+
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F24, [&times]() { times++; });
+    input.handle_input(SDL_SCANCODE_F24);
+    CHECK(times == 1);
+
+    input.remove_context(KeyContext::DefaultContext);
+    input.handle_input(SDL_SCANCODE_F24);
+    CHECK(times == 2);
+    input.clear();
+}
+
 }
