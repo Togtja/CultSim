@@ -231,3 +231,27 @@ TEST_CASE("attempting to remove top non default context from stack")
     CHECK(times1 == 2);
     input.clear();
 }
+
+TEST_CASE("attempting to clear context from all bindings")
+{
+    auto& input = get_input();
+    int times   = 0;
+
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F11, [&times]() { times++; });
+    // Nothing should happend as the context are not on the stack
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times == 0);
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times == 1);
+
+    // Removed AgentOnHover
+    input.clear_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times == 1);
+    // Note how we don't need to add it to the context again
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F11, [&times]() { times++; });
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times == 2);
+    input.clear();
+}
