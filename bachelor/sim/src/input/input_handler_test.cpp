@@ -169,4 +169,35 @@ TEST_CASE("attempting to remove default context from stack")
     input.clear();
 }
 
+TEST_CASE("attempting to remove non default context from stack by context")
+{
+    auto& input = get_input();
+    int times1 = 0, times0 = 0;
+
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F11, [&times1]() { times1++; });
+    input.bind_key(KeyContext::AgentOnHover, SDL_SCANCODE_F13, [&times0]() { times0++; });
+    // Nothing should happend as the context are not on the stack
+    input.handle_input(SDL_SCANCODE_F11);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 0);
+    CHECK(times0 == 0);
+    input.add_context(KeyContext::AgentOnHover);
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F11);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 1);
+
+    // Removed AgentOnHover
+    input.remove_context(KeyContext::AgentOnHover);
+    input.handle_input(SDL_SCANCODE_F11);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 2);
+    CHECK(times0 == 1);
+
+    input.add_context(KeyContext::AgentOnHover);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times0 == 2);
+    input.clear();
+}
 }
