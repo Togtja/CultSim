@@ -23,10 +23,10 @@ void SpriteRenderer::display()
     /** Setup */
     uint32_t next_image{};
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
-    VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
     vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 100000000000ull);
     vkResetFences(m_device, 1, &m_fences[next_image]);
+    VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
     auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pools[next_image]);
 
@@ -74,7 +74,7 @@ void SpriteRenderer::display()
                        sizeof(float) * 16,
                        glm::value_ptr(m_camera.get_view_matrix()));
 
-    VkViewport viewport{0, 0, 1280, 720, 0, 1};
+    VkViewport viewport{0, 720, 1280, -720, 0, 1};
     vkCmdSetViewport(cbuf, 0, 1, &viewport);
 
     VkRect2D scissor{{0, 0}, {1280, 720}};
