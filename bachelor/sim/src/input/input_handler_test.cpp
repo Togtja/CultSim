@@ -126,4 +126,32 @@ TEST_CASE("attempting to add default context on top of something else")
     input.clear();
 }
 
+TEST_CASE("attempting to add non default context on top of another one")
+{
+    auto& input = get_input();
+    int times1 = 0, times0 = 0;
+
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F13, [&times1]() { times1++; });
+    input.bind_key(KeyContext::AgentOnHover, SDL_SCANCODE_F13, [&times0]() { times0++; });
+    // Nothing should happend as the context are not on the stack
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 0);
+    CHECK(times0 == 0);
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 0);
+    // Adding AgentOnHover, on top
+    input.add_context(KeyContext::AgentOnHover);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 1);
+    CHECK(times0 == 1);
+    // Removed old Agent that was under AgentOnHover, and put it above again
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F13);
+    CHECK(times1 == 2);
+    CHECK(times0 == 1);
+    input.clear();
+}
+
 }
