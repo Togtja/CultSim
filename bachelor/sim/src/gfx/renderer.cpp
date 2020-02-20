@@ -96,7 +96,11 @@ void Renderer::create_instance(const Window& window)
     VkInstanceCreateInfo instance_info = {VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
     instance_info.pApplicationInfo     = &appinfo;
 
-    const char* layers[]              = {"VK_LAYER_LUNARG_standard_validation"};
+    const char* layers[] = {
+#ifndef NDEBUG
+        "VK_LAYER_LUNARG_standard_validation"
+#endif
+    };
     instance_info.ppEnabledLayerNames = layers;
     instance_info.enabledLayerCount   = sizeof(layers) / sizeof(layers[0]);
 
@@ -105,7 +109,6 @@ void Renderer::create_instance(const Window& window)
 
     std::vector<const char*> extensions(ext_count);
     SDL_Vulkan_GetInstanceExtensions(window.get(), &ext_count, extensions.data());
-    extensions.push_back(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
 
     instance_info.ppEnabledExtensionNames = extensions.data();
     instance_info.enabledExtensionCount   = ext_count;
@@ -163,8 +166,6 @@ void Renderer::create_device()
     queue_info.pQueuePriorities        = priorities;
 
     std::vector<const char*> extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-    extensions.push_back(VK_KHR_GET_MEMORY_REQUIREMENTS_2_EXTENSION_NAME);
-    extensions.push_back(VK_KHR_BIND_MEMORY_2_EXTENSION_NAME);
 
     VkPhysicalDeviceFeatures features{};
     features.wideLines         = VK_TRUE;
