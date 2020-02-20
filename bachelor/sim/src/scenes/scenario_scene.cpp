@@ -12,6 +12,7 @@
 #include "entity/systems/requirement.h"
 #include "gfx/renderer.h"
 #include "preferences.h"
+#include "random_engine.h"
 
 #include <common_helpers.h>
 #include <functional>
@@ -50,9 +51,7 @@ void ScenarioScene::on_enter()
                              tags::TAG_Food,
                              std::vector<action::Action>{std::move(action)}};
 
-    static auto seed = std::random_device{};
-    static auto gen  = std::mt19937{seed()};
-    std::normal_distribution<float> rng(0.f, 1.f);
+    RandomEngine rng{};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
@@ -65,12 +64,9 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
-        glm::vec2 pos(i1 * 15.f, 0.f);
+        glm::vec2 pos(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent,
-                                               std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
-                                               glm::normalize(glm::vec2(1.f, 1.f)),
-                                               100.f);
+        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 100.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
