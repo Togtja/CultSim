@@ -86,4 +86,21 @@ TEST_CASE("attempting to bind same key to different function with overwrite")
     input.clear();
 }
 
+TEST_CASE("attempting to unbind something that is already unbound")
+{
+    auto& input = get_input();
+    int times   = 0;
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F19, [&times]() { times++; });
+    input.handle_input(SDL_SCANCODE_F19);
+    CHECK(times == 1);
+
+    input.unbind_key(KeyContext::DefaultContext, SDL_SCANCODE_F19);
+    input.handle_input(SDL_SCANCODE_F19);
+    CHECK(times == 1);
+
+    input.unbind_key(KeyContext::DefaultContext, SDL_SCANCODE_F19);
+    input.handle_input(SDL_SCANCODE_F19);
+    CHECK(times == 1);
+    input.clear();
+}
 }
