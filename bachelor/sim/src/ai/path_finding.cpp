@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+namespace cs::ai
+{
 glm::ivec2 world_to_grid(glm::vec2 pos, int grid)
 {
     return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
@@ -15,13 +17,15 @@ int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
 
 void reconstruct_path(const glm::ivec2& start,
                       const glm::ivec2& goal,
+                      const glm::vec2& actual_goal,
                       std::vector<glm::vec3>& pos,
                       const robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2>& a_star_grid)
 {
     glm::ivec2 curr = goal;
+    pos.emplace_back(glm::vec3(actual_goal, 0.f));
     do
     {
-        pos.emplace_back(glm::vec3(curr.x * 32, curr.y * 32, 0));
+        pos.emplace_back(glm::vec3(curr * 32, 0));
         curr = a_star_grid.at(curr);
     } while (curr != start);
 }
@@ -52,7 +56,7 @@ bool path_finding(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3
         open.pop();
         if (curr == goal)
         {
-            reconstruct_path(start, goal, poss, a_star_grid);
+            reconstruct_path(start, goal, goal_vec, poss, a_star_grid);
             return true;
         }
         glm::ivec2 next{};
@@ -85,3 +89,4 @@ bool path_finding(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3
     }
     return false;
 }
+} // namespace cs::ai
