@@ -255,3 +255,51 @@ TEST_CASE("attempting to clear context from all bindings")
     CHECK(times == 2);
     input.clear();
 }
+
+TEST_CASE("attempting to go back to default context")
+{
+    auto& input = get_input();
+    int times0 = 0, times1 = 0, times2 = 0;
+
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F11, [&times0]() { times0++; });
+    input.bind_key(KeyContext::Agent, SDL_SCANCODE_F11, [&times1]() { times1++; });
+    input.bind_key(KeyContext::AgentOnHover, SDL_SCANCODE_F11, [&times2]() { times2++; });
+    // Only deafult is on the context stack
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 1);
+    CHECK(times1 == 0);
+    CHECK(times2 == 0);
+
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 1);
+    CHECK(times1 == 1);
+    CHECK(times2 == 0);
+
+    input.add_context(KeyContext::AgentOnHover);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 1);
+    CHECK(times1 == 1);
+    CHECK(times2 == 1);
+
+    // Going back to default
+    input.back_to_default();
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 2);
+    CHECK(times1 == 1);
+    CHECK(times2 == 1);
+
+    input.add_context(KeyContext::Agent);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 2);
+    CHECK(times1 == 2);
+    CHECK(times2 == 1);
+
+    input.add_context(KeyContext::AgentOnHover);
+    input.handle_input(SDL_SCANCODE_F11);
+    CHECK(times0 == 2);
+    CHECK(times1 == 2);
+    CHECK(times2 == 2);
+
+    input.clear();
+}
