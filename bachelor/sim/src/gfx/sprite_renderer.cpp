@@ -25,10 +25,33 @@ void SpriteRenderer::display()
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
     VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
-    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 10000000000ull);
+    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 100000000000ull);
     vkResetFences(m_device, 1, &m_fences[next_image]);
 
     auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pools[next_image]);
+
+    VkBufferCopy region{0, 0, sizeof(SpriteInstanceVertex) * m_nsprites};
+    vkCmdCopyBuffer(cbuf, m_instance_buffer.buffer, m_instance_frame_buffers[next_image].buffer, 1, &region);
+
+    VkBufferMemoryBarrier instance_buffer_barrier = {VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
+    instance_buffer_barrier.buffer                = m_instance_frame_buffers[next_image].buffer;
+    instance_buffer_barrier.dstQueueFamilyIndex   = VK_QUEUE_FAMILY_IGNORED;
+    instance_buffer_barrier.srcQueueFamilyIndex   = VK_QUEUE_FAMILY_IGNORED;
+    instance_buffer_barrier.offset                = 0u;
+    instance_buffer_barrier.size                  = sizeof(SpriteInstanceVertex) * m_nsprites;
+    instance_buffer_barrier.dstAccessMask         = VK_ACCESS_TRANSFER_WRITE_BIT;
+    instance_buffer_barrier.srcAccessMask         = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+
+    vkCmdPipelineBarrier(cbuf,
+                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         0,
+                         0,
+                         nullptr,
+                         1,
+                         &instance_buffer_barrier,
+                         0,
+                         nullptr);
 
     VkClearColorValue color_clear_value = {48.f / 255.f, 10.f / 255.f, 36.f / 255.f, 1.f};
     VkClearValue clear_value{};
@@ -133,13 +156,17 @@ void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
     {
         m_cmd_pools.push_back(vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
         m_fences.push_back(vk::create_fence(m_device, true));
+        m_instance_frame_buffers.push_back(vk::create_buffer(m_allocator,
+                                                             sizeof(SpriteInstanceVertex) * SIM_MAX_AGENTS,
+                                                             VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                                             VMA_MEMORY_USAGE_GPU_ONLY));
     }
 
     init_pipeline();
 
     m_instance_buffer = vk::create_buffer(m_allocator,
                                           sizeof(SpriteInstanceVertex) * SIM_MAX_AGENTS,
-                                          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                                          VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                                           VMA_MEMORY_USAGE_CPU_ONLY);
 
     VK_CHECK(vmaMapMemory(m_allocator, m_instance_buffer.allocation, &m_instance_buffer.data));
@@ -183,6 +210,11 @@ void SpriteRenderer::deinit()
     for (auto fence : m_fences)
     {
         vkDestroyFence(m_device, fence, nullptr);
+    }
+
+    for (auto buf : m_instance_frame_buffers)
+    {
+        vk::destroy_buffer(m_allocator, buf);
     }
 
     vkDestroySemaphore(m_device, m_rel_sem, nullptr);

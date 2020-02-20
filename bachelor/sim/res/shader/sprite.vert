@@ -29,8 +29,9 @@ layout(location = 0) out VertexData
 {
     vec3 color;
     vec2 texcoord;
-    uint texture;
 } vs_out;
+
+layout(location = 2) out uint vs_texture;
 
 /** Uniforms */
 layout(push_constant) uniform PerFrame
@@ -40,9 +41,9 @@ layout(push_constant) uniform PerFrame
 
 void main()
 {
-    vs_out.color    = vec3(1.f);
+    vs_out.color    = a_color;
     vs_out.texcoord = tex_coords[gl_VertexIndex];
-    vs_out.texture  = 2u;
+    vs_texture      = a_texture;
 
     gl_Position = u_projection * (vec4(positions[gl_VertexIndex], 1.f) * 10.f + vec4(a_offset, 0.f));
 }

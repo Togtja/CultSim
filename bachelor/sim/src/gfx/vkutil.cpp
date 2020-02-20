@@ -299,9 +299,10 @@ VkPipeline create_gfx_pipeline(VkDevice device,
     std::vector<VkVertexInputBindingDescription> vertex_bindings{
         {0, sizeof(gfx::SpriteInstanceVertex), VK_VERTEX_INPUT_RATE_INSTANCE}};
 
-    std::vector<VkVertexInputAttributeDescription> vertex_attributes{{0, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                     {1, 0, VK_FORMAT_R32G32B32_SFLOAT},
-                                                                     {2, 0, VK_FORMAT_R32_UINT}};
+    std::vector<VkVertexInputAttributeDescription> vertex_attributes{
+        {0, 0, VK_FORMAT_R32G32B32_SFLOAT, 0u},
+        {1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(gfx::SpriteInstanceVertex, color)},
+        {2, 0, VK_FORMAT_R32_UINT, offsetof(gfx::SpriteInstanceVertex, texture)}};
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
     vertex_input_info.vertexBindingDescriptionCount        = vertex_bindings.size();

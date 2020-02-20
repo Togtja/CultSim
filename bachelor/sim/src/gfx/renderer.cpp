@@ -12,7 +12,6 @@ namespace cs::gfx
 {
 Renderer::~Renderer() noexcept
 {
-    deinit();
 }
 
 DebugRenderer& Renderer::debug()
@@ -230,7 +229,7 @@ void Renderer::create_swapchain(const Window& window)
     create_info.imageExtent              = surface_capabilities.currentExtent;
     create_info.imageFormat              = m_format.format;
     create_info.imageColorSpace          = m_format.colorSpace;
-    create_info.minImageCount            = glm::max(2u, surface_capabilities.minImageCount);
+    create_info.minImageCount            = glm::clamp(3u, surface_capabilities.minImageCount, surface_capabilities.maxImageCount);
     create_info.queueFamilyIndexCount    = 1;
     create_info.pQueueFamilyIndices      = &m_gfx_queue_idx;
     create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;

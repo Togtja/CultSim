@@ -59,6 +59,8 @@ private:
 
     vk::Buffer m_instance_buffer{};
 
+    std::vector<vk::Buffer> m_instance_frame_buffers{};
+
     /** Pointer to GPU memory where the instance variables are */
     SpriteInstanceVertex* m_instance_data{};
 
