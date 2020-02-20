@@ -174,6 +174,11 @@ void ContextHandler::clear_context(const KeyContext& context)
         spdlog::debug("the context {} has no bindings", context);
     }
 }
+void ContextHandler::back_to_default()
+{
+    m_active_stack.erase(m_active_stack.begin() + 1, m_active_stack.end());
+}
+
 void ContextHandler::clear()
 {
     m_input_map.clear();

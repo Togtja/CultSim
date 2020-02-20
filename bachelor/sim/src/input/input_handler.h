@@ -141,6 +141,11 @@ public:
     void clear_context(const KeyContext& context);
 
     /**
+     * Similar to clear, except it keeps all the keybindings
+     */
+    void back_to_default();
+
+    /**
      * Clears KeyContext stack, and the mappings
      */
     void clear();
