@@ -5,10 +5,11 @@ before_script:
   - uname --all
   - apt update -qq
   - apt install -y -qq git make lua5.3 lua5.3-dev libx11-dev libxext-dev clang
-  - apt install -y -qq cppcheck libphysfs-dev
-  - apt install -y -qq libtbb-dev snapd
-  - systemctl restart snapd.service
-  - snap install cmake --classic
+  - apt install -y -qq cppcheck libphysfs-dev libtbb-dev wget
+  - wget https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4-Linux-x86_64.sh
+  - chmod +x cmake-3.16.4-Linux-x86_64.sh 
+  - mkdir cmakebin
+  - ./cmake-3.16.4-Linux-x86_64.sh --skip-license --prefix=cmakebin
 
 # Run unit tests (soon -> run linter and formatting)
 test:
@@ -18,6 +19,6 @@ test:
     - cmake --version
     - mkdir build
     - cd build
-    - cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
+    - cmakebin/bin/cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
     - make -j4
     - ctest
