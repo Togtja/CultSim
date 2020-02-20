@@ -33,23 +33,18 @@ void SpriteRenderer::display()
     VkBufferCopy region{0, 0, sizeof(SpriteInstanceVertex) * m_nsprites};
     vkCmdCopyBuffer(cbuf, m_instance_buffer.buffer, m_instance_frame_buffers[next_image].buffer, 1, &region);
 
-    VkBufferMemoryBarrier instance_buffer_barrier = {VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER};
-    instance_buffer_barrier.buffer                = m_instance_frame_buffers[next_image].buffer;
-    instance_buffer_barrier.dstQueueFamilyIndex   = VK_QUEUE_FAMILY_IGNORED;
-    instance_buffer_barrier.srcQueueFamilyIndex   = VK_QUEUE_FAMILY_IGNORED;
-    instance_buffer_barrier.offset                = 0u;
-    instance_buffer_barrier.size                  = sizeof(SpriteInstanceVertex) * m_nsprites;
-    instance_buffer_barrier.dstAccessMask         = VK_ACCESS_TRANSFER_WRITE_BIT;
-    instance_buffer_barrier.srcAccessMask         = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+    VkMemoryBarrier memory_barrier = {VK_STRUCTURE_TYPE_MEMORY_BARRIER};
+    memory_barrier.dstAccessMask   = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT;
+    memory_barrier.srcAccessMask   = VK_ACCESS_TRANSFER_WRITE_BIT;
 
     vkCmdPipelineBarrier(cbuf,
-                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
                          VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
                          0,
+                         1,
+                         &memory_barrier,
                          0,
                          nullptr,
-                         1,
-                         &instance_buffer_barrier,
                          0,
                          nullptr);
 
