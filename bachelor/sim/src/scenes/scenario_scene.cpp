@@ -121,20 +121,25 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
+    ImGui::Text("GRID");
+    ImGui::Separator();
     static bool show_grid = true;
+    static int grid_span  = 25;
+    static int grid_size  = 32;
     ImGui::Checkbox("Show Grid", &show_grid);
+    ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
+    ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
 
     if (show_grid)
     {
-        constexpr int grid_size = 25;
-        for (int i = -grid_size; i <= grid_size; i++)
+        for (int i = -grid_span; i <= grid_span; i++)
         {
-            gfx::get_renderer().debug().draw_line(glm::vec3(-32 * grid_size, i * 32, 0),
-                                                  glm::vec3(32 * grid_size, i * 32, 0),
+            gfx::get_renderer().debug().draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
+                                                  glm::vec3(grid_size * grid_span, i * grid_size, 0),
                                                   glm::vec3(0.3f));
 
-            gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * grid_size, 0),
-                                                  glm::vec3(i * 32, 32 * grid_size, 0),
+            gfx::get_renderer().debug().draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
+                                                  glm::vec3(i * grid_size, grid_size * grid_span, 0),
                                                   glm::vec3(0.3f));
         }
     }
