@@ -6,6 +6,8 @@
 #include <execution>
 #include <random>
 
+#include <glm/glm.hpp>
+
 namespace cs::system
 {
 Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)

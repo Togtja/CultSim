@@ -33,6 +33,10 @@ void Mitigation::update(float dt)
                 }
             }
         }
+        else
+        {
+            strategies.staged_strategies.clear();
+        }
     });
 }
 bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
