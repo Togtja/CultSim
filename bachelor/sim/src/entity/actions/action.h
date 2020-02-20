@@ -18,8 +18,8 @@ struct Action
     float time_to_complete{};
     float time_spent = 0.f;
 
-    std::function<void(void)> abort{};
     std::function<void(void)> success{};
     std::function<void(void)> failure{};
+    std::function<void(void)> abort{};
 };
 } // namespace cs::action
