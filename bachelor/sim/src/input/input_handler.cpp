@@ -13,8 +13,13 @@ InputHandler::InputHandler(const KeyContext& type)
     m_context_type = type;
 }
 
-void InputHandler::bind_key(const SDL_Scancode& event, const std::function<void()>& function)
+void InputHandler::bind_key(const SDL_Scancode& event, const std::function<void()>& function, bool overwrite)
 {
+    if (overwrite)
+    {
+        m_key_binding[event] = function;
+        return;
+    }
     if (!has_event(event))
     {
         m_key_binding.emplace(event, function);
@@ -110,12 +115,15 @@ void ContextHandler::remove_context()
     m_active_stack.pop_back();
 }
 
-void ContextHandler::bind_key(const KeyContext& context, const SDL_Scancode& event, const std::function<void()>& function)
+void ContextHandler::bind_key(const KeyContext& context,
+                              const SDL_Scancode& event,
+                              const std::function<void()>& function,
+                              bool overwrite)
 {
     auto input_it = m_input_map.find(context);
     if (input_it != m_input_map.end())
     {
-        m_input_map.at(context).bind_key(event, function);
+        m_input_map.at(context).bind_key(event, function, overwrite);
     }
     else
     {

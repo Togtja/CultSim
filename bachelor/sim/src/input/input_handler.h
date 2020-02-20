@@ -32,9 +32,10 @@ public:
      * Given a key and a function binds that key to that function in the input handlers context
      *
      * @param event The key event that you want to bind
-     * @param function the function you want that key to be binded to
+     * @param function The function you want that key to be binded to
+     * @param overwrite Set to true if you want to overwrite what is already there
      */
-    void bind_key(const SDL_Scancode& event, const std::function<void()>& function);
+    void bind_key(const SDL_Scancode& event, const std::function<void()>& function, bool overwrite = false);
 
     /**
      * Unbinds a key in the input handlers context
@@ -105,8 +106,10 @@ public:
      * @param context The context you want to bind a key for
      * @param event The key you want to bind to the context
      * @param function The function you want you bind to the key event
+     * @param overwrite Set to true if you want to overwrite what is already there
      */
-    void bind_key(const KeyContext& context, const SDL_Scancode& event, const std::function<void()>& function);
+    void
+    bind_key(const KeyContext& context, const SDL_Scancode& event, const std::function<void()>& function, bool overwrite = false);
 
     /**
      * Unbind a key from a context
