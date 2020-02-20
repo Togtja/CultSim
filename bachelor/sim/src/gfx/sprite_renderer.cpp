@@ -25,7 +25,7 @@ void SpriteRenderer::display()
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
     VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
-    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, ~0ull);
+    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 10000000000ull);
     vkResetFences(m_device, 1, &m_fences[next_image]);
 
     auto cbuf = vk::begin_one_time_cmd_buffer(m_device, m_cmd_pools[next_image]);
@@ -167,6 +167,8 @@ void SpriteRenderer::init_pipeline()
 
 void SpriteRenderer::deinit()
 {
+    vkWaitForFences(m_device, m_fences.size(), m_fences.data(), VK_TRUE, ~0ull);
+
     vmaUnmapMemory(m_allocator, m_instance_buffer.allocation);
     vk::destroy_buffer(m_allocator, m_instance_buffer);
 
