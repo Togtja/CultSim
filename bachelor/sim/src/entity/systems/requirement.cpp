@@ -21,7 +21,7 @@ void Requirement::update(float dt)
             }
             else if (mov.desired_position.empty())
             {
-                ai::path_finding(pos.position, locationreqs.desired_position, mov.desired_position);
+                ai::find_path_astar(pos.position, locationreqs.desired_position, mov.desired_position);
             }
         });
 
@@ -61,7 +61,7 @@ void Requirement::update(float dt)
         }
         else if (mov.desired_position.empty())
         {
-            ai::path_finding(pos.position, findreqs.desired_position, mov.desired_position);
+            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
         }
     });
 }
