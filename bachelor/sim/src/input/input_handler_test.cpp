@@ -66,4 +66,24 @@ TEST_CASE("attempting to bind same key to different function without overwrite")
     CHECK(times0 == 0);
     input.clear();
 }
+TEST_CASE("attempting to bind same key to different function with overwrite")
+{
+    auto& input = get_input();
+    int times1 = 0, times0 = 0;
+
+    input.bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F19, [&times1]() { times1++; });
+    input.handle_input(SDL_SCANCODE_F19);
+    CHECK(times1 == 1);
+
+    input.bind_key(
+        KeyContext::DefaultContext,
+        SDL_SCANCODE_F19,
+        [&times0]() { times0++; },
+        true);
+    input.handle_input(SDL_SCANCODE_F19);
+    CHECK(times1 == 1);
+    CHECK(times0 == 1);
+    input.clear();
+}
+
 }
