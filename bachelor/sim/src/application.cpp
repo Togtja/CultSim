@@ -1,5 +1,6 @@
 #include "application.h"
 #include "constants.h"
+#include "debug/debug_timer_manager.h"
 #include "delta_clock.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
@@ -39,6 +40,7 @@ void Application::run(const std::vector<char*>& args)
         ImGui::NewFrame();
 
         update(dt_clock.restart());
+        getDebugTimerResults().show_debug_ui();
 
         draw();
     }
