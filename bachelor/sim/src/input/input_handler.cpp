@@ -68,6 +68,7 @@ void ContextHandler::add_context(const KeyContext& context)
 {
     if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
     {
+        spdlog::warn("can not add default context on top of something else");
         return;
     }
 
@@ -127,7 +128,7 @@ void ContextHandler::unbind_key(const KeyContext& context, const SDL_Scancode& e
 {
     if (has_context(context))
     {
-        auto input = m_input_map.at(context);
+        auto& input = m_input_map.at(context);
         input.unbind_key(event);
     }
     else
