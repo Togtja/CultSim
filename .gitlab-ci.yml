@@ -1,19 +1,23 @@
-image: frolvlad/alpine-gxx
+image: gcc:9.2.0
 
 # Install dependencies for build up front
 before_script:
-  - apk update
-  - apk add git make cmake mesa mesa-dev lua lua-dev libx11-dev libxext-dev clang
-  - apk add cppcheck physfs physfs-dev physfs-static --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+  - uname --all
+  - apt update -qq
+  - apt install -y -qq git make lua5.3 lua5.3-dev libx11-dev libxext-dev clang
+  - apt install -y -qq cppcheck libphysfs-dev libtbb-dev wget mesa-common-dev libgl1-mesa-dev
+  - wget https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4-Linux-x86_64.sh
+  - chmod +x cmake-3.16.4-Linux-x86_64.sh 
+  - mkdir cmakebin
+  - ./cmake-3.16.4-Linux-x86_64.sh --skip-license --prefix=cmakebin
 
 # Run unit tests (soon -> run linter and formatting)
 test:
   tags:
     - docker
   script:
-    - cmake --version
     - mkdir build
     - cd build
-    - cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
-    - make -j4
+    - ../cmakebin/bin/cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
+    - make
     - ctest

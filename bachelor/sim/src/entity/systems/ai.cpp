@@ -1,6 +1,10 @@
 #include "ai.h"
+#include "ai/path_finding.h"
 #include "constants.h"
 #include "entity/components/components.h"
+
+#include <algorithm>
+#include <execution>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
@@ -19,19 +23,6 @@ bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
     return is_visible(pos, pos2, size + size2);
 }
 
-glm::vec2 AI::path_finding()
-{
-    static std::random_device rd{};
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution dist(-360, 360);
-    return glm::vec2(dist(gen), dist(gen));
-}
-
-glm::ivec2 AI::world_to_grid(glm::vec2 pos)
-{
-    return {static_cast<int>(pos.x) / static_cast<int>(SIM_GRID_SIZE), static_cast<int>(pos.y) / static_cast<int>(SIM_GRID_SIZE)};
-}
-
 void AI::update(float dt)
 {
     collision_grid.clear();
@@ -45,14 +36,22 @@ void AI::update(float dt)
     m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = m_registry.group<component::Vision, component::Position>();
 
-    vis_view.each([this](entt::entity e, component::Vision& vis, const component::Position& pos) {
+    std::for_each(std::execution::par_unseq, vis_view.begin(), vis_view.end(), [this, &vis_view](entt::entity e) {
+        auto&& vis      = vis_view.get<component::Vision>(e);
+        const auto& pos = vis_view.get<component::Position>(e);
+
         auto min = world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         auto max = world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                for (auto&& e2 : collision_grid[x * SIM_GRID_SIZE + y])
+                if (collision_grid.find(x * SIM_GRID_SIZE + y) == collision_grid.end())
+                {
+                    continue;
+                }
+
+                for (auto e2 : collision_grid[x * SIM_GRID_SIZE + y])
                 {
                     auto& pos2 = m_registry.get<component::Position>(e2);
                     if (e == e2)
@@ -62,6 +61,25 @@ void AI::update(float dt)
                     if (is_visible(pos.position, pos2.position, vis.vision_radius))
                     {
                         vis.seen.push_back(e2);
+
+                        // Collision avoidance
+                        // if (is_visible(pos.position, pos2.position, vis.vision_radius * 0.5f))
+                        //{
+                        //    auto move = m_registry.try_get<component::Movement>(e);
+                        //    if (move == nullptr)
+                        //    {
+                        //        continue;
+                        //    }
+                        //    // How much ahead we see
+                        //    auto ahead = glm::vec2(pos.position.x, pos.position.y) + move->direction * (vis.vision_radius / 2);
+                        //    // 5 should be the size of the entt on pos2
+                        //    if (is_visible(ahead, pos2.position, 5 + 4))
+                        //    {
+                        //        auto avoid_force = ahead - glm::vec2(pos2.position.x, pos2.position.y);
+                        //        move->desired_position.push_back(pos.position + glm::normalize(glm::vec3(avoid_force, 0))
+                        //        * 2.f);
+                        //    }
+                        //}
                     }
                 }
             }
