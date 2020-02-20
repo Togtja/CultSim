@@ -9,7 +9,8 @@ namespace cs::system
 {
 void Action::update(float dt)
 {
-    auto group = m_registry.group<component::Strategies>(entt::exclude<component::LocationRequirement, component::VisionRequirement, component::FindRequirement>);
+    auto group = m_registry.group<component::Strategies>(
+        entt::exclude<component::LocationRequirement, component::VisionRequirement, component::FindRequirement>);
     group.each([this, dt](entt::entity e, component::Strategies& strategies) {
         if (!strategies.staged_strategies.empty())
         {
@@ -64,7 +65,7 @@ void Action::update(float dt)
                 }
                 else
                 {
-                    continue;
+                    strategies.staged_strategies.erase(strategies.staged_strategies.begin());
                 }
             }
         }

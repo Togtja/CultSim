@@ -22,4 +22,9 @@ struct Action
     std::function<void(void)> failure{};
     std::function<void(void)> abort{};
 };
+
+inline bool operator==(Action const& lhs, Action const& rhs)
+{
+    return lhs.name == rhs.name;
+}
 } // namespace cs::action
