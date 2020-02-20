@@ -1,6 +1,5 @@
 #include "scenario_scene.h"
 #include "entity/actions/action.h"
-#include "entity/actions/location_requirement.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
@@ -67,7 +66,6 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Requirement>(agent);
         m_registry.assign<component::Tags>(agent, tags::TAG_Food);
     }
 

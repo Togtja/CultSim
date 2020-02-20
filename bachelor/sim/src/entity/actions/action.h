@@ -1,6 +1,5 @@
 #pragma once
 
-#include "requirement.h"
 #include "entity/components/tags.h"
 
 #include <functional>
