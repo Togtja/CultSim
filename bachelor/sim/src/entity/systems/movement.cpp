@@ -7,6 +7,7 @@
 #include <random>
 
 #include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
@@ -27,8 +28,17 @@ void Movement::update(float dt)
         }
         auto cur_head  = mov.desired_position.back();
         glm::vec3 temp = cur_head - pos.position;
-        mov.direction  = glm::normalize(temp);
+
+        if (glm::length(temp) != 0)
+        {
+            mov.direction = glm::normalize(temp);
+        }
+        else
+        {
+            mov.direction = temp;
+        }
         pos.position += glm::vec3(mov.direction * (mov.speed * dt), 0.f);
+
         if (glm::distance(pos.position, cur_head) < 5.f)
         {
             mov.desired_position.pop_back();
