@@ -21,12 +21,18 @@ class AutoTimer
     using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
     using TimeUnit  = std::chrono::duration<double, std::milli>;
 
+    struct Record
+    {
+        std::string_view name{};
+        double time_ms{};
+    };
+
 private:
     TimePoint m_start_time = std::chrono::steady_clock::now();
     std::string_view m_name{};
 
     /** AutoTimer Results */
-    inline static robin_hood::unordered_map<std::string_view, double> s_results{};
+    inline static std::vector<Record> s_results{};
 
 public:
     explicit AutoTimer(std::string_view name) : m_name(name)
@@ -40,8 +46,8 @@ public:
 
     ~AutoTimer() noexcept
     {
-        TimeUnit timed    = std::chrono::steady_clock::now() - m_start_time;
-        s_results[m_name] = timed.count();
+        TimeUnit timed = std::chrono::steady_clock::now() - m_start_time;
+        s_results.push_back({m_name, timed.count()});
     }
 
     /**
