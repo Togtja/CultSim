@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "ai/path_finding.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/events.h"
 
@@ -17,6 +18,8 @@ Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISy
 
 void Movement::update(float dt)
 {
+    CS_AUTOTIMER(Movement System);
+
     static auto seed = std::random_device{};
     static auto gen  = std::mt19937{seed()};
     std::uniform_real_distribution rng(-1.f, 1.f);
