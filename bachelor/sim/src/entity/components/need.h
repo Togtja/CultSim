@@ -16,7 +16,7 @@ struct Need
 
     float decay_rate{};
 
-    tags::ETag tags{};
+    ETag tags{};
 };
 
 inline bool operator<(Need const& lhs, Need const& rhs)

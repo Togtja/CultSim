@@ -47,7 +47,7 @@ void Movement::update(float dt)
 
             for (auto other : vis.seen)
             {
-                if (!(m_registry.get<component::Tags>(other).tags & tags::TAG_Avoidable))
+                if (!(m_registry.get<component::Tags>(other).tags & TAG_Avoidable))
                 {
                     continue;
                 }

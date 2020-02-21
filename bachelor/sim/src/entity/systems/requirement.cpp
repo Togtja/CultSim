@@ -47,11 +47,14 @@ void Requirement::update(float dt)
                               component::Movement& mov) {
         for (auto& entity : vision.seen)
         {
-            if ((m_registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
+            if (m_registry.valid(entity) && ((m_registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
             {
                 m_registry.assign<component::LocationRequirement>(e, m_registry.get<component::Position>(entity).position);
+                m_registry.get<component::Strategies>(e).staged_strategies.front().actions.back().target = entity;
                 m_registry.remove<component::FindRequirement>(e);
                 mov.desired_position.clear();
+                m_registry.get<component::Tags>(entity).tags =
+                    static_cast<ETag>(m_registry.get<component::Tags>(entity).tags & ~findreqs.tags);
                 return;
             }
         }
@@ -60,13 +63,13 @@ void Requirement::update(float dt)
             m_registry.assign_or_replace<component::FindRequirement>(
                 e,
                 findreqs.tags,
-                glm::vec3(m_rng.uniform(-250.f, 250.f), m_rng.uniform(-250.f, 250.f), 0.f));
+                glm::vec3(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f), 0.f));
         }
         else if (mov.desired_position.empty())
         {
             if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
             {
-                findreqs.desired_position = glm::vec3(m_rng.uniform(-200.f, 200.f), m_rng.uniform(-200.f, 200.f), 0.f);
+                findreqs.desired_position = glm::vec3(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f), 0.f);
             }
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
         }
