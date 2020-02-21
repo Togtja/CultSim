@@ -6,7 +6,7 @@ namespace cs::ai
 {
 glm::ivec2 world_to_grid(const glm::vec2& pos, int grid)
 {
-    return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
+    return {static_cast<int>(pos.x) / grid, static_cast<int>(pos.y) / grid};
 }
 
 int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
