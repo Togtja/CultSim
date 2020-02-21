@@ -27,23 +27,23 @@ void Action::update(float dt)
                         spdlog::warn("Pushing back requirement {}", action.requirements);
                         switch (action.requirements)
                         {
-                            case tags::TAG_Location:
+                            case TAG_Location:
                             {
                                 spdlog::warn("Pushing to entt: {}", static_cast<uint32_t>(e));
                                 m_registry.assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
-                                action.requirements = static_cast<tags::ETag>(action.requirements & ~tags::TAG_Location);
+                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
                                 break;
                             }
-                            case tags::TAG_Vision:
+                            case TAG_Vision:
                             {
-                                m_registry.assign<component::VisionRequirement>(e, tags::TAG_Food);
-                                action.requirements = static_cast<tags::ETag>(action.requirements & ~tags::TAG_Vision);
+                                m_registry.assign<component::VisionRequirement>(e, TAG_Food);
+                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
                                 break;
                             }
-                            case tags::TAG_Find:
+                            case TAG_Find:
                             {
-                                m_registry.assign<component::FindRequirement>(e, tags::TAG_Food, glm::vec3{});
-                                action.requirements = static_cast<tags::ETag>(action.requirements & ~tags::TAG_Find);
+                                m_registry.assign<component::FindRequirement>(e, TAG_Food, glm::vec3{});
+                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
                             }
                         }
                         break;

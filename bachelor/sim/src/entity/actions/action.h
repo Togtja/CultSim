@@ -15,7 +15,7 @@ struct Action
 {
     std::string name{};
 
-    tags::ETag requirements{};
+    ETag requirements{};
 
     float time_to_complete{};
     float time_spent = 0.f;

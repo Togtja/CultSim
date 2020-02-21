@@ -35,12 +35,12 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, tags::TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, tags::TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, tags::TAG_Sleep};
+    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
+    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, TAG_Drink};
+    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, TAG_Sleep};
 
     action::Action action_eat{static_cast<std::string>("eat"),
-                              tags::TAG_Find,
+                              TAG_Find,
                               5.f,
                               0.f,
                               {},
@@ -49,7 +49,7 @@ void ScenarioScene::on_enter()
                                   r.destroy(n);
                                   for (auto& need : r.get<component::Needs>(e).needs)
                                   {
-                                      if (need.tags & tags::TAG_Food)
+                                      if (need.tags & TAG_Food)
                                       {
                                           spdlog::warn("Current status of need FOOD: {}", need.status);
                                           need.status += 50.f;
@@ -65,7 +65,7 @@ void ScenarioScene::on_enter()
                               }};
 
     action::Action action_drink{static_cast<std::string>("drink"),
-                                tags::TAG_Find,
+                                TAG_Find,
                                 2.f,
                                 0.f,
                                 {},
@@ -74,7 +74,7 @@ void ScenarioScene::on_enter()
                                     r.destroy(n);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
-                                        if (need.tags & tags::TAG_Drink)
+                                        if (need.tags & TAG_Drink)
                                         {
                                             spdlog::warn("Current status of need DRINK: {}", need.status);
                                             need.status += 50.f;
@@ -98,7 +98,7 @@ void ScenarioScene::on_enter()
                                     spdlog::warn("We finished action: sleep on entity: {}", e);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
-                                        if (need.tags & tags::TAG_Sleep)
+                                        if (need.tags & TAG_Sleep)
                                         {
                                             spdlog::warn("Current status of need SLEEP: {}", need.status);
                                             need.status += 10.f;
@@ -113,17 +113,17 @@ void ScenarioScene::on_enter()
     ai::Strategy strategy_findfood  = {static_cast<std::string>("eat food"),
                                       0,
                                       {},
-                                      tags::TAG_Food,
+                                      TAG_Food,
                                       std::vector<action::Action>{action_eat}};
     ai::Strategy strategy_finddrink = {static_cast<std::string>("drink water"),
                                        0,
                                        {},
-                                       tags::TAG_Drink,
+                                       TAG_Drink,
                                        std::vector<action::Action>{action_drink}};
     ai::Strategy strategy_sleep     = {static_cast<std::string>("sleep"),
                                    0,
                                    {},
-                                   tags::TAG_Sleep,
+                                   TAG_Sleep,
                                    std::vector<action::Action>{action_sleep}};
 
     RandomEngine rng{};
@@ -145,7 +145,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Tags>(agent, tags::TAG_Avoidable);
+        m_registry.assign<component::Tags>(agent, TAG_Avoidable);
         m_registry.assign<component::Needs>(agent,
                                             std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
                                             std::vector<ai::Need>{});
@@ -154,15 +154,13 @@ void ScenarioScene::on_enter()
             agent,
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
             std::vector<ai::Strategy>{});
-
-        m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
     }
     for (int j = 0; j < 200; j++)
     {
         auto food = m_registry.create();
         m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
         m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-        m_registry.assign<component::Tags>(food, tags::TAG_Food);
+        m_registry.assign<component::Tags>(food, TAG_Food);
     }
 
     for (int k = 0; k < 200; k++)
@@ -170,7 +168,7 @@ void ScenarioScene::on_enter()
         auto drink = m_registry.create();
         m_registry.assign<component::Position>(drink, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
         m_registry.assign<component::Sprite>(drink, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-        m_registry.assign<component::Tags>(drink, tags::TAG_Drink);
+        m_registry.assign<component::Tags>(drink, TAG_Drink);
     }
 
     /** Add required systems */

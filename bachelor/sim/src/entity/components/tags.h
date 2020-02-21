@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-namespace cs::tags
+namespace cs
 {
 enum ETag : uint64_t
 {
@@ -15,4 +15,4 @@ enum ETag : uint64_t
 
     TAG_Avoidable = 1 << 8
 };
-} // namespace cs::tags
+} // namespace cs

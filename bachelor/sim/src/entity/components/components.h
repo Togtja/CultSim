@@ -118,18 +118,18 @@ struct LocationRequirement
 
 struct VisionRequirement
 {
-    tags::ETag tags{};
+    ETag tags{};
 };
 
 struct FindRequirement
 {
-    tags::ETag tags{};
+    ETag tags{};
     glm::vec3 desired_position{};
 };
 
 struct Tags
 {
-    tags::ETag tags{};
+    ETag tags{};
 };
 
 struct AI
