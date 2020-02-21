@@ -33,9 +33,13 @@ struct SpriteTextureID
     /** Unspecified flag */
     uint16_t flag_c : 1;
 
-    operator uint16_t()
+    uint8_t bigrees{0};
+
+    uint8_t scale{10};
+
+    operator uint32_t()
     {
-        return static_cast<uint16_t>(*this);
+        return static_cast<uint32_t>(*this);
     }
 };
 
