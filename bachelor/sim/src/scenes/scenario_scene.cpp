@@ -53,10 +53,10 @@ void ScenarioScene::on_enter()
 
     RandomEngine rng{};
 
-    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 1; i <= 6; i++)
+    for (int i = 1; i <= 240; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -64,20 +64,15 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
-        glm::vec2 pos(i1 * 50.f, 0.f);
+        glm::vec2 pos(rng.uniform(-1050.f, 1050.f), rng.uniform(-1350.f, 1350.f));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{{-i1 * 50.f, 0.f, 0.f}}, glm::vec2{}, 40.f, 0.f);
+        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
+        m_registry.assign<component::Tags>(agent, tags::TAG_Avoidable);
     }
-
-    auto food = m_registry.create();
-    m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
-    m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-    m_registry.assign<component::Tags>(food, static_cast<tags::ETag>(0));
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
