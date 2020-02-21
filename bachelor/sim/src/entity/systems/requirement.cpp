@@ -54,7 +54,7 @@ void Requirement::update(float dt)
                 m_registry.remove<component::FindRequirement>(e);
                 mov.desired_position.clear();
                 m_registry.get<component::Tags>(entity).tags =
-                    static_cast<tags::ETag>(m_registry.get<component::Tags>(entity).tags & ~findreqs.tags);
+                    static_cast<ETag>(m_registry.get<component::Tags>(entity).tags & ~findreqs.tags);
                 return;
             }
         }

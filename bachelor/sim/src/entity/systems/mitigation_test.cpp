@@ -13,10 +13,10 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
     entt::registry test_registry;
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::tags::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
     cs::action::Action action{
         static_cast<std::string>("eat"),
-        cs::tags::TAG_Find,
+        cs::TAG_Find,
         5.f,
         0.f,
         {},
@@ -27,14 +27,14 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
                                  {},
-                                 cs::tags::TAG_Food,
+                                 cs::TAG_Food,
                                  std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy}),
                                                     std::vector<cs::ai::Strategy>{});
-    test_registry.assign<cs::component::Tags>(agent, cs::tags::TAG_Food);
+    test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
     auto need_system       = new cs::system::Need(test_registry);
     auto mitigation_system = new cs::system::Mitigation(test_registry);
@@ -65,10 +65,10 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
     entt::registry test_registry;
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::tags::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
     cs::action::Action action{
         static_cast<std::string>("eat"),
-        cs::tags::TAG_Find,
+        cs::TAG_Find,
         5.f,
         0.f,
         {},
@@ -79,20 +79,20 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
                                  {},
-                                 cs::tags::TAG_Food,
+                                 cs::TAG_Food,
                                  std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("go sleep"),
                                   0,
                                   {},
-                                  cs::tags::TAG_Sleep,
+                                  cs::TAG_Sleep,
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy, strategy2}),
                                                     std::vector<cs::ai::Strategy>{});
-    test_registry.assign<cs::component::Tags>(agent, cs::tags::TAG_Food);
+    test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
     auto need_system       = new cs::system::Need(test_registry);
     auto mitigation_system = new cs::system::Mitigation(test_registry);
@@ -117,10 +117,10 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
                          3.f,
                          100.f,
                          1.f,
-                         static_cast<cs::tags::ETag>(cs::tags::TAG_Food | cs::tags::TAG_Drink)};
+                         static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{
         static_cast<std::string>("eat"),
-        cs::tags::TAG_Find,
+        cs::TAG_Find,
         5.f,
         0.f,
         {},
@@ -131,20 +131,20 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
                                  {},
-                                 cs::tags::TAG_Food,
+                                 cs::TAG_Food,
                                  std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink slushy"),
                                   0,
                                   {},
-                                  static_cast<cs::tags::ETag>(cs::tags::TAG_Food | cs::tags::TAG_Drink),
+                                  static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink),
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy, strategy2}),
                                                     std::vector<cs::ai::Strategy>{});
-    test_registry.assign<cs::component::Tags>(agent, cs::tags::TAG_Food);
+    test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
     auto need_system       = new cs::system::Need(test_registry);
     auto mitigation_system = new cs::system::Mitigation(test_registry);
@@ -171,10 +171,10 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
                          3.f,
                          100.f,
                          1.f,
-                         static_cast<cs::tags::ETag>(cs::tags::TAG_Food | cs::tags::TAG_Drink)};
+                         static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{
         static_cast<std::string>("eat"),
-        cs::tags::TAG_Find,
+        cs::TAG_Find,
         5.f,
         0.f,
         {},
@@ -185,20 +185,20 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
                                  {},
-                                 cs::tags::TAG_Food,
+                                 cs::TAG_Food,
                                  std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink slushy"),
                                   0,
                                   {},
-                                  static_cast<cs::tags::ETag>(cs::tags::TAG_Food | cs::tags::TAG_Drink),
+                                  static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink),
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy, strategy2}),
                                                     std::vector<cs::ai::Strategy>{});
-    test_registry.assign<cs::component::Tags>(agent, cs::tags::TAG_Food);
+    test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
     auto need_system       = new cs::system::Need(test_registry);
     auto mitigation_system = new cs::system::Mitigation(test_registry);
@@ -226,13 +226,13 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     entt::registry test_registry;
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 50.f, 0.f, static_cast<cs::tags::ETag>(cs::tags::TAG_Food)};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 50.f, 0.f, static_cast<cs::ETag>(cs::TAG_Food)};
 
-    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, static_cast<cs::tags::ETag>(cs::tags::TAG_Drink)};
+    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, static_cast<cs::ETag>(cs::TAG_Drink)};
 
     cs::action::Action action{
         static_cast<std::string>("eat"),
-        cs::tags::TAG_Find,
+        cs::TAG_Find,
         5.f,
         0.f,
         {},
@@ -243,20 +243,20 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
                                  {},
-                                 cs::tags::TAG_Food,
+                                 cs::TAG_Food,
                                  std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink water"),
                                   0,
                                   {},
-                                  static_cast<cs::tags::ETag>(cs::tags::TAG_Drink),
+                                  static_cast<cs::ETag>(cs::TAG_Drink),
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need, need2}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy, strategy2}),
                                                     std::vector<cs::ai::Strategy>{});
-    test_registry.assign<cs::component::Tags>(agent, cs::tags::TAG_Food);
+    test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
     auto need_system       = new cs::system::Need(test_registry);
     auto mitigation_system = new cs::system::Mitigation(test_registry);

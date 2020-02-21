@@ -14,9 +14,9 @@ struct Strategy
 
     float desirability{};
 
-    tags::ETag requirements{};
+    ETag requirements{};
 
-    tags::ETag tags{};
+    ETag tags{};
     // TODO: Actual functionality
 
     std::vector<action::Action> actions{};
