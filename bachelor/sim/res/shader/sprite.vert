@@ -25,7 +25,7 @@ void main()
     vs_out.texcoord = a_texcoord;
     vs_out.texture  = a_texture;
 
-    const float angle = bitfieldExtract(a_texture, 16, 8) / 127.5f * 3.14f;
+    const float angle = bitfieldExtract(a_texture, 16, 8) / 127.5f * 3.14f + 3.14f;
     const float scale = bitfieldExtract(a_texture, 24, 8);
     const mat2 rotation = mat2(vec2(cos(angle), sin(angle)), vec2(-sin(angle), cos(angle)));
 
