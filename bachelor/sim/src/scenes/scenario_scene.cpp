@@ -141,7 +141,7 @@ void ScenarioScene::on_enter()
         }
         glm::vec2 pos(rng.uniform(-1050.f, 1050.f), rng.uniform(-1350.f, 1350.f));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
+        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{{0.f, 0.f, 0.f}}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, TAG_Avoidable);
