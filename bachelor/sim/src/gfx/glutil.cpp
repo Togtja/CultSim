@@ -110,6 +110,7 @@ LoadedTexture load_texture(std::string_view rpath)
     int c{};
     auto out         = LoadedTexture{};
     const auto bytes = fs::read_byte_file(rpath);
+    stbi_set_flip_vertically_on_load(true);
     auto pixels      = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
 
     /** Copy pixels into output */
