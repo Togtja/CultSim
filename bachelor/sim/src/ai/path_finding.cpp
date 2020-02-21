@@ -4,7 +4,7 @@
 
 namespace cs::ai
 {
-glm::ivec2 world_to_grid(glm::vec2 pos, int grid)
+glm::ivec2 world_to_grid(const glm::vec2& pos, int grid)
 {
     return {static_cast<int>(pos.x) / static_cast<int>(grid), static_cast<int>(pos.y) / static_cast<int>(grid)};
 }
@@ -17,12 +17,12 @@ int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
 
 void reconstruct_path(const glm::ivec2& start,
                       const glm::ivec2& goal,
-                      const glm::vec2& actual_goal,
+                      const glm::vec2& grid_goal,
                       std::vector<glm::vec3>& pos,
                       const robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2>& a_star_grid)
 {
     glm::ivec2 curr = goal;
-    pos.emplace_back(glm::vec3(actual_goal, 0.f));
+    pos.emplace_back(glm::vec3(grid_goal, 0.f));
     do
     {
         pos.emplace_back(glm::vec3(curr * 32, 0));
@@ -30,7 +30,7 @@ void reconstruct_path(const glm::ivec2& start,
     } while (curr != start);
 }
 
-bool find_path_astar(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss, int accuracy)
+bool path_finding(const glm::vec2& start_vec, const glm::vec2& goal_vec, std::vector<glm::vec3>& poss)
 {
     robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
     robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
