@@ -190,7 +190,9 @@ bool Application::init_imgui()
 {
     /** Set up Context */
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO& io               = ImGui::GetIO();
+    io.ConfigDockingWithShift = true;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     /** Load custom UI Font */
     auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
