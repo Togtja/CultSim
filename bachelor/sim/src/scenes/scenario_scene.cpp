@@ -34,15 +34,32 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
+    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 5.f, tags::TAG_Food};
 
     action::Action action{static_cast<std::string>("eat"),
                           tags::TAG_Find,
                           5.f,
                           0.f,
-                          []() { spdlog::warn("We finished action: eat"); },
-                          []() { spdlog::warn("We failed to finish action: eat"); },
-                          {}};
+                          {},
+                          [](entt::entity e, entt::entity n, entt::registry& r) {
+                              spdlog::warn("We finished action: eat on entity: {}");
+                              r.destroy(n);
+                              for (auto& need : r.get<component::Needs>(e).needs)
+                              {
+                                  if (need.tags & tags::TAG_Food)
+                                  {
+                                      spdlog::warn("Current status of need FOOD: {}", need.status);
+                                      need.status += 50.f;
+                                  }
+                              }
+                          },
+                          [](entt::entity e, entt::registry& r) {
+                              spdlog::warn("We failed to finish action: eat");
+                              r.destroy(e);
+                          },
+                          []() {
+                              spdlog::warn("We aborted our action");
+                          }};
 
     ai::Strategy strategy = {static_cast<std::string>("eat food"), 0, {}, tags::TAG_Food, std::vector<action::Action>{action}};
 
@@ -53,7 +70,7 @@ void ScenarioScene::on_enter()
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -73,11 +90,13 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
         m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
     }
-
-    auto food = m_registry.create();
-    m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
-    m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-    m_registry.assign<component::Tags>(food, tags::TAG_Food);
+    for (int j = 0; j < 900; j++)
+    {
+        auto food = m_registry.create();
+        m_registry.assign<component::Position>(food, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0));
+        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
+        m_registry.assign<component::Tags>(food, tags::TAG_Food);
+    }
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
