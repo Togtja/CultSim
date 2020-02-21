@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include "glm/gtc/epsilon.hpp"
-#include "glm/glm.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/epsilon.hpp>
 #include <sol/state_view.hpp>
 
 namespace cs
