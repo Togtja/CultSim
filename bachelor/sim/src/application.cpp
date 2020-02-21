@@ -74,7 +74,6 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    m_window.clear();
     m_scene_manager.draw();
 
     auto& r = gfx::get_renderer();
@@ -88,6 +87,7 @@ void Application::draw()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     m_window.display();
+    m_window.clear();
 }
 
 bool Application::init(const std::vector<char*>& args)

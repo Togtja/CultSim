@@ -23,6 +23,8 @@ struct Movement
     std::vector<glm::vec3> desired_position{};
     glm::vec2 direction{};
     float speed = 1.f;
+    float avoidance_cd = 0.f;
+    int avoid_count{};
 };
 
 struct Sprite

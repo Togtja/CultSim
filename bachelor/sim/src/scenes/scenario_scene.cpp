@@ -12,6 +12,7 @@
 #include "entity/systems/requirement.h"
 #include "gfx/renderer.h"
 #include "preferences.h"
+#include "random_engine.h"
 
 #include <common_helpers.h>
 #include <functional>
@@ -50,14 +51,12 @@ void ScenarioScene::on_enter()
                              tags::TAG_Food,
                              std::vector<action::Action>{std::move(action)}};
 
-    static auto seed = std::random_device{};
-    static auto gen  = std::mt19937{seed()};
-    std::normal_distribution<float> rng(0.f, 1.f);
+    RandomEngine rng{};
 
-    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 50000; i++)
+    for (int i = 1; i <= 240; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -65,23 +64,15 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
-        glm::vec2 pos(i1 * 15.f, 0.f);
+        glm::vec2 pos(rng.uniform(-1050.f, 1050.f), rng.uniform(-1350.f, 1350.f));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent,
-                                               std::vector<glm::vec3>(1, glm::vec3(rng(seed) * 100, rng(seed) * 100, 0)),
-                                               glm::normalize(glm::vec2(1.f, 1.f)),
-                                               500.f);
+        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
         m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
+        m_registry.assign<component::Tags>(agent, tags::TAG_Avoidable);
     }
-
-    auto food = m_registry.create();
-    m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
-    m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-    m_registry.assign<component::Tags>(food, tags::TAG_Food);
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
@@ -120,10 +111,27 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    for (int i = -5; i <= 5; i++)
+    ImGui::Text("GRID");
+    ImGui::Separator();
+    static bool show_grid = false;
+    static int grid_span  = 25;
+    static int grid_size  = 32;
+    ImGui::Checkbox("Show Grid", &show_grid);
+    ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
+    ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
+
+    if (show_grid)
     {
-        gfx::get_renderer().debug().draw_line(glm::vec3(-32 * 5, i * 32, 0), glm::vec3(32 * 5, i * 32, 0), glm::vec3(1, 0.5f, 1));
-        gfx::get_renderer().debug().draw_line(glm::vec3(i * 32, -32 * 5, 0), glm::vec3(i * 32, 32 * 5, 0), glm::vec3(1, 0.5f, 1));
+        for (int i = -grid_span; i <= grid_span; i++)
+        {
+            gfx::get_renderer().debug().draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
+                                                  glm::vec3(grid_size * grid_span, i * grid_size, 0),
+                                                  glm::vec3(0.3f));
+
+            gfx::get_renderer().debug().draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
+                                                  glm::vec3(i * grid_size, grid_size * grid_span, 0),
+                                                  glm::vec3(0.3f));
+        }
     }
     return false;
 }
