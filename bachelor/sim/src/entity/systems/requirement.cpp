@@ -63,10 +63,14 @@ void Requirement::update(float dt)
             m_registry.assign_or_replace<component::FindRequirement>(
                 e,
                 findreqs.tags,
-                glm::vec3(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f), 0.f));
+                glm::vec3(m_rng.uniform(-100.f, 100.f), m_rng.uniform(-100.f, 100.f), 0.f));
         }
         else if (mov.desired_position.empty())
         {
+            if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
+            {
+                findreqs.desired_position = glm::vec3(m_rng.uniform(-100.f, 100.f), m_rng.uniform(-100.f, 100.f), 0.f);
+            }
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
         }
     });
