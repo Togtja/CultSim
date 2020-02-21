@@ -30,7 +30,7 @@ void reconstruct_path(const glm::ivec2& start,
     } while (curr != start);
 }
 
-bool find_path_astar(glm::vec2 start_vec, glm::vec2 goal_vec, std::vector<glm::vec3>& poss, int accuracy)
+bool find_path_astar(const glm::vec2& start_vec, const glm::vec2& goal_vec, std::vector<glm::vec3>& poss, const int accuracy)
 {
     robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
     robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
