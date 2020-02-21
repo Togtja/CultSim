@@ -35,26 +35,102 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 10.f, tags::TAG_Food};
+    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
+    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, TAG_Drink};
+    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, TAG_Sleep};
 
-    action::Action action{static_cast<std::string>("eat"),
-                          tags::TAG_Find,
-                          5.f,
-                          0.f,
-                          []() { spdlog::warn("We finished action: eat"); },
-                          []() { spdlog::warn("We failed to finish action: eat"); },
-                          {}};
+    action::Action action_eat{static_cast<std::string>("eat"),
+                              TAG_Find,
+                              5.f,
+                              0.f,
+                              {},
+                              [](entt::entity e, entt::entity n, entt::registry& r) {
+                                  spdlog::warn("We finished action: eat on entity: {}", e);
+                                  r.destroy(n);
+                                  for (auto& need : r.get<component::Needs>(e).needs)
+                                  {
+                                      if (need.tags & TAG_Food)
+                                      {
+                                          spdlog::warn("Current status of need FOOD: {}", need.status);
+                                          need.status += 50.f;
+                                      }
+                                  }
+                              },
+                              [](entt::entity e, entt::registry& r) {
+                                  spdlog::warn("We failed to finish action: eat");
+                                  r.destroy(e);
+                              },
+                              []() {
+                                  spdlog::warn("We aborted our action");
+                              }};
 
-    ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                             0,
-                             {},
-                             tags::TAG_Food,
-                             std::vector<action::Action>{std::move(action)}};
+    action::Action action_drink{static_cast<std::string>("drink"),
+                                TAG_Find,
+                                2.f,
+                                0.f,
+                                {},
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    spdlog::warn("We finished action: drink on entity: {}", e);
+                                    r.destroy(n);
+                                    for (auto& need : r.get<component::Needs>(e).needs)
+                                    {
+                                        if (need.tags & TAG_Drink)
+                                        {
+                                            spdlog::warn("Current status of need DRINK: {}", need.status);
+                                            need.status += 50.f;
+                                        }
+                                    }
+                                },
+                                [](entt::entity e, entt::registry& r) {
+                                    spdlog::warn("We failed to finish action: drink");
+                                    r.destroy(e);
+                                },
+                                []() {
+                                    spdlog::warn("We aborted our action");
+                                }};
+
+    action::Action action_sleep{static_cast<std::string>("sleep"),
+                                {},
+                                1.f,
+                                0.f,
+                                {},
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    spdlog::warn("We finished action: sleep on entity: {}", e);
+                                    for (auto& need : r.get<component::Needs>(e).needs)
+                                    {
+                                        if (need.tags & TAG_Sleep)
+                                        {
+                                            spdlog::warn("Current status of need SLEEP: {}", need.status);
+                                            need.status += 10.f;
+                                        }
+                                    }
+                                },
+                                [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: sleep"); },
+                                []() {
+                                    spdlog::warn("We aborted our action");
+                                }};
+
+    ai::Strategy strategy_findfood  = {static_cast<std::string>("eat food"),
+                                      0,
+                                      {},
+                                      TAG_Food,
+                                      std::vector<action::Action>{action_eat}};
+    ai::Strategy strategy_finddrink = {static_cast<std::string>("drink water"),
+                                       0,
+                                       {},
+                                       TAG_Drink,
+                                       std::vector<action::Action>{action_drink}};
+    ai::Strategy strategy_sleep     = {static_cast<std::string>("sleep"),
+                                   0,
+                                   {},
+                                   TAG_Sleep,
+                                   std::vector<action::Action>{action_sleep}};
 
     RandomEngine rng{};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
+    auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
 
     for (int i = 1; i <= 240; i++)
     {
@@ -69,9 +145,30 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
-        m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy}), std::vector<ai::Strategy>{});
-        m_registry.assign<component::Tags>(agent, tags::TAG_Avoidable);
+        m_registry.assign<component::Tags>(agent, TAG_Avoidable);
+        m_registry.assign<component::Needs>(agent,
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
+                                            std::vector<ai::Need>{});
+
+        m_registry.assign<component::Strategies>(
+            agent,
+            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
+            std::vector<ai::Strategy>{});
+    }
+    for (int j = 0; j < 200; j++)
+    {
+        auto food = m_registry.create();
+        m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
+        m_registry.assign<component::Tags>(food, TAG_Food);
+    }
+
+    for (int k = 0; k < 200; k++)
+    {
+        auto drink = m_registry.create();
+        m_registry.assign<component::Position>(drink, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
+        m_registry.assign<component::Tags>(drink, TAG_Drink);
     }
 
     /** Add required systems */

@@ -2,6 +2,7 @@
 
 #include "gfx/render_data.h"
 #include "need.h"
+#include "random_engine.h"
 #include "strategy.h"
 #include "tags.h"
 
@@ -117,18 +118,18 @@ struct LocationRequirement
 
 struct VisionRequirement
 {
-    tags::ETag tags{};
+    ETag tags{};
 };
 
 struct FindRequirement
 {
-    tags::ETag tags{};
+    ETag tags{};
     glm::vec3 desired_position{};
 };
 
 struct Tags
 {
-    tags::ETag tags{};
+    ETag tags{};
 };
 
 struct AI
