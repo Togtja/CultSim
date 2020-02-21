@@ -132,6 +132,7 @@ void ScenarioScene::on_enter()
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
+
     for (int i = 0; i < 100; i++)
     {
         auto agent = m_registry.create();
@@ -159,15 +160,14 @@ void ScenarioScene::on_enter()
 
         m_registry.assign<component::Tags>(agent, static_cast<tags::ETag>(0));
     }
-    for (int j = 0; j < 900; j++)
+    for (int j = 0; j < 200; j++)
     {
         auto food = m_registry.create();
         m_registry.assign<component::Position>(food, glm::vec3(rng(seed) * 500, rng(seed) * 500, 0));
         m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
         m_registry.assign<component::Tags>(food, tags::TAG_Food);
     }
-
-    for (int k = 0; k < 900; k++)
+    for (int k = 0; k < 200; k++)
     {
         auto drink = m_registry.create();
         m_registry.assign<component::Position>(drink, glm::vec3(rng(seed) * 500, rng(seed) * 500, 0));
@@ -195,7 +195,6 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
-    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {

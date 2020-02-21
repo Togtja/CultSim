@@ -8,13 +8,18 @@ namespace cs::input
 {
 namespace detail
 {
-InputHandler::InputHandler(KeyContext type)
+InputHandler::InputHandler(const KeyContext& type)
 {
     m_context_type = type;
 }
 
-void InputHandler::bind_key(const SDL_Scancode event, const std::function<void()> function)
+void InputHandler::bind_key(const SDL_Scancode& event, const std::function<void()>& function, bool overwrite)
 {
+    if (overwrite)
+    {
+        m_key_binding[event] = function;
+        return;
+    }
     if (!has_event(event))
     {
         m_key_binding.emplace(event, function);
@@ -24,16 +29,18 @@ void InputHandler::bind_key(const SDL_Scancode event, const std::function<void()
         spdlog::debug("this context (id: {}) already has a binding for this event ({})", m_context_type, event);
     }
 }
-void InputHandler::unbind_key(const SDL_Scancode event)
+void InputHandler::unbind_key(const SDL_Scancode& event)
 {
-    // erase returns how many elements it erased
-    if (m_key_binding.erase(event) == 0)
+    auto&& it = m_key_binding.find(event);
+    if (it == m_key_binding.end())
     {
-        spdlog::debug("this context (id: {}) doesnot have a binding for this event ({})", m_context_type, event);
+        spdlog::debug("this context (id: {}) does not have a binding for this event ({})", m_context_type, event);
+        return;
     }
+    m_key_binding.erase(it);
 }
 
-void InputHandler::handle_input(const SDL_Scancode event)
+void InputHandler::handle_input(const SDL_Scancode& event)
 {
     if (has_event(event))
     {
@@ -46,23 +53,27 @@ void InputHandler::handle_input(const SDL_Scancode event)
     }
 }
 
-bool InputHandler::has_event(const SDL_Scancode event)
+bool InputHandler::has_event(const SDL_Scancode& event)
 {
-    auto key_it = m_key_binding.find(event);
-    return key_it != m_key_binding.end();
+    return m_key_binding.contains(event);
 }
 
-InputHandler::~InputHandler()
-= default;
+void InputHandler::clear()
+{
+    m_key_binding.clear();
+}
+
+InputHandler::~InputHandler() = default;
 
 } // namespace detail
 
 /******** CONTEXT HANDLER *********/
 
-void ContextHandler::add_context(KeyContext context)
+void ContextHandler::add_context(const KeyContext& context)
 {
     if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
     {
+        spdlog::warn("can not add default context on top of something else");
         return;
     }
 
@@ -75,7 +86,7 @@ void ContextHandler::add_context(KeyContext context)
     m_active_stack.push_back(context);
 }
 
-void ContextHandler::remove_context(KeyContext context)
+void ContextHandler::remove_context(const KeyContext& context)
 {
     if (context == KeyContext::DefaultContext)
     {
@@ -104,12 +115,15 @@ void ContextHandler::remove_context()
     m_active_stack.pop_back();
 }
 
-void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, const std::function<void()> function)
+void ContextHandler::bind_key(const KeyContext& context,
+                              const SDL_Scancode& event,
+                              const std::function<void()>& function,
+                              bool overwrite)
 {
-    auto input_it = m_input_map.find(context);
+    const auto& input_it = m_input_map.find(context);
     if (input_it != m_input_map.end())
     {
-        m_input_map.at(context).bind_key(event, function);
+        m_input_map.at(context).bind_key(event, function, overwrite);
     }
     else
     {
@@ -118,32 +132,60 @@ void ContextHandler::bind_key(KeyContext context, const SDL_Scancode event, cons
         m_input_map.emplace(context, new_input);
     }
 }
-void ContextHandler::unbind_key(KeyContext context, const SDL_Scancode event)
+void ContextHandler::unbind_key(const KeyContext& context, const SDL_Scancode& event)
 {
-    auto input_it = m_input_map.find(context);
-    if (input_it != m_input_map.end())
+    if (has_context(context))
     {
-        auto input = m_input_map.at(context);
+        auto& input = m_input_map.at(context);
         input.unbind_key(event);
     }
     else
     {
-        spdlog::debug("could not unbind, because no input created for the context (id: {})", context);
+        spdlog::debug("could not unbind, because the context (id: {}) does not exist", context);
     }
 }
 
-void ContextHandler::handle_input(const SDL_Scancode event)
+void ContextHandler::handle_input(const SDL_Scancode& event)
 {
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (m_input_map.at(*it).has_event(event))
+        if (has_context(*it) && m_input_map.at(*it).has_event(event))
         {
             m_input_map.at(*it).handle_input(event);
             return;
         }
     }
     spdlog::debug("could not find anything for the {} event", event);
+}
+
+bool ContextHandler::has_context(const KeyContext& context)
+{
+    return m_input_map.contains(context);
+}
+
+void ContextHandler::clear_context(const KeyContext& context)
+{
+    if (has_context(context))
+    {
+        m_input_map.at(context).clear();
+    }
+    else
+    {
+        spdlog::debug("the context {} has no bindings", context);
+    }
+}
+void ContextHandler::back_to_default()
+{
+    m_active_stack.erase(m_active_stack.begin() + 1, m_active_stack.end());
+}
+
+void ContextHandler::clear()
+{
+    m_input_map.clear();
+    m_active_stack.clear();
+    // There always need to be a DefaultContext at the bottom of the stack
+    add_context(KeyContext::DefaultContext);
 }
 
 ContextHandler::ContextHandler()
@@ -157,4 +199,4 @@ ContextHandler& get_input()
     return instance;
 }
 
-} // namespace cs
+} // namespace cs::input

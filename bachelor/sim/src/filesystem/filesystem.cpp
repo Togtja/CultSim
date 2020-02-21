@@ -23,12 +23,14 @@ bool init(std::string_view project_name)
     return true;
 }
 
-void deinit()
+bool deinit()
 {
-    if (!PHYSFS_deinit())
+    if (static_cast<bool>(PHYSFS_deinit()))
     {
-        spdlog::error("failed to deinitialize PhysFS, {}", get_errorstring());
+        return true;
     }
+    spdlog::error("failed to deinitialize PhysFS, {}", get_errorstring());
+    return false;
 }
 
 std::string read_file(std::string_view rpath)
@@ -75,6 +77,11 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
         spdlog::debug("file: '{}' does not exist", rpath);
         spdlog::info("creating file: '{}'", rpath);
     }
+    else if (!is_file(rpath))
+    {
+        spdlog::warn("file: {} is not a file , but directory", rpath);
+        return -1;
+    }
 
     auto file = PHYSFS_openWrite(rpath.data());
     if (file == nullptr)
@@ -112,12 +119,12 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
 
 bool exists(std::string_view rpath)
 {
-    return PHYSFS_exists(rpath.data());
+    return static_cast<bool>(PHYSFS_exists(rpath.data()));
 }
 
 bool mkdir(std::string_view rpath)
 {
-    return PHYSFS_mkdir(rpath.data());
+    return static_cast<bool>(PHYSFS_mkdir(rpath.data()));
 }
 
 bool move_file(std::string_view rpath_old, std::string_view rpath_new)
@@ -144,15 +151,6 @@ bool move_file(std::string_view rpath_old, std::string_view rpath_new)
             return false;
         }
         return true;
-    }
-
-    /** At this point a new file is created, but is incomplete, so delete to restore fs state */
-    if (exists(rpath_new))
-    {
-        if (!delete_file(rpath_new))
-        {
-            spdlog::error("failed to delete new file during move");
-        }
     }
     return false;
 }
@@ -197,7 +195,19 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
         spdlog::info("successfully copied file");
         return true;
     }
-    spdlog::error("could not copy file");
+    /** At this point a new file should have failed to be created,
+     * if it has been created we delete to restore fs state */
+    if (exists(rpath_new))
+    {
+        if (!delete_file(rpath_new))
+        {
+            spdlog::error("fail to delete new file during failed copy");
+        }
+    }
+    else
+    {
+        spdlog::error("fail to create new file");
+    }
     return false;
 }
 
@@ -214,15 +224,12 @@ std::vector<std::string> list_directory(std::string_view rpath)
         return {};
     }
     std::vector<std::string> files;
-    auto files_raw = PHYSFS_enumerateFiles(rpath.data());
-    if (files_raw == nullptr)
+    auto* files_raw = PHYSFS_enumerateFiles(rpath.data());
+    for (char** file = files_raw; *file != nullptr; ++file)
     {
-        return {};
+        files.emplace_back(*file);
     }
-    for (char* file = *files_raw; file; file = *++files_raw)
-    {
-        files.emplace_back(file);
-    }
+
     PHYSFS_freeList(files_raw);
     return files;
 }
