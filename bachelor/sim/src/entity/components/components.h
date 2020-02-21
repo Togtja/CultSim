@@ -25,6 +25,7 @@ struct Movement
     glm::vec2 direction{};
     float speed = 1.f;
     float avoidance_cd = 0.f;
+    int avoid_count{};
 };
 
 struct Sprite
