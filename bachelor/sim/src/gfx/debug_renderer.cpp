@@ -22,8 +22,6 @@ DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
     m_shader = create_program({vs, fs});
     glDeleteShader(vs);
     glDeleteShader(fs);
-
-    glLineWidth(2.f);
 }
 
 void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
