@@ -2,6 +2,7 @@
 build/
 builds/
 vs_build/
+*.spv
 
 # IDE Files
 .vs/
