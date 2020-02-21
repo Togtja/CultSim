@@ -203,6 +203,7 @@ bool Application::init_imgui()
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
 
     /** Set up Style colors */
+    ImGui::GetStyle().WindowRounding       = 0.f;
     ImVec4* colors                         = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text]                  = ImVec4(0.91f, 0.91f, 0.91f, 1.00f);
     colors[ImGuiCol_TextDisabled]          = ImVec4(0.38f, 0.38f, 0.38f, 0.59f);
