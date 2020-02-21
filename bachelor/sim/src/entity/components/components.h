@@ -2,6 +2,7 @@
 
 #include "gfx/render_data.h"
 #include "need.h"
+#include "random_engine.h"
 #include "strategy.h"
 #include "tags.h"
 
