@@ -1,6 +1,7 @@
 #include "requirement.h"
 #include "ai/path_finding.h"
 #include "common_helpers.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
 #include "glm/glm.hpp"
@@ -10,6 +11,8 @@ namespace cs::system
 {
 void Requirement::update(float dt)
 {
+    CS_AUTOTIMER(Requirement System);
+
     auto view_loc = m_registry.view<component::LocationRequirement, component::Movement, component::Position>();
     view_loc.each(
         [this,

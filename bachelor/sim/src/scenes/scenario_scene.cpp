@@ -56,7 +56,7 @@ void ScenarioScene::on_enter()
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50000; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -99,7 +99,6 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
-    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {

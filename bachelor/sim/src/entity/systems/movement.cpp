@@ -1,5 +1,6 @@
 #include "movement.h"
 #include "ai/path_finding.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/events.h"
 #include "gfx/renderer.h"
@@ -18,6 +19,8 @@ Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISy
 
 void Movement::update(float dt)
 {
+    CS_AUTOTIMER(Movement System);
+
     m_registry.view<component::Vision, component::Movement, component::Position>().each(
         [&dt, this](entt::entity e, const component::Vision& vis, component::Movement& mov, const component::Position& pos) {
             mov.avoidance_cd -= dt;

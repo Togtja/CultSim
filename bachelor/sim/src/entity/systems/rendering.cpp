@@ -1,4 +1,5 @@
 #include "rendering.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
 #include "gfx/ImGUI/imgui.h"
@@ -8,6 +9,8 @@ namespace cs::system
 {
 void Rendering::update(float dt)
 {
+    CS_AUTOTIMER(Rendering System);
+
     static glm::vec3 noseecolor{1.f, 0.f, 0.f};
     static glm::vec3 seecolor{0.f, 1.f, 0.f};
 

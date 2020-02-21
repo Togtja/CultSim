@@ -1,5 +1,6 @@
 #include "application.h"
 #include "constants.h"
+#include "debug/auto_timer.h"
 #include "delta_clock.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
@@ -32,6 +33,7 @@ void Application::run(const std::vector<char*>& args)
     /** Main Loop */
     while (m_running)
     {
+        CS_AUTOTIMER(Frame Time);
         handle_input();
 
         ImGui_ImplOpenGL3_NewFrame();
@@ -39,6 +41,7 @@ void Application::run(const std::vector<char*>& args)
         ImGui::NewFrame();
 
         update(dt_clock.restart());
+        AutoTimer::show_debug_ui();
 
         draw();
     }
@@ -187,7 +190,9 @@ bool Application::init_imgui()
 {
     /** Set up Context */
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO& io               = ImGui::GetIO();
+    io.ConfigDockingWithShift = true;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     /** Load custom UI Font */
     auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
@@ -200,6 +205,7 @@ bool Application::init_imgui()
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
 
     /** Set up Style colors */
+    ImGui::GetStyle().WindowRounding       = 0.f;
     ImVec4* colors                         = ImGui::GetStyle().Colors;
     colors[ImGuiCol_Text]                  = ImVec4(0.91f, 0.91f, 0.91f, 1.00f);
     colors[ImGuiCol_TextDisabled]          = ImVec4(0.38f, 0.38f, 0.38f, 0.59f);

@@ -5,4 +5,5 @@ target_sources(
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/input_handler.h
         ${CMAKE_CURRENT_LIST_DIR}/input_handler.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/input_handler_test.cpp
 )
