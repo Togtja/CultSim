@@ -159,7 +159,7 @@ void ScenarioScene::on_enter()
     {
         auto food = m_registry.create();
         m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
-        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
+        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
         m_registry.assign<component::Tags>(food, TAG_Food);
     }
 
@@ -167,7 +167,7 @@ void ScenarioScene::on_enter()
     {
         auto drink = m_registry.create();
         m_registry.assign<component::Position>(drink, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
-        m_registry.assign<component::Sprite>(drink, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
+        m_registry.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
         m_registry.assign<component::Tags>(drink, TAG_Drink);
     }
 
