@@ -54,10 +54,10 @@ void ScenarioScene::on_enter()
     static auto gen  = std::mt19937{seed()};
     std::normal_distribution<float> rng(0.f, 1.f);
 
-    auto tex = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50000; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -83,8 +83,8 @@ void ScenarioScene::on_enter()
     m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
     m_registry.assign<component::Tags>(food, tags::TAG_Food);
 
-        /** Add required systems */
-        m_active_systems.emplace_back(new system::Need(m_registry));
+    /** Add required systems */
+    m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
@@ -103,7 +103,6 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
-    ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
 
     for (auto& system : m_active_systems)
     {

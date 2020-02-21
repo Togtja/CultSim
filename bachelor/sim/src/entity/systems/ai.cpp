@@ -1,6 +1,7 @@
 #include "ai.h"
 #include "ai/path_finding.h"
 #include "constants.h"
+#include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
 #include <algorithm>
@@ -25,6 +26,8 @@ bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 
 void AI::update(float dt)
 {
+    CS_AUTOTIMER(AI System);
+
     collision_grid.clear();
 
     /** Construct collision grid */
