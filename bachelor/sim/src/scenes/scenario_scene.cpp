@@ -69,7 +69,7 @@ void ScenarioScene::on_enter()
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/weapon_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
 
-    for (int i = 0; i < 50000; i++)
+    for (int i = 1; i <= 6; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -77,9 +77,9 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
-        glm::vec2 pos(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f));
+        glm::vec2 pos(i1 * 50.f, 0.f);
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 100.f, 0.f);
+        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{{-i1 * 50.f, 0.f, 0.f}}, glm::vec2{}, 40.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need}, std::vector<ai::Need>{});
@@ -97,7 +97,7 @@ void ScenarioScene::on_enter()
     auto food = m_registry.create();
     m_registry.assign<component::Position>(food, glm::vec3(100, 100, 0));
     m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.5f, 0.5f, 1.f));
-    m_registry.assign<component::Tags>(food, tags::TAG_Food);
+    m_registry.assign<component::Tags>(food, static_cast<tags::ETag>(0));
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
@@ -138,7 +138,7 @@ bool ScenarioScene::draw()
 {
     ImGui::Text("GRID");
     ImGui::Separator();
-    static bool show_grid = true;
+    static bool show_grid = false;
     static int grid_span  = 25;
     static int grid_size  = 32;
     ImGui::Checkbox("Show Grid", &show_grid);
