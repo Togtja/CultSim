@@ -14,6 +14,9 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_sdl.h
     ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_sdl.cpp
 
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_vulkan.h
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_impl_vulkan.cpp
+
     ${CMAKE_CURRENT_LIST_DIR}/imgui_internal.h
 
     ${CMAKE_CURRENT_LIST_DIR}/imgui_widgets.cpp
