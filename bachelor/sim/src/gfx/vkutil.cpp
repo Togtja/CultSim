@@ -81,15 +81,17 @@ VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& 
     return avail[0];
 }
 
-Swapchain create_swapchain(VkDevice device,
-                           VkPhysicalDevice pdevice,
-                           VkSurfaceKHR surface,
-                           VkSurfaceCapabilitiesKHR surface_caps,
-                           VkRenderPass render_pass,
-                           uint32_t queue_idx,
-                           VkSurfaceFormatKHR format)
+void create_swapchain(VkDevice device,
+                      VkPhysicalDevice pdevice,
+                      VkSurfaceKHR surface,
+                      VkSurfaceCapabilitiesKHR surface_caps,
+                      VkRenderPass render_pass,
+                      uint32_t queue_idx,
+                      VkSurfaceFormatKHR format,
+                      Swapchain& out)
 {
-    Swapchain out{};
+    /** If there is an old swapchain, delete it's resources so we can resize */
+    auto old_swapchain = out;
 
     /** Enumerate present modes */
     uint32_t present_mode_count{};
@@ -102,7 +104,7 @@ Swapchain create_swapchain(VkDevice device,
     assert(surface_caps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR);
     assert(surface_caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR);
 
-    const auto present_mode = vk::select_present_mode(VK_PRESENT_MODE_FIFO_KHR, present_modes);
+    const auto present_mode = vk::select_present_mode(VK_PRESENT_MODE_FIFO_RELAXED_KHR, present_modes);
 
     /** Then create swapchain */
     VkSwapchainCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
@@ -119,9 +121,18 @@ Swapchain create_swapchain(VkDevice device,
     create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
     create_info.compositeAlpha           = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     create_info.imageArrayLayers         = 1;
+    create_info.oldSwapchain             = old_swapchain.swapchain;
 
+    VK_CHECK(vkDeviceWaitIdle(device));
     VK_CHECK(vkCreateSwapchainKHR(device, &create_info, nullptr, &out.swapchain));
     assert(out.swapchain);
+
+    /** If the old swapchain was valid we will clean it up here */
+    if (old_swapchain.swapchain != VK_NULL_HANDLE)
+    {
+        VK_CHECK(vkDeviceWaitIdle(device));
+        destroy_swapchain(device, old_swapchain);
+    }
 
     uint32_t image_count{};
     vkGetSwapchainImagesKHR(device, out.swapchain, &image_count, nullptr);
@@ -129,7 +140,7 @@ Swapchain create_swapchain(VkDevice device,
     /** Get and create images */
     std::vector<VkImage> images(image_count);
     vkGetSwapchainImagesKHR(device, out.swapchain, &image_count, images.data());
-    out.images = std::move(out.images);
+    out.images = std::move(images);
     assert(image_count);
 
     /** Create image views */
@@ -144,13 +155,12 @@ Swapchain create_swapchain(VkDevice device,
     }
 
     out.format = format;
-    out.size = surface_caps.currentExtent;
-    return out;
+    out.size   = surface_caps.currentExtent;
 }
 
 void destroy_swapchain(VkDevice device, Swapchain& swapchain)
 {
-    for(auto fb : swapchain.framebuffers)
+    for (auto fb : swapchain.framebuffers)
     {
         vkDestroyFramebuffer(device, fb, nullptr);
     }

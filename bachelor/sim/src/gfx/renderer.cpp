@@ -208,7 +208,7 @@ void Renderer::create_renderpass_and_swapchain()
 
     auto format   = vk::select_surface_format(formats);
     m_render_pass = vk::create_render_pass(m_device, format.format);
-    m_swapchain   = vk::create_swapchain(m_device, m_pdevice, m_surface, surface_caps, m_render_pass, m_gfx_queue_idx, format);
+    vk::create_swapchain(m_device, m_pdevice, m_surface, surface_caps, m_render_pass, m_gfx_queue_idx, format, m_swapchain);
 }
 
 Renderer& get_renderer()

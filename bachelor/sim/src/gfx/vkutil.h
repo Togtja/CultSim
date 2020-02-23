@@ -47,13 +47,26 @@ VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPre
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail);
 
-Swapchain create_swapchain(VkDevice device,
+/**
+ * Create a new swapchain or resize an existing one
+ *
+ * @param device
+ * @param pdevice
+ * @param surface
+ * @param surface_caps
+ * @param render_pass
+ * @param queue_idx
+ * @param format
+ * @param out Where the new swapchain will be stored, if there is already a valid swapchain here, it will be deleted and resized
+ */
+void create_swapchain(VkDevice device,
                            VkPhysicalDevice pdevice,
                            VkSurfaceKHR surface,
                            VkSurfaceCapabilitiesKHR surface_caps,
                            VkRenderPass render_pass,
                            uint32_t queue_idx,
-                           VkSurfaceFormatKHR format);
+                           VkSurfaceFormatKHR format,
+                           Swapchain& out);
 
 void destroy_swapchain(VkDevice device, Swapchain& swapchain);
 

@@ -24,7 +24,12 @@ void SpriteRenderer::display()
     uint32_t next_image{};
     VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain->swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
 
-    vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 100000000000ull);
+    auto result = vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 7e+6);
+    if (result != VK_SUCCESS)
+    {
+        return;
+    }
+
     vkResetFences(m_device, 1, &m_fences[next_image]);
     VK_CHECK(vkResetCommandPool(m_device, m_cmd_pools[next_image], 0u));
 
@@ -69,10 +74,15 @@ void SpriteRenderer::display()
                        sizeof(float) * 16,
                        glm::value_ptr(m_camera.get_view_matrix()));
 
-    VkViewport viewport{0, 720, 1280, -720, 0, 1};
+    VkViewport viewport{0,
+                        static_cast<float>(m_swapchain->size.height),
+                        static_cast<float>(m_swapchain->size.width),
+                        -static_cast<float>(m_swapchain->size.height),
+                        0,
+                        1};
     vkCmdSetViewport(cbuf, 0, 1, &viewport);
 
-    VkRect2D scissor{{0, 0}, {1280, 720}};
+    VkRect2D scissor{{0, 0}, m_swapchain->size};
     vkCmdSetScissor(cbuf, 0, 1, &scissor);
 
     VkDeviceSize offsets[] = {0};
@@ -130,11 +140,11 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 
 void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 {
-    m_device    = volkGetLoadedDevice();
-    m_swapchain = &create_info.swapchain;
+    m_device      = volkGetLoadedDevice();
+    m_swapchain   = &create_info.swapchain;
     m_render_pass = create_info.render_pass;
-    m_gfx_queue = create_info.gfx_queue;
-    m_allocator = create_info.allocator;
+    m_gfx_queue   = create_info.gfx_queue;
+    m_allocator   = create_info.allocator;
 
     /** Create synchronization prim's and command pool */
     m_aq_sem  = vk::create_semaphore(m_device);
