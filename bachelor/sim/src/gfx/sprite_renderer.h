@@ -17,10 +17,8 @@ namespace cs::gfx
  */
 struct SpriteRendererCreateInfo
 {
-    VkSwapchainKHR swapchain{VK_NULL_HANDLE};
-    const std::vector<VkImage>& sc_images{};
-    const std::vector<VkImageView>& sc_image_views{};
-    VkFormat sc_format{VK_FORMAT_UNDEFINED};
+    vk::Swapchain& swapchain;
+    VkRenderPass render_pass;
     uint32_t gfx_queue_idx{};
     VkQueue gfx_queue{VK_NULL_HANDLE};
     VmaAllocator allocator{VK_NULL_HANDLE};
@@ -33,17 +31,15 @@ private:
 
     VkDevice m_device{VK_NULL_HANDLE};
 
-    VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+    vk::Swapchain* m_swapchain{nullptr};
+
+    VkRenderPass m_render_pass{VK_NULL_HANDLE};
 
     std::vector<VkImage> m_sc_images;
 
     VkQueue m_gfx_queue{VK_NULL_HANDLE};
 
     VmaAllocator m_allocator{VK_NULL_HANDLE};
-
-    VkRenderPass m_renderpass{VK_NULL_HANDLE};
-
-    std::vector<VkFramebuffer> m_framebuffers{};
 
     VkPipelineLayout m_pipeline_layout{VK_NULL_HANDLE};
 

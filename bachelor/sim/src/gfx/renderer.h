@@ -31,13 +31,9 @@ private:
 
     VkSurfaceKHR m_surface{VK_NULL_HANDLE};
 
-    VkSwapchainKHR m_swapchain{VK_NULL_HANDLE};
+    VkRenderPass m_render_pass{VK_NULL_HANDLE};
 
-    std::vector<VkImage> m_swapchain_images{};
-
-    std::vector<VkImageView> m_swapchain_views{};
-
-    VkSurfaceFormatKHR m_format{};
+    vk::Swapchain m_swapchain{};
 
     VmaAllocator m_allocator{VK_NULL_HANDLE};
 
@@ -85,7 +81,9 @@ private:
 
     void create_device();
 
-    void create_swapchain(const Window& window);
+    void create_surface(const Window& window);
+
+    void create_renderpass_and_swapchain();
 };
 
 /**

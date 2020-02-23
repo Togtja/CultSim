@@ -22,7 +22,7 @@ void SpriteRenderer::display()
 {
     /** Setup */
     uint32_t next_image{};
-    VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
+    VK_CHECK(vkAcquireNextImageKHR(m_device, m_swapchain->swapchain, ~0ull, m_aq_sem, VK_NULL_HANDLE, &next_image));
 
     vkWaitForFences(m_device, 1, &m_fences[next_image], VK_TRUE, 100000000000ull);
     vkResetFences(m_device, 1, &m_fences[next_image]);
@@ -53,8 +53,8 @@ void SpriteRenderer::display()
     clear_value.color = color_clear_value;
 
     VkRenderPassBeginInfo rpass_begin_info = {VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
-    rpass_begin_info.renderPass            = m_renderpass;
-    rpass_begin_info.framebuffer           = m_framebuffers[next_image];
+    rpass_begin_info.renderPass            = m_render_pass;
+    rpass_begin_info.framebuffer           = m_swapchain->framebuffers[next_image];
     rpass_begin_info.renderArea            = {0, 0, 1280, 720};
     rpass_begin_info.pClearValues          = &clear_value;
     rpass_begin_info.clearValueCount       = 1;
@@ -102,7 +102,7 @@ void SpriteRenderer::display()
     VkPresentInfoKHR present_info   = {VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
     present_info.pWaitSemaphores    = &m_rel_sem;
     present_info.waitSemaphoreCount = 1;
-    present_info.pSwapchains        = &m_swapchain;
+    present_info.pSwapchains        = &m_swapchain->swapchain;
     present_info.swapchainCount     = 1;
     present_info.pImageIndices      = &next_image;
 
@@ -131,23 +131,16 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
 void SpriteRenderer::init(const SpriteRendererCreateInfo& create_info)
 {
     m_device    = volkGetLoadedDevice();
-    m_swapchain = create_info.swapchain;
-    m_sc_images = create_info.sc_images;
+    m_swapchain = &create_info.swapchain;
+    m_render_pass = create_info.render_pass;
     m_gfx_queue = create_info.gfx_queue;
     m_allocator = create_info.allocator;
-
-    /** Create render pass and frame buffers */
-    m_renderpass = vk::create_render_pass(m_device, create_info.sc_format);
-    for (auto image : create_info.sc_image_views)
-    {
-        m_framebuffers.push_back(vk::create_framebuffer(m_device, m_renderpass, image, {1280, 720}));
-    }
 
     /** Create synchronization prim's and command pool */
     m_aq_sem  = vk::create_semaphore(m_device);
     m_rel_sem = vk::create_semaphore(m_device);
 
-    for (int i = 0; i < create_info.sc_image_views.size(); ++i)
+    for (int i = 0; i < m_swapchain->views.size(); ++i)
     {
         m_cmd_pools.push_back(vk::create_command_pool(m_device, create_info.gfx_queue_idx, VK_COMMAND_POOL_CREATE_TRANSIENT_BIT));
         m_fences.push_back(vk::create_fence(m_device, true));
@@ -179,7 +172,7 @@ void SpriteRenderer::init_pipeline()
 
     m_pipeline = vk::create_gfx_pipeline(m_device,
                                          VK_NULL_HANDLE,
-                                         m_renderpass,
+                                         m_render_pass,
                                          m_pipeline_layout,
                                          {{vs, VK_SHADER_STAGE_VERTEX_BIT}, {fs, VK_SHADER_STAGE_FRAGMENT_BIT}});
 
@@ -214,13 +207,6 @@ void SpriteRenderer::deinit()
 
     vkDestroySemaphore(m_device, m_rel_sem, nullptr);
     vkDestroySemaphore(m_device, m_aq_sem, nullptr);
-
-    for (auto fb : m_framebuffers)
-    {
-        vkDestroyFramebuffer(m_device, fb, nullptr);
-    }
-
-    vkDestroyRenderPass(m_device, m_renderpass, nullptr);
 }
 
 bool SpriteRenderer::increment_next_texture_id()

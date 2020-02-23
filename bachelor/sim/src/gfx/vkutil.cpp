@@ -1,6 +1,7 @@
 #include "vkutil.h"
 #include "filesystem/filesystem.h"
 #include "render_data.h"
+#include <glm/common.hpp>
 
 namespace cs::vk
 {
@@ -78,6 +79,88 @@ VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& 
     }
 
     return avail[0];
+}
+
+Swapchain create_swapchain(VkDevice device,
+                           VkPhysicalDevice pdevice,
+                           VkSurfaceKHR surface,
+                           VkSurfaceCapabilitiesKHR surface_caps,
+                           VkRenderPass render_pass,
+                           uint32_t queue_idx,
+                           VkSurfaceFormatKHR format)
+{
+    Swapchain out{};
+
+    /** Enumerate present modes */
+    uint32_t present_mode_count{};
+    vkGetPhysicalDeviceSurfacePresentModesKHR(pdevice, surface, &present_mode_count, nullptr);
+
+    std::vector<VkPresentModeKHR> present_modes(present_mode_count);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(pdevice, surface, &present_mode_count, present_modes.data());
+
+    /** Get surface capabilities */
+    assert(surface_caps.supportedTransforms & VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR);
+    assert(surface_caps.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR);
+
+    const auto present_mode = vk::select_present_mode(VK_PRESENT_MODE_FIFO_KHR, present_modes);
+
+    /** Then create swapchain */
+    VkSwapchainCreateInfoKHR create_info = {VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
+    create_info.imageUsage               = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    create_info.surface                  = surface;
+    create_info.preTransform             = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    create_info.presentMode              = present_mode;
+    create_info.imageExtent              = surface_caps.currentExtent;
+    create_info.imageFormat              = format.format;
+    create_info.imageColorSpace          = format.colorSpace;
+    create_info.minImageCount            = glm::clamp(3u, surface_caps.minImageCount, surface_caps.maxImageCount);
+    create_info.queueFamilyIndexCount    = 1;
+    create_info.pQueueFamilyIndices      = &queue_idx;
+    create_info.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
+    create_info.compositeAlpha           = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.imageArrayLayers         = 1;
+
+    VK_CHECK(vkCreateSwapchainKHR(device, &create_info, nullptr, &out.swapchain));
+    assert(out.swapchain);
+
+    uint32_t image_count{};
+    vkGetSwapchainImagesKHR(device, out.swapchain, &image_count, nullptr);
+
+    /** Get and create images */
+    std::vector<VkImage> images(image_count);
+    vkGetSwapchainImagesKHR(device, out.swapchain, &image_count, images.data());
+    out.images = std::move(out.images);
+    assert(image_count);
+
+    /** Create image views */
+    for (auto image : out.images)
+    {
+        out.views.push_back(vk::create_image_view(device, image, format.format));
+    }
+
+    for (auto image_view : out.views)
+    {
+        out.framebuffers.push_back(vk::create_framebuffer(device, render_pass, image_view, surface_caps.currentExtent));
+    }
+
+    out.format = format;
+    out.size = surface_caps.currentExtent;
+    return out;
+}
+
+void destroy_swapchain(VkDevice device, Swapchain& swapchain)
+{
+    for(auto fb : swapchain.framebuffers)
+    {
+        vkDestroyFramebuffer(device, fb, nullptr);
+    }
+
+    for (auto iv : swapchain.views)
+    {
+        vkDestroyImageView(device, iv, nullptr);
+    }
+
+    vkDestroySwapchainKHR(device, swapchain.swapchain, nullptr);
 }
 
 VkRenderPass create_render_pass(VkDevice device, VkFormat format)

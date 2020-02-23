@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "vma.h"
+#include <glm/vec2.hpp>
 #include <volk.h>
 
 namespace cs::vk
@@ -30,11 +31,31 @@ struct Buffer
     void* data = nullptr;
 };
 
+struct Swapchain
+{
+    VkSwapchainKHR swapchain{VK_NULL_HANDLE};
+    std::vector<VkImage> images{};
+    std::vector<VkImageView> views{};
+    std::vector<VkFramebuffer> framebuffers{};
+    VkSurfaceFormatKHR format{};
+    VkExtent2D size{};
+};
+
 uint32_t get_queue_index(VkPhysicalDevice pdev, VkQueueFlags required_flags);
 
 VkPresentModeKHR select_present_mode(VkPresentModeKHR desired, std::vector<VkPresentModeKHR>& avail);
 
 VkSurfaceFormatKHR select_surface_format(const std::vector<VkSurfaceFormatKHR>& avail);
+
+Swapchain create_swapchain(VkDevice device,
+                           VkPhysicalDevice pdevice,
+                           VkSurfaceKHR surface,
+                           VkSurfaceCapabilitiesKHR surface_caps,
+                           VkRenderPass render_pass,
+                           uint32_t queue_idx,
+                           VkSurfaceFormatKHR format);
+
+void destroy_swapchain(VkDevice device, Swapchain& swapchain);
 
 VkRenderPass create_render_pass(VkDevice device, VkFormat format);
 
