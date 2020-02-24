@@ -10,6 +10,7 @@ enum class KeyContext
     DefaultContext,
     Agent,
     AgentOnHover,
+    ScenarioScene
 };
 namespace detail
 {
