@@ -8,68 +8,116 @@ namespace cs::input
 {
 namespace detail
 {
-InputHandler::InputHandler(const KeyContext& type)
+ActionHandler::ActionHandler(const KeyContext type)
 {
     m_context_type = type;
 }
 
-void InputHandler::bind_key(const SDL_Scancode& event, const std::function<void()>& function, bool overwrite)
+void ActionHandler::set_blocking(bool blocking)
 {
-    if (overwrite)
+    m_blocking = blocking;
+}
+
+void ActionHandler::bind_action(const Action action, const std::function<void()>& function)
+{
+    m_action_binding[action] = function;
+}
+
+void ActionHandler::bind_key(const SDL_Scancode scancode, const Action action)
+{
+    m_key_binding[scancode] = action;
+}
+
+void ActionHandler::bind_btn(const Uint8 button, const Action action)
+{
+    m_mouse_binding[button] = action;
+}
+
+void ActionHandler::unbind_action(const Action action)
+{
+    auto&& it = m_action_binding.find(action);
+    if (it == m_action_binding.end())
     {
-        m_key_binding[event] = function;
+        spdlog::debug("this context (id: {}) does not have a binding for this action ({})", m_context_type, action);
         return;
     }
-    if (!has_event(event))
-    {
-        m_key_binding.emplace(event, function);
-    }
-    else
-    {
-        spdlog::debug("this context (id: {}) already has a binding for this event ({})", m_context_type, event);
-    }
+    m_action_binding.erase(it);
 }
-void InputHandler::unbind_key(const SDL_Scancode& event)
+
+void ActionHandler::unbind_key(const SDL_Scancode scancode)
 {
-    auto&& it = m_key_binding.find(event);
+    auto&& it = m_key_binding.find(scancode);
     if (it == m_key_binding.end())
     {
-        spdlog::debug("this context (id: {}) does not have a binding for this event ({})", m_context_type, event);
+        spdlog::debug("this context (id: {}) does not have a binding for this key ({})", m_context_type, scancode);
         return;
     }
     m_key_binding.erase(it);
 }
 
-void InputHandler::handle_input(const SDL_Scancode& event)
+void ActionHandler::unbind_btn(const Uint8 button)
 {
-    if (has_event(event))
+    auto&& it = m_mouse_binding.find(button);
+    if (it == m_mouse_binding.end())
     {
-        // Call the function the event maps to
-        m_key_binding.at(event)();
+        spdlog::debug("this context (id: {}) does not have a binding for this button ({})", m_context_type, button);
+        return;
+    }
+    m_mouse_binding.erase(it);
+}
+
+bool ActionHandler::handle_input(const SDL_Scancode scancode)
+{
+    if (has_event(scancode))
+    {
+        // Call the function the scancode maps to
+        auto& action = m_key_binding.at(scancode);
+        m_action_binding.at(action)();
     }
     else
     {
-        spdlog::debug("no keybinding for {} exist from before in context id: {}", event, m_context_type);
+        spdlog::debug("no keybinding for {} exist from before in context id: {}", scancode, m_context_type);
     }
+    return m_blocking;
+}
+bool ActionHandler::handle_input(const Uint8 button)
+{
+    if (has_event(button))
+    {
+        // Call the function the button maps to
+        auto& action = m_mouse_binding.at(button);
+        m_action_binding.at(action)();
+    }
+    else
+    {
+        spdlog::debug("no keybinding for {} exist from before in context id: {}", button, m_context_type);
+    }
+    return m_blocking;
 }
 
-bool InputHandler::has_event(const SDL_Scancode& event)
+bool ActionHandler::has_event(const SDL_Scancode scancode)
 {
-    return m_key_binding.contains(event);
+    return m_key_binding.contains(scancode);
+}
+bool ActionHandler::has_event(const Uint8 button)
+{
+    return m_mouse_binding.contains(button);
 }
 
-void InputHandler::clear()
+void ActionHandler::clear()
 {
+    m_action_binding.clear();
     m_key_binding.clear();
+    m_mouse_binding.clear();
 }
 
-InputHandler::~InputHandler() = default;
+ActionHandler::~ActionHandler() = default;
 
 } // namespace detail
 
 /******** CONTEXT HANDLER *********/
 
-void ContextHandler::add_context(const KeyContext& context)
+void ContextHandler::add_context(const KeyContext context, bool blocking)
 {
     if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
     {
@@ -83,10 +131,15 @@ void ContextHandler::add_context(const KeyContext& context)
     {
         remove_context(context);
     }
+    if (!has_context(context))
+    {
+        m_input_map.emplace(context, detail::ActionHandler{context});
+    }
+    m_input_map.at(context).set_blocking(blocking);
     m_active_stack.push_back(context);
 }
 
-void ContextHandler::remove_context(const KeyContext& context)
+void ContextHandler::remove_context(const KeyContext context)
 {
     if (context == KeyContext::DefaultContext)
     {
@@ -132,49 +185,80 @@ void ContextHandler::fast_bind_btn(const KeyContext context,
     bind_btn(context, button, action);
     bind_action(context, action, function);
 }
-    {
-        m_input_map.at(context).bind_key(event, function, overwrite);
-    }
-    else
-    {
-        detail::InputHandler new_input{context};
-        new_input.bind_key(event, function);
-        m_input_map.emplace(context, new_input);
-    }
+
+void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void()>& function)
+{
+    get_action_handler(context).bind_action(action, function);
 }
-void ContextHandler::unbind_key(const KeyContext& context, const SDL_Scancode& event)
+
+void ContextHandler::bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action)
+{
+    get_action_handler(context).bind_key(scancode, action);
+}
+
+void ContextHandler::bind_btn(const KeyContext context, Uint8 button, const Action action)
+{
+    get_action_handler(context).bind_btn(button, action);
+}
+
+void ContextHandler::unbind_action(const KeyContext context, const Action action)
 {
     if (has_context(context))
     {
-        auto& input = m_input_map.at(context);
-        input.unbind_key(event);
-    }
-    else
-    {
-        spdlog::debug("could not unbind, because the context (id: {}) does not exist", context);
+        m_input_map.at(context).unbind_action(action);
     }
 }
 
-void ContextHandler::handle_input(const SDL_Scancode& event)
+void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode scancode)
+{
+    if (has_context(context))
+    {
+        m_input_map.at(context).unbind_key(scancode);
+    }
+}
+
+void ContextHandler::unbind_btn(const KeyContext context, const Uint8 button)
+{
+    if (has_context(context))
+    {
+        m_input_map.at(context).unbind_btn(button);
+    }
+}
+
+void ContextHandler::handle_input(const SDL_Scancode scancode)
 {
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it) && m_input_map.at(*it).has_event(event))
+        if (has_context(*it) && m_input_map.at(*it).has_event(scancode))
         {
-            m_input_map.at(*it).handle_input(event);
+            m_input_map.at(*it).handle_input(scancode);
             return;
         }
     }
-    spdlog::debug("could not find anything for the {} event", event);
+    spdlog::debug("could not find anything for the {} scancode", scancode);
 }
 
-bool ContextHandler::has_context(const KeyContext& context)
+void ContextHandler::handle_input(const Uint8 button)
+{
+    // Iterate over the the active context stack
+    for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
+    {
+        if (has_context(*it) && m_input_map.at(*it).has_event(button))
+        {
+            m_input_map.at(*it).handle_input(button);
+            return;
+        }
+    }
+    spdlog::debug("could not find anything for the {} button", button);
+}
+
+bool ContextHandler::has_context(const KeyContext context)
 {
     return m_input_map.contains(context);
 }
 
-void ContextHandler::clear_context(const KeyContext& context)
+void ContextHandler::clear_context(const KeyContext context)
 {
     if (has_context(context))
     {
