@@ -100,6 +100,7 @@ void Window::set_fullscreen(bool fullscreen)
     {
         SDL_SetWindowBordered(m_window, SDL_TRUE);
         SDL_SetWindowPosition(m_window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+        SDL_SetWindowSize(m_window, 1280, 720);
     }
 }
 

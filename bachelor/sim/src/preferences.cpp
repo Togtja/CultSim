@@ -71,6 +71,13 @@ void PreferenceManager::set_fullscreen(bool fullscreen)
     m_window.set_fullscreen(fullscreen);
     m_fullscreen.value = fullscreen;
     m_preference_changed.publish(old, m_fullscreen);
+
+    /** Update the resolution as well now that fullscreen has changed */
+    glm::ivec2 new_size{};
+    SDL_GetWindowSize(m_window.get(), &new_size.x, &new_size.y);
+    auto old_res       = m_resolution;
+    m_resolution.value = new_size;
+    m_preference_changed.publish(old_res, m_resolution);
 }
 
 const Preference& PreferenceManager::get_language() const
