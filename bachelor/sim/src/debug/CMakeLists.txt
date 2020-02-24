@@ -5,4 +5,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/auto_timer.h
         ${CMAKE_CURRENT_LIST_DIR}/auto_timer.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/locale_editor.h
+        ${CMAKE_CURRENT_LIST_DIR}/locale_editor.cpp
 )
