@@ -86,7 +86,7 @@ struct Timer
 
     int number_of_loops{};
 
-    std::function<void(void)> on_complete{};
+    std::function<void(entt::entity, entt::registry&)> on_complete{};
 };
 
 struct DropItems
