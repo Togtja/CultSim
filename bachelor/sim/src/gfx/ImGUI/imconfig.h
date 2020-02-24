@@ -13,6 +13,7 @@
 //-----------------------------------------------------------------------------
 
 #pragma once
+#include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 //---- Define assertion handler. Defaults to calling assert().
@@ -73,11 +74,27 @@
 
 //---- Define constructor and implicit cast operators to convert back<>forth between your math types and ImVec2/ImVec4.
 // This will be inlined as part of ImVec2 and ImVec4 class declarations.
-/*
-#define IM_VEC2_CLASS_EXTRA                                                 \
-        ImVec2(const MyVec2& f) { x = f.x; y = f.y; }                       \
-        operator MyVec2() const { return MyVec2(x,y); }
-*/
+
+#define IM_VEC2_CLASS_EXTRA                                                                                                      \
+    ImVec2(const glm::vec2& f)                                                                                                   \
+    {                                                                                                                            \
+        x = f.x;                                                                                                                 \
+        y = f.y;                                                                                                                 \
+    }                                                                                                                            \
+    operator glm::vec2() const                                                                                                   \
+    {                                                                                                                            \
+        return glm::vec2(x, y);                                                                                                  \
+    }                                                                                                                            \
+                                                                                                                                 \
+    ImVec2(const glm::ivec2& f)                                                                                                  \
+    {                                                                                                                            \
+        x = f.x;                                                                                                                 \
+        y = f.y;                                                                                                                 \
+    }                                                                                                                            \
+    operator glm::ivec2() const                                                                                                  \
+    {                                                                                                                            \
+        return glm::ivec2(x, y);                                                                                                 \
+    }
 
 #define IM_VEC4_CLASS_EXTRA                                                                                                      \
     ImVec4(const glm::vec4& f)                                                                                                   \
