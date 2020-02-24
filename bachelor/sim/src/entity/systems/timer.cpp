@@ -6,7 +6,7 @@ namespace cs::system
 {
 void Timer::update(float dt)
 {
-    CS_AUTOTIMER(Action System);
+    CS_AUTOTIMER(Timer System);
 
     auto view = m_registry.view<component::Timer>();
     view.each([this, dt](entt::entity e, component::Timer& timer) {
