@@ -28,12 +28,26 @@ bool MainMenuScene::update(float dt)
 
     if (ImGui::Button("Load Scenario", {150, 50}))
     {
-        m_context->scene_manager->push<ScenarioScene>("basic_needs");
+        ImGui::OpenPopup("Select##Scenario");
     }
 
-    if (ImGui::Button("Terminate", {150, 50}))
+    if (ImGui::Button("Exit", {150, 50}))
     {
         m_context->scene_manager->clear();
+    }
+
+    /** Shows the popup to select scenario (TODO: Lua-fi) */
+    if (ImGui::BeginPopupModal("Select##Scenario", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+    {
+        if (ImGui::Button("Basic Needs", {150, 50}))
+        {
+            m_context->scene_manager->push<ScenarioScene>("basic_needs");
+        }
+        if (ImGui::Button("Cancel", {150, 25}))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
 
     ImGui::End();
@@ -48,5 +62,10 @@ bool MainMenuScene::draw()
 
 void MainMenuScene::handle_size_changed(const Preference& before, const Preference& after)
 {
+    if (before.name == "Resolution")
+    {
+        m_window_size    = std::get<glm::ivec2>(after.value);
+        m_main_menu_size = m_window_size / 2;
+    }
 }
 } // namespace cs
