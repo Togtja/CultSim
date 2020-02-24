@@ -1,4 +1,5 @@
 #include "pausemenu_scene.h"
+#include "mainmenu_scene.h"
 #include "scene_manager.h"
 
 #include <common_helpers.h>
@@ -30,8 +31,14 @@ bool PauseMenuScene::update(float dt)
         if (ImGui::Button("Main Menu", {150, 25}))
         {
             m_context->scene_manager->clear();
-            // m_context->scene_manager->push<MainMenuScene>();
+            m_context->scene_manager->push<MainMenuScene>();
         }
+
+        if (ImGui::Button("Exit", {150, 25}))
+        {
+            m_context->scene_manager->clear();
+        }
+
         ImGui::EndPopup();
     }
 
