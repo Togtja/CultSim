@@ -132,7 +132,7 @@ void ScenarioScene::on_enter()
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
 
-    for (int i = 1; i <= 240; i++)
+    for (int i = 1; i <= 10; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -147,21 +147,21 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, TAG_Avoidable);
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
+                                            std::vector<ai::Need>{need_hunger,need_thirst,need_sleep},
                                             std::vector<ai::Need>{});
 
         m_registry.assign<component::Strategies>(
             agent,
-            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
+            std::vector<ai::Strategy>({strategy_findfood,strategy_finddrink,strategy_sleep}),
             std::vector<ai::Strategy>{});
     }
-    for (int j = 0; j < 200; j++)
-    {
-        auto food = m_registry.create();
-        m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
-        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
-        m_registry.assign<component::Tags>(food, TAG_Food);
-    }
+   for (int j = 0; j < 200; j++)
+   {
+       auto food = m_registry.create();
+       m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
+       m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
+       m_registry.assign<component::Tags>(food, TAG_Food);
+   }
 
     for (int k = 0; k < 200; k++)
     {
