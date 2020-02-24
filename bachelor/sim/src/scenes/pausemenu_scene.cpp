@@ -1,9 +1,14 @@
 #include "pausemenu_scene.h"
+#include "scene_manager.h"
+
+#include <common_helpers.h>
+#include <gfx/ImGUI/imgui.h>
 
 namespace cs
 {
 void PauseMenuScene::on_enter()
 {
+    ImGui::OpenPopup("Paused##Menu");
 }
 
 void PauseMenuScene::on_exit()
@@ -12,11 +17,29 @@ void PauseMenuScene::on_exit()
 
 bool PauseMenuScene::update(float dt)
 {
+    if (ImGui::BeginPopupModal("Paused##Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+    {
+        ImGui::Text("You have paused.");
+
+        if (ImGui::Button("Resume", {150, 25}))
+        {
+            m_context->scene_manager->pop();
+            ImGui::CloseCurrentPopup();
+        }
+
+        if (ImGui::Button("Main Menu", {150, 25}))
+        {
+            m_context->scene_manager->clear();
+            // m_context->scene_manager->push<MainMenuScene>();
+        }
+        ImGui::EndPopup();
+    }
+
     return false;
 }
 
 bool PauseMenuScene::draw()
 {
-    return false;
+    return true;
 }
 } // namespace cs
