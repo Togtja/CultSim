@@ -152,6 +152,7 @@ public:
 
 private:
     ContextHandler();
+    detail::ActionHandler& get_action_handler(KeyContext context);
 };
 /**
  * Get the input manager singleton

@@ -193,6 +193,16 @@ ContextHandler::ContextHandler()
     add_context(KeyContext::DefaultContext);
 }
 
+detail::ActionHandler& ContextHandler::get_action_handler(KeyContext context)
+{
+    const auto& input_it = m_input_map.find(context);
+    if (input_it == m_input_map.end())
+    {
+        m_input_map.emplace(context, detail::ActionHandler{context});
+    }
+    return m_input_map.at(context);
+}
+
 ContextHandler& get_input()
 {
     static ContextHandler instance{};
