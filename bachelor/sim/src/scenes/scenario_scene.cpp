@@ -10,6 +10,7 @@
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
 #include "entity/systems/requirement.h"
+#include "entity/systems/timer.h"
 #include "gfx/renderer.h"
 #include "preferences.h"
 #include "random_engine.h"
@@ -156,13 +157,6 @@ void ScenarioScene::on_enter()
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
             std::vector<ai::Strategy>{});
     }
-    for (int j = 0; j < 200; j++)
-    {
-        auto food = m_registry.create();
-        m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
-        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
-        m_registry.assign<component::Tags>(food, TAG_Food);
-    }
 
     for (int k = 0; k < 200; k++)
     {
@@ -178,6 +172,15 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Position>(trees,glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
         m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
         m_registry.assign<component::Tags>(trees, TAG_Avoidable);
+        m_registry.assign<component::Timer>(trees, rng.uniform(5.f,20.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
+            auto food  = r.create();
+            auto pos   = r.get<component::Position>(e).position;
+            static RandomEngine rng;
+            r.assign<component::Position>(food,
+                                          glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f), 0.f));
+            r.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
+            r.assign<component::Tags>(food, TAG_Food);
+        });
     }
 
     /** Add required systems */
@@ -188,6 +191,7 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
+    m_active_systems.emplace_back(new system::Timer(m_registry));
 
     m_context->preferences->on_preference_changed.connect<&response>();
 }

@@ -14,6 +14,7 @@ void Timer::update(float dt)
         if (timer.time_spent > timer.time_to_complete)
         {
             timer.number_of_loops--;
+            timer.time_spent = 0;
             timer.on_complete(e,m_registry);
             if (timer.number_of_loops > 0)
             {
