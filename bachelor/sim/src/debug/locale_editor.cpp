@@ -2,26 +2,36 @@
 #include "filesystem/filesystem.h"
 #include "l10n/lang_manager.h"
 
+#include <algorithm>
+
 #include <gfx/ImGUI/imgui.h>
 
 #include <utility>
 
 namespace cs
 {
-LocaleEditor::LocaleEditor(sol::state_view lua) : m_lua(std::move(lua))
+void LocaleEditor::init(sol::state_view lua)
 {
     auto locales = fs::list_directory("l10n");
     for (const auto& str : locales)
     {
         auto script_file = fs::read_file("l10n/" + str);
-        m_lua.script(script_file);
-        sol::table locale = m_lua["locale"];
+        lua.script(script_file);
+        sol::table locale = lua["locale"];
 
         m_locales.push_back(str);
         for (auto&& [k, v] : locale)
         {
             m_translations[k.as<std::string>()].push_back(v.as<std::string>());
-            m_translations[k.as<std::string>()].back().resize(MAX_STR_LEN);
+        }
+    }
+
+    for (auto&& [k, v] : m_translations)
+    {
+        v.resize(m_locales.size());
+        for (auto&& elem : v)
+        {
+            elem.resize(MAX_STR_LEN);
         }
     }
 }
