@@ -81,9 +81,12 @@ struct Reproduction
 
 struct Timer
 {
-    ETag tags{};
     float time_to_complete{};
     float time_spent{};
+
+    int number_of_loops{};
+
+    std::function<void(void)> on_complete{};
 };
 
 struct DropItems
