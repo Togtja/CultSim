@@ -11,8 +11,11 @@
 #include "entity/systems/rendering.h"
 #include "entity/systems/requirement.h"
 #include "gfx/renderer.h"
+#include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+#include "scene_manager.h"
+#include "scenes/pausemenu_scene.h"
 
 #include <common_helpers.h>
 #include <functional>
@@ -35,6 +38,13 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
+    input::get_input().bind_key(
+        input::KeyContext::ScenarioScene,
+        SDL_SCANCODE_P,
+        [this] { m_context->scene_manager->push<PauseMenuScene>(); },
+        true);
+    input::get_input().add_context(input::KeyContext::ScenarioScene);
+
     ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
     ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, TAG_Drink};
     ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, TAG_Sleep};
@@ -143,7 +153,7 @@ void ScenarioScene::on_enter()
         glm::vec2 pos(rng.uniform(-1050.f, 1050.f), rng.uniform(-1350.f, 1350.f));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{{0.f, 0.f, 0.f}}, glm::vec2{}, 80.f, 0.f);
-        m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
+        auto& sc = m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, TAG_Avoidable);
         m_registry.assign<component::Needs>(agent,
@@ -185,6 +195,7 @@ void ScenarioScene::on_enter()
 
 void ScenarioScene::on_exit()
 {
+    input::get_input().remove_context(input::KeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&response>();
 }
 
