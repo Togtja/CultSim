@@ -63,6 +63,10 @@ void Application::handle_input()
         {
             input::get_input().handle_input(e.key.keysym.scancode);
         }
+        if (e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            input::get_input().handle_input(e.button.button);
+        }
     }
 }
 
@@ -108,15 +112,34 @@ bool Application::init_physfs(std::vector<char*> args)
 bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
-    std::function<void()> test([] { spdlog::info("You have hit the space bar"); });
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, [] { gfx::get_renderer().move_camera({0.f, 1.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, [] { gfx::get_renderer().move_camera({-1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, [] { gfx::get_renderer().move_camera({0.f, -1.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, [] { gfx::get_renderer().move_camera({1.f, 0.f, 0.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, [] { gfx::get_renderer().move_camera({0.f, 0.f, -4.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, [] { gfx::get_renderer().move_camera({0.f, 0.f, 4.f}); });
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_SPACE, test);
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, input::Action::MoveFWD);
+
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, input::Action::MoveLeft);
+
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, input::Action::MoveBack);
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, input::Action::MoveRight);
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, input::Action::ZoomIn);
+    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, input::Action::ZoomOut);
+
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveFWD, [] {
+        gfx::get_renderer().move_camera({0.f, 1.f, 0.f});
+    });
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveLeft, [] {
+        gfx::get_renderer().move_camera({-1.f, 0.f, 0.f});
+    });
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveBack, [] {
+        gfx::get_renderer().move_camera({0.f, -1.f, 0.f});
+    });
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveRight, [] {
+        gfx::get_renderer().move_camera({1.f, 0.f, 0.f});
+    });
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::ZoomIn, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, -4.f});
+    });
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::ZoomOut, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, 4.f});
+    });
 
     /* TODO: Fix to not return true */
 
