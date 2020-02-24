@@ -38,9 +38,11 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    input::get_input().bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, [this] {
-        m_context->scene_manager->push<PauseMenuScene>();
-    });
+    input::get_input().bind_key(
+        input::KeyContext::ScenarioScene,
+        SDL_SCANCODE_P,
+        [this] { m_context->scene_manager->push<PauseMenuScene>(); },
+        true);
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
     ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
