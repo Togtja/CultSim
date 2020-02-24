@@ -128,9 +128,11 @@ void ScenarioScene::on_enter()
 
     RandomEngine rng{};
 
-    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
-    auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
-    auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
+    auto tex    = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
+    auto f_tex  = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
+    auto d_tex  = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
+    auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
+    b_tex.scale = 100;
 
     for (int i = 1; i <= 10; i++)
     {
@@ -147,21 +149,21 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, TAG_Avoidable);
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger,need_thirst,need_sleep},
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
                                             std::vector<ai::Need>{});
 
         m_registry.assign<component::Strategies>(
             agent,
-            std::vector<ai::Strategy>({strategy_findfood,strategy_finddrink,strategy_sleep}),
+            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
             std::vector<ai::Strategy>{});
     }
-   for (int j = 0; j < 200; j++)
-   {
-       auto food = m_registry.create();
-       m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
-       m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
-       m_registry.assign<component::Tags>(food, TAG_Food);
-   }
+    for (int j = 0; j < 200; j++)
+    {
+        auto food = m_registry.create();
+        m_registry.assign<component::Position>(food, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
+        m_registry.assign<component::Tags>(food, TAG_Food);
+    }
 
     for (int k = 0; k < 200; k++)
     {
@@ -171,6 +173,16 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Tags>(drink, TAG_Drink);
     }
 
+    for (int l = -50; l < 50; l++)
+    {
+        for (int m = -50; m < 50; m++)
+        {
+            auto background = m_registry.create();
+            m_registry.assign<component::Position>(background, glm::vec3(l*100.f, m*100.f, -1.f));
+            m_registry.assign<component::Sprite>(background, b_tex, glm::vec3(0.f, 0.8f, 0.f));
+            m_registry.assign<component::Tags>(background, ETag{});
+        }
+    }
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
