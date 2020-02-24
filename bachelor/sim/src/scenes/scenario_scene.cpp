@@ -128,11 +128,10 @@ void ScenarioScene::on_enter()
 
     RandomEngine rng{};
 
-    auto tex    = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
-    auto f_tex  = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
-    auto d_tex  = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
-    auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
-    b_tex.scale = 100;
+    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
+    auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
+    auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
+    auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
     for (int i = 1; i <= 10; i++)
     {
@@ -173,16 +172,14 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Tags>(drink, TAG_Drink);
     }
 
-    for (int l = -50; l < 50; l++)
+    for (int l = 0; l < 50; l++)
     {
-        for (int m = -50; m < 50; m++)
-        {
-            auto background = m_registry.create();
-            m_registry.assign<component::Position>(background, glm::vec3(l*100.f, m*100.f, -1.f));
-            m_registry.assign<component::Sprite>(background, b_tex, glm::vec3(0.f, 0.8f, 0.f));
-            m_registry.assign<component::Tags>(background, ETag{});
-        }
+        auto trees = m_registry.create();
+        m_registry.assign<component::Position>(trees,glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
+        m_registry.assign<component::Tags>(trees, TAG_Avoidable);
     }
+
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
@@ -203,6 +200,17 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     ImGui::Begin("Scenario Scene");
+
+    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
+    b_tex.scale       = 100.f;
+
+    for (int i = -50; i < 50; i++)
+    {
+        for (int j = -50; j < 50; j++)
+        {
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, -1.f), glm::vec3(0.f, 0.5f, 0.2f), b_tex);
+        }
+    }
 
     for (auto& system : m_active_systems)
     {
