@@ -100,6 +100,12 @@ public:
      */
     void remove_context();
 
+    void fast_bind_key(const KeyContext context,
+                       const SDL_Scancode scancode,
+                       const Action action,
+                       const std::function<void()>& function);
+
+    void fast_bind_btn(const KeyContext context, const Uint8 button, const Action action, const std::function<void()>& function);
     /**
      * Bind context to a key, and that key to a function
      *

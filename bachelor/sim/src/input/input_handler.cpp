@@ -115,13 +115,23 @@ void ContextHandler::remove_context()
     m_active_stack.pop_back();
 }
 
-void ContextHandler::bind_key(const KeyContext& context,
-                              const SDL_Scancode& event,
-                              const std::function<void()>& function,
-                              bool overwrite)
+void ContextHandler::fast_bind_key(const KeyContext context,
+                                   const SDL_Scancode scancode,
+                                   const Action action,
+                                   const std::function<void()>& function)
 {
-    const auto& input_it = m_input_map.find(context);
-    if (input_it != m_input_map.end())
+    bind_key(context, scancode, action);
+    bind_action(context, action, function);
+}
+
+void ContextHandler::fast_bind_btn(const KeyContext context,
+                                   const Uint8 button,
+                                   const Action action,
+                                   const std::function<void()>& function)
+{
+    bind_btn(context, button, action);
+    bind_action(context, action, function);
+}
     {
         m_input_map.at(context).bind_key(event, function, overwrite);
     }
