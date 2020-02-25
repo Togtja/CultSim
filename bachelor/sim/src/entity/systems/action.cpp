@@ -36,13 +36,13 @@ void Action::update(float dt)
                             }
                             case TAG_Vision:
                             {
-                                m_registry.assign<component::VisionRequirement>(e, TAG_Food);
+                                m_registry.assign<component::VisionRequirement>(e, strategy.tags);
                                 action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
                                 break;
                             }
                             case TAG_Find:
                             {
-                                m_registry.assign<component::FindRequirement>(e, TAG_Food, glm::vec3{});
+                                m_registry.assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
                                 action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
                             }
                         }
