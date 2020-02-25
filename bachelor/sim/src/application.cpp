@@ -72,6 +72,7 @@ void Application::handle_input()
 
 void Application::update(float dt)
 {
+    input::get_input().handle_live_input(dt);
     m_scene_manager.update(dt);
     m_preferences.show_debug_ui();
 }
@@ -122,17 +123,17 @@ bool Application::init_input()
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, input::Action::ZoomIn);
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, input::Action::ZoomOut);
 
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveFWD, [] {
-        gfx::get_renderer().move_camera({0.f, 1.f, 0.f});
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveFWD, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 50.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveLeft, [] {
-        gfx::get_renderer().move_camera({-1.f, 0.f, 0.f});
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveLeft, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 50.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveBack, [] {
-        gfx::get_renderer().move_camera({0.f, -1.f, 0.f});
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveBack, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 50.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveRight, [] {
-        gfx::get_renderer().move_camera({1.f, 0.f, 0.f});
+    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveRight, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 50.f);
     });
     inputs.bind_action(input::KeyContext::DefaultContext, input::Action::ZoomIn, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, -4.f});
