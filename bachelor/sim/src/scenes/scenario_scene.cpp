@@ -46,9 +46,9 @@ void ScenarioScene::on_enter()
         true);
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, TAG_Sleep};
+    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
+    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
+    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -144,7 +144,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= 10000; i++)
+    for (int i = 1; i <= 100; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -185,7 +185,7 @@ void ScenarioScene::on_enter()
         });
     }
 
-    for (int k = 0; k < 25; k++) 
+    for (int k = 0; k < 25; k++)
     {
         auto ponds = m_registry.create();
         m_registry.assign<component::Position>(ponds, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
@@ -195,7 +195,8 @@ void ScenarioScene::on_enter()
             auto drink = r.create();
             auto pos   = r.get<component::Position>(e).position;
             static RandomEngine rng;
-            r.assign<component::Position>(drink, glm::vec3(pos.x+rng.uniform(-10.f, 10.f), pos.y+rng.uniform(-10.f, 10.f), 0.f));
+            r.assign<component::Position>(drink,
+                                          glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f), 0.f));
             r.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
             r.assign<component::Tags>(drink, TAG_Drink);
         });
@@ -231,7 +232,7 @@ bool ScenarioScene::update(float dt)
     {
         for (int j = -50; j < 50; j++)
         {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, -1.f), glm::vec3(0.f, 0.3f, 0.1f), b_tex);
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.f, 0.3f, 0.1f), b_tex);
         }
     }
 
@@ -273,6 +274,11 @@ bool ScenarioScene::draw()
                                                   glm::vec3(0.3f));
         }
     }
+
+    gfx::get_renderer().debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+    gfx::get_renderer().debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+    gfx::get_renderer().debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+
     return false;
 }
 
