@@ -6,6 +6,10 @@
 #include <glm/vec2.hpp>
 namespace cs::input
 {
+/**
+ * KeyContext
+ * the context in which the program is in, with a certain key mapping.
+ */
 enum class KeyContext
 {
     DefaultContext,
@@ -13,6 +17,12 @@ enum class KeyContext
     AgentOnHover,
     ScenarioScene
 };
+
+/**
+ * Action, the step between a key and a functions
+ * A key (Keyboard key/MouseBtn) gets mapped to an Action
+ * And an Action get mapped to a certain function
+ */
 enum class Action
 {
     MoveFWD,
@@ -24,6 +34,9 @@ enum class Action
     Pause,
 };
 
+/**
+ * Mouse, a easier way to use the diffrent SDL_events
+ */
 enum class Mouse
 {
     Left,       // Left mouse btn
@@ -40,16 +53,20 @@ enum class Mouse
 };
 namespace detail
 {
-/** Handles input for a certain context */
+/** Handles Actions for a certain context */
 class ActionHandler
 {
 private:
+    KeyContext m_context_type;
+    // Action to function bindings
     robin_hood::unordered_map<Action, std::function<void()>> m_action_binding;
     robin_hood::unordered_map<Action, std::function<void(float)>> m_live_action_binding;
 
+    // Key to Action Binding
     robin_hood::unordered_map<SDL_Scancode, Action> m_key_binding;
     robin_hood::unordered_map<Mouse, Action> m_mouse_binding;
-    KeyContext m_context_type;
+
+    // If blocking it will not go further down the context stack for keys
     bool m_blocking = false;
 
 public:
@@ -64,23 +81,67 @@ public:
     void set_blocking(bool blocking);
 
     /**
-     * Given a key and a function binds that key to that function in the input handlers context
+     * Given an Action and a function binds that Action to that function
      *
-     * @param scancode The key code that you want to bind
-     * @param function The function you want that key to be binded to
+     * @note many to 1 binding (ie. actions can do the same functions)
+     *
+     * @param action The Action enum you want to bind
+     * @param function The function you want to trigger when the action gets triggered
      */
     void bind_action(const Action action, const std::function<void()>& function);
+
+    /**
+     * Given an Action and a function binds that Action to that function
+     *
+     *  @note many to 1 binding (ie. actions can do the same functions)
+     * @note Lambda function takes in a float that is delta time
+     *
+     * @param action The Action enum you want to bind
+     * @param function The function you want to trigger when the action gets triggered
+     */
     void bind_action(const Action action, const std::function<void(float)>& function);
+
+    /**
+     * Given an key (scancode) and an action, bind them together
+     *
+     * @note many to 1 binding
+     *
+     * @param scancode the SDL scancode of the key you want to trigger an action with
+     * @param action the Action you want to trigger with the given scancode
+     */
     void bind_key(const SDL_Scancode scancode, const Action action);
+
+    /**
+     * Given an Mouse button and an action, bind them together
+     *
+     * @note many to 1 binding
+     *
+     * @param button the Mouse button from the Mouse enum you want to trigger an action with
+     * @param action the Action you want to trigger with the given button
+     */
     void bind_btn(const Mouse button, const Action action);
 
     /**
-     * Unbinds a key in the input handlers context
+     * Unbinds an action from the function
      *
-     * @param scancode The key even you want to unbind
+     * @note unbind both
+     *
+     * @param action The action you want to unbind
      */
     void unbind_action(const Action action);
+
+    /**
+     * Unbinds a key from the action
+     *
+     * @param scancode The key you want to unbind
+     */
     void unbind_key(const SDL_Scancode scancode);
+
+    /**
+     * Unbinds a Mouse button from the action
+     *
+     * @param button The key you want to unbind
+     */
     void unbind_btn(const Mouse button);
 
     /**
@@ -92,7 +153,7 @@ public:
     bool handle_input(const Mouse button);
     bool handle_live_input(const float dt);
     /**
-     * Given an Key code, checks if this context has that key code
+     * Given an scancode, checks if this context has that scancode
      *
      * @param scancode The scancode you want to check
      *
