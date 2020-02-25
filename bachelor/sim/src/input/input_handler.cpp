@@ -272,28 +272,87 @@ void ContextHandler::unbind_btn(const KeyContext context, const Mouse button)
     }
 }
 
-void ContextHandler::handle_input(const SDL_Scancode scancode)
+void ContextHandler::handle_input(const SDL_Event& event)
 {
+    bool break_event = false;
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         // Handled the input
-        if (m_input_map.at(*it).handle_input(scancode))
+        if (event.type == SDL_KEYDOWN)
+        {
+            if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
+            {
+                break_event = true;
+            }
+        }
+        if (event.type == SDL_MOUSEBUTTONDOWN)
+        {
+            // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
+            Mouse click = static_cast<Mouse>(event.button.button - 1);
+            // Update last mouse positions
+            last_click = {event.button.x, event.button.y};
+            if (click == Mouse::Left)
+            {
+                last_left = last_click;
+            }
+            if (click == Mouse::Right)
+            {
+                last_right = last_click;
+            }
+            if (m_input_map.at(*it).handle_input(click))
+            {
+                break_event = true;
+            }
+        }
+        if (event.type == SDL_MOUSEWHEEL)
+        {
+            auto x = event.wheel.x;
+            auto y = event.wheel.y;
+            if (event.wheel.direction == SDL_MOUSEWHEEL_FLIPPED)
+            {
+                x *= -1;
+                y *= -1;
+            }
+            if (x > 0)
+            {
+                if (m_input_map.at(*it).handle_input(Mouse::WheelRight))
+                {
+                    break_event = true;
+                }
+            }
+            if (x < 0)
+            {
+                if (m_input_map.at(*it).handle_input(Mouse::WheelLeft))
+                {
+                    break_event = true;
+                }
+            }
+            if (y > 0)
+            {
+                if (m_input_map.at(*it).handle_input(Mouse::WheelUp))
+                {
+                    break_event = true;
+                }
+            }
+            if (y < 0)
+            {
+                if (m_input_map.at(*it).handle_input(Mouse::WheelDown))
+                {
+                    break_event = true;
+                }
+            }
+        }
+        if (event.type == SDL_MOUSEMOTION)
+        {
+            last_move = {event.motion.x, event.motion.y};
+            if (m_input_map.at(*it).handle_input(Mouse::Move))
+            {
+                break_event = true;
+            }
+        }
+        if (break_event)
         {
             return;
-        }
-    }
-}
-
-void ContextHandler::handle_live_input(float dt)
-{
-    for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
-    {
-        if (has_context(*it))
-        {
-            if (m_input_map.at(*it).handle_live_input(dt))
-            {
-                return;
-            }
         }
     }
 }
