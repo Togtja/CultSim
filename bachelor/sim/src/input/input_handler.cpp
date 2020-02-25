@@ -97,6 +97,10 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
 }
 bool ActionHandler::handle_live_input(const float dt)
 {
+    // Used to make sure we break from stack after a key is found in a context
+    // The other handles can just return, however this one needs to loop through all the keys
+    // To keep the ability to hold down two keys at the same time
+    bool found_key = false;
     auto key_state = SDL_GetKeyboardState(NULL);
     for (auto&& [k, v] : m_key_binding)
     {
@@ -105,11 +109,11 @@ bool ActionHandler::handle_live_input(const float dt)
             if (has_live_action(v))
             {
                 m_live_action_binding[v](dt);
-                return true;
+                found_key = true;
             }
         }
     }
-    return m_blocking;
+    return m_blocking || found_key;
 }
 bool ActionHandler::handle_input(const Uint8 button)
 {
