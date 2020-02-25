@@ -59,14 +59,7 @@ void Application::handle_input()
         {
             m_running = false;
         }
-        if (e.type == SDL_KEYDOWN)
-        {
-            input::get_input().handle_input(e.key.keysym.scancode);
-        }
-        if (e.type == SDL_MOUSEBUTTONDOWN)
-        {
-            input::get_input().handle_input(e.button.button);
-        }
+        input::get_input().handle_input(e);
     }
 }
 
@@ -119,6 +112,9 @@ bool Application::init_input()
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, input::Action::MoveRight);
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, input::Action::ZoomIn);
     inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, input::Action::ZoomOut);
+
+    inputs.bind_btn(input::KeyContext::DefaultContext, input::Mouse::WheelUp, input::Action::ZoomIn);
+    inputs.bind_btn(input::KeyContext::DefaultContext, input::Mouse::WheelDown, input::Action::ZoomOut);
 
     inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveFWD, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 50.f);
