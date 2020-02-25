@@ -90,11 +90,8 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
         if (has_action(action))
         {
             m_action_binding[action]();
+            return true;
         }
-    }
-    else
-    {
-        spdlog::debug("no keybinding for {} exist from before in context id: {}", get_key_name(scancode), m_context_type);
     }
     return m_blocking;
 }
@@ -108,6 +105,7 @@ bool ActionHandler::handle_live_input(const float dt)
             if (has_live_action(v))
             {
                 m_live_action_binding[v](dt);
+                return true;
             }
         }
     }
@@ -120,10 +118,7 @@ bool ActionHandler::handle_input(const Uint8 button)
         // Call the function the button maps to
         auto& action = m_mouse_binding[button];
         m_action_binding[action]();
-    }
-    else
-    {
-        spdlog::debug("no keybinding for {} exist from before in context id: {}", button, m_context_type);
+        return true;
     }
     return m_blocking;
 }
@@ -278,9 +273,9 @@ void ContextHandler::handle_input(const SDL_Scancode scancode)
 {
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it) && m_input_map.at(*it).has_event(scancode))
+        // Handled the input
+        if (m_input_map.at(*it).handle_input(scancode))
         {
-            m_input_map.at(*it).handle_input(scancode);
             return;
         }
     }
@@ -292,8 +287,10 @@ void ContextHandler::handle_live_input(float dt)
     {
         if (has_context(*it))
         {
-            m_input_map.at(*it).handle_live_input(dt);
-            return;
+            if (m_input_map.at(*it).handle_live_input(dt))
+            {
+                return;
+            }
         }
     }
 }
@@ -305,8 +302,11 @@ void ContextHandler::handle_input(const Uint8 button)
     {
         if (has_context(*it))
         {
-            m_input_map.at(*it).handle_input(button);
-            return;
+            // Handled the input
+            if (m_input_map.at(*it).handle_input(button))
+            {
+                return;
+            }
         }
     }
     spdlog::debug("could not find anything for the {} button", button);
