@@ -71,7 +71,7 @@ public:
      * @param scancode the key even you want to trigger
      */
     bool handle_input(const SDL_Scancode scancode);
-    bool handle_live_input(const SDL_Scancode scancode, const float dt);
+    bool handle_live_input(const float dt);
     bool handle_input(const Uint8 button);
 
     /**
@@ -162,7 +162,7 @@ public:
      * @param scancode The scancode you want to run
      */
     void handle_input(const SDL_Scancode scancode);
-    void handle_live_input(const SDL_Scancode scancode, const float dt);
+    void handle_live_input(const float dt);
     void handle_input(const Uint8 button);
 
     /**

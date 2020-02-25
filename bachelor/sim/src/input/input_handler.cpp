@@ -98,20 +98,18 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
     }
     return m_blocking;
 }
-bool ActionHandler::handle_live_input(const SDL_Scancode scancode, const float dt)
+bool ActionHandler::handle_live_input(const float dt)
 {
-    if (has_event(scancode))
+    auto key_state = SDL_GetKeyboardState(NULL);
+    for (auto&& [k, v] : m_key_binding)
     {
-        // Call the function the scancode maps to
-        auto& action = m_key_binding[scancode];
-        if (has_live_action(action))
+        if (key_state[k])
         {
-            m_live_action_binding[action](dt);
+            if (has_live_action(v))
+            {
+                m_live_action_binding[v](dt);
+            }
         }
-    }
-    else
-    {
-        spdlog::debug("no keybinding for {} exist from before in context id: {}", get_key_name(scancode), m_context_type);
     }
     return m_blocking;
 }
@@ -182,7 +180,7 @@ void ContextHandler::add_context(const KeyContext context, bool blocking)
     {
         m_input_map.emplace(context, detail::ActionHandler{context});
     }
-    m_input_map[context].set_blocking(blocking);
+    m_input_map.at(context).set_blocking(blocking);
     m_active_stack.push_back(context);
 }
 
@@ -256,7 +254,7 @@ void ContextHandler::unbind_action(const KeyContext context, const Action action
 {
     if (has_context(context))
     {
-        m_input_map[context].unbind_action(action);
+        m_input_map.at(context).unbind_action(action);
     }
 }
 
@@ -264,7 +262,7 @@ void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode sca
 {
     if (has_context(context))
     {
-        m_input_map[context].unbind_key(scancode);
+        m_input_map.at(context).unbind_key(scancode);
     }
 }
 
@@ -272,7 +270,7 @@ void ContextHandler::unbind_btn(const KeyContext context, const Uint8 button)
 {
     if (has_context(context))
     {
-        m_input_map[context].unbind_btn(button);
+        m_input_map.at(context).unbind_btn(button);
     }
 }
 
@@ -280,27 +278,24 @@ void ContextHandler::handle_input(const SDL_Scancode scancode)
 {
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it))
+        if (has_context(*it) && m_input_map.at(*it).has_event(scancode))
         {
-            m_input_map[*it].handle_input(scancode);
+            m_input_map.at(*it).handle_input(scancode);
             return;
         }
     }
-    handle_live_input(scancode, 0.f);
 }
 
-void ContextHandler::handle_live_input(const SDL_Scancode scancode, float dt)
+void ContextHandler::handle_live_input(float dt)
 {
-    // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         if (has_context(*it))
         {
-            m_input_map[*it].handle_live_input(scancode, dt);
+            m_input_map.at(*it).handle_live_input(dt);
             return;
         }
     }
-    spdlog::debug("could not find anything for the {} key", SDL_GetKeyName(SDL_GetKeyFromScancode(scancode)));
 }
 
 void ContextHandler::handle_input(const Uint8 button)
@@ -308,9 +303,9 @@ void ContextHandler::handle_input(const Uint8 button)
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it) && m_input_map[*it].has_event(button))
+        if (has_context(*it))
         {
-            m_input_map[*it].handle_input(button);
+            m_input_map.at(*it).handle_input(button);
             return;
         }
     }
@@ -326,7 +321,7 @@ void ContextHandler::clear_context(const KeyContext context)
 {
     if (has_context(context))
     {
-        m_input_map[context].clear();
+        m_input_map.at(context).clear();
     }
     else
     {
@@ -358,7 +353,7 @@ detail::ActionHandler& ContextHandler::get_action_handler(KeyContext context)
     {
         m_input_map.emplace(context, detail::ActionHandler{context});
     }
-    return m_input_map[context];
+    return m_input_map.at(context);
 }
 
 ContextHandler& get_input()
