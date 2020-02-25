@@ -78,6 +78,7 @@ void Application::draw()
 
     auto& r = gfx::get_renderer();
     r.sprite().display();
+    r.debug().display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
