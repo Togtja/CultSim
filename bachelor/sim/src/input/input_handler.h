@@ -22,6 +22,21 @@ enum class Action
     ZoomOut,
     Pause,
 };
+
+enum class Mouse
+{
+    Left,       // Left mouse btn
+    Middle,     // Middle mouse btn
+    Right,      // Right mouse btn
+    X1,         // Optional mouse btn 1
+    X2,         // Optional mouse btn 2
+    WheelUp,    // Scroll wheel up
+    WheelDown,  // Scroll wheel down
+    WheelRight, // Scroll wheel right
+    WheelLeft,  // Scroll wheel left
+    Move        // Any mouse movement
+
+};
 namespace detail
 {
 /** Handles input for a certain context */
