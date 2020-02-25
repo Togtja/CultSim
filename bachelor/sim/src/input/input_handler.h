@@ -20,6 +20,7 @@ enum class Action
     MoveBack,
     ZoomIn,
     ZoomOut,
+    Pause,
 };
 namespace detail
 {
