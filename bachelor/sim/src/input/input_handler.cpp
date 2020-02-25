@@ -13,6 +13,8 @@ ActionHandler::ActionHandler(const KeyContext type)
     m_context_type = type;
 }
 
+ActionHandler::~ActionHandler() = default;
+
 void ActionHandler::set_blocking(bool blocking)
 {
     m_blocking = blocking;
@@ -21,6 +23,11 @@ void ActionHandler::set_blocking(bool blocking)
 void ActionHandler::bind_action(const Action action, const std::function<void()>& function)
 {
     m_action_binding[action] = function;
+}
+
+void ActionHandler::bind_action(const Action action, const std::function<void(float)>& function)
+{
+    m_live_action_binding[action] = function;
 }
 
 void ActionHandler::bind_key(const SDL_Scancode scancode, const Action action)
@@ -35,13 +42,21 @@ void ActionHandler::bind_btn(const Uint8 button, const Action action)
 
 void ActionHandler::unbind_action(const Action action)
 {
-    auto&& it = m_action_binding.find(action);
-    if (it == m_action_binding.end())
+    auto&& it  = m_action_binding.find(action);
+    auto&& it2 = m_live_action_binding.find(action);
+    if (it != m_action_binding.end())
+    {
+        m_action_binding.erase(it);
+    }
+    if (it2 != m_live_action_binding.end())
+    {
+        m_live_action_binding.erase(it2);
+    }
+    // DEBUG
+    if (it == m_action_binding.end() && it2 == m_live_action_binding.end())
     {
         spdlog::debug("this context (id: {}) does not have a binding for this action ({})", m_context_type, action);
-        return;
     }
-    m_action_binding.erase(it);
 }
 
 void ActionHandler::unbind_key(const SDL_Scancode scancode)
@@ -49,7 +64,7 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     auto&& it = m_key_binding.find(scancode);
     if (it == m_key_binding.end())
     {
-        spdlog::debug("this context (id: {}) does not have a binding for this key ({})", m_context_type, scancode);
+        spdlog::debug("this context (id: {}) does not have a binding for this key ({})", m_context_type, get_key_name(scancode));
         return;
     }
     m_key_binding.erase(it);
@@ -71,12 +86,32 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
     if (has_event(scancode))
     {
         // Call the function the scancode maps to
-        auto& action = m_key_binding.at(scancode);
-        m_action_binding.at(action)();
+        auto& action = m_key_binding[scancode];
+        if (has_action(action))
+        {
+            m_action_binding[action]();
+        }
     }
     else
     {
-        spdlog::debug("no keybinding for {} exist from before in context id: {}", scancode, m_context_type);
+        spdlog::debug("no keybinding for {} exist from before in context id: {}", get_key_name(scancode), m_context_type);
+    }
+    return m_blocking;
+}
+bool ActionHandler::handle_live_input(const SDL_Scancode scancode, const float dt)
+{
+    if (has_event(scancode))
+    {
+        // Call the function the scancode maps to
+        auto& action = m_key_binding[scancode];
+        if (has_live_action(action))
+        {
+            m_live_action_binding[action](dt);
+        }
+    }
+    else
+    {
+        spdlog::debug("no keybinding for {} exist from before in context id: {}", get_key_name(scancode), m_context_type);
     }
     return m_blocking;
 }
@@ -85,8 +120,8 @@ bool ActionHandler::handle_input(const Uint8 button)
     if (has_event(button))
     {
         // Call the function the button maps to
-        auto& action = m_mouse_binding.at(button);
-        m_action_binding.at(action)();
+        auto& action = m_mouse_binding[button];
+        m_action_binding[action]();
     }
     else
     {
@@ -103,6 +138,15 @@ bool ActionHandler::has_event(const Uint8 button)
 {
     return m_mouse_binding.contains(button);
 }
+bool ActionHandler::has_action(const Action action)
+{
+    return m_action_binding.contains(action);
+}
+
+bool ActionHandler::has_live_action(const Action action)
+{
+    return m_live_action_binding.contains(action);
+}
 
 void ActionHandler::clear()
 {
@@ -111,7 +155,10 @@ void ActionHandler::clear()
     m_mouse_binding.clear();
 }
 
-ActionHandler::~ActionHandler() = default;
+std::string ActionHandler::get_key_name(SDL_Scancode scancode)
+{
+    return SDL_GetKeyName(SDL_GetKeyFromScancode(scancode));
+}
 
 } // namespace detail
 
@@ -135,7 +182,7 @@ void ContextHandler::add_context(const KeyContext context, bool blocking)
     {
         m_input_map.emplace(context, detail::ActionHandler{context});
     }
-    m_input_map.at(context).set_blocking(blocking);
+    m_input_map[context].set_blocking(blocking);
     m_active_stack.push_back(context);
 }
 
@@ -190,6 +237,10 @@ void ContextHandler::bind_action(KeyContext context, const Action action, const 
 {
     get_action_handler(context).bind_action(action, function);
 }
+void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void(float)>& function)
+{
+    get_action_handler(context).bind_action(action, function);
+}
 
 void ContextHandler::bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action)
 {
@@ -205,7 +256,7 @@ void ContextHandler::unbind_action(const KeyContext context, const Action action
 {
     if (has_context(context))
     {
-        m_input_map.at(context).unbind_action(action);
+        m_input_map[context].unbind_action(action);
     }
 }
 
@@ -213,7 +264,7 @@ void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode sca
 {
     if (has_context(context))
     {
-        m_input_map.at(context).unbind_key(scancode);
+        m_input_map[context].unbind_key(scancode);
     }
 }
 
@@ -221,22 +272,35 @@ void ContextHandler::unbind_btn(const KeyContext context, const Uint8 button)
 {
     if (has_context(context))
     {
-        m_input_map.at(context).unbind_btn(button);
+        m_input_map[context].unbind_btn(button);
     }
 }
 
 void ContextHandler::handle_input(const SDL_Scancode scancode)
 {
-    // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it) && m_input_map.at(*it).has_event(scancode))
+        if (has_context(*it))
         {
-            m_input_map.at(*it).handle_input(scancode);
+            m_input_map[*it].handle_input(scancode);
             return;
         }
     }
-    spdlog::debug("could not find anything for the {} scancode", scancode);
+    handle_live_input(scancode, 0.f);
+}
+
+void ContextHandler::handle_live_input(const SDL_Scancode scancode, float dt)
+{
+    // Iterate over the the active context stack
+    for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
+    {
+        if (has_context(*it))
+        {
+            m_input_map[*it].handle_live_input(scancode, dt);
+            return;
+        }
+    }
+    spdlog::debug("could not find anything for the {} key", SDL_GetKeyName(SDL_GetKeyFromScancode(scancode)));
 }
 
 void ContextHandler::handle_input(const Uint8 button)
@@ -244,9 +308,9 @@ void ContextHandler::handle_input(const Uint8 button)
     // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
-        if (has_context(*it) && m_input_map.at(*it).has_event(button))
+        if (has_context(*it) && m_input_map[*it].has_event(button))
         {
-            m_input_map.at(*it).handle_input(button);
+            m_input_map[*it].handle_input(button);
             return;
         }
     }
@@ -262,7 +326,7 @@ void ContextHandler::clear_context(const KeyContext context)
 {
     if (has_context(context))
     {
-        m_input_map.at(context).clear();
+        m_input_map[context].clear();
     }
     else
     {
@@ -294,7 +358,7 @@ detail::ActionHandler& ContextHandler::get_action_handler(KeyContext context)
     {
         m_input_map.emplace(context, detail::ActionHandler{context});
     }
-    return m_input_map.at(context);
+    return m_input_map[context];
 }
 
 ContextHandler& get_input()

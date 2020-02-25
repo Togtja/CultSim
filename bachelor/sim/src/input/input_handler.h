@@ -27,6 +27,7 @@ class ActionHandler
 {
 private:
     robin_hood::unordered_map<Action, std::function<void()>> m_action_binding;
+    robin_hood::unordered_map<Action, std::function<void(float)>> m_live_action_binding;
 
     robin_hood::unordered_map<SDL_Scancode, Action> m_key_binding;
     robin_hood::unordered_map<Uint8, Action> m_mouse_binding;
@@ -40,6 +41,7 @@ public:
      * @param type The Key Context that the input handler should handle
      */
     explicit ActionHandler(const KeyContext type);
+    ~ActionHandler();
 
     void set_blocking(bool blocking);
 
@@ -49,6 +51,8 @@ public:
      * @param scancode The key code that you want to bind
      * @param function The function you want that key to be binded to
      */
+    void bind_action(const Action action, const std::function<void()>& function);
+    void bind_action(const Action action, const std::function<void(float)>& function);
     void bind_key(const SDL_Scancode scancode, const Action action);
     void bind_btn(const Uint8 button, const Action action);
 
@@ -57,17 +61,17 @@ public:
      *
      * @param scancode The key even you want to unbind
      */
+    void unbind_action(const Action action);
     void unbind_key(const SDL_Scancode scancode);
     void unbind_btn(const Uint8 button);
 
-    void bind_action(const Action action, const std::function<void()>& function);
-    void unbind_action(const Action action);
     /**
      * Given a key, runs that key's binded function in the input handlers context
      *
      * @param scancode the key even you want to trigger
      */
     bool handle_input(const SDL_Scancode scancode);
+    bool handle_live_input(const SDL_Scancode scancode, const float dt);
     bool handle_input(const Uint8 button);
 
     /**
@@ -81,12 +85,16 @@ public:
 
     bool has_event(const Uint8 button);
 
+    bool has_action(const Action action);
+    bool has_live_action(const Action action);
+
     /**
      * Clears the key bindings
      */
     void clear();
 
-    ~ActionHandler();
+private:
+    std::string get_key_name(SDL_Scancode scancode);
 };
 
 } // namespace detail
@@ -135,6 +143,7 @@ public:
      * @param function The function you want you bind to the key code
      */
     void bind_action(KeyContext context, const Action action, const std::function<void()>& function);
+    void bind_action(KeyContext context, const Action action, const std::function<void(float)>& function);
     void bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action);
     void bind_btn(const KeyContext context, Uint8 button, const Action action);
 
@@ -153,6 +162,7 @@ public:
      * @param scancode The scancode you want to run
      */
     void handle_input(const SDL_Scancode scancode);
+    void handle_live_input(const SDL_Scancode scancode, const float dt);
     void handle_input(const Uint8 button);
 
     /**
