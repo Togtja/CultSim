@@ -107,6 +107,11 @@ private:
     std::vector<KeyContext> m_active_stack;
     robin_hood::unordered_map<KeyContext, detail::ActionHandler> m_input_map;
 
+    glm::ivec2 last_click{};
+    glm::ivec2 last_right{};
+    glm::ivec2 last_left{};
+    glm::ivec2 last_move{};
+
 public:
     friend ContextHandler& get_input();
     ContextHandler(ContextHandler const&) = delete;
@@ -190,6 +195,11 @@ public:
      * Clears KeyContext stack, and the mappings
      */
     void clear();
+
+    glm::ivec2 get_last_click();
+    glm::ivec2 get_last_right_click();
+    glm::ivec2 get_last_left_click();
+    glm::ivec2 get_last_move();
 
 private:
     ContextHandler();

@@ -345,6 +345,23 @@ void ContextHandler::clear()
     add_context(KeyContext::DefaultContext);
 }
 
+glm::ivec2 ContextHandler::get_last_click()
+{
+    return last_click;
+}
+glm::ivec2 ContextHandler::get_last_right_click()
+{
+    return last_right;
+}
+glm::ivec2 ContextHandler::get_last_left_click()
+{
+    return last_left;
+}
+glm::ivec2 ContextHandler::get_last_move()
+{
+    return last_move;
+}
+
 ContextHandler::ContextHandler()
 {
     add_context(KeyContext::DefaultContext);
