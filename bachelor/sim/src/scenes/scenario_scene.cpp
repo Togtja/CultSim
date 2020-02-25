@@ -12,8 +12,11 @@
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
+#include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+#include "scene_manager.h"
+#include "scenes/pausemenu_scene.h"
 
 #include <common_helpers.h>
 #include <functional>
@@ -36,9 +39,16 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    input::get_input().bind_key(
+        input::KeyContext::ScenarioScene,
+        SDL_SCANCODE_P,
+        [this] { m_context->scene_manager->push<PauseMenuScene>(); },
+        true);
+    input::get_input().add_context(input::KeyContext::ScenarioScene);
+
+    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 2.f, TAG_Food};
+    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 3.f, TAG_Drink};
+    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 1.f, TAG_Sleep};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -206,6 +216,7 @@ void ScenarioScene::on_enter()
 
 void ScenarioScene::on_exit()
 {
+    input::get_input().remove_context(input::KeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&response>();
 }
 

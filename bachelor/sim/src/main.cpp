@@ -6,6 +6,8 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 int main(int argc, char* argv[])
 {
     const auto args = std::vector(argv, argv + argc);
@@ -32,6 +34,10 @@ int main(int argc, char* argv[])
 #else
     spdlog::set_level(spdlog::level::info);
 #endif
+
+    auto default_logger = spdlog::stdout_color_st("default");
+    default_logger->set_pattern("[%D | %H:%M:%S.%e] [%^%n %l%$] - %v");
+    spdlog::set_default_logger(default_logger);
 
     /** Run the program */
     cs::Application cultsim{};

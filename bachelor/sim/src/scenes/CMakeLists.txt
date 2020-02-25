@@ -12,6 +12,12 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/scene_manager.cpp
         ${CMAKE_CURRENT_LIST_DIR}/scene_manager_test.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/pausemenu_scene.h
+        ${CMAKE_CURRENT_LIST_DIR}/pausemenu_scene.cpp
+
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/mainmenu_scene.h
+        ${CMAKE_CURRENT_LIST_DIR}/mainmenu_scene.cpp
 )
