@@ -58,6 +58,7 @@ void PreferenceManager::set_resolution(const glm::ivec2& resolution)
     m_window.resize(resolution);
     m_resolution.value = resolution;
     m_preference_changed.publish(old, m_resolution);
+    glViewport(0, 0, resolution.x, resolution.y);
 }
 
 const Preference& PreferenceManager::get_fullscreen() const
@@ -78,6 +79,7 @@ void PreferenceManager::set_fullscreen(bool fullscreen)
     auto old_res       = m_resolution;
     m_resolution.value = new_size;
     m_preference_changed.publish(old_res, m_resolution);
+    glViewport(0, 0, new_size.x, new_size.y);
 }
 
 const Preference& PreferenceManager::get_language() const

@@ -46,9 +46,9 @@ void ScenarioScene::on_enter()
         true);
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 60.f, 1.f, TAG_Food};
+    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 90.f, 1.5f, TAG_Drink};
+    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 70.f, 0.5f, TAG_Sleep};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -207,10 +207,10 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
+    m_active_systems.emplace_back(new system::Timer(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
-    m_active_systems.emplace_back(new system::Timer(m_registry));
 
     m_context->preferences->on_preference_changed.connect<&response>();
 }
@@ -232,7 +232,7 @@ bool ScenarioScene::update(float dt)
     {
         for (int j = -50; j < 50; j++)
         {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.f, 0.3f, 0.1f), b_tex);
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.17f, 0.1f), b_tex);
         }
     }
 
