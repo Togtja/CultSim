@@ -35,7 +35,7 @@ void ActionHandler::bind_key(const SDL_Scancode scancode, const Action action)
     m_key_binding[scancode] = action;
 }
 
-void ActionHandler::bind_btn(const Uint8 button, const Action action)
+void ActionHandler::bind_btn(const Mouse button, const Action action)
 {
     m_mouse_binding[button] = action;
 }
@@ -70,7 +70,7 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     m_key_binding.erase(it);
 }
 
-void ActionHandler::unbind_btn(const Uint8 button)
+void ActionHandler::unbind_btn(const Mouse button)
 {
     auto&& it = m_mouse_binding.find(button);
     if (it == m_mouse_binding.end())
@@ -115,7 +115,7 @@ bool ActionHandler::handle_live_input(const float dt)
     }
     return m_blocking || found_key;
 }
-bool ActionHandler::handle_input(const Uint8 button)
+bool ActionHandler::handle_input(const Mouse button)
 {
     if (has_event(button))
     {
@@ -131,7 +131,7 @@ bool ActionHandler::has_event(const SDL_Scancode scancode)
 {
     return m_key_binding.contains(scancode);
 }
-bool ActionHandler::has_event(const Uint8 button)
+bool ActionHandler::has_event(const Mouse button)
 {
     return m_mouse_binding.contains(button);
 }
@@ -222,7 +222,7 @@ void ContextHandler::fast_bind_key(const KeyContext context,
 }
 
 void ContextHandler::fast_bind_btn(const KeyContext context,
-                                   const Uint8 button,
+                                   const Mouse button,
                                    const Action action,
                                    const std::function<void()>& function)
 {
@@ -244,11 +244,10 @@ void ContextHandler::bind_key(const KeyContext context, const SDL_Scancode scanc
     get_action_handler(context).bind_key(scancode, action);
 }
 
-void ContextHandler::bind_btn(const KeyContext context, Uint8 button, const Action action)
+void ContextHandler::bind_btn(const KeyContext context, const Mouse button, const Action action)
 {
     get_action_handler(context).bind_btn(button, action);
 }
-
 void ContextHandler::unbind_action(const KeyContext context, const Action action)
 {
     if (has_context(context))
@@ -265,7 +264,7 @@ void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode sca
     }
 }
 
-void ContextHandler::unbind_btn(const KeyContext context, const Uint8 button)
+void ContextHandler::unbind_btn(const KeyContext context, const Mouse button)
 {
     if (has_context(context))
     {
@@ -299,21 +298,18 @@ void ContextHandler::handle_live_input(float dt)
     }
 }
 
-void ContextHandler::handle_input(const Uint8 button)
+void ContextHandler::handle_live_input(float dt)
 {
-    // Iterate over the the active context stack
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         if (has_context(*it))
         {
-            // Handled the input
-            if (m_input_map.at(*it).handle_input(button))
+            if (m_input_map.at(*it).handle_live_input(dt))
             {
                 return;
             }
         }
     }
-    spdlog::debug("could not find anything for the {} button", button);
 }
 
 bool ContextHandler::has_context(const KeyContext context)

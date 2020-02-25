@@ -3,6 +3,7 @@
 
 #include "robin_hood.h"
 #include <SDL_events.h>
+#include <glm/vec2.hpp>
 namespace cs::input
 {
 enum class KeyContext
@@ -47,7 +48,7 @@ private:
     robin_hood::unordered_map<Action, std::function<void(float)>> m_live_action_binding;
 
     robin_hood::unordered_map<SDL_Scancode, Action> m_key_binding;
-    robin_hood::unordered_map<Uint8, Action> m_mouse_binding;
+    robin_hood::unordered_map<Mouse, Action> m_mouse_binding;
     KeyContext m_context_type;
     bool m_blocking = false;
 
@@ -71,7 +72,7 @@ public:
     void bind_action(const Action action, const std::function<void()>& function);
     void bind_action(const Action action, const std::function<void(float)>& function);
     void bind_key(const SDL_Scancode scancode, const Action action);
-    void bind_btn(const Uint8 button, const Action action);
+    void bind_btn(const Mouse button, const Action action);
 
     /**
      * Unbinds a key in the input handlers context
@@ -80,7 +81,7 @@ public:
      */
     void unbind_action(const Action action);
     void unbind_key(const SDL_Scancode scancode);
-    void unbind_btn(const Uint8 button);
+    void unbind_btn(const Mouse button);
 
     /**
      * Given a key, runs that key's binded function in the input handlers context
@@ -88,9 +89,8 @@ public:
      * @param scancode the key even you want to trigger
      */
     bool handle_input(const SDL_Scancode scancode);
+    bool handle_input(const Mouse button);
     bool handle_live_input(const float dt);
-    bool handle_input(const Uint8 button);
-
     /**
      * Given an Key code, checks if this context has that key code
      *
@@ -100,7 +100,7 @@ public:
      */
     bool has_event(const SDL_Scancode scancode);
 
-    bool has_event(const Uint8 button);
+    bool has_event(const Mouse button);
 
     bool has_action(const Action action);
     bool has_live_action(const Action action);
@@ -156,7 +156,7 @@ public:
                        const Action action,
                        const std::function<void()>& function);
 
-    void fast_bind_btn(const KeyContext context, const Uint8 button, const Action action, const std::function<void()>& function);
+    void fast_bind_btn(const KeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
     /**
      * Bind context to a key, and that key to a function
      *
@@ -164,10 +164,11 @@ public:
      * @param scancode The key you want to bind to the context
      * @param function The function you want you bind to the key code
      */
-    void bind_action(KeyContext context, const Action action, const std::function<void()>& function);
-    void bind_action(KeyContext context, const Action action, const std::function<void(float)>& function);
+    void bind_action(const KeyContext context, const Action action, const std::function<void()>& function);
+    void bind_action(const KeyContext context, const Action action, const std::function<void(float)>& function);
     void bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action);
-    void bind_btn(const KeyContext context, Uint8 button, const Action action);
+    void bind_btn(const KeyContext context, const Mouse button, const Action action);
+    void bind_wheel(const KeyContext context, const bool wheel_up, Action action);
 
     /**
      * Unbind a key from a context
@@ -177,15 +178,14 @@ public:
      */
     void unbind_action(const KeyContext context, const Action action);
     void unbind_key(const KeyContext context, const SDL_Scancode scancode);
-    void unbind_btn(const KeyContext context, const Uint8 button);
+    void unbind_btn(const KeyContext context, const Mouse button);
     /**
      * Handle's input from an event, goes through the context stack and runs the first found event matching function
      *
      * @param scancode The scancode you want to run
      */
-    void handle_input(const SDL_Scancode scancode);
+    void handle_input(const SDL_Event& event);
     void handle_live_input(const float dt);
-    void handle_input(const Uint8 button);
 
     /**
      * Checks if the context have a mapping to an InputHandler
