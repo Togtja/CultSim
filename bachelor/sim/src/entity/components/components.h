@@ -23,7 +23,7 @@ struct Movement
 {
     std::vector<glm::vec3> desired_position{};
     glm::vec2 direction{};
-    float speed = 1.f;
+    float speed        = 1.f;
     float avoidance_cd = 0.f;
     int avoid_count{};
 };
@@ -79,18 +79,14 @@ struct Reproduction
     uint16_t number_of_children{};
 };
 
-struct Produce
+struct Timer
 {
-    enum EProduce
-    {
-        Food,
-        Silk,
-        Hemp,
-        Drugs,
-        Milk
-    };
+    float time_to_complete{};
+    float time_spent{};
 
-    std::vector<EProduce> produces{};
+    int number_of_loops{};
+
+    std::function<void(entt::entity, entt::registry&)> on_complete{};
 };
 
 struct DropItems

@@ -6,7 +6,7 @@
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "input/input_handler.h"
-#include "scenes/scenario_scene.h"
+#include "scenes/mainmenu_scene.h"
 
 #include <functional>
 
@@ -25,13 +25,13 @@ void Application::run(const std::vector<char*>& args)
     m_scene_manager.set_application_context(context);
 
     /** Add default scene */
-    m_scene_manager.push<ScenarioScene>("basic_needs");
+    m_scene_manager.push<MainMenuScene>();
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
 
     /** Main Loop */
-    while (m_running)
+    do
     {
         CS_AUTOTIMER(Frame Time);
         handle_input();
@@ -44,7 +44,7 @@ void Application::run(const std::vector<char*>& args)
         AutoTimer::show_debug_ui();
 
         draw();
-    }
+    } while (m_running && !m_scene_manager.empty());
 
     deinit();
 }
@@ -83,10 +83,7 @@ void Application::draw()
 
     auto& r = gfx::get_renderer();
     r.sprite().display();
-
-    r.debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    r.debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-    r.debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    r.debug().display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

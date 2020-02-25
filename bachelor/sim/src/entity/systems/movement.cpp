@@ -22,15 +22,20 @@ void Movement::update(float dt)
 {
     CS_AUTOTIMER(Movement System);
 
+    static bool draw_paths      = false;
     static float avoid_rotation = 35.f;
     static float avoid_cd       = 0.14f;
     static float avoid_dist     = 10.f;
     static float avoid_start    = 15.f;
 
-    ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);
-    ImGui::DragFloat("Avoid CD", &avoid_cd, 0.01f, 0.01f, 1.f);
-    ImGui::DragFloat("Avoid Dist", &avoid_dist, 1.f, 1.f, 256.f);
-    ImGui::DragFloat("Avoid Start", &avoid_start, 1.f, 1.f, 64.f);
+    if (ImGui::TreeNode("Avoidance Controls"))
+    {
+        ImGui::Checkbox("Draw Paths", &draw_paths);
+        ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);
+        ImGui::DragFloat("Avoid CD", &avoid_cd, 0.01f, 0.01f, 1.f);
+        ImGui::DragFloat("Avoid Dist", &avoid_dist, 1.f, 1.f, 256.f);
+        ImGui::DragFloat("Avoid Start", &avoid_start, 1.f, 1.f, 64.f);
+    }
 
     m_registry.view<component::Vision, component::Movement, component::Position>().each(
         [&dt, this](entt::entity e, const component::Vision& vis, component::Movement& mov, component::Position& pos) {
@@ -107,16 +112,18 @@ void Movement::update(float dt)
 
         pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * dt;
 
-        //        gfx::get_renderer().debug().draw_line(pos.position,
-        //                                              pos.position + glm::vec3(mov.direction, 0.f) * mov.speed,
-        //                                              {1.f, 0.f, 1.f});
+        if (draw_paths)
+        {
+            gfx::get_renderer().debug().draw_line(pos.position,
+                                                  pos.position + glm::vec3(mov.direction, 0.f) * mov.speed,
+                                                  {1.f, 0.f, 1.f});
 
-        //        gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
-        //        for (int i = 0; i < mov.desired_position.size() - 1; ++i)
-        //        {
-        //            gfx::get_renderer().debug().draw_line(mov.desired_position[i], mov.desired_position[i + 1],
-        //            {0.f, 1.f, 1.f});
-        //        }
+            gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
+            for (int i = 0; i < mov.desired_position.size() - 1; ++i)
+            {
+                gfx::get_renderer().debug().draw_line(mov.desired_position[i], mov.desired_position[i + 1], {0.f, 1.f, 1.f});
+            }
+        }
 
         if (glm::distance(pos.position, cur_head) < 5.f)
         {

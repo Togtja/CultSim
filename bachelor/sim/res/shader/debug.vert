@@ -9,10 +9,10 @@ layout(location = 0) out vec3 vs_color;
 
 /** Uniforms */
 layout(location = 0) uniform mat4 u_projection;
-layout(location = 1) uniform vec3 u_color;
+// layout(location = 1) uniform vec3 u_color;
 
 void main()
 {
-    vs_color    = a_color * u_color;
+    vs_color    = a_color;
     gl_Position = u_projection * (vec4(a_position * 0.1f, 1.f));
 }
