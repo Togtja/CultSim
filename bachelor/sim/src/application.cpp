@@ -7,6 +7,7 @@
 #include "gfx/glutil.h"
 #include "input/input_handler.h"
 #include "scenes/mainmenu_scene.h"
+#include "lua_type_bindings.h"
 
 #include <functional>
 
@@ -141,6 +142,8 @@ bool Application::init_lua()
     log_table.set_function("warn", [](std::string_view msg) { spdlog::warn(msg); });
     log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
     log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
+
+    lua::bind_components(m_lua.lua_state());
 
     return true;
 }
