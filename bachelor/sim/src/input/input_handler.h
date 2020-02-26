@@ -145,13 +145,33 @@ public:
     void unbind_btn(const Mouse button);
 
     /**
-     * Given a key, runs that key's binded function in the input handlers context
+     * Given a scancode (key), triggers the action it's binded to
+     * Then the action triggers the function
      *
      * @param scancode the key even you want to trigger
+     *
+     * @return true if we don't need to go further down the context stack
      */
     bool handle_input(const SDL_Scancode scancode);
+
+    /**
+     * Given a Mouse button, triggers the action it's binded to
+     * Then the action triggers the function
+     *
+     * @param scancode the key even you want to trigger
+     *
+     * @return true if we don't need to go further down the context stack
+     */
     bool handle_input(const Mouse button);
+
+    /**
+     * Every frame checks the keys connected to a live action
+     * And runs that function with delta time as parameter
+     *
+     * @param dt the delta time (time between frames)
+     */
     bool handle_live_input(const float dt);
+
     /**
      * Given an scancode, checks if this context has that scancode
      *
@@ -161,9 +181,30 @@ public:
      */
     bool has_event(const SDL_Scancode scancode);
 
+    /**
+     * Given an mousebutton, checks if this context has that mousebutton
+     *
+     * @param button The mousebutton you want to check
+     *
+     * @return true if the mousebutton is in the context else false
+     */
     bool has_event(const Mouse button);
 
+    /**
+     * Given an action, checks if this context has that action
+     *
+     * @param action The action you want to check
+     *
+     * @return true if the action is in the context else false
+     */
     bool has_action(const Action action);
+    /**
+     * Given a live action, checks if this context has that action
+     *
+     * @param action The live action you want to check
+     *
+     * @return true if the live action is in the context else false
+     */
     bool has_live_action(const Action action);
 
     /**
@@ -192,16 +233,17 @@ public:
     friend ContextHandler& get_input();
     ContextHandler(ContextHandler const&) = delete;
     void operator=(ContextHandler const&) = delete;
+
     /**
-     * Adds a new context and create an input handler for it
-     * and add it to the top of the context stack
+     * Adds a new context and create an action handler for it
+     * if it does not already exist, and add it to the top of the context stack
      *
      * @param context The context you want to create an input handler for
      */
     void add_context(const KeyContext context, bool blocking = false);
 
     /**
-     * Remove a context and the input handler
+     * Remove a context for the context stack
      *
      * @param context The context you want the remove the input handler for
      */
@@ -212,40 +254,108 @@ public:
      */
     void remove_context();
 
+    /**
+     * A quicker way to bind a scancode to an action and a action to a function
+     *
+     * @note Only use for first time binding
+     *
+     * @param context the context you want it all to be binded to
+     * @param scancode the SDL scancode to bind to the action
+     * @param action the Action to bind to the function
+     * @param function the function you want to run when the scancode is pressed
+     */
     void fast_bind_key(const KeyContext context,
                        const SDL_Scancode scancode,
                        const Action action,
                        const std::function<void()>& function);
 
-    void fast_bind_btn(const KeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
     /**
-     * Bind context to a key, and that key to a function
+     * A quicker way to bind a mousebutton to an action and a action to a function
      *
-     * @param context The context you want to bind a key for
-     * @param scancode The key you want to bind to the context
-     * @param function The function you want you bind to the key code
+     * @note Only use for first time binding
+     *
+     * @param context the context you want it all to be binded to
+     * @param button the mousebutton to bind to the action
+     * @param action the Action to bind to the function
+     * @param function the function you want to run when the scancode is pressed
      */
-    void bind_action(const KeyContext context, const Action action, const std::function<void()>& function);
-    void bind_action(const KeyContext context, const Action action, const std::function<void(float)>& function);
-    void bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action);
-    void bind_btn(const KeyContext context, const Mouse button, const Action action);
-    void bind_wheel(const KeyContext context, const bool wheel_up, Action action);
+    void fast_bind_btn(const KeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
 
     /**
-     * Unbind a key from a context
+     * Bind context to an action-function
+     *
+     * @param context The context you want to bind an action-function to
+     * @param action The action you want to bind to the context
+     * @param function The function you want you bind to the action
+     */
+    void bind_action(const KeyContext context, const Action action, const std::function<void()>& function);
+
+    /**
+     * Bind context to an action-function
+     *
+     * @note function takes a float (dt) parameter
+     *
+     * @param context The context you want to bind an action-function to
+     * @param action The action you want to bind to the context
+     * @param function The function you want you bind to the action
+     */
+    void bind_action(const KeyContext context, const Action action, const std::function<void(float)>& function);
+
+    /**
+     * Bind context to a key-action
+     *
+     * @param context The context you want to bind a key-action
+     * @param scancode The key you want to bind to action
+     * @param action The action you want you bind to the key
+     */
+    void bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action);
+
+    /**
+     * Bind context to a mousebutton-action
+     *
+     * @param context The context you want to bind a mousebutton-action
+     * @param button The mousebutton you want to bind to action
+     * @param action The action you want you bind to the mousebutton
+     */
+    void bind_btn(const KeyContext context, const Mouse button, const Action action);
+
+    /**
+     * Unbind a action-function from a context
      *
      * @param context The context you want to unbind from
-     * @param scancode The key you want to unbind from the context
+     * @param action The action you want to unbind from the context and its function
      */
     void unbind_action(const KeyContext context, const Action action);
-    void unbind_key(const KeyContext context, const SDL_Scancode scancode);
-    void unbind_btn(const KeyContext context, const Mouse button);
+
     /**
-     * Handle's input from an event, goes through the context stack and runs the first found event matching function
+     * Unbind a key-action from a context
      *
-     * @param scancode The scancode you want to run
+     * @param context The context you want to unbind from
+     * @param scancode The key you want to unbind from the context and its action
+     */
+    void unbind_key(const KeyContext context, const SDL_Scancode scancode);
+
+    /**
+     * Unbind a mousebutton-action from a context
+     *
+     * @param context The context you want to unbind from
+     * @param button The mousebutton you want to unbind from the context and its action
+     */
+    void unbind_btn(const KeyContext context, const Mouse button);
+
+    /**
+     * Handle's input from an event, goes through the context stack and runs the first found matching event
+     *
+     * @param event The event you want to run
      */
     void handle_input(const SDL_Event& event);
+
+    /**
+     * Handle's input every frame, goes through the context stack and runs the first match
+     * matching is based on what key you are holding down
+     *
+     * @param event The event you want to run
+     */
     void handle_live_input(const float dt);
 
     /**
@@ -272,10 +382,35 @@ public:
      */
     void clear();
 
+    /**
+     * Get the last mouse click
+     *
+     * @return position of mouse click
+     */
     glm::ivec2 get_last_click();
+
+    /**
+     * Get the last right-mouse click
+     *
+     * @return position of mouse click
+     */
     glm::ivec2 get_last_right_click();
+
+    /**
+     * Get the last left-mouse click
+     *
+     * @return position of mouse click
+     */
     glm::ivec2 get_last_left_click();
-    glm::ivec2 get_last_move();
+
+    /**
+     * Get the mouse position within the program
+     *
+     * @note if mouse is outside of program it will find where it was last found
+     *
+     * @return position of the mouse
+     */
+    glm::ivec2 get_mouse_pos();
 
 private:
     ContextHandler();

@@ -410,7 +410,7 @@ glm::ivec2 ContextHandler::get_last_left_click()
 {
     return last_left;
 }
-glm::ivec2 ContextHandler::get_last_move()
+glm::ivec2 ContextHandler::get_mouse_pos()
 {
     return last_move;
 }
