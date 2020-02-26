@@ -43,7 +43,6 @@ struct Animation
 struct Needs
 {
     std::vector<ai::Need> needs{};
-
     std::vector<ai::Need> pressing_needs{};
 };
 

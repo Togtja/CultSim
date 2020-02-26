@@ -19,6 +19,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/random_engine.h
         ${CMAKE_CURRENT_LIST_DIR}/random_engine.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/lua_type_bindings.h
+        ${CMAKE_CURRENT_LIST_DIR}/lua_type_bindings.cpp
+
         ${CMAKE_CURRENT_LIST_DIR}/common_helpers.h
 )
 
