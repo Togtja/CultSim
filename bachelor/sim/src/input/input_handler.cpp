@@ -13,9 +13,7 @@ ActionHandler::ActionHandler(const KeyContext type)
     m_context_type = type;
 }
 
-ActionHandler::~ActionHandler() = default;
-
-void ActionHandler::set_blocking(bool blocking)
+void ActionHandler::set_blocking(const bool blocking)
 {
     m_blocking = blocking;
 }
@@ -101,7 +99,7 @@ bool ActionHandler::handle_live_input(const float dt)
     // The other handles can just return, however this one needs to loop through all the keys
     // To keep the ability to hold down two keys at the same time
     bool found_key = false;
-    auto key_state = SDL_GetKeyboardState(NULL);
+    auto key_state = SDL_GetKeyboardState(nullptr);
     for (auto&& [k, v] : m_key_binding)
     {
         if (key_state[k])
@@ -288,7 +286,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
-            Mouse click = static_cast<Mouse>(event.button.button - 1);
+            auto click = static_cast<Mouse>(event.button.button - 1);
             // Update last mouse positions
             last_click = {event.button.x, event.button.y};
             if (click == Mouse::Left)

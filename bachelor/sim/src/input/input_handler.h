@@ -1,3 +1,4 @@
+#pragma once
 #include <functional>
 #include <vector>
 
@@ -76,9 +77,8 @@ public:
      * @param type The Key Context that the input handler should handle
      */
     explicit ActionHandler(const KeyContext type);
-    ~ActionHandler();
 
-    void set_blocking(bool blocking);
+    void set_blocking(const bool blocking);
 
     /**
      * Given an Action and a function binds that Action to that function
