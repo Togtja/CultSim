@@ -89,6 +89,15 @@ struct Timer
     std::function<void(entt::entity, entt::registry&)> on_complete{};
 };
 
+struct Health
+{
+    float hp{};
+
+    float tickdown_rate{};
+
+    ETag Need_tags{};
+};
+
 struct DropItems
 {
     enum EDeathDrops
