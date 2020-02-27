@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "scene.h"
 
@@ -33,8 +34,12 @@ private:
     /** Disabled Systems for this Scenario */
     std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
 
+    /** The scenario we are running */
+    lua::Scenario m_scenario;
+
 public:
     explicit ScenarioScene(std::string_view scenario);
+    explicit ScenarioScene(lua::Scenario scenario);
 
     void on_enter() override;
 

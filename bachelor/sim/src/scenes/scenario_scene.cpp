@@ -28,17 +28,14 @@
 
 namespace cs
 {
-static void response(const Preference& before, const Preference& after)
-{
-    spdlog::info("preference changed [{}]", before.name);
-}
-
-ScenarioScene::ScenarioScene(std::string_view scenario)
+ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
 {
 }
 
 void ScenarioScene::on_enter()
 {
+    m_scenario.init();
+
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
@@ -142,7 +139,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= 100; i++)
+    for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -209,14 +206,11 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
-
-    m_context->preferences->on_preference_changed.connect<&response>();
 }
 
 void ScenarioScene::on_exit()
 {
     input::get_input().remove_context(input::KeyContext::ScenarioScene);
-    m_context->preferences->on_preference_changed.disconnect<&response>();
 }
 
 bool ScenarioScene::update(float dt)
@@ -245,6 +239,7 @@ bool ScenarioScene::update(float dt)
     m_scheduler.update(dt);
     m_dispatcher.update();
 
+    m_scenario.update(dt);
     return false;
 }
 
@@ -277,6 +272,7 @@ bool ScenarioScene::draw()
     gfx::get_renderer().debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
     gfx::get_renderer().debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
+    m_scenario.draw();
     return false;
 }
 
