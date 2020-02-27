@@ -8,16 +8,19 @@ scenario.name = "Basic Needs"
 scenario.description = "Observe as your agents walk around in a forest looking for food and water to survive. How many can be sustained?"
 
 -- Decide how many agents should be used
-scenario.agent_count = 1
+scenario.agent_count = 67
 
 -- Declare all systems that should be active initially
-scenario.systems = { "ActionSystem", "MovementSystem" }
+scenario.systems = { "NeedSystem", "MitigationSystem", "ActionSystem", "RequirementSystem", "TimerSystem", "AiSystem", "MovementSystem", "RenderingSystem" }
 
 -- This function is called before starting the simulation, once
 scenario.init = function() log.info("Starting scenario " .. scenario.name .. "!") end
 
 -- This function is called every frame of the simulation
 scenario.update = function(dt) end
+
+-- This function is called during the draw phase of the update
+scenario.draw = function() end
 
 -- This function is called before finishing the scenario
 scenario.shutdown = function() end

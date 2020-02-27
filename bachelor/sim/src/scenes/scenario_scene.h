@@ -11,6 +11,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <entt/meta/factory.hpp>
 
 namespace cs
 {
@@ -33,10 +34,10 @@ private:
     RandomEngine m_rng{};
 
     /** Enabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
+    std::vector<entt::meta_any> m_active_systems{};
 
     /** Disabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
+    std::vector<entt::meta_any> m_inactive_systems{};
 
     /** The scenario we are running */
     lua::Scenario m_scenario;

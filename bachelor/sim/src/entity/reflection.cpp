@@ -63,13 +63,14 @@ void reflect_data_types()
 void reflect_systems()
 {
     entt::meta<system::ISystem>().type("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
-    entt::meta<system::Action>().type("ActionSystem"_hs).base<system::ISystem>();
-    entt::meta<system::AI>().type("AiSystem"_hs).base<system::ISystem>();
-    entt::meta<system::Mitigation>().type("MitigationSystem"_hs).base<system::ISystem>();
-    entt::meta<system::Movement>().type("MovementSystem"_hs).base<system::ISystem>();
-    entt::meta<system::Need>().type("NeedSystem"_hs).base<system::ISystem>();
-    entt::meta<system::Rendering>().type("RenderingSystem"_hs).base<system::ISystem>();
-    entt::meta<system::Requirement>().type("RequirementSystem"_hs).base<system::ISystem>();
+    entt::meta<system::Action>().type("ActionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::AI>().type("AiSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Mitigation>().type("MitigationSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Movement>().type("MovementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Need>().type("NeedSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Rendering>().type("RenderingSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Requirement>().type("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Timer>().type("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta
