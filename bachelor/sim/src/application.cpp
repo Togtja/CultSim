@@ -9,6 +9,7 @@
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
+#include "lua_type_bindings.h"
 
 #include <functional>
 
