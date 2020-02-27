@@ -1,7 +1,13 @@
 #include "reflection.h"
 #include "entity/components/components.h"
 #include "entity/systems/action.h"
+#include "entity/systems/ai.h"
+#include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
+#include "entity/systems/need.h"
+#include "entity/systems/rendering.h"
+#include "entity/systems/requirement.h"
+#include "entity/systems/timer.h"
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -58,9 +64,12 @@ void reflect_systems()
 {
     entt::meta<system::ISystem>().type("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
     entt::meta<system::Action>().type("ActionSystem"_hs).base<system::ISystem>();
+    entt::meta<system::AI>().type("AiSystem"_hs).base<system::ISystem>();
+    entt::meta<system::Mitigation>().type("MitigationSystem"_hs).base<system::ISystem>();
     entt::meta<system::Movement>().type("MovementSystem"_hs).base<system::ISystem>();
-
-    /** Keep adding the rest of our systems */
+    entt::meta<system::Need>().type("NeedSystem"_hs).base<system::ISystem>();
+    entt::meta<system::Rendering>().type("RenderingSystem"_hs).base<system::ISystem>();
+    entt::meta<system::Requirement>().type("RequirementSystem"_hs).base<system::ISystem>();
 }
 
 } // namespace cs::meta
