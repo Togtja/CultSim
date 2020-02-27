@@ -42,7 +42,7 @@ void bind_systems(sol::state_view lua)
     lua.new_usertype<Scenario>("Scenario",
                                "name",
                                &Scenario::name,
-                               "descrpition",
+                               "description",
                                &Scenario::description,
                                "agent_count",
                                &Scenario::agent_count,
