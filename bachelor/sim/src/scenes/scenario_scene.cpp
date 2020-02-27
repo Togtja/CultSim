@@ -37,9 +37,10 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    ai::Need need_reproduction = {static_cast<std::string>("reproduction"), 1.f, 100.f, 0.1f, TAG_Joy};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -111,6 +112,20 @@ void ScenarioScene::on_enter()
                                 []() {
                                     spdlog::warn("We aborted our action");
                                 }};
+
+    action::Action action_reproduce{
+        static_cast<std::string>("Reproduce"),
+        TAG_Find,
+        5.f,
+        0.f,
+        {},
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            spdlog::warn("We finished action: reproduce on entity{} with entity{}", e, n);
+        },
+        [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: reproduce"); },
+        []() {
+            spdlog::warn("We aborted our action: reproduce");
+        }};
 
     ai::Strategy strategy_findfood  = {static_cast<std::string>("eat food"),
                                       0,
