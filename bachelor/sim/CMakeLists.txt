@@ -81,7 +81,7 @@ target_compile_options(
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
         cultsim_resource_copy ALL
-        COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n sprites fonts
+        COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n sprites fonts scenarios
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
         DEPENDS cultsim
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip

@@ -1,5 +1,6 @@
 #include "mainmenu_scene.h"
 #include "editor_scene.h"
+#include "entity/scenario.h"
 #include "preferences.h"
 #include "scenario_scene.h"
 #include "scene_manager.h"
@@ -47,7 +48,8 @@ bool MainMenuScene::update(float dt)
     {
         if (ImGui::Button("Basic Needs", {150, 50}))
         {
-            m_context->scene_manager->push<ScenarioScene>("basic_needs");
+            auto&& scenario = lua::quick_load_scenario(m_context->lua_state, "scenarios/basic_needs.lua");
+            m_context->scene_manager->push<ScenarioScene>(scenario);
         }
         if (ImGui::Button("Cancel", {150, 25}))
         {
