@@ -1,5 +1,6 @@
 #pragma once
 
+#include "random_engine.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "scene.h"
@@ -27,6 +28,9 @@ private:
 
     /** Event dispatcher used within this scene */
     entt::dispatcher m_dispatcher{};
+
+    /** Random number generator for this scene */
+    RandomEngine m_rng{};
 
     /** Enabled Systems for this Scenario */
     std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};

@@ -14,7 +14,7 @@ TEST_CASE("testing the needs system initialization")
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need(test_registry);
+    auto need_system = new cs::system::Need({&test_registry});
     auto view        = test_registry.view<cs::component::Needs>();
     REQUIRE(view.size() == 1);
     view.each([](cs::component::Needs& needs) {
@@ -42,7 +42,7 @@ TEST_CASE("testing the needs system update function")
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need(test_registry);
+    auto need_system = new cs::system::Need({&test_registry});
     auto view        = test_registry.view<cs::component::Needs>();
 
     need_system->update(1.f);
@@ -94,7 +94,7 @@ TEST_CASE("Testing outliers for dt")
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need(test_registry);
+    auto need_system = new cs::system::Need({&test_registry});
     auto view        = test_registry.view<cs::component::Needs>();
 
     need_system->update(101.f);
@@ -138,7 +138,7 @@ TEST_CASE("pressing needs are correctly updated")
                                                std::vector<cs::ai::Need>({need1, need2, need3, need4}),
                                                std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need(test_registry);
+    auto need_system = new cs::system::Need({&test_registry});
     auto view        = test_registry.view<cs::component::Needs>();
 
     // Ensure that many needs are added into the needs list correctly and that many tests can be added to pressing needs

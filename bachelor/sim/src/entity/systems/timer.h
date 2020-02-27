@@ -6,8 +6,6 @@ namespace cs::system
 {
 class Timer : public ISystem
 {
-private:
-
 public:
     using ISystem::ISystem;
 

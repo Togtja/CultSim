@@ -11,6 +11,7 @@
 TEST_CASE("Testing that system does not run if pressing needs are empty")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
@@ -36,8 +37,8 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
 
     need_system->update(50.f);
     auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
@@ -63,6 +64,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
 TEST_CASE("Test case for mitigation system not adding strategies that do not match any tags")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
@@ -94,8 +96,8 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
@@ -146,8 +148,8 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
@@ -200,8 +202,8 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
@@ -258,8 +260,8 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry});
 
     need_system->update(1.f);
     mitigation_system->update(1.f);

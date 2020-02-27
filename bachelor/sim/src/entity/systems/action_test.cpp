@@ -2,6 +2,7 @@
 #include "entity/components/components.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/need.h"
+#include "random_engine.h"
 
 #include <random>
 
@@ -11,6 +12,7 @@
 TEST_CASE("Test case for regular action system setup")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
@@ -36,9 +38,9 @@ TEST_CASE("Test case for regular action system setup")
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need(test_registry);
-    auto mitigation_system = new cs::system::Mitigation(test_registry);
-    auto action_system     = new cs::system::Action(test_registry);
+    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
+    auto action_system     = new cs::system::Action({&test_registry, nullptr, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);

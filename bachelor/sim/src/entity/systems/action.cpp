@@ -12,9 +12,10 @@ void Action::update(float dt)
 {
     CS_AUTOTIMER(Action System);
 
-    auto group = m_registry.group<component::Strategies>(
+    auto& registry = *m_context.registry;
+    auto group     = registry.group<component::Strategies>(
         entt::exclude<component::LocationRequirement, component::VisionRequirement, component::FindRequirement>);
-    group.each([this, dt](entt::entity e, component::Strategies& strategies) {
+    group.each([this, &registry, dt](entt::entity e, component::Strategies& strategies) {
         if (!strategies.staged_strategies.empty())
         {
             for (auto& strategy : strategies.staged_strategies)
@@ -30,19 +31,19 @@ void Action::update(float dt)
                             case TAG_Location:
                             {
                                 spdlog::warn("Pushing to entt: {}", static_cast<uint32_t>(e));
-                                m_registry.assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
+                                registry.assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
                                 action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
                                 break;
                             }
                             case TAG_Vision:
                             {
-                                m_registry.assign<component::VisionRequirement>(e, strategy.tags);
+                                registry.assign<component::VisionRequirement>(e, strategy.tags);
                                 action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
                                 break;
                             }
                             case TAG_Find:
                             {
-                                m_registry.assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
+                                registry.assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
                                 action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
                             }
                         }
@@ -53,16 +54,16 @@ void Action::update(float dt)
                         action.time_spent += dt;
                         if (action.time_spent >= action.time_to_complete)
                         {
-                            if (m_registry.valid(action.target))
+                            if (registry.valid(action.target))
                             {
-                                if (m_rng.trigger(0.9))
+                                if (m_context.rng->trigger(0.9))
                                 {
-                                    action.success(e, action.target, m_registry);
+                                    action.success(e, action.target, registry);
                                 }
 
                                 else
                                 {
-                                    action.failure(action.target, m_registry);
+                                    action.failure(action.target, registry);
                                 }
                             }
                             strategy.actions.pop_back();
