@@ -5,6 +5,7 @@
 #include "entity/components/tags.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
+#include "entity/systems/health.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
@@ -134,7 +135,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= 10000; i++)
+    for (int i = 1; i <= 1; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -156,6 +157,7 @@ void ScenarioScene::on_enter()
             agent,
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
             std::vector<ai::Strategy>{});
+        m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
     for (int j = 0; j < 50; j++)
@@ -175,7 +177,7 @@ void ScenarioScene::on_enter()
         });
     }
 
-    for (int k = 0; k < 25; k++) 
+    for (int k = 0; k < 25; k++)
     {
         auto ponds = m_registry.create();
         m_registry.assign<component::Position>(ponds, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
@@ -185,7 +187,8 @@ void ScenarioScene::on_enter()
             auto drink = r.create();
             auto pos   = r.get<component::Position>(e).position;
             static RandomEngine rng;
-            r.assign<component::Position>(drink, glm::vec3(pos.x+rng.uniform(-10.f, 10.f), pos.y+rng.uniform(-10.f, 10.f), 0.f));
+            r.assign<component::Position>(drink,
+                                          glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f), 0.f));
             r.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
             r.assign<component::Tags>(drink, TAG_Drink);
         });
@@ -193,6 +196,7 @@ void ScenarioScene::on_enter()
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
+    m_active_systems.emplace_back(new system::Health(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
