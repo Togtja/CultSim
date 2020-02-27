@@ -3,6 +3,7 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
+#include "entity/scenario.h"
 #include "entity/systems/system.h"
 
 namespace cs::lua
@@ -37,6 +38,24 @@ void bind_components(sol::state_view lua)
 void bind_systems(sol::state_view lua)
 {
     lua.new_usertype<system::ISystem>("ISystem", "update", &system::ISystem::update);
+
+    lua.new_usertype<Scenario>("Scenario",
+                               "name",
+                               &Scenario::name,
+                               "descrpition",
+                               &Scenario::description,
+                               "agent_count",
+                               &Scenario::agent_count,
+                               "systems",
+                               &Scenario::systems,
+                               "init",
+                               &Scenario::init,
+                               "update",
+                               &Scenario::update,
+                               "draw",
+                               &Scenario::draw,
+                               "shutdown",
+                               &Scenario::shutdown);
 }
 
 } // namespace cs::lua
