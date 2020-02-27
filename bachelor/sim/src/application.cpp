@@ -2,12 +2,13 @@
 #include "constants.h"
 #include "debug/auto_timer.h"
 #include "delta_clock.h"
+#include "entity/reflection.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "input/input_handler.h"
-#include "scenes/mainmenu_scene.h"
 #include "lua_type_bindings.h"
+#include "scenes/mainmenu_scene.h"
 
 #include <functional>
 
@@ -163,7 +164,12 @@ bool Application::init_lua()
     log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
     log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
 
+    lua::bind_glm(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
+    lua::bind_systems(m_lua.lua_state());
+
+    meta::reflect_data_types();
+    meta::reflect_systems();
 
     return true;
 }
