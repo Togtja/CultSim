@@ -232,9 +232,9 @@ bool ScenarioScene::update(float dt)
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
 
-    for (int i = -2; i <= 2; i++)
+    for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
     {
-        for (int j = -2; j <= 2; j++)
+        for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
         {
             gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.17f, 0.1f), b_tex);
         }
