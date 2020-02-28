@@ -69,7 +69,7 @@ public:
      * @param rpath Relative path to the texture file you want the ID of
      * @return An ID to the given texture
      */
-    SpriteTextureID get_texture(std::string_view rpath);
+    SpriteTextureID get_texture(const std::string &rpath);
 
 private:
     bool increment_next_texture_id();

@@ -43,10 +43,10 @@ void SpriteRenderer::display()
     m_nsprites = 0u;
 }
 
-SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
+SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
 {
     /** If we alreadly loaded this texture, then give it back */
-    if (auto itr = m_texture_cache.find(rpath.data()); itr != m_texture_cache.end())
+    if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
         spdlog::info("used cached texture for {}", rpath);
         return itr->second;
@@ -74,6 +74,7 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
                         color_data.pixels.data());
 
     increment_next_texture_id();
+    m_texture_cache[rpath] = textureID;
     return textureID;
 }
 
