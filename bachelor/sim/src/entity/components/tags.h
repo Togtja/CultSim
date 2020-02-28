@@ -14,6 +14,7 @@ enum ETag : uint64_t
     TAG_Vision    = 1 << 7,
     TAG_Avoidable = 1 << 8,
     TAG_Reproduce = 1 << 9,
-    TAG_Human     = 1 << 10
+    TAG_Human     = 1 << 10,
+    TAG_Tag       = 1 << 11
 };
 } // namespace cs
