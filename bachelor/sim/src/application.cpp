@@ -120,16 +120,16 @@ bool Application::init_input()
 
     /** Likewise with actions */
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveUp, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 50.f);
+        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveLeft, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 50.f);
+        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveDown, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 50.f);
+        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveRight, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 50.f);
+        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomIn, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
