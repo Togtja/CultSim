@@ -71,7 +71,7 @@ bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Nee
 
     // TODO: Add checks for agents personality and personal history to further increase / decrease strategy desirability
 
-    if (strategies.staged_strategies.size() != 0)
+    if (!strategies.staged_strategies.empty())
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end(), std::greater<ai::Strategy>());
         return true;

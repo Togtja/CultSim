@@ -82,13 +82,13 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
                                  0,
                                  {},
                                  cs::TAG_Food,
-                                 std::vector<cs::action::Action>{std::move(action)}};
+                                 std::vector<cs::action::Action>{action}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("go sleep"),
                                   0,
                                   {},
                                   cs::TAG_Sleep,
-                                  std::vector<cs::action::Action>{std::move(action)}};
+                                  std::vector<cs::action::Action>{action}};
 
     test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategies>(agent,
