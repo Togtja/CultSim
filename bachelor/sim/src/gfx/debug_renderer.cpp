@@ -12,6 +12,7 @@ namespace cs::gfx
 {
 DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
 {
+    init();
 }
 
 void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
