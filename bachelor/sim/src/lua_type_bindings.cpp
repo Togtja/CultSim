@@ -11,8 +11,21 @@ namespace cs::lua
 void bind_glm(sol::state_view lua)
 {
     /** Vectors */
-    lua.new_usertype<glm::vec2>("Vec2", "x", &glm::vec2::x, "y", &glm::vec2::y);
-    lua.new_usertype<glm::vec3>("Vec3", "x", &glm::vec3::x, "y", &glm::vec3::y, "z", &glm::vec3::z);
+    lua.new_usertype<glm::vec2>("Vec2",
+                                sol::constructors<glm::vec2(), glm::vec2(float), glm::vec2(float, float)>(),
+                                "x",
+                                &glm::vec2::x,
+                                "y",
+                                &glm::vec2::y);
+
+    lua.new_usertype<glm::vec3>("Vec3",
+                                sol::constructors<glm::vec3(), glm::vec3(float), glm::vec3(float, float, float)>(),
+                                "x",
+                                &glm::vec3::x,
+                                "y",
+                                &glm::vec3::y,
+                                "z",
+                                &glm::vec3::z);
 }
 
 void bind_components(sol::state_view lua)
@@ -48,6 +61,8 @@ void bind_systems(sol::state_view lua)
                                &Scenario::agent_count,
                                "systems",
                                &Scenario::systems,
+                               "bounds",
+                               &Scenario::bounds,
                                "init",
                                &Scenario::init,
                                "update",

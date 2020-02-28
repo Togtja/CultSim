@@ -35,6 +35,7 @@ ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scen
 void ScenarioScene::on_enter()
 {
     m_scenario.init();
+    gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
 
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
@@ -222,7 +223,7 @@ bool ScenarioScene::update(float dt)
     ImGui::Begin("Scenario Scene");
 
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
-    b_tex.scale       = 100.f;
+    b_tex.scale       = 100;
 
     for (int i = -50; i < 50; i++)
     {
@@ -258,23 +259,37 @@ bool ScenarioScene::draw()
     ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
     ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
 
+    auto& r_debug = gfx::get_renderer().debug();
     if (show_grid)
     {
         for (int i = -grid_span; i <= grid_span; i++)
         {
-            gfx::get_renderer().debug().draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
-                                                  glm::vec3(grid_size * grid_span, i * grid_size, 0),
-                                                  glm::vec3(0.3f));
+            r_debug.draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
+                              glm::vec3(grid_size * grid_span, i * grid_size, 0),
+                              glm::vec3(0.3f));
 
-            gfx::get_renderer().debug().draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
-                                                  glm::vec3(i * grid_size, grid_size * grid_span, 0),
-                                                  glm::vec3(0.3f));
+            r_debug.draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
+                              glm::vec3(i * grid_size, grid_size * grid_span, 0),
+                              glm::vec3(0.3f));
         }
     }
 
-    gfx::get_renderer().debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    gfx::get_renderer().debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-    gfx::get_renderer().debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+    r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+    r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+
+    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
+                      {m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
+                      {0.f, 1.f, 0.f});
+    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
+                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
+                      {0.f, 1.f, 0.f});
+    r_debug.draw_line({m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
+                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
+                      {0.f, 1.f, 0.f});
+    r_debug.draw_line({m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
+                      {m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
+                      {0.f, 1.f, 0.f});
 
     m_scenario.draw();
     return false;
