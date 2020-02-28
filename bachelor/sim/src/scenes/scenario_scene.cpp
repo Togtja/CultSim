@@ -35,6 +35,7 @@ ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scen
 void ScenarioScene::on_enter()
 {
     m_scenario.init();
+    m_context->lua_state["random"] = m_rng;
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
 
@@ -258,8 +259,8 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    ImGui::Text("GRID");
     ImGui::Separator();
+    ImGui::Text("GRID");
     static bool show_grid = false;
     static int grid_span  = 25;
     static int grid_size  = 32;

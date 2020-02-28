@@ -168,6 +168,7 @@ bool Application::init_lua()
     lua::bind_glm(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
     lua::bind_systems(m_lua.lua_state());
+    lua::bind_utils(m_lua.lua_state());
 
     meta::reflect_data_types();
     meta::reflect_systems();

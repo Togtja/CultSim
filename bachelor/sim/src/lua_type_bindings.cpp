@@ -5,6 +5,7 @@
 #include "entity/components/tags.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "random_engine.h"
 
 namespace cs::lua
 {
@@ -71,6 +72,23 @@ void bind_systems(sol::state_view lua)
                                &Scenario::draw,
                                "shutdown",
                                &Scenario::shutdown);
+}
+
+void bind_utils(sol::state_view lua)
+{
+    /** Enable use of random number generator */
+    lua.new_usertype<RandomEngine>("RandomEngine",
+                                   sol::no_constructor,
+                                   "uniform",
+                                   &RandomEngine::uniform<float>,
+                                   "randint",
+                                   &RandomEngine::uniform<int>,
+                                   "normal",
+                                   &RandomEngine::normal,
+                                   "trigger",
+                                   &RandomEngine::trigger,
+                                   "roll",
+                                   &RandomEngine::roll);
 }
 
 } // namespace cs::lua
