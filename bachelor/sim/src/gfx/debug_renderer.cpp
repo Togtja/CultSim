@@ -1,6 +1,6 @@
 #include "debug_renderer.h"
+#include "constants.h"
 #include "glutil.h"
-#include "render_data.h"
 #include "vao_builder.h"
 
 #include <vector>
@@ -15,7 +15,12 @@ DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
     m_vao = VaoBuilder().attribute(0, 0, 3, GL_FLOAT, 0u).attribute(1, 0, 3, GL_FLOAT, offsetof(PrimitiveVertex, color)).build();
 
     glCreateBuffers(1, &m_linevbo);
-    glNamedBufferStorage(m_linevbo, sizeof(PrimitiveVertex) * 2u, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(m_linevbo, sizeof(PrimitiveVertex) * DEBUG_MAX_LINES, nullptr, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
+    m_line_data = static_cast<PrimitiveVertex*>(
+        glMapNamedBufferRange(m_linevbo,
+                              0u,
+                              sizeof(PrimitiveVertex) * DEBUG_MAX_LINES,
+                              GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 
     auto vs  = fcompile_shader("shader/debug.vert", GL_VERTEX_SHADER);
     auto fs  = fcompile_shader("shader/debug.frag", GL_FRAGMENT_SHADER);
@@ -26,14 +31,19 @@ DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
 
 void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
 {
-    auto data = std::vector<PrimitiveVertex>{{{from.x, from.y, from.z}, {1.f, 1.f, 1.f}}, {{to.x, to.y, to.z}, {1.f, 1.f, 1.f}}};
+    m_line_data[m_nlines++] = {{from.x, from.y, from.z}, {color.r, color.g, color.b}};
+    m_line_data[m_nlines++] = {{to.x, to.y, to.z}, {color.r, color.g, color.b}};
+}
 
-    glNamedBufferSubData(m_linevbo, 0, sizeof(PrimitiveVertex) * 2, data.data());
+void DebugRenderer::display()
+{
+    glFlushMappedNamedBufferRange(m_linevbo, 0, sizeof(PrimitiveVertex) * m_nlines);
+
     glBindVertexArray(m_vao);
     glBindVertexBuffer(0, m_linevbo, 0, sizeof(PrimitiveVertex));
     glUseProgram(m_shader);
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
-    glUniform3f(1, color.r, color.g, color.b);
-    glDrawArrays(GL_LINES, 0, 2);
+    glDrawArrays(GL_LINES, 0, m_nlines);
+    m_nlines = 0u;
 }
 } // namespace cs::gfx

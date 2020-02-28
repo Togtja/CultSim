@@ -38,7 +38,7 @@
       <task id="7" name="Create Requirements" note="" work="201600" start="20200114T000000Z" end="20200122T170000Z" work-start="20200114T080000Z" percent-complete="95" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
       </task>
-      <task id="8" name="Do Risk Analysis" note="" work="144000" start="20200122T170000Z" end="20200129T170000Z" work-start="20200123T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
+      <task id="8" name="Do Risk Analysis" note="" work="144000" start="20200122T170000Z" end="20200129T170000Z" work-start="20200123T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <predecessors>
           <predecessor id="1" predecessor-id="7" type="FS"/>
         </predecessors>
@@ -47,7 +47,7 @@
       <task id="10" name="Designate Roles and Responsibilities" note="" work="86400" start="20200120T000000Z" end="20200122T170000Z" work-start="20200120T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200120T000000Z"/>
       </task>
-      <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="88" priority="0" type="normal" scheduling="fixed-work">
+      <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200113T000000Z"/>
       </task>
       <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="50" priority="0" type="normal" scheduling="fixed-work">
@@ -56,7 +56,7 @@
       <task id="13" name="Set up Development Environments" note="" work="144000" start="20200115T000000Z" end="20200121T170000Z" work-start="20200115T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200115T000000Z"/>
       </task>
-      <task id="14" name="Write the Deliverable" note="" work="403200" start="20200114T000000Z" end="20200131T170000Z" work-start="20200114T080000Z" percent-complete="90" priority="0" type="normal" scheduling="fixed-work">
+      <task id="14" name="Write the Deliverable" note="" work="403200" start="20200114T000000Z" end="20200131T170000Z" work-start="20200114T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200114T000000Z"/>
       </task>
     </task>
@@ -73,21 +73,21 @@
     <task id="18" name="Implement Code" note="" work="2160000" start="20200127T000000Z" end="20200508T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
       <task id="19" name="Create Initital Prototype" note="" work="720000" start="20200127T000000Z" end="20200228T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200122T000000Z"/>
-        <task id="20" name="Sprint 01" note="" work="144000" start="20200127T000000Z" end="20200131T170000Z" work-start="20200127T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="20" name="Sprint 01" note="" work="144000" start="20200127T000000Z" end="20200131T170000Z" work-start="20200127T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <constraint type="start-no-earlier-than" time="20200127T000000Z"/>
         </task>
-        <task id="21" name="Sprint 02" note="" work="144000" start="20200131T170000Z" end="20200207T170000Z" work-start="20200203T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="21" name="Sprint 02" note="" work="144000" start="20200131T170000Z" end="20200207T170000Z" work-start="20200203T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <constraint type="start-no-earlier-than" time="20200121T000000Z"/>
           <predecessors>
             <predecessor id="1" predecessor-id="20" type="FS"/>
           </predecessors>
         </task>
-        <task id="22" name="Sprint 03" note="" work="144000" start="20200207T170000Z" end="20200214T170000Z" work-start="20200210T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="22" name="Sprint 03" note="" work="144000" start="20200207T170000Z" end="20200214T170000Z" work-start="20200210T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="21" type="FS"/>
           </predecessors>
         </task>
-        <task id="23" name="Sprint 04" note="" work="144000" start="20200214T170000Z" end="20200221T170000Z" work-start="20200217T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="23" name="Sprint 04" note="" work="144000" start="20200214T170000Z" end="20200221T170000Z" work-start="20200217T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="22" type="FS"/>
           </predecessors>

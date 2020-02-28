@@ -14,8 +14,11 @@
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
+#include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+#include "scene_manager.h"
+#include "scenes/pausemenu_scene.h"
 
 #include <common_helpers.h>
 #include <functional>
@@ -289,16 +292,17 @@ void ScenarioScene::on_enter()
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));
+    m_active_systems.emplace_back(new system::Timer(m_registry));
     m_active_systems.emplace_back(new system::AI(m_registry));
     m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     m_active_systems.emplace_back(new system::Rendering(m_registry));
-    m_active_systems.emplace_back(new system::Timer(m_registry));
 
     m_context->preferences->on_preference_changed.connect<&response>();
 }
 
 void ScenarioScene::on_exit()
 {
+    input::get_input().remove_context(input::KeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&response>();
 }
 
@@ -313,7 +317,7 @@ bool ScenarioScene::update(float dt)
     {
         for (int j = -50; j < 50; j++)
         {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, -1.f), glm::vec3(0.f, 0.3f, 0.1f), b_tex);
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.17f, 0.1f), b_tex);
         }
     }
 
@@ -355,6 +359,11 @@ bool ScenarioScene::draw()
                                                   glm::vec3(0.3f));
         }
     }
+
+    gfx::get_renderer().debug().draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+    gfx::get_renderer().debug().draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+    gfx::get_renderer().debug().draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+
     return false;
 }
 
