@@ -5,10 +5,12 @@
 #include "entity/components/tags.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
+#include "entity/systems/health.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
@@ -39,14 +41,10 @@ ScenarioScene::ScenarioScene(std::string_view scenario)
 
 void ScenarioScene::on_enter()
 {
-    input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
-        m_context->scene_manager->push<PauseMenuScene>();
-    });
-    input::get_input().add_context(input::KeyContext::ScenarioScene);
-
-    ai::Need need_hunger = {static_cast<std::string>("hunger"), 3.f, 60.f, 1.f, TAG_Food};
-    ai::Need need_thirst = {static_cast<std::string>("thirst"), 4.f, 90.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep  = {static_cast<std::string>("sleep"), 1.f, 70.f, 0.5f, TAG_Sleep};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, ETag(TAG_Reproduce | TAG_Human)};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -61,7 +59,7 @@ void ScenarioScene::on_enter()
                                       if (need.tags & TAG_Food)
                                       {
                                           spdlog::warn("Current status of need FOOD: {}", need.status);
-                                          need.status += 50.f;
+                                          need.status += 80.f;
                                       }
                                   }
                               },
@@ -86,7 +84,7 @@ void ScenarioScene::on_enter()
                                         if (need.tags & TAG_Drink)
                                         {
                                             spdlog::warn("Current status of need DRINK: {}", need.status);
-                                            need.status += 50.f;
+                                            need.status += 80.f;
                                         }
                                     }
                                 },
@@ -119,6 +117,82 @@ void ScenarioScene::on_enter()
                                     spdlog::warn("We aborted our action");
                                 }};
 
+    action::Action action_reproduce{
+        static_cast<std::string>("Reproduce"),
+        ETag(TAG_Find | TAG_Tag),
+        5.f,
+        0.f,
+        {},
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            spdlog::warn("We finished action: reproduce on entity{} with entity{}", e, n);
+
+            if (r.has<component::Reproduction>(e))
+            {
+                spdlog::warn("We have a reproduction component");
+                auto& repr = r.get<component::Reproduction>(e);
+                repr.number_of_children++;
+            }
+
+            if (r.has<component::Reproduction>(n))
+            {
+                spdlog::warn("Target has Reproduction component");
+                auto& target_repr = r.get<component::Reproduction>(n);
+            }
+
+            if (r.has<component::Reproduction>(e) && r.has<component::Reproduction>(n))
+            {
+                auto repr        = r.get<component::Reproduction>(e);
+                auto target_repr = r.get<component::Reproduction>(n);
+                if (repr.sex == component::Reproduction::Female && target_repr.sex == component::Reproduction::Male)
+                {
+                    spdlog::warn("We are making a baby");
+                    auto child         = r.create(e, r);
+                    auto& child_needs  = r.get<component::Needs>(child);
+                    auto& child_reprd  = r.get<component::Reproduction>(child);
+                    auto& child_health = r.get<component::Health>(child);
+                    auto& child_pos    = r.get<component::Position>(child);
+                    for (auto need : child_needs.needs)
+                    {
+                        need.status = 100.f;
+                    }
+                    child_reprd.number_of_children = 0;
+                    child_health.hp                = 100.f;
+                    child_pos.position             = r.get<component::Position>(e).position + glm::vec3(10.f, 10.f, 0.f);
+                    spdlog::warn("Child entity: {}", child);
+                    RandomEngine rng{};
+                    if (rng.trigger(0.5f))
+                    {
+                        child_reprd.sex = component::Reproduction::Male;
+                    }
+                }
+            }
+            auto& needs        = r.get<component::Needs>(e);
+            auto& tags         = r.get<component::Tags>(e);
+            auto& target_needs = r.get<component::Needs>(n);
+            auto& target_tags  = r.get<component::Tags>(n);
+            for (auto& need : needs.needs)
+            {
+                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                {
+                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
+                    need.status += 100.f;
+                }
+            }
+
+            for (auto& need : target_needs.needs)
+            {
+                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                {
+                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
+                    need.status += 100.f;
+                }
+            }
+        },
+        [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: reproduce"); },
+        []() {
+            spdlog::warn("We aborted our action: reproduce");
+        }};
+
     ai::Strategy strategy_findfood  = {static_cast<std::string>("eat food"),
                                       0,
                                       {},
@@ -135,6 +209,11 @@ void ScenarioScene::on_enter()
                                    TAG_Sleep,
                                    std::vector<action::Action>{action_sleep}};
 
+    ai::Strategy strategy_breed = {static_cast<std::string>("reproduce"),
+                                   0,
+                                   {},
+                                   ETag(TAG_Reproduce | TAG_Human),
+                                   std::vector<action::Action>{action_reproduce}};
     RandomEngine rng{};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
@@ -155,18 +234,24 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Tags>(agent, TAG_Avoidable);
+        m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep, need_reproduction},
                                             std::vector<ai::Need>{});
-
+        cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
+        if (i % 2 == 1)
+        {
+            gender = cs::component::Reproduction::Female;
+        }
+        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(2));
         m_registry.assign<component::Strategies>(
             agent,
-            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
+            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
             std::vector<ai::Strategy>{});
+        m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
-    for (int j = 0; j < 50; j++)
+    for (int j = 0; j < 100; j++)
     {
         auto trees = m_registry.create();
         m_registry.assign<component::Position>(trees, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
@@ -183,7 +268,7 @@ void ScenarioScene::on_enter()
         });
     }
 
-    for (int k = 0; k < 25; k++)
+    for (int k = 0; k < 100; k++)
     {
         auto ponds = m_registry.create();
         m_registry.assign<component::Position>(ponds, glm::vec3(rng.uniform(-500.f, 500.f), rng.uniform(-500.f, 500.f), 0.f));
@@ -202,6 +287,8 @@ void ScenarioScene::on_enter()
 
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
+    m_active_systems.emplace_back(new system::Health(m_registry));
+    m_active_systems.emplace_back(new system::Reproduction(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));

@@ -66,8 +66,6 @@ struct Hearing
 
 struct Reproduction
 {
-    bool can_reproduce = false;
-
     enum ESex
     {
         Male   = true,
@@ -77,6 +75,7 @@ struct Reproduction
     ESex sex = Male;
 
     uint16_t number_of_children{};
+    uint16_t max_children{};
 };
 
 struct Timer
@@ -87,6 +86,15 @@ struct Timer
     int number_of_loops{};
 
     std::function<void(entt::entity, entt::registry&)> on_complete{};
+};
+
+struct Health
+{
+    float hp{};
+
+    float tickdown_rate{};
+
+    ETag Need_tags{};
 };
 
 struct DropItems
@@ -121,6 +129,11 @@ struct FindRequirement
 {
     ETag tags{};
     glm::vec3 desired_position{};
+};
+
+struct TagRequirement
+{
+    ETag tags{};
 };
 
 struct Tags
