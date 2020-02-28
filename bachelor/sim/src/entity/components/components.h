@@ -131,6 +131,11 @@ struct FindRequirement
     glm::vec3 desired_position{};
 };
 
+struct TagRequirement
+{
+    ETag tags{};
+};
+
 struct Tags
 {
     ETag tags{};
