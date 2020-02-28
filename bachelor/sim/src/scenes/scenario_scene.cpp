@@ -10,6 +10,7 @@
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
@@ -40,7 +41,7 @@ void ScenarioScene::on_enter()
     ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
     ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("reproduction"), 1.f, 100.f, 0.1f, TAG_Joy};
+    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 5.f, TAG_Reproduce};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -115,12 +116,65 @@ void ScenarioScene::on_enter()
 
     action::Action action_reproduce{
         static_cast<std::string>("Reproduce"),
-        TAG_Find,
+        ETag(TAG_Find | TAG_Tag),
         5.f,
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
             spdlog::warn("We finished action: reproduce on entity{} with entity{}", e, n);
+
+            if (r.has<component::Reproduction>(e))
+            {
+                auto& repr = r.get<component::Reproduction>(e);
+                repr.number_of_children++;
+            }
+
+            if (r.has<component::Reproduction>(n))
+            {
+                auto& target_repr = r.get<component::Reproduction>(n);
+                if (target_repr.sex == component::Reproduction::Female)
+                {
+                    auto child         = r.create(n, r);
+                    auto& child_needs  = r.get<component::Needs>(child);
+                    auto& child_reprd  = r.get<component::Reproduction>(child);
+                    auto& child_health = r.get<component::Health>(child);
+
+                    for (auto need : child_needs.needs)
+                    {
+                        need.status = 100.f;
+                    }
+                    child_reprd.number_of_children = 0;
+                    child_health.hp                = 100.f;
+                    spdlog::warn("Child entity: {}", child);
+                    RandomEngine rng{};
+                    if (rng.trigger(0.5f))
+                    {
+                        child_reprd.sex = component::Reproduction::Male;
+                    }
+                }
+            }
+
+            auto& needs = r.get<component::Needs>(e);
+
+            auto& target_needs = r.get<component::Needs>(n);
+
+            for (auto& need : needs.needs)
+            {
+                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                {
+                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
+                    need.status += 100.f;
+                }
+            }
+
+            for (auto& need : target_needs.needs)
+            {
+                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                {
+                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
+                    need.status += 100.f;
+                }
+            }
         },
         [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: reproduce"); },
         []() {
@@ -143,6 +197,11 @@ void ScenarioScene::on_enter()
                                    TAG_Sleep,
                                    std::vector<action::Action>{action_sleep}};
 
+    ai::Strategy strategy_breed = {static_cast<std::string>("reproduce"),
+                                   0,
+                                   {},
+                                   ETag(TAG_Reproduce | TAG_Human),
+                                   std::vector<action::Action>{action_reproduce}};
     RandomEngine rng{};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
@@ -150,7 +209,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= 1; i++)
+    for (int i = 1; i <= 100; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -163,15 +222,15 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Tags>(agent, TAG_Avoidable);
-        m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
-                                            std::vector<ai::Need>{});
-
-        m_registry.assign<component::Strategies>(
-            agent,
-            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep}),
-            std::vector<ai::Strategy>{});
+        m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable | TAG_Reproduce | TAG_Human));
+        m_registry.assign<component::Needs>(agent, std::vector<ai::Need>{need_reproduction}, std::vector<ai::Need>{});
+        cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
+        if (i % 2)
+        {
+            gender = cs::component::Reproduction::Female;
+        }
+        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(2));
+        m_registry.assign<component::Strategies>(agent, std::vector<ai::Strategy>({strategy_breed}), std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
@@ -212,6 +271,7 @@ void ScenarioScene::on_enter()
     /** Add required systems */
     m_active_systems.emplace_back(new system::Need(m_registry));
     m_active_systems.emplace_back(new system::Health(m_registry));
+    m_active_systems.emplace_back(new system::Reproduction(m_registry));
     m_active_systems.emplace_back(new system::Mitigation(m_registry));
     m_active_systems.emplace_back(new system::Action(m_registry));
     m_active_systems.emplace_back(new system::Requirement(m_registry));

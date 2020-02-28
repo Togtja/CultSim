@@ -14,10 +14,8 @@ void Health::update(float dt)
     view.each([this, dt](entt::entity e, component::Health& health, component::Needs& need, component::Tags tags) {
         for (auto& need : need.pressing_needs)
         {
-            spdlog::warn("Need status: {}", need.status);
             if ((need.tags & health.Need_tags) && need.status <= 0.f)
             {
-                spdlog::error("health is : {}", health.hp);
                 health.hp -= dt * health.tickdown_rate;
             }
         }
