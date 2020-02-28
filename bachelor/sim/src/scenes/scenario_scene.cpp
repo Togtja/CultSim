@@ -36,6 +36,7 @@ void ScenarioScene::on_enter()
 {
     m_scenario.init();
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
+    gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
 
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
