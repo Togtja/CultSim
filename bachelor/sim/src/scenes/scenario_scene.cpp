@@ -35,7 +35,7 @@ ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scen
 void ScenarioScene::on_enter()
 {
     m_scenario.init();
-    m_context->lua_state["random"] = m_rng;
+    m_context->lua_state["random"] = &m_rng;
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
 
