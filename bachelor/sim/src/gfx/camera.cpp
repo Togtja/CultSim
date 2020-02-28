@@ -17,12 +17,10 @@ void Camera::init(glm::vec3 position)
 
 glm::mat4 Camera::get_view_matrix() const
 {
-    // const auto view_mat = glm::translate(glm::mat4(1.f), -m_pos);
-    // const auto view_mat = glm::lookAt(m_pos, glm::vec3(m_pos.x, m_pos.y, 0.f), glm::vec3(0.f, 1.f, 0.f));
-    const auto proj =
-        glm::ortho(m_pos.z * -640.f + m_pos.x, m_pos.z * 640.f + m_pos.x, m_pos.z * -360.f + m_pos.y, m_pos.z * 360.f + m_pos.y);
-
-    return proj;
+    return glm::ortho(m_pos.z * -640.f + m_pos.x,
+                      m_pos.z * 640.f + m_pos.x,
+                      m_pos.z * -360.f + m_pos.y,
+                      m_pos.z * 360.f + m_pos.y);
 }
 
 void Camera::move(glm::vec3 delta)
