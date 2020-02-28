@@ -146,7 +146,8 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
-        glm::vec2 pos(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f));
+        glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
+                      m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
         m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
         m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
@@ -165,7 +166,10 @@ void ScenarioScene::on_enter()
     for (int j = 0; j < 50; j++)
     {
         auto trees = m_registry.create();
-        m_registry.assign<component::Position>(trees, glm::vec3(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Position>(trees,
+                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
+                                                         m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y),
+                                                         0.f));
         m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
         m_registry.assign<component::Tags>(trees, TAG_Avoidable);
         m_registry
@@ -183,7 +187,10 @@ void ScenarioScene::on_enter()
     for (int k = 0; k < 25; k++)
     {
         auto ponds = m_registry.create();
-        m_registry.assign<component::Position>(ponds, glm::vec3(m_rng.uniform(-500.f, 500.f), m_rng.uniform(-500.f, 500.f), 0.f));
+        m_registry.assign<component::Position>(ponds,
+                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
+                                                         m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y),
+                                                         0.f));
         m_registry.assign<component::Sprite>(ponds, t_tex, glm::vec3(0.1f, 0.2f, 0.6f));
         m_registry.assign<component::Tags>(ponds, TAG_Avoidable);
         m_registry
@@ -204,7 +211,7 @@ void ScenarioScene::on_enter()
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng}));
+            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
         }
         else
         {
@@ -225,9 +232,9 @@ bool ScenarioScene::update(float dt)
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
 
-    for (int i = -50; i < 50; i++)
+    for (int i = -2; i <= 2; i++)
     {
-        for (int j = -50; j < 50; j++)
+        for (int j = -2; j <= 2; j++)
         {
             gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.17f, 0.1f), b_tex);
         }

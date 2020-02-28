@@ -1,5 +1,6 @@
 #pragma once
 #include "random_engine.h"
+#include "entity/scenario.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
@@ -14,6 +15,7 @@ struct SystemContext
     entt::registry* registry{nullptr};
     entt::dispatcher* dispatcher{nullptr};
     RandomEngine* rng{nullptr};
+    lua::Scenario* scenario{nullptr};
 };
 
 class ISystem
