@@ -49,9 +49,13 @@ void Requirement::update(float dt)
         {
             if (m_registry.valid(entity) && ((m_registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
             {
-                m_registry.assign<component::LocationRequirement>(e, m_registry.get<component::Position>(entity).position);
-                auto&& strat                                          = m_registry.get<component::Strategies>(e);
-                strat.staged_strategies.front().actions.back().target = entity;
+                auto&& strat = m_registry.get<component::Strategies>(e);
+                if (strat.staged_strategies.size() != 0)
+                {
+                    m_registry.assign<component::LocationRequirement>(e, m_registry.get<component::Position>(entity).position);
+
+                    strat.staged_strategies.front().actions.back().target = entity;
+                }
 
                 m_registry.remove<component::FindRequirement>(e);
                 mov.desired_position.clear();
@@ -78,7 +82,7 @@ void Requirement::update(float dt)
     });
 
     auto view_tag = m_registry.view<component::TagRequirement, component::Tags>();
-    view_tag.each([this, dt](entt::entity e, component::TagRequirement tagreqs, component::Tags tags) {
+    view_tag.each([this, dt](entt::entity e, component::TagRequirement tagreqs, component::Tags& tags) {
         tags.tags = ETag(tags.tags | tagreqs.tags);
         m_registry.remove<component::TagRequirement>(e);
     });

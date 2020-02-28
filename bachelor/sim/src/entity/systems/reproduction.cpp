@@ -10,22 +10,25 @@ void Reproduction::update(float dt)
 
     auto view = m_registry.view<component::Reproduction, component::Needs, component::Tags>();
     view.each([dt, this](entt::entity e, component::Reproduction& repr, component::Needs& needs, component::Tags& tags) {
-        if (repr.number_of_children > repr.max_children)
+        if (repr.number_of_children >= repr.max_children)
         {
             ai::Need temp = {static_cast<std::string>("reproduce"), 0.f, 0.f, 0.f, ETag{}};
             auto need     = std::find(needs.needs.begin(), needs.needs.end(), temp);
             if (need != needs.needs.end())
             {
                 needs.needs.erase(need);
-                needs.pressing_needs.erase(need);
+            }
+            auto pressing_need = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), temp);
+            if (pressing_need != needs.pressing_needs.end())
+            {
+                needs.pressing_needs.erase(pressing_need);
             }
             else
             {
-                spdlog::error("There was an error finding the reproduction component of entity: {}", e);
+                spdlog::error("There was an error finding the reproduction need of entity: {}", e);
             }
+            m_registry.remove<component::Reproduction>(e);
         }
-
-        m_registry.remove<component::Reproduction>(e);
     });
 }
 } // namespace cs::system
