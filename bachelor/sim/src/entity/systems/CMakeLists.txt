@@ -29,4 +29,12 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/timer.h
         ${CMAKE_CURRENT_LIST_DIR}/timer.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/health.h
+        ${CMAKE_CURRENT_LIST_DIR}/health.cpp
+
+
+        ${CMAKE_CURRENT_LIST_DIR}/reproduction.h
+        ${CMAKE_CURRENT_LIST_DIR}/reproduction.cpp
+
 )
