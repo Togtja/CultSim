@@ -154,16 +154,17 @@ void ScenarioScene::on_enter()
                 }
             }
 
-            auto& needs = r.get<component::Needs>(e);
-
+            auto& needs        = r.get<component::Needs>(e);
+            auto& tags         = r.get<component::Tags>(e);
             auto& target_needs = r.get<component::Needs>(n);
-
+            auto& target_tags  = r.get<component::Tags>(n);
             for (auto& need : needs.needs)
             {
                 if ((need.tags & TAG_Reproduce) && need.status < 50.f)
                 {
                     spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
+                    tags.tags = ETag(tags.tags & ~TAG_Reproduce);
                 }
             }
 
@@ -173,6 +174,7 @@ void ScenarioScene::on_enter()
                 {
                     spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
+                    target_tags.tags = ETag(target_tags.tags & ~TAG_Reproduce);
                 }
             }
         },
