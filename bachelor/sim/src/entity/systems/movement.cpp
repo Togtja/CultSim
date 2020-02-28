@@ -24,7 +24,7 @@ void Movement::update(float dt)
     static float avoid_dist     = 10.f;
     static float avoid_start    = 15.f;
 
-    if (ImGui::TreeNode("Avoidance Controls"))
+    //    if (ImGui::TreeNode("Avoidance Controls"))
     {
         ImGui::Checkbox("Draw Paths", &draw_paths);
         ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);

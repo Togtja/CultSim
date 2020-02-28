@@ -48,6 +48,7 @@ SpriteTextureID SpriteRenderer::get_texture(std::string_view rpath)
     /** If we alreadly loaded this texture, then give it back */
     if (auto itr = m_texture_cache.find(rpath.data()); itr != m_texture_cache.end())
     {
+        spdlog::info("used cached texture for {}", rpath);
         return itr->second;
     }
 

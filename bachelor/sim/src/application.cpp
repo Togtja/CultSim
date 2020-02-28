@@ -132,10 +132,10 @@ bool Application::init_input()
         gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 50.f);
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomIn, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, -4.f});
+        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
     });
     inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomOut, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, 4.f});
+        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
     });
 
     /* TODO: Fix to not return true */

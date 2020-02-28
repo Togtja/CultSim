@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <sol/sol.hpp>
+#include <glm/vec2.hpp>
 
 namespace cs::lua
 {
@@ -15,6 +16,9 @@ struct Scenario
 
     /** Number of agents initially */
     int agent_count{};
+
+    /** Scenario Bounds */
+    glm::vec2 bounds{};
 
     /** Initially active systems */
     std::vector<std::string> systems{};
