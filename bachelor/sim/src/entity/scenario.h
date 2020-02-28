@@ -13,7 +13,10 @@ struct Scenario
     std::string name{};
     std::string description{};
 
+    /** Number of agents initially */
     int agent_count{};
+
+    /** Initially active systems */
     std::vector<std::string> systems{};
 
     /** Called on startup */

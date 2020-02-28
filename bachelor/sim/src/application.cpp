@@ -159,11 +159,11 @@ bool Application::init_lua()
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");
-    log_table.set_function("debug", [](std::string_view msg) { spdlog::debug(msg); });
-    log_table.set_function("info", [](std::string_view msg) { spdlog::info(msg); });
-    log_table.set_function("warn", [](std::string_view msg) { spdlog::warn(msg); });
-    log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
-    log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
+    log_table.set_function("debug", [](std::string_view msg) { spdlog::get("lua")->debug(msg); });
+    log_table.set_function("info", [](std::string_view msg) { spdlog::get("lua")->info(msg); });
+    log_table.set_function("warn", [](std::string_view msg) { spdlog::get("lua")->warn(msg); });
+    log_table.set_function("error", [](std::string_view msg) { spdlog::get("lua")->error(msg); });
+    log_table.set_function("critical", [](std::string_view msg) { spdlog::get("lua")->critical(msg); });
 
     lua::bind_glm(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
