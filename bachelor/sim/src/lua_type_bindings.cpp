@@ -49,7 +49,7 @@ void bind_components(sol::state_view lua)
                                &ai::Need::weight,
                                "status",
                                &ai::Need::status,
-                               "decayRate",
+                               "decay_rate",
                                &ai::Need::decay_rate,
                                "tags",
                                &ai::Need::tags);

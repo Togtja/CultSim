@@ -28,6 +28,12 @@ struct Movement
     int avoid_count{};
 };
 
+struct Meta
+{
+    std::string name{};
+    std::string description{};
+};
+
 struct Sprite
 {
     gfx::SpriteTextureID texture{};
