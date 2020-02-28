@@ -9,7 +9,7 @@ namespace cs::lua
  *
  * @param lua The lua state
  */
-void bind_glm(sol::state_view lua);
+void bind_dataonly(sol::state_view lua);
 
 /**
  * Bind our component types to Lua so it can read and understand them

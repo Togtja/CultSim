@@ -165,7 +165,7 @@ bool Application::init_lua()
     log_table.set_function("error", [](std::string_view msg) { spdlog::get("lua")->error(msg); });
     log_table.set_function("critical", [](std::string_view msg) { spdlog::get("lua")->critical(msg); });
 
-    lua::bind_glm(m_lua.lua_state());
+    lua::bind_dataonly(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
     lua::bind_systems(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());

@@ -9,7 +9,7 @@
 
 namespace cs::lua
 {
-void bind_glm(sol::state_view lua)
+void bind_dataonly(sol::state_view lua)
 {
     /** Vectors */
     lua.new_usertype<glm::vec2>("Vec2",
@@ -27,6 +27,16 @@ void bind_glm(sol::state_view lua)
                                 &glm::vec3::y,
                                 "z",
                                 &glm::vec3::z);
+
+    lua.new_enum<ETag>("Tag",
+                       {{"Food", ETag::TAG_Food},
+                        {"Drink", ETag::TAG_Drink},
+                        {"Sleep", ETag::TAG_Sleep},
+                        {"Joy", ETag::TAG_Joy},
+                        {"Location", ETag::TAG_Location},
+                        {"Find", ETag::TAG_Find},
+                        {"Vision", ETag::TAG_Vision},
+                        {"Avoidable", ETag::TAG_Avoidable}});
 }
 
 void bind_components(sol::state_view lua)
