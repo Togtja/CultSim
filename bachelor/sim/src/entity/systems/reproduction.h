@@ -1,11 +1,10 @@
 #pragma once
-#include "system.h"
 
-#include <entt/signal/dispatcher.hpp>
+#include "system.h"
 
 namespace cs::system
 {
-class Movement : public ISystem
+class Reproduction : public ISystem
 {
 public:
     using ISystem::ISystem;

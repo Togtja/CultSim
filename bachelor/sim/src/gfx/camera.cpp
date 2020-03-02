@@ -17,22 +17,23 @@ void Camera::init(glm::vec3 position)
 
 glm::mat4 Camera::get_view_matrix() const
 {
-    const auto view_mat = glm::translate(glm::mat4(1.f), -m_pos);
-    const auto proj     = glm::perspectiveFov(glm::radians(90.f), 16.f, 9.f, 1.f, 200.f);
-
-    return proj * view_mat;
+    return glm::ortho(m_pos.z * -640.f + m_pos.x,
+                      m_pos.z * 640.f + m_pos.x,
+                      m_pos.z * -360.f + m_pos.y,
+                      m_pos.z * 360.f + m_pos.y);
 }
 
 void Camera::move(glm::vec3 delta)
 {
     m_pos += delta;
-    m_pos.x = glm::clamp(m_pos.x, -m_bounds.x / 2.f, m_bounds.x / 2.f);
-    m_pos.y = glm::clamp(m_pos.y, -m_bounds.y / 2.f, m_bounds.y / 2.f);
-    m_pos.z = glm::clamp(m_pos.z, 5.f, 1000.f);
+    m_pos.x = glm::clamp(m_pos.x, -m_bounds.x, m_bounds.x);
+    m_pos.y = glm::clamp(m_pos.y, -m_bounds.y, m_bounds.y);
+    m_pos.z = glm::clamp(m_pos.z, 0.05f, 5.f);
 }
+
 void Camera::zoom(float zoom)
 {
-    m_pos.z = std::clamp(m_pos.y + (zoom * m_speed), 1.0f, 50.f);
+    m_pos.z = std::clamp(m_pos.z + (zoom * m_speed), 0.2f, 50.f);
 }
 
 void Camera::set_speed(float speed)

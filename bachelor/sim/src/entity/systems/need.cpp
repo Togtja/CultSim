@@ -9,7 +9,7 @@ void Need::update(float dt)
 {
     CS_AUTOTIMER(Need System);
 
-    auto view = m_registry.view<component::Needs>();
+    auto view = m_context.registry->view<component::Needs>();
     view.each([dt](component::Needs& needs) {
         for (auto& need : needs.needs)
         {
@@ -19,8 +19,9 @@ void Need::update(float dt)
             // If the need does not exist in pressing needs
             if (found != needs.pressing_needs.end())
             {
+                found->status = need.status;
                 // Remove it if it should not be there
-                if (need.status > 50.f)
+                if (found->status > 50.f)
                 {
                     needs.pressing_needs.erase(found);
                 }

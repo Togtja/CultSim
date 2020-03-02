@@ -14,10 +14,6 @@
 
 namespace cs::system
 {
-Movement::Movement(entt::registry& registry, entt::dispatcher& dispatcher) : ISystem(registry), m_dispatcher(dispatcher)
-{
-}
-
 void Movement::update(float dt)
 {
     CS_AUTOTIMER(Movement System);
@@ -28,7 +24,7 @@ void Movement::update(float dt)
     static float avoid_dist     = 10.f;
     static float avoid_start    = 15.f;
 
-    if (ImGui::TreeNode("Avoidance Controls"))
+    //    if (ImGui::TreeNode("Avoidance Controls"))
     {
         ImGui::Checkbox("Draw Paths", &draw_paths);
         ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);
@@ -37,8 +33,10 @@ void Movement::update(float dt)
         ImGui::DragFloat("Avoid Start", &avoid_start, 1.f, 1.f, 64.f);
     }
 
-    m_registry.view<component::Vision, component::Movement, component::Position>().each(
-        [&dt, this](entt::entity e, const component::Vision& vis, component::Movement& mov, component::Position& pos) {
+    auto& registry = *m_context.registry;
+
+    registry.view<component::Vision, component::Movement, component::Position>().each(
+        [&dt, this, &registry](entt::entity e, const component::Vision& vis, component::Movement& mov, component::Position& pos) {
             mov.avoidance_cd -= dt;
             if (mov.avoidance_cd > 0.f)
             {
@@ -52,12 +50,12 @@ void Movement::update(float dt)
 
             for (auto other : vis.seen)
             {
-                if (!(m_registry.get<component::Tags>(other).tags & TAG_Avoidable))
+                if (!(registry.get<component::Tags>(other).tags & TAG_Avoidable))
                 {
                     continue;
                 }
 
-                if (auto* other_pos = m_registry.try_get<component::Position>(other); other_pos)
+                if (auto* other_pos = registry.try_get<component::Position>(other); other_pos)
                 {
                     if (glm::distance(pos.position, other_pos->position) < 12.f)
                     {
@@ -88,12 +86,8 @@ void Movement::update(float dt)
             }
         });
 
-    static auto seed = std::random_device{};
-    static auto gen  = std::mt19937{seed()};
-    std::uniform_real_distribution rng(-1.f, 1.f);
-
-    auto view = m_registry.view<component::Movement, component::Position>();
-    view.each([dt, &rng, this](entt::entity e, component::Movement& mov, component::Position& pos) {
+    auto view = registry.view<component::Movement, component::Position>();
+    view.each([dt, this](entt::entity e, component::Movement& mov, component::Position& pos) {
         if (mov.desired_position.empty())
         {
             return;
@@ -112,6 +106,7 @@ void Movement::update(float dt)
 
         pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * dt;
 
+        /** Draw paths */
         if (draw_paths)
         {
             gfx::get_renderer().debug().draw_line(pos.position,
@@ -136,7 +131,7 @@ void Movement::update(float dt)
             if (mov.desired_position.empty())
             {
                 // Arrived at final destination
-                m_dispatcher.enqueue(event::ArrivedAtDestination{e, cur_head});
+                m_context.dispatcher->enqueue(event::ArrivedAtDestination{e, cur_head});
             }
         }
     });
