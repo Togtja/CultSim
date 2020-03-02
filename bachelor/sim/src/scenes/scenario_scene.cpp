@@ -547,28 +547,38 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& needs = m_registry.try_get<component::Needs>(selection_info.selected_entity);
-    if (!needs)
-    {
-        return;
-    }
+    const auto& [needs, health] = m_registry.try_get<component::Needs, component::Health>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_Once);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_Once);
     ImGui::Begin("Agent Information");
 
-    ImGui::BeginTable("Entity Needs", 2);
-    ImGui::TableSetupColumn("Need");
-    ImGui::TableSetupColumn("Status");
-    ImGui::TableAutoHeaders();
-    for (const auto& need : needs->needs)
+    ImGui::Text("Ola Normann");
+
+    if (health)
     {
-        ImGui::TableNextCell();
-        ImGui::Text("%s", need.name.c_str());
-        ImGui::TableNextCell();
-        ImGui::Text("%3.1f", need.status);
+        ImGui::PushFont(g_header_font);
+        ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->hp);
+        ImGui::SameLine();
+        ImGui::TextColored({0.941f, 0.902, 0.549, 1.f}, "(-%3.1f)", health->tickdown_rate);
+        ImGui::PopFont();
     }
-    ImGui::EndTable();
+
+    if (needs)
+    {
+        ImGui::BeginTable("Entity Needs", 2);
+        ImGui::TableSetupColumn("Need");
+        ImGui::TableSetupColumn("Status");
+        ImGui::TableAutoHeaders();
+        for (const auto& need : needs->needs)
+        {
+            ImGui::TableNextCell();
+            ImGui::Text("%s", need.name.c_str());
+            ImGui::TableNextCell();
+            ImGui::Text("%3.1f", need.status);
+        }
+        ImGui::EndTable();
+    }
 
     ImGui::End();
 }
