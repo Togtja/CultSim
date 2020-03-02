@@ -16,7 +16,11 @@ void Health::update(float dt)
         {
             if ((need.tags & health.need_tags) && need.status <= 0.f)
             {
-                health.hp -= dt * health.tickdown_rate;
+                health.hp -= dt * health.tickdown_rate * need.vitality;
+                if (health.hp <= 0.f)
+                {
+                    spdlog::warn("Entity {} killed by need {}", e, need.name);
+                }
             }
         }
 

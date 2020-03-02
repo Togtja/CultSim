@@ -14,7 +14,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
     cs::action::Action action{
         static_cast<std::string>("eat"),
         cs::TAG_Find,
@@ -67,7 +67,7 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f,1.f, cs::TAG_Food};
     cs::action::Action action{
         static_cast<std::string>("eat"),
         cs::TAG_Find,
@@ -119,6 +119,7 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
                          3.f,
                          100.f,
                          1.f,
+        1.f,
                          static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{
         static_cast<std::string>("eat"),
@@ -173,6 +174,7 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
                          3.f,
                          100.f,
                          1.f,
+        1.f,
                          static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{
         static_cast<std::string>("eat"),
@@ -228,9 +230,9 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     entt::registry test_registry;
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 50.f, 0.f, static_cast<cs::ETag>(cs::TAG_Food)};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 50.f, 0.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food)};
 
-    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, static_cast<cs::ETag>(cs::TAG_Drink)};
+    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, 1.f,  static_cast<cs::ETag>(cs::TAG_Drink)};
 
     cs::action::Action action{
         static_cast<std::string>("eat"),
