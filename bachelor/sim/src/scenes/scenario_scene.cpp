@@ -363,6 +363,7 @@ bool ScenarioScene::update(float dt)
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
     draw_time_control_ui();
+    draw_selected_entity_information_ui();
 
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
@@ -540,6 +541,36 @@ void ScenarioScene::draw_time_control_ui()
 
 void ScenarioScene::draw_selected_entity_information_ui()
 {
+    const auto& selection_info = m_registry.ctx<EntitySelectionHelper>();
+    if (!m_registry.valid(selection_info.selected_entity))
+    {
+        return;
+    }
+
+    const auto& needs = m_registry.try_get<component::Needs>(selection_info.selected_entity);
+    if (!needs)
+    {
+        return;
+    }
+
+    ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_Once);
+    ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_Once);
+    ImGui::Begin("Agent Information");
+
+    ImGui::BeginTable("Entity Needs", 2);
+    ImGui::TableSetupColumn("Need");
+    ImGui::TableSetupColumn("Status");
+    ImGui::TableAutoHeaders();
+    for (const auto& need : needs->needs)
+    {
+        ImGui::TableNextCell();
+        ImGui::Text("%s", need.name.c_str());
+        ImGui::TableNextCell();
+        ImGui::Text("%3.1f", need.status);
+    }
+    ImGui::EndTable();
+
+    ImGui::End();
 }
 
 void ScenarioScene::update_entity_hover()
