@@ -58,13 +58,11 @@ void ScenarioScene::on_enter()
                               0.f,
                               {},
                               [](entt::entity e, entt::entity n, entt::registry& r) {
-                                  spdlog::warn("We finished action: eat on entity: {}", e);
                                   r.destroy(n);
                                   for (auto& need : r.get<component::Needs>(e).needs)
                                   {
                                       if (need.tags & TAG_Food)
                                       {
-                                          spdlog::warn("Current status of need FOOD: {}", need.status);
                                           need.status += 80.f;
                                       }
                                   }
@@ -83,13 +81,11 @@ void ScenarioScene::on_enter()
                                 0.f,
                                 {},
                                 [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("We finished action: drink on entity: {}", e);
                                     r.destroy(n);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
                                         if (need.tags & TAG_Drink)
                                         {
-                                            spdlog::warn("Current status of need DRINK: {}", need.status);
                                             need.status += 80.f;
                                         }
                                     }
@@ -108,12 +104,10 @@ void ScenarioScene::on_enter()
                                 0.f,
                                 {},
                                 [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("We finished action: sleep on entity: {}", e);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
                                         if (need.tags & TAG_Sleep)
                                         {
-                                            spdlog::warn("Current status of need SLEEP: {}", need.status);
                                             need.status += 10.f;
                                         }
                                     }
@@ -130,18 +124,15 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
-            spdlog::warn("We finished action: reproduce on entity{} with entity{}", e, n);
 
             if (r.has<component::Reproduction>(e))
             {
-                spdlog::warn("We have a reproduction component");
                 auto& repr = r.get<component::Reproduction>(e);
                 repr.number_of_children++;
             }
 
             if (r.has<component::Reproduction>(n))
             {
-                spdlog::warn("Target has Reproduction component");
                 auto& target_repr = r.get<component::Reproduction>(n);
             }
 
@@ -151,7 +142,6 @@ void ScenarioScene::on_enter()
                 auto target_repr = r.get<component::Reproduction>(n);
                 if (repr.sex == component::Reproduction::Female && target_repr.sex == component::Reproduction::Male)
                 {
-                    spdlog::warn("We are making a baby");
                     auto child         = r.create(e, r);
                     auto& child_needs  = r.get<component::Needs>(child);
                     auto& child_reprd  = r.get<component::Reproduction>(child);
@@ -164,7 +154,7 @@ void ScenarioScene::on_enter()
                     child_reprd.number_of_children = 0;
                     child_health.hp                = 100.f;
                     child_pos.position             = r.get<component::Position>(e).position + glm::vec3(10.f, 10.f, 0.f);
-                    spdlog::warn("Child entity: {}", child);
+
                     RandomEngine rng{};
                     if (rng.trigger(0.5f))
                     {
@@ -180,7 +170,6 @@ void ScenarioScene::on_enter()
             {
                 if ((need.tags & TAG_Reproduce) && need.status < 50.f)
                 {
-                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
                 }
             }
@@ -189,7 +178,6 @@ void ScenarioScene::on_enter()
             {
                 if ((need.tags & TAG_Reproduce) && need.status < 50.f)
                 {
-                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
                 }
             }
