@@ -11,7 +11,7 @@ scenario.description = "Observe as your agents walk around in a forest looking f
 scenario.agent_count = 67
 
 -- The bounds of the level on the X and Y in both directions based on the center 200,200 means the total world is 400,400 with 200 units on both sides of 0,0
-scenario.bounds = Vec2:new(200.0, 200.0)
+scenario.bounds = Vec2:new(300.0, 300.0)
 
 -- Declare all systems that should be active initially
 scenario.systems = {
