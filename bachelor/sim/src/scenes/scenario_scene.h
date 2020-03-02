@@ -42,6 +42,9 @@ private:
     /** The scenario we are running */
     lua::Scenario m_scenario;
 
+    /** Time sim has been running */
+    float m_simtime = 0.f;
+
 public:
     explicit ScenarioScene(std::string_view scenario);
     explicit ScenarioScene(lua::Scenario scenario);

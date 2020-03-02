@@ -324,6 +324,8 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
+    m_simtime += dt;
+
     setup_docking_ui();
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
@@ -441,12 +443,13 @@ void ScenarioScene::draw_scenario_information_ui()
 
     /** Stat Bar */
     ImGui::PushFont(g_light_font);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, {1.f, 1.f, 1.f, 1.f});
     ImGui::Spacing();
     ImGui::TextColored({0.0, 0.749, 1., 1.}, "FPS: %5.1f", ImGui::GetIO().Framerate);
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.size<component::AI>()));
-    ImGui::PopStyleColor();
+    ImGui::SameLine();
+    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f", m_simtime);
+    ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
 
