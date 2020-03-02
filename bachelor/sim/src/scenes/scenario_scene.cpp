@@ -51,9 +51,9 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(26.f, 76.f), 1.f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(48.f, 86.f), 1.5f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 96.f, 0.5f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, ETag(TAG_Reproduce | TAG_Human)};
 
     action::Action action_eat{static_cast<std::string>("eat"),
@@ -465,14 +465,7 @@ void ScenarioScene::draw_scenario_information_ui()
         living_entities.push_back(m_registry.size<component::Needs>());
     }
 
-    ImGui::PlotLines("##Chart Living Agents",
-                     living_entities.data(),
-                     living_entities.size(),
-                     0,
-                     "Living Agents",
-                     FLT_MAX,
-                     FLT_MAX,
-                     {0, 75});
+    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
 }
 
 } // namespace cs
