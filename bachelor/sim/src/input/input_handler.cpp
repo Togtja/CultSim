@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
 namespace cs::input
@@ -283,7 +284,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
                 break_event = true;
             }
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<Mouse>(event.button.button - 1);
