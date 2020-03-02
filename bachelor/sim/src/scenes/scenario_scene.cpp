@@ -52,8 +52,30 @@ void ScenarioScene::on_enter()
 
     /** Select entity on click */
     input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
-        auto&& select_helper          = m_registry.ctx<EntitySelectionHelper>();
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+
+        if (select_helper.selected_entity != entt::null)
+        {
+            m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+        }
+
         select_helper.selected_entity = select_helper.hovered_entity;
+
+        if (select_helper.selected_entity != entt::null)
+        {
+            m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+        }
+    });
+
+    /** Move to selected entity */
+    input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_F, input::Action::FollowEntity, [this] {
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+        if (select_helper.selected_entity == entt::null)
+        {
+            return;
+        }
+        const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
+        gfx::get_renderer().set_camera_position_2d({pos_comp.position.x, pos_comp.position.y});
     });
 
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
@@ -532,7 +554,10 @@ void ScenarioScene::update_entity_hover()
     auto cursor_pos         = input::get_input().get_mouse_pos();
     auto world_pos          = gfx::get_renderer().screen_to_world_pos(cursor_pos);
 
-    spdlog::info("World: {} | {} | {}", world_pos.x, world_pos.y, world_pos.z);
+    if (selection_helper.hovered_entity != entt::null)
+    {
+        m_registry.remove<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
+    }
 
     m_registry.view<component::Position>().each([&selection_helper, world_pos](entt::entity e, const component::Position& pos) {
         if (glm::distance(world_pos, pos.position) < 10.f)
@@ -541,6 +566,17 @@ void ScenarioScene::update_entity_hover()
             return;
         }
     });
+
+    if (selection_helper.hovered_entity != entt::null)
+    {
+        m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
+    }
+
+    ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
+    ImGui::Text("World: %.2f | %.2f | %.2f", world_pos.x, world_pos.y, world_pos.z);
+    ImGui::Text("Hovering: %u | Selected: %u",
+                static_cast<uint32_t>(selection_helper.hovered_entity),
+                static_cast<uint32_t>(selection_helper.selected_entity));
 }
 
 } // namespace cs

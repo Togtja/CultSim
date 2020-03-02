@@ -33,7 +33,8 @@ enum class Action
     ZoomIn,
     ZoomOut,
     Pause,
-    SelectEntity
+    SelectEntity,
+    FollowEntity
 };
 
 /**

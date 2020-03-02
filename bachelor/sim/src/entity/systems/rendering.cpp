@@ -24,6 +24,14 @@ void Rendering::update(float dt)
         sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
     });
 
+    registry.view<entt::tag<"selected"_hs>, component::Sprite>().each([](entt::tag<"selected"_hs> _, component::Sprite& sprite) {
+        sprite.color = {1.f, 1.f, 1.f};
+    });
+
+    registry.view<entt::tag<"hovered"_hs>, component::Sprite>().each([](entt::tag<"hovered"_hs> _, component::Sprite& sprite) {
+        sprite.color = {1.f, 0.8f, 0.f};
+    });
+
     auto pos_sprite_view = registry.view<component::Sprite, component::Position>();
     pos_sprite_view.each([](const component::Sprite& sprite, const component::Position& pos) {
         gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);

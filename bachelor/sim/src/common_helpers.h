@@ -29,8 +29,8 @@ struct ApplicationContext
  */
 struct EntitySelectionHelper
 {
-    entt::entity hovered_entity;
-    entt::entity selected_entity;
+    entt::entity hovered_entity{entt::null};
+    entt::entity selected_entity{entt::null};
 };
 
 inline unsigned count_set_bits(uint64_t x)

@@ -43,6 +43,8 @@ public:
 
     void move_camera(glm::vec3 delta);
 
+    void set_camera_position_2d(glm::vec2 position);
+
     void set_camera_bounds(glm::vec2 bounds);
 
     /**
