@@ -13,9 +13,11 @@ void Action::update(float dt)
     CS_AUTOTIMER(Action System);
 
     auto& registry = *m_context.registry;
-    auto group     = registry.group<component::Strategies>(
-        entt::exclude<component::LocationRequirement, component::VisionRequirement, component::FindRequirement>);
-    group.each([this, &registry, dt](entt::entity e, component::Strategies& strategies) {
+    auto group = m_registry.group<component::Strategies>(entt::exclude<component::LocationRequirement,
+                                                                       component::VisionRequirement,
+                                                                       component::FindRequirement,
+                                                                       component::TagRequirement>);
+    group.each([this, dt](entt::entity e, component::Strategies& strategies) {
         if (!strategies.staged_strategies.empty())
         {
             for (auto& strategy : strategies.staged_strategies)
@@ -26,28 +28,26 @@ void Action::update(float dt)
                     if (action.requirements != 0)
                     {
                         spdlog::warn("Pushing back requirement {}", action.requirements);
-                        switch (action.requirements)
+                        if (action.requirements & TAG_Tag)
                         {
-                            case TAG_Location:
-                            {
-                                spdlog::warn("Pushing to entt: {}", static_cast<uint32_t>(e));
-                                registry.assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
-                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
-                                break;
-                            }
-                            case TAG_Vision:
-                            {
-                                registry.assign<component::VisionRequirement>(e, strategy.tags);
-                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
-                                break;
-                            }
-                            case TAG_Find:
-                            {
-                                registry.assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
-                                action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
-                            }
+                            m_registry.assign<component::TagRequirement>(e, strategy.tags);
+                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Tag);
                         }
-                        break;
+                        else if (action.requirements & TAG_Location)
+                        {
+                            m_registry.assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
+                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
+                        }
+                        else if (action.requirements & TAG_Vision)
+                        {
+                            m_registry.assign<component::VisionRequirement>(e, strategy.tags);
+                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
+                        }
+                        else if (action.requirements & TAG_Find)
+                        {
+                            m_registry.assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
+                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
+                        }
                     }
                     else
                     {

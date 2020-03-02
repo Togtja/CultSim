@@ -19,8 +19,9 @@ void Need::update(float dt)
             // If the need does not exist in pressing needs
             if (found != needs.pressing_needs.end())
             {
+                found->status = need.status;
                 // Remove it if it should not be there
-                if (need.status > 50.f)
+                if (found->status > 50.f)
                 {
                     needs.pressing_needs.erase(found);
                 }
