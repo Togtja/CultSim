@@ -40,11 +40,21 @@ ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scen
 
 void ScenarioScene::on_enter()
 {
-    m_scenario.init();
+    /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
     m_context->lua_state.script(fs::read_file("script/needs.lua"));
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
+    m_scenario.init();
+
+    /** Set up context variables in EnTT */
+    m_registry.set<EntitySelectionHelper>();
+
+    /** Select entity on click */
+    input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
+        auto&& select_helper          = m_registry.ctx<EntitySelectionHelper>();
+        select_helper.selected_entity = select_helper.hovered_entity;
+    });
 
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
@@ -330,6 +340,9 @@ bool ScenarioScene::update(float dt)
     m_simtime += dt;
     m_next_data_sample += dt;
 
+    // TODO : Move to input action response
+    update_entity_hover();
+
     setup_docking_ui();
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
@@ -507,6 +520,27 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 5.f;
     }
     ImGui::End();
+}
+
+void ScenarioScene::draw_selected_entity_information_ui()
+{
+}
+
+void ScenarioScene::update_entity_hover()
+{
+    auto&& selection_helper = m_registry.ctx<EntitySelectionHelper>();
+    auto cursor_pos         = input::get_input().get_mouse_pos();
+    auto world_pos          = gfx::get_renderer().screen_to_world_pos(cursor_pos);
+
+    spdlog::info("World: {} | {} | {}", world_pos.x, world_pos.y, world_pos.z);
+
+    m_registry.view<component::Position>().each([&selection_helper, world_pos](entt::entity e, const component::Position& pos) {
+        if (glm::distance(world_pos, pos.position) < 10.f)
+        {
+            selection_helper.hovered_entity = e;
+            return;
+        }
+    });
 }
 
 } // namespace cs

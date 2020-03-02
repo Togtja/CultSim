@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include <entt/entity/registry.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <sol/state_view.hpp>
@@ -19,6 +20,17 @@ struct ApplicationContext
     sol::state_view lua_state;
     SceneManager* scene_manager{nullptr};
     PreferenceManager* preferences{nullptr};
+};
+
+/**
+ * Helper struct for entity selection
+ *
+ * Used as a context variable within registries in the scenario scene
+ */
+struct EntitySelectionHelper
+{
+    entt::entity hovered_entity;
+    entt::entity selected_entity;
 };
 
 inline unsigned count_set_bits(uint64_t x)

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "random_engine.h"
@@ -68,5 +67,9 @@ private:
     void draw_scenario_information_ui();
 
     void draw_time_control_ui();
+
+    void draw_selected_entity_information_ui();
+
+    void update_entity_hover();
 };
 } // namespace cs

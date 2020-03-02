@@ -1,8 +1,8 @@
 #pragma once
 
 #include "camera.h"
-#include "sprite_renderer.h"
 #include "debug_renderer.h"
+#include "sprite_renderer.h"
 
 namespace cs::gfx
 {
@@ -45,6 +45,15 @@ public:
 
     void set_camera_bounds(glm::vec2 bounds);
 
+    /**
+     * Convert a screen coordinate to a world position
+     *
+     * @param screen_pos The cursor position relative to the top left corner of the screen
+     * @param desired_z The desired Z level to put the cursor at
+     * @return The cursor position in world space
+     */
+    glm::vec3 screen_to_world_pos(glm::ivec2 screen_pos, float desired_z = 0.f);
+
 private:
     Renderer();
 };
@@ -56,4 +65,4 @@ private:
  */
 Renderer& get_renderer();
 
-} // namespace cs
+} // namespace cs::gfx
