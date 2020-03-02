@@ -8,7 +8,7 @@ void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(reproduction System);
 
-    auto view = m_registry.view<component::Reproduction, component::Needs, component::Tags>();
+    auto view = m_context.registry->view<component::Reproduction, component::Needs, component::Tags>();
     view.each([dt, this](entt::entity e, component::Reproduction& repr, component::Needs& needs, component::Tags& tags) {
         if (repr.number_of_children >= repr.max_children)
         {
@@ -27,7 +27,7 @@ void Reproduction::update(float dt)
             {
                 spdlog::error("There was an error finding the reproduction need of entity: {}", e);
             }
-            m_registry.remove<component::Reproduction>(e);
+            m_context.registry->remove<component::Reproduction>(e);
         }
     });
 }

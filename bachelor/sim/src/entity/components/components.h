@@ -99,7 +99,7 @@ struct Health
 
     float tickdown_rate{};
 
-    ETag Need_tags{};
+    ETag need_tags{};
 };
 
 struct DropItems

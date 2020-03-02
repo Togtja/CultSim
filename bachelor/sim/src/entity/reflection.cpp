@@ -8,6 +8,8 @@
 #include "entity/systems/rendering.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
+#include "entity/systems/health.h"
+#include "entity/systems/reproduction.h"
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -57,7 +59,7 @@ void reflect_data_types()
         .data<&component::Needs::needs>("needs"_hs)
         .data<&component::Needs::pressing_needs>("pressing_needs"_hs);
 
-    /** Keep adding the components we've used so far... */
+    /** Keep adding the components we've used so far (but only add members that make sense to set defaults for in Lua)... */
 }
 
 void reflect_systems()
@@ -65,10 +67,12 @@ void reflect_systems()
     entt::meta<system::ISystem>().type("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
     entt::meta<system::Action>().type("ActionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::AI>().type("AiSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Health>().type("HealthSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Mitigation>().type("MitigationSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Movement>().type("MovementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Need>().type("NeedSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Rendering>().type("RenderingSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Reproduction>().type("ReproductionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Requirement>().type("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Timer>().type("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }

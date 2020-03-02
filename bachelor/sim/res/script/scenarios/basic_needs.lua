@@ -14,7 +14,18 @@ scenario.agent_count = 67
 scenario.bounds = Vec2:new(200.0, 200.0)
 
 -- Declare all systems that should be active initially
-scenario.systems = { "NeedSystem", "MitigationSystem", "ActionSystem", "RequirementSystem", "TimerSystem", "AiSystem", "MovementSystem", "RenderingSystem" }
+scenario.systems = {
+    "NeedSystem",
+    "HealthSystem",
+    "ReproductionSystem",
+    "MitigationSystem",
+    "ActionSystem",
+    "RequirementSystem",
+    "TimerSystem",
+    "AiSystem",
+    "MovementSystem",
+    "RenderingSystem"
+}
 
 -- This function is called before starting the simulation, once
 scenario.init = function() log.info("Starting scenario " .. scenario.name .. "!") end

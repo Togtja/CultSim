@@ -323,8 +323,6 @@ void ScenarioScene::on_enter()
     // m_active_systems.emplace_back(new system::AI(m_registry));
     // m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
     // m_active_systems.emplace_back(new system::Rendering(m_registry));
-
-    m_context->preferences->on_preference_changed.connect<&response>();
 }
 
 void ScenarioScene::on_exit()
