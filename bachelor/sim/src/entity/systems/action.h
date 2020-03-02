@@ -19,13 +19,9 @@ namespace cs::system
 */
 class Action : public ISystem
 {
-private:
-    RandomEngine m_rng{};
-
 public:
     using ISystem::ISystem;
 
     void update(float dt) override;
-
 };
 } // namespace cs::system

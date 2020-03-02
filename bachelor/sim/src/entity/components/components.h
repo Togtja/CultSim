@@ -28,6 +28,12 @@ struct Movement
     int avoid_count{};
 };
 
+struct Meta
+{
+    std::string name{};
+    std::string description{};
+};
+
 struct Sprite
 {
     gfx::SpriteTextureID texture{};
@@ -43,7 +49,6 @@ struct Animation
 struct Needs
 {
     std::vector<ai::Need> needs{};
-
     std::vector<ai::Need> pressing_needs{};
 };
 
@@ -94,7 +99,7 @@ struct Health
 
     float tickdown_rate{};
 
-    ETag Need_tags{};
+    ETag need_tags{};
 };
 
 struct DropItems

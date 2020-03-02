@@ -24,6 +24,7 @@ target_link_libraries(
         ${EXEC_NAME}
         PRIVATE
         benchmark
+        EnTT::EnTT
         # OpenMP::OpenMP_CXX
 )
 

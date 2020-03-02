@@ -7,13 +7,8 @@ namespace cs::system
 {
 class Rendering : public ISystem
 {
-private:
-    gfx::Renderer& m_renderer;
-
 public:
-
-    Rendering(entt::registry& registry) : ISystem(registry), m_renderer{gfx::get_renderer()}
-    {}
+    using ISystem::ISystem;
 
     void update(float dt) override;
 };

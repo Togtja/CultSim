@@ -6,7 +6,6 @@ namespace cs::system
 {
 class Health : public ISystem
 {
-private:
 public:
     using ISystem::ISystem;
 

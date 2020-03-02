@@ -1,5 +1,7 @@
 #pragma once
 
+#include "random_engine.h"
+#include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "scene.h"
 
@@ -9,6 +11,7 @@
 #include <entt/entity/registry.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <entt/meta/factory.hpp>
 
 namespace cs
 {
@@ -27,14 +30,21 @@ private:
     /** Event dispatcher used within this scene */
     entt::dispatcher m_dispatcher{};
 
+    /** Random number generator for this scene */
+    RandomEngine m_rng{};
+
     /** Enabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
+    std::vector<entt::meta_any> m_active_systems{};
 
     /** Disabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
+    std::vector<entt::meta_any> m_inactive_systems{};
+
+    /** The scenario we are running */
+    lua::Scenario m_scenario;
 
 public:
     explicit ScenarioScene(std::string_view scenario);
+    explicit ScenarioScene(lua::Scenario scenario);
 
     void on_enter() override;
 

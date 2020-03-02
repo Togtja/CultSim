@@ -1,16 +1,30 @@
 #pragma once
+#include "random_engine.h"
+#include "entity/scenario.h"
 
 #include <entt/entity/registry.hpp>
+#include <entt/signal/dispatcher.hpp>
 
 namespace cs::system
 {
+/**
+ * Context used to provide systems with potentially necessary variables
+ */
+struct SystemContext
+{
+    entt::registry* registry{nullptr};
+    entt::dispatcher* dispatcher{nullptr};
+    RandomEngine* rng{nullptr};
+    lua::Scenario* scenario{nullptr};
+};
+
 class ISystem
 {
 protected:
-    entt::registry& m_registry;
+    SystemContext m_context;
 
 public:
-    ISystem(entt::registry& registry) : m_registry(registry)
+    ISystem(SystemContext context) : m_context(context)
     {
     }
 

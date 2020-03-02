@@ -6,11 +6,16 @@
 #include <string_view>
 #include <vector>
 
+#include <robin_hood.h>
+
 namespace cs::gfx
 {
 class SpriteRenderer
 {
 private:
+    inline static constexpr int TEXTURE_WIDTH  = 512;
+    inline static constexpr int TEXTURE_HEIGHT = 512;
+
     Camera& m_camera;
 
     uint32_t m_vao{};
@@ -38,6 +43,9 @@ private:
     /** Next available texture ID for sprites */
     SpriteTextureID m_next_texture_id{};
 
+    /** Cache of previously loaded textures */
+    robin_hood::unordered_map<std::string, SpriteTextureID> m_texture_cache{};
+
 public:
     explicit SpriteRenderer(Camera& camera);
 
@@ -61,7 +69,7 @@ public:
      * @param rpath Relative path to the texture file you want the ID of
      * @return An ID to the given texture
      */
-    SpriteTextureID get_texture(std::string_view rpath);
+    SpriteTextureID get_texture(const std::string &rpath);
 
 private:
     bool increment_next_texture_id();
@@ -73,4 +81,4 @@ private:
     void init_texture_slots();
 };
 
-} // namespace cs
+} // namespace cs::gfx

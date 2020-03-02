@@ -2,10 +2,12 @@
 #include "constants.h"
 #include "debug/auto_timer.h"
 #include "delta_clock.h"
+#include "entity/reflection.h"
 #include "entity/systems/rendering.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "input/input_handler.h"
+#include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
 
 #include <functional>
@@ -39,6 +41,8 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
 
         update(dt_clock.restart());
         AutoTimer::show_debug_ui();
@@ -104,35 +108,36 @@ bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_W, input::Action::MoveFWD);
+    /** For now we bind default camera controls here ( TODO: Preferences ) */
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_W, input::Action::MoveUp);
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_A, input::Action::MoveLeft);
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_S, input::Action::MoveDown);
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_D, input::Action::MoveRight);
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_A, input::Action::MoveLeft);
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_Q, input::Action::ZoomIn);
+    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_E, input::Action::ZoomOut);
 
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_S, input::Action::MoveBack);
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_D, input::Action::MoveRight);
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_Q, input::Action::ZoomIn);
-    inputs.bind_key(input::KeyContext::DefaultContext, SDL_SCANCODE_E, input::Action::ZoomOut);
+    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelUp, input::Action::ZoomIn);
+    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelDown, input::Action::ZoomOut);
 
-    inputs.bind_btn(input::KeyContext::DefaultContext, input::Mouse::WheelUp, input::Action::ZoomIn);
-    inputs.bind_btn(input::KeyContext::DefaultContext, input::Mouse::WheelDown, input::Action::ZoomOut);
-
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveFWD, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 50.f);
+    /** Likewise with actions */
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveUp, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveLeft, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 50.f);
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveLeft, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveBack, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 50.f);
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveDown, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::MoveRight, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 50.f);
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveRight, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::ZoomIn, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, -4.f});
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomIn, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
     });
-    inputs.bind_action(input::KeyContext::DefaultContext, input::Action::ZoomOut, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, 4.f});
+    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomOut, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
     });
 
     /* TODO: Fix to not return true */
@@ -156,11 +161,19 @@ bool Application::init_lua()
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");
-    log_table.set_function("debug", [](std::string_view msg) { spdlog::debug(msg); });
-    log_table.set_function("info", [](std::string_view msg) { spdlog::info(msg); });
-    log_table.set_function("warn", [](std::string_view msg) { spdlog::warn(msg); });
-    log_table.set_function("error", [](std::string_view msg) { spdlog::error(msg); });
-    log_table.set_function("critical", [](std::string_view msg) { spdlog::critical(msg); });
+    log_table.set_function("debug", [](std::string_view msg) { spdlog::get("lua")->debug(msg); });
+    log_table.set_function("info", [](std::string_view msg) { spdlog::get("lua")->info(msg); });
+    log_table.set_function("warn", [](std::string_view msg) { spdlog::get("lua")->warn(msg); });
+    log_table.set_function("error", [](std::string_view msg) { spdlog::get("lua")->error(msg); });
+    log_table.set_function("critical", [](std::string_view msg) { spdlog::get("lua")->critical(msg); });
+
+    lua::bind_dataonly(m_lua.lua_state());
+    lua::bind_components(m_lua.lua_state());
+    lua::bind_systems(m_lua.lua_state());
+    lua::bind_utils(m_lua.lua_state());
+
+    meta::reflect_data_types();
+    meta::reflect_systems();
 
     return true;
 }
@@ -272,6 +285,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    colors[ImGuiCol_TableHeaderBg]         = ImVec4(0.39f, 0.10f, 0.35f, 0.78f);
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
