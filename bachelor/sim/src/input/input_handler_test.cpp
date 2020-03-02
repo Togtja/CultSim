@@ -8,7 +8,7 @@ TEST_CASE("attempting to get input handler")
     REQUIRE(&get_input() != nullptr);
 }
 
-TEST_CASE("attempting to create a key and use it")
+TEST_CASE("attempting to create a keybinding and use it")
 {
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
@@ -51,7 +51,7 @@ TEST_CASE("attempting to use keybinding after unbind")
     auto& input = get_input();
     int times1 = 0, times0 = 0;
     // Binding 2 key to make sure that no other key also get unbinding
-    // AKA somebody just "cleared" all
+    // AKA the code just "cleared" all
     input.fast_bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F11, Action::MoveLeft, [&times1]() { times1++; });
     input.fast_bind_key(KeyContext::DefaultContext, SDL_SCANCODE_F10, Action::ZoomIn, [&times0]() { times0++; });
     input.handle_input(f11);
@@ -381,5 +381,59 @@ TEST_CASE("attempting to go back to default context")
     CHECK(times1 == 2);
     CHECK(times2 == 2);
 
+    input.clear();
+}
+
+TEST_CASE("attempting to create blocking context")
+{
+    SDL_Event e{};
+    e.type                = SDL_KEYDOWN;
+    e.key.keysym.scancode = SDL_SCANCODE_A;
+    SDL_Event e2{};
+    e2.type                = SDL_KEYDOWN;
+    e2.key.keysym.scancode = SDL_SCANCODE_P;
+
+    auto& input = get_input();
+    int times0  = 0;
+    int times1  = 0;
+    input.fast_bind_key(KeyContext::DefaultContext, SDL_SCANCODE_P, Action::MoveLeft, [&times0]() { times0++; });
+    input.fast_bind_key(KeyContext::Agent, SDL_SCANCODE_A, Action::MoveLeft, [&times1]() { times1++; });
+    // Blocks everything "below" the stack, so Default should not trigger
+    input.add_context(KeyContext::Agent, true);
+
+    input.handle_input(e);
+    input.handle_input(e2);
+    CHECK(times0 == 0);
+    CHECK(times1 == 1);
+    input.clear();
+}
+
+TEST_CASE("attempting to bind mousebutton")
+{
+    SDL_Event e{};
+    e.type          = SDL_MOUSEBUTTONDOWN;
+    e.button.button = 1; // Left mouse click
+
+    auto& input  = get_input();
+    bool success = false;
+    input.fast_bind_btn(KeyContext::DefaultContext, Mouse::Left, Action::MoveFWD, [&success]() { success = true; });
+    input.handle_input(e);
+    CHECK(success == true);
+    input.clear();
+}
+TEST_CASE("attempting to handle live input mousebutton")
+{
+    SDL_Event e{};
+    e.type          = SDL_MOUSEBUTTONDOWN;
+    e.button.button = 1; // Left mouse click
+
+    auto& input = get_input();
+    float time  = 50;
+
+    input.bind_btn(KeyContext::DefaultContext, Mouse::Left, Action::MoveFWD);
+    input.bind_action(KeyContext::DefaultContext, Action::MoveFWD, [&time](float dt) { time += dt; });
+
+    input.handle_live_input(0.5f);
+    CHECK(time == 50.5f);
     input.clear();
 }
