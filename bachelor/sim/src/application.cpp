@@ -42,6 +42,8 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
 
+        ImGui::ShowDemoWindow();
+
         update(dt_clock.restart());
         AutoTimer::show_debug_ui();
 
@@ -283,6 +285,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
     colors[ImGuiCol_NavWindowingDimBg]     = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
     colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+    colors[ImGuiCol_TableHeaderBg]         = ImVec4(0.39f, 0.10f, 0.35f, 0.78f);
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());

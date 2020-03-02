@@ -312,17 +312,6 @@ void ScenarioScene::on_enter()
             spdlog::warn("adding system \"{}\" that is unknown", system);
         }
     }
-    /** Add required systems */
-    // m_active_systems.emplace_back(new system::Need(m_registry));
-    // m_active_systems.emplace_back(new system::Health(m_registry));
-    // m_active_systems.emplace_back(new system::Reproduction(m_registry));
-    // m_active_systems.emplace_back(new system::Mitigation(m_registry));
-    // m_active_systems.emplace_back(new system::Action(m_registry));
-    // m_active_systems.emplace_back(new system::Requirement(m_registry));
-    // m_active_systems.emplace_back(new system::Timer(m_registry));
-    // m_active_systems.emplace_back(new system::AI(m_registry));
-    // m_active_systems.emplace_back(new system::Movement(m_registry, m_dispatcher));
-    // m_active_systems.emplace_back(new system::Rendering(m_registry));
 }
 
 void ScenarioScene::on_exit()
@@ -332,11 +321,34 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
+    /** Set up Scenario Dock Space first */
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Scenario##DockingWindow",
+                 nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+    ImGui::PopStyleVar();
+
+    ImGuiID dockspace_id = ImGui::GetID("Scenario##Docking");
+    ImGui::DockSpace(dockspace_id,
+                     {0.f, 0.f},
+                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode |
+                         ImGuiDockNodeFlags_AutoHideTabBar);
+
+    /** Extract above to func ^ */
+
     ImGui::Begin("Scenario Scene");
 
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
 
+    /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
     {
         for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
@@ -345,6 +357,7 @@ bool ScenarioScene::update(float dt)
         }
     }
 
+    /** Update systems */
     for (auto&& system : m_active_systems)
     {
         system.type().func("update"_hs).invoke(system, dt);
@@ -355,8 +368,9 @@ bool ScenarioScene::update(float dt)
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);
     m_dispatcher.update();
-
     m_scenario.update(dt);
+
+    ImGui::End();
     return false;
 }
 
