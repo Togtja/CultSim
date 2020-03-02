@@ -18,6 +18,7 @@
 
 /** Header font for ImGui purposes */
 ImFont* g_header_font = nullptr;
+ImFont* g_light_font  = nullptr;
 
 namespace cs
 {
@@ -226,17 +227,21 @@ bool Application::init_imgui()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     /** Load custom UI Font */
-    auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto font_file       = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto light_font_file = fs::read_byte_file("fonts/CenturyGothicRegular400.ttf");
 
     /** Malloc because ImGui uses it under the hood, and will take ownership */
     auto font_memory   = malloc(font_file.size());
     auto font_memory_2 = malloc(font_file.size());
+    auto font_memory_3 = malloc(light_font_file.size());
     memcpy(font_memory, font_file.data(), font_file.size());
     memcpy(font_memory_2, font_file.data(), font_file.size());
+    memcpy(font_memory_3, light_font_file.data(), light_font_file.size());
 
     /** Give font ot ImGui (do not free above memory! ImGui does it) */
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
     g_header_font = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_2), 20, 20);
+    g_light_font  = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_3), 16, 16);
     io.Fonts->Build();
 
     /** Set up Style colors */

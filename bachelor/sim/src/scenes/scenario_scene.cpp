@@ -29,6 +29,7 @@
 #include "spdlog/spdlog.h"
 
 extern ImFont* g_header_font;
+extern ImFont* g_light_font;
 
 namespace cs
 {
@@ -429,12 +430,27 @@ void ScenarioScene::setup_docking_ui()
 
 void ScenarioScene::draw_scenario_information_ui()
 {
+    /** Title and description */
     ImGui::PushFont(g_header_font);
     ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
     ImGui::PopFont();
     ImGui::Indent();
     ImGui::TextWrapped("%s", m_scenario.description.c_str());
     ImGui::Unindent();
+    ImGui::Separator();
+
+    /** Stat Bar */
+    ImGui::PushFont(g_light_font);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, {1.f, 1.f, 1.f, 1.f});
+    ImGui::Spacing();
+    ImGui::TextColored({0.0, 0.749, 1., 1.}, "FPS: %5.1f", ImGui::GetIO().Framerate);
+    ImGui::SameLine();
+    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.size<component::AI>()));
+    ImGui::PopStyleColor();
+    ImGui::PopFont();
+    ImGui::Separator();
+
+    /** Entity count graph */
 }
 
 } // namespace cs
