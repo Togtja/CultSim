@@ -559,8 +559,6 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::PushFont(g_header_font);
         ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->hp);
-        ImGui::SameLine();
-        ImGui::TextColored({0.941f, 0.902, 0.549, 1.f}, "(-%3.1f)", health->tickdown_rate);
         ImGui::PopFont();
     }
 
