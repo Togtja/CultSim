@@ -47,6 +47,9 @@ private:
 
     float m_next_data_sample = 0.f;
 
+    /** Current time scale of simulation */
+    float m_timescale = 1.f;
+
 public:
     explicit ScenarioScene(std::string_view scenario);
     explicit ScenarioScene(lua::Scenario scenario);
@@ -63,5 +66,7 @@ private:
     void setup_docking_ui();
 
     void draw_scenario_information_ui();
+
+    void draw_time_control_ui();
 };
 } // namespace cs
