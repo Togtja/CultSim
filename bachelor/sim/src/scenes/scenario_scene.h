@@ -1,17 +1,17 @@
 #pragma once
 
-#include "random_engine.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "random_engine.h"
 #include "scene.h"
 
 #include <string_view>
 #include <vector>
 
 #include <entt/entity/registry.hpp>
+#include <entt/meta/factory.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include <entt/meta/factory.hpp>
 
 namespace cs
 {
@@ -53,5 +53,10 @@ public:
     bool update(float dt) override;
 
     bool draw() override;
+
+private:
+    void setup_docking_ui();
+
+    void draw_scenario_information_ui();
 };
 } // namespace cs

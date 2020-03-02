@@ -28,6 +28,8 @@
 #include "gfx/ImGUI/imgui.h"
 #include "spdlog/spdlog.h"
 
+extern ImFont* g_header_font;
+
 namespace cs
 {
 ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
@@ -321,29 +323,9 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    /** Set up Scenario Dock Space first */
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize(viewport->Size);
-    ImGui::SetNextWindowViewport(viewport->ID);
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Scenario##DockingWindow",
-                 nullptr,
-                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
-    ImGui::PopStyleVar();
-
-    ImGuiID dockspace_id = ImGui::GetID("Scenario##Docking");
-    ImGui::DockSpace(dockspace_id,
-                     {0.f, 0.f},
-                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode |
-                         ImGuiDockNodeFlags_AutoHideTabBar);
-
-    /** Extract above to func ^ */
-
-    ImGui::Begin("Scenario Scene");
+    setup_docking_ui();
+    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
+    draw_scenario_information_ui();
 
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
@@ -419,6 +401,40 @@ bool ScenarioScene::draw()
 
     m_scenario.draw();
     return false;
+}
+
+void ScenarioScene::setup_docking_ui()
+{
+    /** Set up Scenario Dock Space first */
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Scenario##DockingWindow",
+                 nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+    ImGui::PopStyleVar();
+
+    /** Create docking space inside of docking window */
+    ImGuiID dockspace_id = ImGui::GetID("Scenario##Docking");
+    ImGui::DockSpace(dockspace_id,
+                     {0.f, 0.f},
+                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode |
+                         ImGuiDockNodeFlags_AutoHideTabBar);
+}
+
+void ScenarioScene::draw_scenario_information_ui()
+{
+    ImGui::PushFont(g_header_font);
+    ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
+    ImGui::PopFont();
+    ImGui::Indent();
+    ImGui::TextWrapped("%s", m_scenario.description.c_str());
+    ImGui::Unindent();
 }
 
 } // namespace cs
