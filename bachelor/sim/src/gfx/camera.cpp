@@ -23,6 +23,17 @@ glm::mat4 Camera::get_view_matrix() const
                       m_pos.z * 360.f + m_pos.y);
 }
 
+void Camera::set_position_2d(glm::vec2 position)
+{
+    m_pos.x = position.x;
+    m_pos.y = position.y;
+}
+
+void Camera::set_position(glm::vec3 position)
+{
+    m_pos = position;
+}
+
 void Camera::move(glm::vec3 delta)
 {
     m_pos += delta;

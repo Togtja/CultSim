@@ -16,6 +16,10 @@
 #include "gfx/ImGUI/imgui_impl_opengl3.h"
 #include "gfx/ImGUI/imgui_impl_sdl.h"
 
+/** Header font for ImGui purposes */
+ImFont* g_header_font = nullptr;
+ImFont* g_light_font  = nullptr;
+
 namespace cs
 {
 void Application::run(const std::vector<char*>& args)
@@ -223,14 +227,22 @@ bool Application::init_imgui()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     /** Load custom UI Font */
-    auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto font_file       = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto light_font_file = fs::read_byte_file("fonts/CenturyGothicRegular400.ttf");
 
     /** Malloc because ImGui uses it under the hood, and will take ownership */
-    auto font_memory = malloc(font_file.size());
+    auto font_memory   = malloc(font_file.size());
+    auto font_memory_2 = malloc(font_file.size());
+    auto font_memory_3 = malloc(light_font_file.size());
     memcpy(font_memory, font_file.data(), font_file.size());
+    memcpy(font_memory_2, font_file.data(), font_file.size());
+    memcpy(font_memory_3, light_font_file.data(), light_font_file.size());
 
     /** Give font ot ImGui (do not free above memory! ImGui does it) */
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
+    g_header_font = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_2), 20, 20);
+    g_light_font  = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_3), 16, 16);
+    io.Fonts->Build();
 
     /** Set up Style colors */
     ImGui::GetStyle().WindowRounding       = 0.f;
@@ -273,7 +285,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_TabActive]             = ImVec4(0.92f, 0.59f, 0.00f, 1.00f);
     colors[ImGuiCol_TabUnfocused]          = ImVec4(0.11f, 0.06f, 0.07f, 0.97f);
     colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.42f, 0.14f, 0.29f, 1.00f);
-    colors[ImGuiCol_PlotLines]             = ImVec4(0.87f, 0.87f, 0.87f, 1.00f);
+    colors[ImGuiCol_PlotLines]             = ImVec4(0.19f, 0.86f, 0.51f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]      = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     colors[ImGuiCol_PlotHistogram]         = ImVec4(0.90f, 0.51f, 0.00f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);

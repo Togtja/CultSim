@@ -26,7 +26,7 @@ void Action::update(float dt)
                 if (!strategy.actions.empty())
                 {
                     auto& action = strategy.actions.back();
-                    if (action.requirements != 0)
+                    if (action.requirements != TAG_None)
                     {
                         if (action.requirements & TAG_Tag)
                         {
