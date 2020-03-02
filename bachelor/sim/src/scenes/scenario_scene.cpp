@@ -1,5 +1,4 @@
 #include "scenario_scene.h"
-#include "common_helpers.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
@@ -21,16 +20,13 @@
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
 
-#include <algorithm>
+#include <common_helpers.h>
 #include <functional>
 #include <memory>
 #include <random>
 
 #include "gfx/ImGUI/imgui.h"
 #include "spdlog/spdlog.h"
-
-extern ImFont* g_header_font;
-extern ImFont* g_light_font;
 
 namespace cs
 {
@@ -325,12 +321,29 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    m_simtime += dt;
-    m_next_data_sample += dt;
+    /** Set up Scenario Dock Space first */
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->Pos);
+    ImGui::SetNextWindowSize(viewport->Size);
+    ImGui::SetNextWindowViewport(viewport->ID);
 
-    setup_docking_ui();
-    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
-    draw_scenario_information_ui();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Scenario##DockingWindow",
+                 nullptr,
+                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking);
+    ImGui::PopStyleVar();
+
+    ImGuiID dockspace_id = ImGui::GetID("Scenario##Docking");
+    ImGui::DockSpace(dockspace_id,
+                     {0.f, 0.f},
+                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode |
+                         ImGuiDockNodeFlags_AutoHideTabBar);
+
+    /** Extract above to func ^ */
+
+    ImGui::Begin("Scenario Scene");
 
     static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
@@ -406,66 +419,6 @@ bool ScenarioScene::draw()
 
     m_scenario.draw();
     return false;
-}
-
-void ScenarioScene::setup_docking_ui()
-{
-    /** Set up Scenario Dock Space first */
-    ImGuiViewport* viewport = ImGui::GetMainViewport();
-    ImGui::SetNextWindowPos(viewport->Pos);
-    ImGui::SetNextWindowSize(viewport->Size);
-    ImGui::SetNextWindowViewport(viewport->ID);
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Scenario##DockingWindow",
-                 nullptr,
-                 ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground |
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                     ImGuiWindowFlags_NoNavFocus | ImGuiWindowFlags_NoDocking);
-    ImGui::PopStyleVar();
-
-    /** Create docking space inside of docking window */
-    ImGuiID dockspace_id = ImGui::GetID("Scenario##Docking");
-    ImGui::DockSpace(dockspace_id,
-                     {0.f, 0.f},
-                     ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingInCentralNode |
-                         ImGuiDockNodeFlags_AutoHideTabBar);
-}
-
-void ScenarioScene::draw_scenario_information_ui()
-{
-    // TODO : Get rid of after prototype
-    static std::vector<float> living_entities{};
-
-    /** Title and description */
-    ImGui::PushFont(g_header_font);
-    ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
-    ImGui::PopFont();
-    ImGui::Indent();
-    ImGui::TextWrapped("%s", m_scenario.description.c_str());
-    ImGui::Unindent();
-    ImGui::Separator();
-
-    /** Stat Bar */
-    ImGui::PushFont(g_light_font);
-    ImGui::Spacing();
-    ImGui::TextColored({0.0, 0.749, 1., 1.}, "FPS: %5.1f", ImGui::GetIO().Framerate);
-    ImGui::SameLine();
-    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
-    ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f", m_simtime);
-    ImGui::Spacing();
-    ImGui::PopFont();
-    ImGui::Separator();
-
-    /** Entity count graph */
-    if (m_next_data_sample > m_scenario.sampling_rate)
-    {
-        m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Needs>());
-    }
-
-    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
 }
 
 } // namespace cs
