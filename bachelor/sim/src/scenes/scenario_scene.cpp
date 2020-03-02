@@ -85,8 +85,8 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(26.f, 76.f), 1.f, 0.5f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(48.f, 86.f), 1.5f, 1.f, TAG_Drink};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(60.f, 76.f), 1.f, 0.5f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(60.f, 86.f), 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 96.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
@@ -137,7 +137,7 @@ void ScenarioScene::on_enter()
                                 }};
 
     action::Action action_sleep{static_cast<std::string>("sleep"),
-                                {},
+                                TAG_None,
                                 1.f,
                                 0.f,
                                 {},
@@ -341,6 +341,12 @@ void ScenarioScene::on_enter()
         {
             spdlog::warn("adding system \"{}\" that is unknown", system);
         }
+    }
+
+    /** Update systems */
+    for (auto&& system : m_active_systems)
+    {
+        system.type().func("update"_hs).invoke(system, 20.f);
     }
 }
 
@@ -547,7 +553,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health] = m_registry.try_get<component::Needs, component::Health>(selection_info.selected_entity);
+    const auto& [needs, health, strategy] =
+        m_registry.try_get<component::Needs, component::Health, component::Strategies>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_Once);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_Once);
@@ -560,6 +567,14 @@ void ScenarioScene::draw_selected_entity_information_ui()
         ImGui::PushFont(g_header_font);
         ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->hp);
         ImGui::PopFont();
+    }
+
+    if (strategy)
+    {
+        if (!strategy->staged_strategies.empty())
+        {
+            ImGui::Text("Currently: %s", strategy->staged_strategies.front().name.c_str());
+        }
     }
 
     if (needs)
