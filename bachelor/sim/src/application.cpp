@@ -285,7 +285,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_TabActive]             = ImVec4(0.92f, 0.59f, 0.00f, 1.00f);
     colors[ImGuiCol_TabUnfocused]          = ImVec4(0.11f, 0.06f, 0.07f, 0.97f);
     colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.42f, 0.14f, 0.29f, 1.00f);
-    colors[ImGuiCol_PlotLines]             = ImVec4(0.87f, 0.87f, 0.87f, 1.00f);
+    colors[ImGuiCol_PlotLines]             = ImVec4(0.19f, 0.86f, 0.51f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]      = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     colors[ImGuiCol_PlotHistogram]         = ImVec4(0.90f, 0.51f, 0.00f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);

@@ -361,6 +361,7 @@ bool ScenarioScene::update(float dt)
     m_scenario.update(dt);
 
     ImGui::End();
+
     return false;
 }
 
@@ -456,7 +457,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f", m_simtime);
+    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%2.1fx)", m_simtime, m_timescale);
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -468,7 +469,16 @@ void ScenarioScene::draw_scenario_information_ui()
         living_entities.push_back(m_registry.size<component::Needs>());
     }
 
-    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
+    /** Plot number of living entities */
+    int offset = living_entities.size() > 100 ? living_entities.size() - 100u : 0;
+    ImGui::PlotLines("##Alive",
+                     living_entities.data(),
+                     living_entities.size(),
+                     offset,
+                     "Living Agents",
+                     FLT_MAX,
+                     FLT_MAX,
+                     {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
