@@ -21,7 +21,6 @@ void Requirement::update(float dt)
                               component::Position pos) {
         if (close_enough(pos.position, locationreqs.desired_position, 5.f))
         {
-            spdlog::warn("We have arrived, entity: {}", static_cast<uint32_t>(e));
             registry.remove<component::LocationRequirement>(e);
         }
         else if (mov.desired_position.empty())

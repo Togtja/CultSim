@@ -47,10 +47,10 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, TAG_Drink};
-    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, ETag(TAG_Reproduce | TAG_Human)};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 100.f, 0.5f, 0.1f, TAG_Sleep};
+    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 1.f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -58,13 +58,11 @@ void ScenarioScene::on_enter()
                               0.f,
                               {},
                               [](entt::entity e, entt::entity n, entt::registry& r) {
-                                  spdlog::warn("We finished action: eat on entity: {}", e);
                                   r.destroy(n);
                                   for (auto& need : r.get<component::Needs>(e).needs)
                                   {
                                       if (need.tags & TAG_Food)
                                       {
-                                          spdlog::warn("Current status of need FOOD: {}", need.status);
                                           need.status += 80.f;
                                       }
                                   }
@@ -83,13 +81,11 @@ void ScenarioScene::on_enter()
                                 0.f,
                                 {},
                                 [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("We finished action: drink on entity: {}", e);
                                     r.destroy(n);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
                                         if (need.tags & TAG_Drink)
                                         {
-                                            spdlog::warn("Current status of need DRINK: {}", need.status);
                                             need.status += 80.f;
                                         }
                                     }
@@ -108,12 +104,10 @@ void ScenarioScene::on_enter()
                                 0.f,
                                 {},
                                 [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("We finished action: sleep on entity: {}", e);
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
                                         if (need.tags & TAG_Sleep)
                                         {
-                                            spdlog::warn("Current status of need SLEEP: {}", need.status);
                                             need.status += 10.f;
                                         }
                                     }
@@ -130,18 +124,15 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
-            spdlog::warn("We finished action: reproduce on entity{} with entity{}", e, n);
 
             if (r.has<component::Reproduction>(e))
             {
-                spdlog::warn("We have a reproduction component");
                 auto& repr = r.get<component::Reproduction>(e);
                 repr.number_of_children++;
             }
 
             if (r.has<component::Reproduction>(n))
             {
-                spdlog::warn("Target has Reproduction component");
                 auto& target_repr = r.get<component::Reproduction>(n);
             }
 
@@ -151,7 +142,6 @@ void ScenarioScene::on_enter()
                 auto target_repr = r.get<component::Reproduction>(n);
                 if (repr.sex == component::Reproduction::Female && target_repr.sex == component::Reproduction::Male)
                 {
-                    spdlog::warn("We are making a baby");
                     auto child         = r.create(e, r);
                     auto& child_needs  = r.get<component::Needs>(child);
                     auto& child_reprd  = r.get<component::Reproduction>(child);
@@ -161,11 +151,11 @@ void ScenarioScene::on_enter()
                     {
                         need.status = 100.f;
                     }
+                    RandomEngine rng{};
                     child_reprd.number_of_children = 0;
                     child_health.hp                = 100.f;
-                    child_pos.position             = r.get<component::Position>(e).position + glm::vec3(10.f, 10.f, 0.f);
-                    spdlog::warn("Child entity: {}", child);
-                    RandomEngine rng{};
+                    child_pos.position             = r.get<component::Position>(e).position + glm::vec3(rng.uniform(-10.f,10.f),rng.uniform(-10.f, 10.f), 0.f);
+
                     if (rng.trigger(0.5f))
                     {
                         child_reprd.sex = component::Reproduction::Male;
@@ -180,7 +170,6 @@ void ScenarioScene::on_enter()
             {
                 if ((need.tags & TAG_Reproduce) && need.status < 50.f)
                 {
-                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
                 }
             }
@@ -189,7 +178,6 @@ void ScenarioScene::on_enter()
             {
                 if ((need.tags & TAG_Reproduce) && need.status < 50.f)
                 {
-                    spdlog::warn("Current status of need REPRODUCE: {}", need.status);
                     need.status += 100.f;
                 }
             }
@@ -226,7 +214,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= m_scenario.agent_count; i++)
+    for (int i = 1; i <= 100; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -249,7 +237,7 @@ void ScenarioScene::on_enter()
         {
             gender = cs::component::Reproduction::Female;
         }
-        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(2));
+        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(5));
         m_registry.assign<component::Strategies>(
             agent,
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
@@ -257,17 +245,18 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
-    for (int j = 0; j < 100; j++)
+    for (int j = 0; j < 75; j++)
     {
         auto trees = m_registry.create();
         m_registry.assign<component::Position>(trees,
-                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
-                                                         m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y),
+                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x+m_scenario.bounds.x/20.f, m_scenario.bounds.x-m_scenario.bounds.x/20.f),
+                                                         m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
+                                                                       m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
                                                          0.f));
         m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
         m_registry.assign<component::Tags>(trees, TAG_Avoidable);
         m_registry
-            .assign<component::Timer>(trees, m_rng.uniform(25.f, 100.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
+            .assign<component::Timer>(trees, m_rng.uniform(50.f, 140.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
                 auto food = r.create();
                 auto pos  = r.get<component::Position>(e).position;
                 static RandomEngine rng;
@@ -278,17 +267,19 @@ void ScenarioScene::on_enter()
             });
     }
 
-    for (int k = 0; k < 100; k++)
+    for (int k = 0; k < 75; k++)
     {
         auto ponds = m_registry.create();
         m_registry.assign<component::Position>(ponds,
-                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
-                                                         m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y),
+                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x + m_scenario.bounds.x / 20.f,
+                                                                       m_scenario.bounds.x - m_scenario.bounds.x / 20.f),
+                                                         m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
+                                                                       m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
                                                          0.f));
         m_registry.assign<component::Sprite>(ponds, t_tex, glm::vec3(0.1f, 0.2f, 0.6f));
         m_registry.assign<component::Tags>(ponds, TAG_Avoidable);
         m_registry
-            .assign<component::Timer>(ponds, m_rng.uniform(15.f, 50.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r) {
+            .assign<component::Timer>(ponds, m_rng.uniform(25.f, 120.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r) {
                 auto drink = r.create();
                 auto pos   = r.get<component::Position>(e).position;
                 static RandomEngine rng;
@@ -311,6 +302,12 @@ void ScenarioScene::on_enter()
         {
             spdlog::warn("adding system \"{}\" that is unknown", system);
         }
+    }
+
+    /** Make systems start up after "Warming up"*/
+    for (auto&& system : m_active_systems)
+    {
+        system.type().func("update"_hs).invoke(system, 30.f);
     }
 }
 

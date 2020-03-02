@@ -42,8 +42,6 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow();
-
         update(dt_clock.restart());
         AutoTimer::show_debug_ui();
 
