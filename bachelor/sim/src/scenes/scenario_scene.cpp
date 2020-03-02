@@ -54,23 +54,25 @@ void ScenarioScene::on_enter()
     input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
 
-        if (select_helper.selected_entity != entt::null)
+        if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
         }
 
         select_helper.selected_entity = select_helper.hovered_entity;
 
-        if (select_helper.selected_entity != entt::null)
+        if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
         }
     });
 
     /** Move to selected entity */
     input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_F, input::Action::FollowEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
-        if (select_helper.selected_entity == entt::null)
+        if (!m_registry.valid(select_helper.selected_entity))
         {
             return;
         }
@@ -83,10 +85,10 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(26.f, 76.f), 1.f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(48.f, 86.f), 1.5f, TAG_Drink};
-    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 96.f, 0.5f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, ETag(TAG_Reproduce | TAG_Human)};
+    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(26.f, 76.f), 1.f, 0.5f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(48.f, 86.f), 1.5f, 1.f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 96.f, 0.5f, 0.1f, TAG_Sleep};
+    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
     action::Action action_eat{static_cast<std::string>("eat"),
                               TAG_Find,
@@ -160,7 +162,6 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
-
             if (r.has<component::Reproduction>(e))
             {
                 auto& repr = r.get<component::Reproduction>(e);
@@ -190,7 +191,8 @@ void ScenarioScene::on_enter()
                     RandomEngine rng{};
                     child_reprd.number_of_children = 0;
                     child_health.hp                = 100.f;
-                    child_pos.position             = r.get<component::Position>(e).position + glm::vec3(rng.uniform(-10.f,10.f),rng.uniform(-10.f, 10.f), 0.f);
+                    child_pos.position             = r.get<component::Position>(e).position +
+                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
 
                     if (rng.trigger(0.5f))
                     {
@@ -285,7 +287,8 @@ void ScenarioScene::on_enter()
     {
         auto trees = m_registry.create();
         m_registry.assign<component::Position>(trees,
-                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x+m_scenario.bounds.x/20.f, m_scenario.bounds.x-m_scenario.bounds.x/20.f),
+                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x + m_scenario.bounds.x / 20.f,
+                                                                       m_scenario.bounds.x - m_scenario.bounds.x / 20.f),
                                                          m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
                                                                        m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
                                                          0.f));
@@ -338,12 +341,6 @@ void ScenarioScene::on_enter()
         {
             spdlog::warn("adding system \"{}\" that is unknown", system);
         }
-    }
-
-    /** Make systems start up after "Warming up"*/
-    for (auto&& system : m_active_systems)
-    {
-        system.type().func("update"_hs).invoke(system, 30.f);
     }
 }
 
@@ -549,24 +546,30 @@ void ScenarioScene::update_entity_hover()
 {
     auto&& selection_helper = m_registry.ctx<EntitySelectionHelper>();
     auto cursor_pos         = input::get_input().get_mouse_pos();
-    auto world_pos          = gfx::get_renderer().screen_to_world_pos(cursor_pos);
+    auto world_pos          = gfx::get_renderer().screen_to_world_pos({cursor_pos.x, 1080.f - cursor_pos.y});
 
-    if (selection_helper.hovered_entity != entt::null)
+    auto hover_view = m_registry.view<component::Position, component::Sprite>();
+    if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.remove<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
+        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 0;
     }
 
-    m_registry.view<component::Position>().each([&selection_helper, world_pos](entt::entity e, const component::Position& pos) {
-        if (glm::distance(world_pos, pos.position) < 10.f)
+    /** Reset hover status */
+    selection_helper.hovered_entity = entt::null;
+    for (auto e : hover_view)
+    {
+        if (glm::distance(world_pos, hover_view.get<component::Position>(e).position) < 10.f)
         {
             selection_helper.hovered_entity = e;
-            return;
+            break;
         }
-    });
+    };
 
-    if (selection_helper.hovered_entity != entt::null)
+    if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
+        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 1;
     }
 
     ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
