@@ -45,8 +45,6 @@ private:
     /** Time sim has been running */
     float m_simtime = 0.f;
 
-    float m_data_sampling_rate = 1.f;
-
     float m_next_data_sample = 0.f;
 
 public:

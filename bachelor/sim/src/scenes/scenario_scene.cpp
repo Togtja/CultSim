@@ -459,7 +459,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Separator();
 
     /** Entity count graph */
-    if (m_next_data_sample > m_data_sampling_rate)
+    if (m_next_data_sample > m_scenario.sampling_rate)
     {
         m_next_data_sample = 0.f;
         living_entities.push_back(m_registry.size<component::Needs>());

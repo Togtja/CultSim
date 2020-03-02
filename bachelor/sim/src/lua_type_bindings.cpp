@@ -74,6 +74,8 @@ void bind_systems(sol::state_view lua)
                                &Scenario::systems,
                                "bounds",
                                &Scenario::bounds,
+                               "sampling_rate",
+                               &Scenario::sampling_rate,
                                "init",
                                &Scenario::init,
                                "update",
