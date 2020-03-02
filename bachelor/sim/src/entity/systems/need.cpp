@@ -15,7 +15,11 @@ void Need::update(float dt)
         {
             // Ensure statuses cannot go below 0% or above 100%
             need.status = std::clamp(need.status - (need.decay_rate * dt), 0.f, 100.f);
-            auto found  = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), need);
+            if (need.status <= 50.f)
+            {
+                spdlog::warn("Need: {}, status: {}", need.name, need.status);
+            }
+            auto found = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), need);
             // If the need does not exist in pressing needs
             if (found != needs.pressing_needs.end())
             {
