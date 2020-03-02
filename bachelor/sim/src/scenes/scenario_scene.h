@@ -1,17 +1,16 @@
 #pragma once
-
-#include "random_engine.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "random_engine.h"
 #include "scene.h"
 
 #include <string_view>
 #include <vector>
 
 #include <entt/entity/registry.hpp>
+#include <entt/meta/factory.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
-#include <entt/meta/factory.hpp>
 
 namespace cs
 {
@@ -42,6 +41,14 @@ private:
     /** The scenario we are running */
     lua::Scenario m_scenario;
 
+    /** Time sim has been running */
+    float m_simtime = 0.f;
+
+    float m_next_data_sample = 0.f;
+
+    /** Current time scale of simulation */
+    float m_timescale = 1.f;
+
 public:
     explicit ScenarioScene(std::string_view scenario);
     explicit ScenarioScene(lua::Scenario scenario);
@@ -53,5 +60,16 @@ public:
     bool update(float dt) override;
 
     bool draw() override;
+
+private:
+    void setup_docking_ui();
+
+    void draw_scenario_information_ui();
+
+    void draw_time_control_ui();
+
+    void draw_selected_entity_information_ui();
+
+    void update_entity_hover();
 };
 } // namespace cs

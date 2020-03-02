@@ -15,6 +15,8 @@ private:
 public:
     DeltaClock();
 
+    using TimeUnit = std::chrono::duration<float>;
+
     /**
      * Return the time since last restart
      *

@@ -5,6 +5,7 @@ namespace cs
 {
 enum ETag : uint64_t
 {
+    TAG_None      = 0,
     TAG_Food      = 1 << 1,
     TAG_Drink     = 1 << 2,
     TAG_Sleep     = 1 << 3,

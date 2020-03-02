@@ -4,8 +4,8 @@
 #include <string_view>
 #include <vector>
 
-#include <sol/sol.hpp>
 #include <glm/vec2.hpp>
+#include <sol/sol.hpp>
 
 namespace cs::lua
 {
@@ -22,6 +22,9 @@ struct Scenario
 
     /** Initially active systems */
     std::vector<std::string> systems{};
+
+    /** How often this scenario should sample data */
+    float sampling_rate = 1.f;
 
     /** Called on startup */
     sol::function init;
