@@ -272,7 +272,7 @@ void ContextHandler::unbind_btn(const KeyContext context, const Mouse button)
 
 void ContextHandler::handle_input(const SDL_Event& event)
 {
-    bool break_event = false;
+    bool block = false;
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         // Handled the input
@@ -280,12 +280,12 @@ void ContextHandler::handle_input(const SDL_Event& event)
         {
             if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
             {
-                break_event = true;
+                block = true;
             }
         }
         if (event.type == SDL_MOUSEBUTTONDOWN)
         {
-            // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
+            // Subtract 1 to translate from SDL Mouse Index to our Mouse enum
             auto click = static_cast<Mouse>(event.button.button - 1);
             // Update last mouse positions
             last_click = {event.button.x, event.button.y};
@@ -299,7 +299,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (m_input_map.at(*it).handle_input(click))
             {
-                break_event = true;
+                block = true;
             }
         }
         if (event.type == SDL_MOUSEWHEEL)
@@ -315,28 +315,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             {
                 if (m_input_map.at(*it).handle_input(Mouse::WheelRight))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (x < 0)
             {
                 if (m_input_map.at(*it).handle_input(Mouse::WheelLeft))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (y > 0)
             {
                 if (m_input_map.at(*it).handle_input(Mouse::WheelUp))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (y < 0)
             {
                 if (m_input_map.at(*it).handle_input(Mouse::WheelDown))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
         }
@@ -345,10 +345,10 @@ void ContextHandler::handle_input(const SDL_Event& event)
             last_move = {event.motion.x, event.motion.y};
             if (m_input_map.at(*it).handle_input(Mouse::Move))
             {
-                break_event = true;
+                block = true;
             }
         }
-        if (break_event)
+        if (block)
         {
             return;
         }
