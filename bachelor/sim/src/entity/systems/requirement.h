@@ -17,9 +17,6 @@ namespace cs::system
 */
 class Requirement : public ISystem
 {
-private:
-    RandomEngine m_rng{};
-
 public:
     using ISystem::ISystem;
 

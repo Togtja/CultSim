@@ -27,7 +27,9 @@ void main()
 
     const float angle = bitfieldExtract(a_texture, 16, 8) / 127.5f * 3.14f + 3.14f;
     const float scale = bitfieldExtract(a_texture, 24, 8);
-    const mat2 rotation = mat2(vec2(cos(angle), sin(angle)), vec2(-sin(angle), cos(angle)));
+    const mat2 model_mat = mat2(vec2(cos(angle), sin(angle)), vec2(-sin(angle), cos(angle)));
 
-    gl_Position = u_projection * (vec4(rotation * a_position.xy, a_position.z, 1.f) * scale + vec4(a_offset, 0.f));
+    const vec3 scaled_pos = a_position * scale;
+
+    gl_Position = u_projection * (vec4(model_mat * scaled_pos.xy, scaled_pos.z, 1.f) + vec4(a_offset, 0.f));
 }

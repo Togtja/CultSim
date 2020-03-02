@@ -36,5 +36,9 @@ public:
     void draw_circle(glm::vec2 pos, float radius, glm::vec3 color);
 
     void display();
+
+    void init();
+
+    void deinit();
 };
-} // namespace cs
+} // namespace cs::gfx

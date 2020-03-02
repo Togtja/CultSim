@@ -17,7 +17,6 @@ namespace cs::system
 */
 class Mitigation : public ISystem
 {
-private:
 public:
     using ISystem::ISystem;
 

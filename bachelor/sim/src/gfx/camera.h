@@ -61,4 +61,4 @@ public:
      */
     void set_boundaries(glm::vec2 bounds);
 };
-} // namespace cs
+} // namespace cs::gfx

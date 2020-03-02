@@ -13,7 +13,9 @@ void Mitigation::update(float dt)
 {
     CS_AUTOTIMER(Mitigation System);
 
-    auto view = m_registry.view<component::Needs, component::Strategies, component::Tags>();
+    auto& registry = *m_context.registry;
+
+    auto view = registry.view<component::Needs, component::Strategies, component::Tags>();
     view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
         if (!needs.pressing_needs.empty())
         {
@@ -42,6 +44,7 @@ void Mitigation::update(float dt)
         }
     });
 }
+
 bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
 {
     ai::Strategy temp{};
@@ -68,7 +71,7 @@ bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Nee
 
     // TODO: Add checks for agents personality and personal history to further increase / decrease strategy desirability
 
-    if (strategies.staged_strategies.size() != 0)
+    if (!strategies.staged_strategies.empty())
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end(), std::greater<ai::Strategy>());
         return true;

@@ -35,8 +35,9 @@ int main(int argc, char* argv[])
     spdlog::set_level(spdlog::level::info);
 #endif
 
+    auto lua_logger     = spdlog::stdout_color_st("lua");
     auto default_logger = spdlog::stdout_color_st("default");
-    default_logger->set_pattern("[%D | %H:%M:%S.%e] [%^%n %l%$] - %v");
+    spdlog::set_pattern("[%D | %H:%M:%S.%e] [%^%n %l%$] - %v");
     spdlog::set_default_logger(default_logger);
 
     /** Run the program */

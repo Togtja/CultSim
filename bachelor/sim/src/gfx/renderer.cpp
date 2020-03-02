@@ -39,7 +39,7 @@ void Renderer::set_camera_bounds(glm::vec2 bounds)
 
 Renderer::Renderer() : m_debug_renderer(m_camera), m_sprite_renderer(m_camera)
 {
-    m_camera.init({0.f, 0.f, 0.f});
+    m_camera.init({0.f, 0.f, 1.f});
 }
 
 Renderer& get_renderer()
@@ -48,4 +48,4 @@ Renderer& get_renderer()
     return r;
 }
 
-} // namespace cs
+} // namespace cs::gfx

@@ -28,18 +28,19 @@ void AI::update(float dt)
 {
     CS_AUTOTIMER(AI System);
 
-    collision_grid.clear();
+    m_collision_grid.clear();
+    auto& registry = *m_context.registry;
 
     /** Construct collision grid */
-    m_registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
+    registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
         auto min = ai::world_to_grid(pos.position);
-        collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
+        m_collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
     });
 
-    m_registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
-    auto vis_view = m_registry.group<component::Vision, component::Position>();
+    registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
+    auto vis_view = registry.group<component::Vision, component::Position>();
 
-    std::for_each(std::execution::par_unseq, vis_view.begin(), vis_view.end(), [this, &vis_view](entt::entity e) {
+    std::for_each(std::execution::par_unseq, vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
@@ -49,14 +50,14 @@ void AI::update(float dt)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                if (collision_grid.find(x * SIM_GRID_SIZE + y) == collision_grid.end())
+                if (m_collision_grid.find(x * SIM_GRID_SIZE + y) == m_collision_grid.end())
                 {
                     continue;
                 }
 
-                for (auto e2 : collision_grid[x * SIM_GRID_SIZE + y])
+                for (auto e2 : m_collision_grid[x * SIM_GRID_SIZE + y])
                 {
-                    auto& pos2 = m_registry.get<component::Position>(e2);
+                    auto& pos2 = registry.get<component::Position>(e2);
                     if (e == e2)
                     {
                         continue;

@@ -9,7 +9,7 @@ void Need::update(float dt)
 {
     CS_AUTOTIMER(Need System);
 
-    auto view = m_registry.view<component::Needs>();
+    auto view = m_context.registry->view<component::Needs>();
     view.each([dt](component::Needs& needs) {
         for (auto& need : needs.needs)
         {

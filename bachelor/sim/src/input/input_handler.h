@@ -26,10 +26,10 @@ enum class KeyContext
  */
 enum class Action
 {
-    MoveFWD,
+    MoveUp,
     MoveLeft,
     MoveRight,
-    MoveBack,
+    MoveDown,
     ZoomIn,
     ZoomOut,
     Pause,

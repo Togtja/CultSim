@@ -7,11 +7,8 @@ namespace cs::system
 {
 class Movement : public ISystem
 {
-private:
-    entt::dispatcher& m_dispatcher;
-
 public:
-    Movement(entt::registry& registry, entt::dispatcher& dispatcher);
+    using ISystem::ISystem;
 
     void update(float dt) override;
 };
