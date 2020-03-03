@@ -163,7 +163,7 @@ void ScenarioScene::on_enter()
         5.f,
         0.f,
         {},
-        [](entt::entity e, entt::entity n, entt::registry& r) {
+        [this](entt::entity e, entt::entity n, entt::registry& r) {
             if (r.has<component::Reproduction>(e))
             {
                 auto& repr = r.get<component::Reproduction>(e);
@@ -190,13 +190,12 @@ void ScenarioScene::on_enter()
                     {
                         need.status = 100.f;
                     }
-                    RandomEngine rng{};
                     child_reprd.number_of_children = 0;
                     child_health.hp                = 100.f;
                     child_pos.position             = r.get<component::Position>(e).position +
-                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
+                                         glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
 
-                    if (rng.trigger(0.5f))
+                    if (m_rng.trigger(0.5f))
                     {
                         child_reprd.sex = component::Reproduction::Male;
                     }
