@@ -54,18 +54,16 @@ void Action::update(float dt)
                         action.time_spent += dt;
                         if (action.time_spent >= action.time_to_complete)
                         {
-                            if (m_context.registry->valid(action.target))
+                            if (m_context.rng->trigger(0.9))
                             {
-                                if (m_context.rng->trigger(0.9))
-                                {
-                                    action.success(e, action.target, *m_context.registry);
-                                }
-
-                                else
-                                {
-                                    action.failure(action.target, *m_context.registry);
-                                }
+                                action.success(e, action.target, *m_context.registry);
                             }
+
+                            else
+                            {
+                                action.failure(action.target, *m_context.registry);
+                            }
+
                             strategy.actions.pop_back();
                             break;
                         }
