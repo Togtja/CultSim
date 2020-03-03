@@ -252,7 +252,7 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int i = 1; i <= 100; i++)
+    for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = m_registry.create();
         int i1     = i;
@@ -520,27 +520,42 @@ void ScenarioScene::draw_scenario_information_ui()
 void ScenarioScene::draw_time_control_ui()
 {
     ImGui::SetNextWindowPos({960.f, 0.f}, 0, {0.5f, 0.f});
-    ImGui::SetNextWindowSize({150, 64});
+    ImGui::SetNextWindowSize({360, 64});
     ImGui::Begin("Time Control", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     ImGui::Text("Time Scaling");
-    if (ImGui::Button("||", {24, 24}))
+    if (ImGui::Button("||", {36, 24}))
     {
         m_timescale = 0.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">", {24, 24}))
+    if (ImGui::Button(">", {36, 24}))
     {
         m_timescale = 1.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>", {24, 24}))
+    if (ImGui::Button(">>", {36, 24}))
     {
         m_timescale = 2.5f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>>", {24, 24}))
+    if (ImGui::Button(">>>", {36, 24}))
     {
         m_timescale = 5.f;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(">>>>", {36, 24}))
+    {
+        m_timescale = 10.f;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Turbo", {36, 24}))
+    {
+        m_timescale = 25.f;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("!!!", {24, 24}))
+    {
+        m_timescale = 100.f;
     }
     ImGui::End();
 }
