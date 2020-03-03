@@ -22,5 +22,12 @@ needs = {
         status = random:uniform(50.0, 100.0),
         decay_rate = 0.5,
         tags = Tag.Sleep
+    },
+    reproduce = {
+        name = "Reproduction",
+        weight = 1.0,
+        status = random:uniform(50.0, 100.0),
+        decay_rate = 0.5,
+        tags = Tag.Reproduce
     }
 }
