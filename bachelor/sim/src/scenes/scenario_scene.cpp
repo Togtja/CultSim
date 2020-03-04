@@ -53,6 +53,27 @@ void ScenarioScene::on_enter()
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
     m_scenario.init();
 
+    /** TODO : Temporary */
+    m_context->lua_state.set_function("modify_need", [this](entt::entity e, ETag tag, float delta) {
+        if (auto needs = m_registry.try_get<component::Needs>(e); needs)
+        {
+            for (auto& need : needs->needs)
+            {
+                if (need.tags & tag)
+                {
+                    need.status += delta;
+                }
+            }
+        }
+    });
+
+    m_context->lua_state.set_function("modify_health", [this](entt::entity e, float delta) {
+        if (auto hp = m_registry.try_get<component::Health>(e); hp)
+        {
+            hp->hp += delta;
+        }
+    });
+
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
 
@@ -285,6 +306,8 @@ void ScenarioScene::on_enter()
             i1 = -i;
         }
         strategy_sleep.actions.front().target = agent;
+        lua_strategy.actions.front().target   = agent;
+
         glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
                       m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
@@ -303,7 +326,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(5));
         m_registry.assign<component::Strategies>(
             agent,
-            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
+            std::vector<ai::Strategy>({strategy_finddrink, strategy_sleep, strategy_breed, lua_strategy}),
             std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }

@@ -16,6 +16,11 @@ actions.consume_self = {
     requirements = Tag.None,
     tags = Tag.None,
     time_to_complete = 7.5,
-    success = function(owner, target, registry) log.info("Consuming self!") end,
-    failure = function(target, registry) end
+    success = function(owner, target, registry)
+        modify_need(owner, Tag.Food, 40.0)
+        modify_health(owner, random:uniform(-25.0, 0.0))
+    end,
+    failure = function(target, registry)
+        modify_health(target, random:uniform(-40.0, -25.0))
+    end
 }
