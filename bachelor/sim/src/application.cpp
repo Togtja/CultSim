@@ -94,8 +94,8 @@ void Application::draw()
 bool Application::init(const std::vector<char*>& args)
 {
     return init_subsystem(&Application::init_physfs, "PhysFS", args) &&     // Init PhysFS
-           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_lua, "Lua") &&                 // Init Lua
+           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_gl, "OpenGL") &&               // Init OpenGL
            init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
            init_subsystem(&Application::init_imgui, "ImGui");               // Init ImGui
