@@ -1,10 +1,13 @@
 #pragma once
+
 #include <functional>
 #include <vector>
 
 #include "robin_hood.h"
 #include <SDL_events.h>
 #include <glm/vec2.hpp>
+#include <sol/sol.hpp>
+
 namespace cs::input
 {
 /**
@@ -414,6 +417,13 @@ public:
      * @return Position of the mouse
      */
     glm::ivec2 get_mouse_pos();
+
+    /**
+     * Load the key binding from the lua file
+     *
+     * @param
+     */
+    void load_binding_from_file(sol::state_view lua);
 
 private:
     ContextHandler();

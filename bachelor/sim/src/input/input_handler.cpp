@@ -1,6 +1,9 @@
 #include "input_handler.h"
+#include "filesystem/filesystem.h"
 
 #include <algorithm>
+#include <string>
+#include <string_view>
 
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
@@ -427,6 +430,41 @@ glm::ivec2 ContextHandler::get_mouse_lclick_pos()
 glm::ivec2 ContextHandler::get_mouse_pos()
 {
     return mouse_pos;
+}
+
+void ContextHandler::load_binding_from_file(sol::state_view lua)
+{
+    const auto& file = fs::read_file("script/keybinding.lua");
+    lua.script(file);
+    sol::table key_bindings = lua["action_key_bindings"];
+    for (auto&& [context, key_action] : key_bindings)
+    {
+        for (auto&& [key, action] : key_action.as<sol::table>())
+        {
+            auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
+            spdlog::trace("Trying to bind {} to {} in {}",
+                          SDL_GetScancodeName(scancode),
+                          action.as<EAction>(),
+                          context.as<EKeyContext>());
+
+            if (scancode == SDL_SCANCODE_UNKNOWN)
+            {
+                spdlog::warn("invalid key name {} when reading key bindings", key.as<std::string>());
+                continue;
+            }
+            bind_key(context.as<EKeyContext>(), scancode, action.as<EAction>());
+        }
+    }
+
+    sol::table mouse_bindings = lua["action_mouse_bindings"];
+    for (auto&& [context, btn_action] : mouse_bindings)
+    {
+        for (auto&& [btn, action] : btn_action.as<sol::table>())
+        {
+            spdlog::trace("Trying to bind {} to {} in {}", btn.as<EMouse>(), action.as<EAction>(), context.as<EKeyContext>());
+            bind_btn(context.as<EKeyContext>(), btn.as<EMouse>(), action.as<EAction>());
+        }
+    }
 }
 
 ContextHandler::ContextHandler()
