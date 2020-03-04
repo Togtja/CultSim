@@ -30,17 +30,17 @@ void bind_dataonly(sol::state_view lua)
                                 &glm::vec3::z);
 
     lua.new_enum<ETag>("ETag",
-                       {{"Food", ETag::TAG_Food},
+                       {{"None", ETag::TAG_None},
+                        {"Food", ETag::TAG_Food},
                         {"Drink", ETag::TAG_Drink},
                         {"Sleep", ETag::TAG_Sleep},
                         {"Joy", ETag::TAG_Joy},
                         {"Location", ETag::TAG_Location},
                         {"Find", ETag::TAG_Find},
                         {"Vision", ETag::TAG_Vision},
-                        {"Avoidable", ETag::TAG_Avoidable}});
-    lua.new_enum<component::Reproduction::ESex>(
-        "ESex",
-        {{"Male", component::Reproduction::ESex::Male}, {"Female", component::Reproduction::Female}});
+                        {"Avoidable", ETag::TAG_Avoidable},
+                        {"Reproduce", ETag::TAG_Reproduce},
+                        {"Human", ETag::TAG_Human}});
 }
 
 void bind_components(sol::state_view lua)
@@ -55,8 +55,24 @@ void bind_components(sol::state_view lua)
                                &ai::Need::status,
                                "decay_rate",
                                &ai::Need::decay_rate,
+                               "vitality",
+                               &ai::Need::vitality,
                                "tags",
                                &ai::Need::tags);
+
+    lua.new_usertype<action::Action>("Action",
+                                     "name",
+                                     &action::Action::name,
+                                     "requirements",
+                                     &action::Action::requirements,
+                                     "time_to_complete",
+                                     &action::Action::time_to_complete,
+                                     "success",
+                                     &action::Action::success,
+                                     "failure",
+                                     &action::Action::failure,
+                                     "abort",
+                                     &action::Action::abort);
 
     /** Components */
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
