@@ -25,6 +25,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/entity/actions/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/filesystem/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/scenes/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/lua/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/ai/CMakeLists.txt)
 
 
