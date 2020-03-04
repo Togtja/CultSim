@@ -387,30 +387,30 @@ public:
     /**
      * Get the last mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_mouse_click();
+    glm::ivec2 get_mouse_click_pos();
 
     /**
      * Get the last right-mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_mouse_right_click();
+    glm::ivec2 get_mouse_rclick_pos();
 
     /**
      * Get the last left-mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_mouse_left_click();
+    glm::ivec2 get_mouse_lclick_pos();
 
     /**
      * Get the mouse position within the program
      *
      * @note if mouse is outside of program it will find where it was last found
      *
-     * @return position of the mouse
+     * @return Position of the mouse
      */
     glm::ivec2 get_mouse_pos();
 
