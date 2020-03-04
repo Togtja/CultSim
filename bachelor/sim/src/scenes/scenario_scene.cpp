@@ -172,61 +172,73 @@ void ScenarioScene::on_enter()
         5.f,
         0.f,
         {},
-        [this](entt::entity e, entt::entity n, entt::registry& r) {
-            if (r.has<component::Reproduction>(e))
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            if (r.valid(e) && r.valid(n))
             {
-                auto& repr = r.get<component::Reproduction>(e);
-                repr.number_of_children++;
-            }
+                auto repr = r.try_get<component::Reproduction>(e);
 
-            if (r.has<component::Reproduction>(n))
-            {
-                auto& target_repr = r.get<component::Reproduction>(n);
-            }
+                auto target_repr = r.try_get<component::Reproduction>(n);
 
-            if (r.has<component::Reproduction>(e) && r.has<component::Reproduction>(n))
-            {
-                auto repr        = r.get<component::Reproduction>(e);
-                auto target_repr = r.get<component::Reproduction>(n);
-                if (repr.sex == component::Reproduction::Female && target_repr.sex == component::Reproduction::Male)
+                if (repr != nullptr)
                 {
-                    auto child         = r.create(e, r);
-                    auto& child_needs  = r.get<component::Needs>(child);
-                    auto& child_reprd  = r.get<component::Reproduction>(child);
-                    auto& child_health = r.get<component::Health>(child);
-                    auto& child_pos    = r.get<component::Position>(child);
-                    for (auto need : child_needs.needs)
+                    auto needs = r.try_get<component::Needs>(e);
+                    if (needs != nullptr)
                     {
-                        need.status = 100.f;
+                        for (auto& need : needs->needs)
+                        {
+                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                            {
+                                need.status += 100.f;
+                            }
+                        }
                     }
-                    child_reprd.number_of_children = 0;
-                    child_health.hp                = 100.f;
-                    child_pos.position             = r.get<component::Position>(e).position +
-                                         glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
 
-                    if (m_rng.trigger(0.5f))
+                    if (target_repr != nullptr)
                     {
-                        child_reprd.sex = component::Reproduction::Male;
-                    }
-                }
-            }
-            auto& needs        = r.get<component::Needs>(e);
-            auto& tags         = r.get<component::Tags>(e);
-            auto& target_needs = r.get<component::Needs>(n);
-            auto& target_tags  = r.get<component::Tags>(n);
-            for (auto& need : needs.needs)
-            {
-                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-                {
-                    need.status += 100.f;
-                }
-            }
+                        if (repr->sex == component::Reproduction::Female && target_repr->sex == component::Reproduction::Male)
+                        {
+                            spdlog::warn("Pregnancy started");
+                            r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e, entt::registry& r) {
+                                if (r.valid(e))
+                                {
+                                    auto child         = r.create(e, r);
+                                    auto& child_needs  = r.get<component::Needs>(child);
+                                    auto& child_reprd  = r.get<component::Reproduction>(child);
+                                    auto& child_health = r.get<component::Health>(child);
+                                    auto& child_pos    = r.get<component::Position>(child);
+                                    for (auto need : child_needs.needs)
+                                    {
+                                        need.status = 100.f;
+                                    }
 
-            for (auto& need : target_needs.needs)
-            {
-                if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-                {
-                    need.status += 100.f;
+                                    spdlog::warn("Pregnancy finished");
+
+                                    RandomEngine rng{};
+                                    child_reprd.number_of_children = 0;
+                                    child_health.hp                = 100.f;
+                                    child_pos.position             = r.get<component::Position>(e).position +
+                                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
+
+                                    if (rng.trigger(0.5f))
+                                    {
+                                        child_reprd.sex = component::Reproduction::Male;
+                                    }
+                                    repr->number_of_children++;
+                                    target_repr->number_of_children++;
+                                }
+                            });
+                        }
+
+                        auto& target_needs = r.get<component::Needs>(n);
+                        auto& target_tags  = r.get<component::Tags>(n);
+                        for (auto& need : target_needs.needs)
+                        {
+                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+                            {
+                                need.status += 100.f;
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -272,6 +284,7 @@ void ScenarioScene::on_enter()
         {
             i1 = -i;
         }
+        strategy_sleep.actions.front().target = agent;
         glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
                       m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
         m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
@@ -612,18 +625,20 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (needs)
     {
-        ImGui::BeginTable("Entity Needs", 2);
-        ImGui::TableSetupColumn("Need");
-        ImGui::TableSetupColumn("Status");
-        ImGui::TableAutoHeaders();
-        for (const auto& need : needs->needs)
+        if (ImGui::BeginTable("Entity Needs", 2))
         {
-            ImGui::TableNextCell();
-            ImGui::Text("%s", need.name.c_str());
-            ImGui::TableNextCell();
-            ImGui::Text("%3.1f", need.status);
+            ImGui::TableSetupColumn("Need");
+            ImGui::TableSetupColumn("Status");
+            ImGui::TableAutoHeaders();
+            for (const auto& need : needs->needs)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text("%s", need.name.c_str());
+                ImGui::TableNextCell();
+                ImGui::Text("%3.1f", need.status);
+            }
+            ImGui::EndTable();
         }
-        ImGui::EndTable();
     }
 
     ImGui::End();
