@@ -5,6 +5,7 @@
 #include "entity/components/tags.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "input/input_handler.h"
 #include "random_engine.h"
 
 namespace cs::lua
@@ -38,7 +39,7 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable}});
     lua.new_enum<component::Reproduction::ESex>(
-        "Tag",
+        "Sex",
         {{"Male", component::Reproduction::ESex::Male}, {"Female", component::Reproduction::Female}});
 }
 
@@ -115,7 +116,37 @@ void bind_systems(sol::state_view lua)
                                "shutdown",
                                &Scenario::shutdown);
 }
+void bind_input(sol::state_view lua)
+{
+    lua.new_enum<input::KeyContext>("KeyContext",
+                                    {{"DefaultContext", input::KeyContext::DefaultContext},
+                                     {"Agent", input::KeyContext::Agent},
+                                     {"AgentOnHover", input::KeyContext::AgentOnHover},
+                                     {"ScenarioScene", input::KeyContext::ScenarioScene}});
 
+    lua.new_enum<input::Action>("Action",
+                                {{"MoveUp", input::Action::MoveUp},
+                                 {"MoveDown", input::Action::MoveDown},
+                                 {"MoveLeft", input::Action::MoveLeft},
+                                 {"MoveRight", input::Action::MoveRight},
+                                 {"Pause", input::Action::Pause},
+                                 {"ZoomIn", input::Action::ZoomIn},
+                                 {"ZoomOut", input::Action::ZoomOut},
+                                 {"SelectEntity", input::Action::SelectEntity},
+                                 {"FollowEntity", input::Action::FollowEntity}});
+
+    lua.new_enum<input::Mouse>("Mouse",
+                               {{"Left", input::Mouse::Left},
+                                {"Right", input::Mouse::Right},
+                                {"Middle", input::Mouse::Middle},
+                                {"Move", input::Mouse::Move},
+                                {"WheelUp", input::Mouse::WheelUp},
+                                {"WheelDown", input::Mouse::WheelDown},
+                                {"WheelLeft", input::Mouse::WheelLeft},
+                                {"WheelRight", input::Mouse::WheelRight},
+                                {"X1", input::Mouse::X1},
+                                {"X2", input::Mouse::X2}});
+}
 void bind_utils(sol::state_view lua)
 {
     /** Enable use of random number generator */

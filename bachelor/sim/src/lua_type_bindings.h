@@ -19,6 +19,13 @@ void bind_dataonly(sol::state_view lua);
 void bind_components(sol::state_view lua);
 
 /**
+ * Bind our input manager to Lua so it can bind key's to action
+ *
+ * @param lua The lua state
+ */
+void bind_input(sol::state_view lua);
+
+/**
  * Bind C++ systems to Lua
  *
  * @param lua The lua state
