@@ -9,7 +9,7 @@ namespace cs::input
 {
 namespace detail
 {
-ActionHandler::ActionHandler(const KeyContext type)
+ActionHandler::ActionHandler(const EKeyContext type)
 {
     m_context_type = type;
 }
@@ -167,9 +167,9 @@ std::string ActionHandler::get_key_name(SDL_Scancode scancode)
 
 /******** CONTEXT HANDLER *********/
 
-void ContextHandler::add_context(const KeyContext context, bool blocking)
+void ContextHandler::add_context(const EKeyContext context, bool blocking)
 {
-    if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
+    if (!m_active_stack.empty() && context == EKeyContext::DefaultContext)
     {
         spdlog::warn("can not add default context on top of something else");
         return;
@@ -189,9 +189,9 @@ void ContextHandler::add_context(const KeyContext context, bool blocking)
     m_active_stack.push_back(context);
 }
 
-void ContextHandler::remove_context(const KeyContext context)
+void ContextHandler::remove_context(const EKeyContext context)
 {
-    if (context == KeyContext::DefaultContext)
+    if (context == EKeyContext::DefaultContext)
     {
         spdlog::warn("trying to remove the default context");
         return;
@@ -218,7 +218,7 @@ void ContextHandler::pop_context()
     m_active_stack.pop_back();
 }
 
-void ContextHandler::fast_bind_key(const KeyContext context,
+void ContextHandler::fast_bind_key(const EKeyContext context,
                                    const SDL_Scancode scancode,
                                    const Action action,
                                    const std::function<void()>& function)
@@ -227,7 +227,7 @@ void ContextHandler::fast_bind_key(const KeyContext context,
     bind_action(context, action, function);
 }
 
-void ContextHandler::fast_bind_btn(const KeyContext context,
+void ContextHandler::fast_bind_btn(const EKeyContext context,
                                    const Mouse button,
                                    const Action action,
                                    const std::function<void()>& function)
@@ -236,27 +236,27 @@ void ContextHandler::fast_bind_btn(const KeyContext context,
     bind_action(context, action, function);
 }
 
-void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void()>& function)
+void ContextHandler::bind_action(EKeyContext context, const Action action, const std::function<void()>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void(float)>& function)
+void ContextHandler::bind_action(EKeyContext context, const Action action, const std::function<void(float)>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action)
+void ContextHandler::bind_key(const EKeyContext context, const SDL_Scancode scancode, const Action action)
 {
     get_action_handler(context).bind_key(scancode, action);
 }
 
-void ContextHandler::bind_btn(const KeyContext context, const Mouse button, const Action action)
+void ContextHandler::bind_btn(const EKeyContext context, const Mouse button, const Action action)
 {
     get_action_handler(context).bind_btn(button, action);
 }
 
-void ContextHandler::unbind_action(const KeyContext context, const Action action)
+void ContextHandler::unbind_action(const EKeyContext context, const Action action)
 {
     if (has_context(context))
     {
@@ -264,7 +264,7 @@ void ContextHandler::unbind_action(const KeyContext context, const Action action
     }
 }
 
-void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode scancode)
+void ContextHandler::unbind_key(const EKeyContext context, const SDL_Scancode scancode)
 {
     if (has_context(context))
     {
@@ -272,7 +272,7 @@ void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode sca
     }
 }
 
-void ContextHandler::unbind_btn(const KeyContext context, const Mouse button)
+void ContextHandler::unbind_btn(const EKeyContext context, const Mouse button)
 {
     if (has_context(context))
     {
@@ -379,12 +379,12 @@ void ContextHandler::handle_live_input(float dt)
     }
 }
 
-bool ContextHandler::has_context(const KeyContext context)
+bool ContextHandler::has_context(const EKeyContext context)
 {
     return m_input_map.contains(context);
 }
 
-void ContextHandler::clear_context(const KeyContext context)
+void ContextHandler::clear_context(const EKeyContext context)
 {
     if (has_context(context))
     {
@@ -406,7 +406,7 @@ void ContextHandler::clear()
     m_input_map.clear();
     m_active_stack.clear();
     // There always need to be a DefaultContext at the bottom of the stack
-    add_context(KeyContext::DefaultContext);
+    add_context(EKeyContext::DefaultContext);
 }
 
 glm::ivec2 ContextHandler::get_mouse_click_pos()
@@ -431,10 +431,10 @@ glm::ivec2 ContextHandler::get_mouse_pos()
 
 ContextHandler::ContextHandler()
 {
-    add_context(KeyContext::DefaultContext);
+    add_context(EKeyContext::DefaultContext);
 }
 
-detail::ActionHandler& ContextHandler::get_action_handler(KeyContext context)
+detail::ActionHandler& ContextHandler::get_action_handler(EKeyContext context)
 {
     const auto& input_it = m_input_map.find(context);
     if (input_it == m_input_map.end())

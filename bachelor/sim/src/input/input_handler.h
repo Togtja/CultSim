@@ -11,7 +11,7 @@ namespace cs::input
  * KeyContext
  * the context in which the program is in, with a certain key mapping.
  */
-enum class KeyContext
+enum class EKeyContext
 {
     DefaultContext,
     Agent,
@@ -60,7 +60,7 @@ namespace detail
 class ActionHandler
 {
 private:
-    KeyContext m_context_type;
+    EKeyContext m_context_type;
     // Action to function bindings
     robin_hood::unordered_map<Action, std::function<void()>> m_action_binding;
     robin_hood::unordered_map<Action, std::function<void(float)>> m_live_action_binding;
@@ -78,7 +78,7 @@ public:
      *
      * @param type The Key Context that the input handler should handle
      */
-    explicit ActionHandler(const KeyContext type);
+    explicit ActionHandler(const EKeyContext type);
 
     void set_blocking(const bool blocking);
 
@@ -223,8 +223,8 @@ private:
 class ContextHandler
 {
 private:
-    std::vector<KeyContext> m_active_stack;
-    robin_hood::unordered_map<KeyContext, detail::ActionHandler> m_input_map;
+    std::vector<EKeyContext> m_active_stack;
+    robin_hood::unordered_map<EKeyContext, detail::ActionHandler> m_input_map;
 
     glm::ivec2 m_mouse_click_pos{};
     glm::ivec2 m_right_click_pos{};
@@ -242,14 +242,14 @@ public:
      *
      * @param context The context you want to create an input handler for
      */
-    void add_context(const KeyContext context, bool blocking = false);
+    void add_context(const EKeyContext context, bool blocking = false);
 
     /**
      * Remove a context for the context stack
      *
      * @param context The context you want the remove the input handler for
      */
-    void remove_context(const KeyContext context);
+    void remove_context(const EKeyContext context);
 
     /**
      * Remove the top context from the context stack
@@ -266,7 +266,7 @@ public:
      * @param action the Action to bind to the function
      * @param function the function you want to run when the scancode is pressed
      */
-    void fast_bind_key(const KeyContext context,
+    void fast_bind_key(const EKeyContext context,
                        const SDL_Scancode scancode,
                        const Action action,
                        const std::function<void()>& function);
@@ -281,7 +281,7 @@ public:
      * @param action the Action to bind to the function
      * @param function the function you want to run when the scancode is pressed
      */
-    void fast_bind_btn(const KeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
+    void fast_bind_btn(const EKeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
 
     /**
      * Bind context to an action-function
@@ -290,7 +290,7 @@ public:
      * @param action The action you want to bind to the context
      * @param function The function you want you bind to the action
      */
-    void bind_action(const KeyContext context, const Action action, const std::function<void()>& function);
+    void bind_action(const EKeyContext context, const Action action, const std::function<void()>& function);
 
     /**
      * Bind context to an action-function
@@ -301,7 +301,7 @@ public:
      * @param action The action you want to bind to the context
      * @param function The function you want you bind to the action
      */
-    void bind_action(const KeyContext context, const Action action, const std::function<void(float)>& function);
+    void bind_action(const EKeyContext context, const Action action, const std::function<void(float)>& function);
 
     /**
      * Bind context to a key-action
@@ -310,7 +310,7 @@ public:
      * @param scancode The key you want to bind to action
      * @param action The action you want you bind to the key
      */
-    void bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action);
+    void bind_key(const EKeyContext context, const SDL_Scancode scancode, const Action action);
 
     /**
      * Bind context to a mousebutton-action
@@ -319,7 +319,7 @@ public:
      * @param button The mousebutton you want to bind to action
      * @param action The action you want you bind to the mousebutton
      */
-    void bind_btn(const KeyContext context, const Mouse button, const Action action);
+    void bind_btn(const EKeyContext context, const Mouse button, const Action action);
 
     /**
      * Unbind a action-function from a context
@@ -327,7 +327,7 @@ public:
      * @param context The context you want to unbind from
      * @param action The action you want to unbind from the context and its function
      */
-    void unbind_action(const KeyContext context, const Action action);
+    void unbind_action(const EKeyContext context, const Action action);
 
     /**
      * Unbind a key-action from a context
@@ -335,7 +335,7 @@ public:
      * @param context The context you want to unbind from
      * @param scancode The key you want to unbind from the context and its action
      */
-    void unbind_key(const KeyContext context, const SDL_Scancode scancode);
+    void unbind_key(const EKeyContext context, const SDL_Scancode scancode);
 
     /**
      * Unbind a mousebutton-action from a context
@@ -343,7 +343,7 @@ public:
      * @param context The context you want to unbind from
      * @param button The mousebutton you want to unbind from the context and its action
      */
-    void unbind_btn(const KeyContext context, const Mouse button);
+    void unbind_btn(const EKeyContext context, const Mouse button);
 
     /**
      * Handle's input from an event, goes through the context stack and runs the first found matching event
@@ -367,12 +367,12 @@ public:
      *
      * @return true if the context exist in the map, else false
      */
-    bool has_context(const KeyContext context);
+    bool has_context(const EKeyContext context);
 
     /**
      * Clears all keybinding to a certain context
      */
-    void clear_context(const KeyContext context);
+    void clear_context(const EKeyContext context);
 
     /**
      * Similar to clear, except it keeps all the keybindings
@@ -416,7 +416,7 @@ public:
 
 private:
     ContextHandler();
-    detail::ActionHandler& get_action_handler(KeyContext context);
+    detail::ActionHandler& get_action_handler(EKeyContext context);
 };
 /**
  * Get the input manager singleton

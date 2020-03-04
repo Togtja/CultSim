@@ -135,11 +135,11 @@ void bind_systems(sol::state_view lua)
 }
 void bind_input(sol::state_view lua)
 {
-    lua.new_enum<input::KeyContext>("EKeyContext",
-                                    {{"DefaultContext", input::KeyContext::DefaultContext},
-                                     {"Agent", input::KeyContext::Agent},
-                                     {"AgentOnHover", input::KeyContext::AgentOnHover},
-                                     {"ScenarioScene", input::KeyContext::ScenarioScene}});
+    lua.new_enum<input::EKeyContext>("EKeyContext",
+                                     {{"DefaultContext", input::EKeyContext::DefaultContext},
+                                      {"Agent", input::EKeyContext::Agent},
+                                      {"AgentOnHover", input::EKeyContext::AgentOnHover},
+                                      {"ScenarioScene", input::EKeyContext::ScenarioScene}});
 
     lua.new_enum<input::Action>("EAction",
                                 {{"MoveUp", input::Action::MoveUp},

@@ -59,7 +59,7 @@ void ScenarioScene::on_enter()
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     /** Select entity on click */
-    input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
+    input::get_input().fast_bind_btn(input::EKeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
 
         if (m_registry.valid(select_helper.selected_entity))
@@ -78,7 +78,7 @@ void ScenarioScene::on_enter()
     });
 
     /** Move to selected entity */
-    input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_F, input::Action::FollowEntity, [this] {
+    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_F, input::Action::FollowEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
         if (!m_registry.valid(select_helper.selected_entity))
         {
@@ -88,10 +88,10 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d({pos_comp.position.x, pos_comp.position.y});
     });
 
-    input::get_input().fast_bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
+    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
-    input::get_input().add_context(input::KeyContext::ScenarioScene);
+    input::get_input().add_context(input::EKeyContext::ScenarioScene);
 
     ai::Need need_hunger       = {static_cast<std::string>("Hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
@@ -361,7 +361,7 @@ void ScenarioScene::on_enter()
 
 void ScenarioScene::on_exit()
 {
-    input::get_input().remove_context(input::KeyContext::ScenarioScene);
+    input::get_input().remove_context(input::EKeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&ScenarioScene::handle_preference_changed>(this);
 }
 
