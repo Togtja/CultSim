@@ -55,6 +55,9 @@ void ScenarioScene::on_enter()
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
 
+    m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+
     /** Select entity on click */
     input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
@@ -359,6 +362,7 @@ void ScenarioScene::on_enter()
 void ScenarioScene::on_exit()
 {
     input::get_input().remove_context(input::KeyContext::ScenarioScene);
+    m_context->preferences->on_preference_changed.disconnect<&ScenarioScene::handle_preference_changed>(this);
 }
 
 bool ScenarioScene::update(float dt)
@@ -517,8 +521,8 @@ void ScenarioScene::draw_scenario_information_ui()
 
 void ScenarioScene::draw_time_control_ui()
 {
-    ImGui::SetNextWindowPos({960.f, 0.f}, 0, {0.5f, 0.f});
-    ImGui::SetNextWindowSize({190, 64});
+    ImGui::SetNextWindowPos({m_resolution.x / 2.f, 0.f}, 0, {0.5f, 0.f});
+    ImGui::SetNextWindowSize({360, 64});
     ImGui::Begin("Time Control", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
@@ -616,7 +620,7 @@ void ScenarioScene::update_entity_hover()
 {
     auto&& selection_helper = m_registry.ctx<EntitySelectionHelper>();
     auto cursor_pos         = input::get_input().get_mouse_pos();
-    auto world_pos          = gfx::get_renderer().screen_to_world_pos({cursor_pos.x, 1080.f - cursor_pos.y});
+    auto world_pos = gfx::get_renderer().screen_to_world_pos({cursor_pos.x, m_resolution.y - cursor_pos.y}, m_resolution);
 
     auto hover_view = m_registry.view<component::Position, component::Sprite>();
     if (m_registry.valid(selection_helper.hovered_entity))
@@ -647,6 +651,14 @@ void ScenarioScene::update_entity_hover()
     ImGui::Text("Hovering: %u | Selected: %u",
                 static_cast<uint32_t>(selection_helper.hovered_entity),
                 static_cast<uint32_t>(selection_helper.selected_entity));
+}
+
+void ScenarioScene::handle_preference_changed(const Preference& before, const Preference& after)
+{
+    if (after.name == "Resolution")
+    {
+        m_resolution = std::get<glm::ivec2>(after.value);
+    }
 }
 
 } // namespace cs
