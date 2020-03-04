@@ -219,7 +219,7 @@ TEST_CASE("attempting to pop default context from stack")
     input.handle_input(e);
     CHECK(times == 1);
 
-    input.remove_context();
+    input.pop_context();
     input.handle_input(e);
     CHECK(times == 2);
     input.clear();
@@ -292,7 +292,7 @@ TEST_CASE("attempting to remove top non default context from stack")
     CHECK(times0 == 1);
 
     // Removed top (which is Agent)
-    input.remove_context();
+    input.pop_context();
     input.handle_input(f11);
     input.handle_input(f13);
     CHECK(times1 == 1);

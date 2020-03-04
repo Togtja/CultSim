@@ -43,6 +43,12 @@ void ActionHandler::unbind_action(const Action action)
 {
     auto&& it  = m_action_binding.find(action);
     auto&& it2 = m_live_action_binding.find(action);
+    if (it == m_action_binding.end() && it2 == m_live_action_binding.end())
+    {
+        spdlog::trace("unbinding action {} for context id {}, not possible it does not exist", action, m_context_type);
+        return;
+    }
+
     if (it != m_action_binding.end())
     {
         m_action_binding.erase(it);
@@ -51,11 +57,6 @@ void ActionHandler::unbind_action(const Action action)
     {
         m_live_action_binding.erase(it2);
     }
-    // DEBUG
-    if (it == m_action_binding.end() && it2 == m_live_action_binding.end())
-    {
-        spdlog::debug("this context (id: {}) does not have a binding for this action ({})", m_context_type, action);
-    }
 }
 
 void ActionHandler::unbind_key(const SDL_Scancode scancode)
@@ -63,7 +64,9 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     auto&& it = m_key_binding.find(scancode);
     if (it == m_key_binding.end())
     {
-        spdlog::debug("this context (id: {}) does not have a binding for this key ({})", m_context_type, get_key_name(scancode));
+        spdlog::trace("unbinding key {} for context id {}, not possible it does not exist",
+                      get_key_name(scancode),
+                      m_context_type);
         return;
     }
     m_key_binding.erase(it);
@@ -74,7 +77,7 @@ void ActionHandler::unbind_btn(const Mouse button)
     auto&& it = m_mouse_binding.find(button);
     if (it == m_mouse_binding.end())
     {
-        spdlog::debug("this context (id: {}) does not have a binding for this button ({})", m_context_type, button);
+        spdlog::trace("unbinding mouse button id {} for context id {}, not possible it does not exist", button, m_context_type);
         return;
     }
     m_mouse_binding.erase(it);
@@ -94,6 +97,7 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
     }
     return m_blocking;
 }
+
 bool ActionHandler::handle_live_input(const float dt)
 {
     // Used to make sure we break from stack after a key is found in a context
@@ -114,6 +118,7 @@ bool ActionHandler::handle_live_input(const float dt)
     }
     return m_blocking || found_key;
 }
+
 bool ActionHandler::handle_input(const Mouse button)
 {
     if (has_event(button))
@@ -130,10 +135,12 @@ bool ActionHandler::has_event(const SDL_Scancode scancode)
 {
     return m_key_binding.contains(scancode);
 }
+
 bool ActionHandler::has_event(const Mouse button)
 {
     return m_mouse_binding.contains(button);
 }
+
 bool ActionHandler::has_action(const Action action)
 {
     return m_action_binding.contains(action);
@@ -197,11 +204,11 @@ void ContextHandler::remove_context(const KeyContext context)
     }
     else
     {
-        spdlog::debug("trying to remove context id {} and it is not here from before", context);
+        spdlog::trace("removing context id {} not possible it does not exist", context);
     }
 }
 
-void ContextHandler::remove_context()
+void ContextHandler::pop_context()
 {
     if (m_active_stack.size() <= 1)
     {
@@ -233,6 +240,7 @@ void ContextHandler::bind_action(KeyContext context, const Action action, const 
 {
     get_action_handler(context).bind_action(action, function);
 }
+
 void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void(float)>& function)
 {
     get_action_handler(context).bind_action(action, function);
@@ -247,6 +255,7 @@ void ContextHandler::bind_btn(const KeyContext context, const Mouse button, cons
 {
     get_action_handler(context).bind_btn(button, action);
 }
+
 void ContextHandler::unbind_action(const KeyContext context, const Action action)
 {
     if (has_context(context))
@@ -289,14 +298,14 @@ void ContextHandler::handle_input(const SDL_Event& event)
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<Mouse>(event.button.button - 1);
             // Update last mouse positions
-            last_click = {event.button.x, event.button.y};
+            m_mouse_click_pos = {event.button.x, event.button.y};
             if (click == Mouse::Left)
             {
-                last_left = last_click;
+                m_left_click_pos = m_mouse_click_pos;
             }
             if (click == Mouse::Right)
             {
-                last_right = last_click;
+                m_right_click_pos = m_mouse_click_pos;
             }
             if (m_input_map.at(*it).handle_input(click))
             {
@@ -343,7 +352,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         }
         if (event.type == SDL_MOUSEMOTION)
         {
-            last_move = {event.motion.x, event.motion.y};
+            mouse_pos = {event.motion.x, event.motion.y};
             if (m_input_map.at(*it).handle_input(Mouse::Move))
             {
                 break_event = true;
@@ -383,9 +392,10 @@ void ContextHandler::clear_context(const KeyContext context)
     }
     else
     {
-        spdlog::debug("the context {} has no bindings", context);
+        spdlog::trace("clearing context {}, however it does not exist in the mapping", context);
     }
 }
+
 void ContextHandler::back_to_default()
 {
     m_active_stack.erase(m_active_stack.begin() + 1, m_active_stack.end());
@@ -399,21 +409,24 @@ void ContextHandler::clear()
     add_context(KeyContext::DefaultContext);
 }
 
-glm::ivec2 ContextHandler::get_last_click()
+glm::ivec2 ContextHandler::get_mouse_click()
 {
-    return last_click;
+    return m_mouse_click_pos;
 }
-glm::ivec2 ContextHandler::get_last_right_click()
+
+glm::ivec2 ContextHandler::get_mouse_right_click()
 {
-    return last_right;
+    return m_right_click_pos;
 }
-glm::ivec2 ContextHandler::get_last_left_click()
+
+glm::ivec2 ContextHandler::get_mouse_left_click()
 {
-    return last_left;
+    return m_left_click_pos;
 }
+
 glm::ivec2 ContextHandler::get_mouse_pos()
 {
-    return last_move;
+    return mouse_pos;
 }
 
 ContextHandler::ContextHandler()
