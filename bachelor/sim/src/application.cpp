@@ -110,17 +110,8 @@ bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
 
-    /** For now we bind default camera controls here ( TODO: Preferences ) */
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_W, input::EAction::MoveUp);
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_A, input::EAction::MoveLeft);
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_S, input::EAction::MoveDown);
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_D, input::EAction::MoveRight);
-
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_Q, input::EAction::ZoomIn);
-    inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_E, input::EAction::ZoomOut);
-
-    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::WheelUp, input::EAction::ZoomIn);
-    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::WheelDown, input::EAction::ZoomOut);
+    // Load the bindings from a keybinding preference file
+    inputs.load_binding_from_file(m_lua.lua_state());
 
     /** Likewise with actions */
     inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
@@ -172,6 +163,7 @@ bool Application::init_lua()
     lua::bind_dataonly(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
     lua::bind_systems(m_lua.lua_state());
+    lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
 
     meta::reflect_data_types();
