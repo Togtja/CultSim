@@ -54,7 +54,7 @@ public:
      * @param desired_z The desired Z level to put the cursor at
      * @return The cursor position in world space
      */
-    glm::vec3 screen_to_world_pos(glm::ivec2 screen_pos, float desired_z = 0.f);
+    glm::vec3 screen_to_world_pos(glm::ivec2 screen_pos, glm::vec2 viewport_size, float desired_z = 0.f);
 
 private:
     Renderer();
