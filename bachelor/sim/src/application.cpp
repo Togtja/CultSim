@@ -119,8 +119,8 @@ bool Application::init_input()
     inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_Q, input::EAction::ZoomIn);
     inputs.bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_E, input::EAction::ZoomOut);
 
-    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::Mouse::WheelUp, input::EAction::ZoomIn);
-    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::Mouse::WheelDown, input::EAction::ZoomOut);
+    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::WheelUp, input::EAction::ZoomIn);
+    inputs.bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::WheelDown, input::EAction::ZoomOut);
 
     /** Likewise with actions */
     inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {

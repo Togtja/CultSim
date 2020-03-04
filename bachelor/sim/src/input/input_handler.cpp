@@ -34,7 +34,7 @@ void ActionHandler::bind_key(const SDL_Scancode scancode, const EAction action)
     m_key_binding[scancode] = action;
 }
 
-void ActionHandler::bind_btn(const Mouse button, const EAction action)
+void ActionHandler::bind_btn(const EMouse button, const EAction action)
 {
     m_mouse_binding[button] = action;
 }
@@ -72,7 +72,7 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     m_key_binding.erase(it);
 }
 
-void ActionHandler::unbind_btn(const Mouse button)
+void ActionHandler::unbind_btn(const EMouse button)
 {
     auto&& it = m_mouse_binding.find(button);
     if (it == m_mouse_binding.end())
@@ -119,7 +119,7 @@ bool ActionHandler::handle_live_input(const float dt)
     return m_blocking || found_key;
 }
 
-bool ActionHandler::handle_input(const Mouse button)
+bool ActionHandler::handle_input(const EMouse button)
 {
     if (has_event(button))
     {
@@ -136,7 +136,7 @@ bool ActionHandler::has_event(const SDL_Scancode scancode)
     return m_key_binding.contains(scancode);
 }
 
-bool ActionHandler::has_event(const Mouse button)
+bool ActionHandler::has_event(const EMouse button)
 {
     return m_mouse_binding.contains(button);
 }
@@ -228,7 +228,7 @@ void ContextHandler::fast_bind_key(const EKeyContext context,
 }
 
 void ContextHandler::fast_bind_btn(const EKeyContext context,
-                                   const Mouse button,
+                                   const EMouse button,
                                    const EAction action,
                                    const std::function<void()>& function)
 {
@@ -251,7 +251,7 @@ void ContextHandler::bind_key(const EKeyContext context, const SDL_Scancode scan
     get_action_handler(context).bind_key(scancode, action);
 }
 
-void ContextHandler::bind_btn(const EKeyContext context, const Mouse button, const EAction action)
+void ContextHandler::bind_btn(const EKeyContext context, const EMouse button, const EAction action)
 {
     get_action_handler(context).bind_btn(button, action);
 }
@@ -272,7 +272,7 @@ void ContextHandler::unbind_key(const EKeyContext context, const SDL_Scancode sc
     }
 }
 
-void ContextHandler::unbind_btn(const EKeyContext context, const Mouse button)
+void ContextHandler::unbind_btn(const EKeyContext context, const EMouse button)
 {
     if (has_context(context))
     {
@@ -296,14 +296,14 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
-            auto click = static_cast<Mouse>(event.button.button - 1);
+            auto click = static_cast<EMouse>(event.button.button - 1);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};
-            if (click == Mouse::Left)
+            if (click == EMouse::Left)
             {
                 m_left_click_pos = m_mouse_click_pos;
             }
-            if (click == Mouse::Right)
+            if (click == EMouse::Right)
             {
                 m_right_click_pos = m_mouse_click_pos;
             }
@@ -323,28 +323,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (x > 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelRight))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelRight))
                 {
                     break_event = true;
                 }
             }
             if (x < 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelLeft))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelLeft))
                 {
                     break_event = true;
                 }
             }
             if (y > 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelUp))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelUp))
                 {
                     break_event = true;
                 }
             }
             if (y < 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelDown))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelDown))
                 {
                     break_event = true;
                 }
@@ -353,7 +353,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEMOTION)
         {
             mouse_pos = {event.motion.x, event.motion.y};
-            if (m_input_map.at(*it).handle_input(Mouse::Move))
+            if (m_input_map.at(*it).handle_input(EMouse::Move))
             {
                 break_event = true;
             }

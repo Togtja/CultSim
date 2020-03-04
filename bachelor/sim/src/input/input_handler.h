@@ -40,7 +40,7 @@ enum class EAction
 /**
  * Mouse, a easier way to use the diffrent SDL_events
  */
-enum class Mouse
+enum class EMouse
 {
     Left,       // Left mouse btn
     Middle,     // Middle mouse btn
@@ -67,7 +67,7 @@ private:
 
     // Key to Action Binding
     robin_hood::unordered_map<SDL_Scancode, EAction> m_key_binding;
-    robin_hood::unordered_map<Mouse, EAction> m_mouse_binding;
+    robin_hood::unordered_map<EMouse, EAction> m_mouse_binding;
 
     // If blocking it will not go further down the context stack for keys
     bool m_blocking = false;
@@ -121,7 +121,7 @@ public:
      * @param button the Mouse button from the Mouse enum you want to trigger an action with
      * @param action the Action you want to trigger with the given button
      */
-    void bind_btn(const Mouse button, const EAction action);
+    void bind_btn(const EMouse button, const EAction action);
 
     /**
      * Unbinds an action from the function
@@ -144,7 +144,7 @@ public:
      *
      * @param button The key you want to unbind
      */
-    void unbind_btn(const Mouse button);
+    void unbind_btn(const EMouse button);
 
     /**
      * Given a scancode (key), triggers the action it's binded to
@@ -164,7 +164,7 @@ public:
      *
      * @return true if we don't need to go further down the context stack
      */
-    bool handle_input(const Mouse button);
+    bool handle_input(const EMouse button);
 
     /**
      * Every frame checks the keys connected to a live action
@@ -190,7 +190,7 @@ public:
      *
      * @return true if the mousebutton is in the context else false
      */
-    bool has_event(const Mouse button);
+    bool has_event(const EMouse button);
 
     /**
      * Given an action, checks if this context has that action
@@ -282,7 +282,7 @@ public:
      * @param function the function you want to run when the scancode is pressed
      */
     void
-    fast_bind_btn(const EKeyContext context, const Mouse button, const EAction action, const std::function<void()>& function);
+    fast_bind_btn(const EKeyContext context, const EMouse button, const EAction action, const std::function<void()>& function);
 
     /**
      * Bind context to an action-function
@@ -320,7 +320,7 @@ public:
      * @param button The mousebutton you want to bind to action
      * @param action The action you want you bind to the mousebutton
      */
-    void bind_btn(const EKeyContext context, const Mouse button, const EAction action);
+    void bind_btn(const EKeyContext context, const EMouse button, const EAction action);
 
     /**
      * Unbind a action-function from a context
@@ -344,7 +344,7 @@ public:
      * @param context The context you want to unbind from
      * @param button The mousebutton you want to unbind from the context and its action
      */
-    void unbind_btn(const EKeyContext context, const Mouse button);
+    void unbind_btn(const EKeyContext context, const EMouse button);
 
     /**
      * Handle's input from an event, goes through the context stack and runs the first found matching event

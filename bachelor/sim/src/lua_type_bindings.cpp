@@ -152,17 +152,17 @@ void bind_input(sol::state_view lua)
                                   {"SelectEntity", input::EAction::SelectEntity},
                                   {"FollowEntity", input::EAction::FollowEntity}});
 
-    lua.new_enum<input::Mouse>("EMouse",
-                               {{"Left", input::Mouse::Left},
-                                {"Right", input::Mouse::Right},
-                                {"Middle", input::Mouse::Middle},
-                                {"Move", input::Mouse::Move},
-                                {"WheelUp", input::Mouse::WheelUp},
-                                {"WheelDown", input::Mouse::WheelDown},
-                                {"WheelLeft", input::Mouse::WheelLeft},
-                                {"WheelRight", input::Mouse::WheelRight},
-                                {"X1", input::Mouse::X1},
-                                {"X2", input::Mouse::X2}});
+    lua.new_enum<input::EMouse>("EMouse",
+                                {{"Left", input::EMouse::Left},
+                                 {"Right", input::EMouse::Right},
+                                 {"Middle", input::EMouse::Middle},
+                                 {"Move", input::EMouse::Move},
+                                 {"WheelUp", input::EMouse::WheelUp},
+                                 {"WheelDown", input::EMouse::WheelDown},
+                                 {"WheelLeft", input::EMouse::WheelLeft},
+                                 {"WheelRight", input::EMouse::WheelRight},
+                                 {"X1", input::EMouse::X1},
+                                 {"X2", input::EMouse::X2}});
 }
 void bind_utils(sol::state_view lua)
 {
