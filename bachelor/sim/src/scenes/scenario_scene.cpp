@@ -34,6 +34,11 @@ extern ImFont* g_light_font;
 
 namespace cs
 {
+ScenarioScene::ScenarioScene(std::string_view scenario)
+{
+    m_scenario.script_path = scenario;
+}
+
 ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
 {
 }
@@ -42,7 +47,7 @@ void ScenarioScene::on_enter()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
-    m_context->lua_state.script(fs::read_file("script/needs.lua"));
+    m_scenario                     = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
     m_scenario.init();

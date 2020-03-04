@@ -2,14 +2,16 @@
 -- Actions can be spread into as many files as desired
 -- Put all available actions in the actions table
 
-actions.sleep = Action:new()
+actions.sleep = {
+    name = "Sleep",
+    requirements = Tag.None,
+    time_to_complete = 10.0,
+    success = function(owner, target, registry) end
+}
 
-actions.sleep.name = "Sleep"
-
-actions.sleep.requirements = Tag.None
-
-actions.sleep.time_to_complete = random.uniform(9.0, 11.0)
-
-actions.sleep.success = function(owner, target, registry)
-
-end
+actions.consume_self = {
+    name = "Consume Self",
+    requirements = Tag.None,
+    time_to_complete = 7.5,
+    success = function(owner, target, registry) log.info("Consuming self!") end
+}
