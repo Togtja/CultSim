@@ -226,10 +226,10 @@ private:
     std::vector<KeyContext> m_active_stack;
     robin_hood::unordered_map<KeyContext, detail::ActionHandler> m_input_map;
 
-    glm::ivec2 last_click{};
-    glm::ivec2 last_right{};
-    glm::ivec2 last_left{};
-    glm::ivec2 last_move{};
+    glm::ivec2 m_mouse_click_pos{};
+    glm::ivec2 m_right_click_pos{};
+    glm::ivec2 m_left_click_pos{};
+    glm::ivec2 mouse_pos{};
 
 public:
     friend ContextHandler& get_input();
@@ -254,7 +254,7 @@ public:
     /**
      * Remove the top context from the context stack
      */
-    void remove_context();
+    void pop_context();
 
     /**
      * A quicker way to bind a scancode to an action and a action to a function
@@ -387,30 +387,30 @@ public:
     /**
      * Get the last mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_last_click();
+    glm::ivec2 get_mouse_click_pos();
 
     /**
      * Get the last right-mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_last_right_click();
+    glm::ivec2 get_mouse_rclick_pos();
 
     /**
      * Get the last left-mouse click
      *
-     * @return position of mouse click
+     * @return Position of mouse click
      */
-    glm::ivec2 get_last_left_click();
+    glm::ivec2 get_mouse_lclick_pos();
 
     /**
      * Get the mouse position within the program
      *
      * @note if mouse is outside of program it will find where it was last found
      *
-     * @return position of the mouse
+     * @return Position of the mouse
      */
     glm::ivec2 get_mouse_pos();
 
