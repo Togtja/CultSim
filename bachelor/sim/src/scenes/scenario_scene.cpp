@@ -59,7 +59,7 @@ void ScenarioScene::on_enter()
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     /** Select entity on click */
-    input::get_input().fast_bind_btn(input::EKeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
+    input::get_input().fast_bind_btn(input::EKeyContext::ScenarioScene, input::Mouse::Left, input::EAction::SelectEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
 
         if (m_registry.valid(select_helper.selected_entity))
@@ -78,7 +78,7 @@ void ScenarioScene::on_enter()
     });
 
     /** Move to selected entity */
-    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_F, input::Action::FollowEntity, [this] {
+    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_F, input::EAction::FollowEntity, [this] {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
         if (!m_registry.valid(select_helper.selected_entity))
         {
@@ -88,7 +88,7 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d({pos_comp.position.x, pos_comp.position.y});
     });
 
-    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_P, input::Action::Pause, [this] {
+    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_P, input::EAction::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);

@@ -24,7 +24,7 @@ enum class EKeyContext
  * A key (Keyboard key/MouseBtn) gets mapped to an Action
  * And an Action get mapped to a certain function
  */
-enum class Action
+enum class EAction
 {
     MoveUp,
     MoveLeft,
@@ -62,12 +62,12 @@ class ActionHandler
 private:
     EKeyContext m_context_type;
     // Action to function bindings
-    robin_hood::unordered_map<Action, std::function<void()>> m_action_binding;
-    robin_hood::unordered_map<Action, std::function<void(float)>> m_live_action_binding;
+    robin_hood::unordered_map<EAction, std::function<void()>> m_action_binding;
+    robin_hood::unordered_map<EAction, std::function<void(float)>> m_live_action_binding;
 
     // Key to Action Binding
-    robin_hood::unordered_map<SDL_Scancode, Action> m_key_binding;
-    robin_hood::unordered_map<Mouse, Action> m_mouse_binding;
+    robin_hood::unordered_map<SDL_Scancode, EAction> m_key_binding;
+    robin_hood::unordered_map<Mouse, EAction> m_mouse_binding;
 
     // If blocking it will not go further down the context stack for keys
     bool m_blocking = false;
@@ -90,7 +90,7 @@ public:
      * @param action The Action enum you want to bind
      * @param function The function you want to trigger when the action gets triggered
      */
-    void bind_action(const Action action, const std::function<void()>& function);
+    void bind_action(const EAction action, const std::function<void()>& function);
 
     /**
      * Given an Action and a function binds that Action to that function
@@ -101,7 +101,7 @@ public:
      * @param action The Action enum you want to bind
      * @param function The function you want to trigger when the action gets triggered
      */
-    void bind_action(const Action action, const std::function<void(float)>& function);
+    void bind_action(const EAction action, const std::function<void(float)>& function);
 
     /**
      * Given an key (scancode) and an action, bind them together
@@ -111,7 +111,7 @@ public:
      * @param scancode the SDL scancode of the key you want to trigger an action with
      * @param action the Action you want to trigger with the given scancode
      */
-    void bind_key(const SDL_Scancode scancode, const Action action);
+    void bind_key(const SDL_Scancode scancode, const EAction action);
 
     /**
      * Given an Mouse button and an action, bind them together
@@ -121,7 +121,7 @@ public:
      * @param button the Mouse button from the Mouse enum you want to trigger an action with
      * @param action the Action you want to trigger with the given button
      */
-    void bind_btn(const Mouse button, const Action action);
+    void bind_btn(const Mouse button, const EAction action);
 
     /**
      * Unbinds an action from the function
@@ -130,7 +130,7 @@ public:
      *
      * @param action The action you want to unbind
      */
-    void unbind_action(const Action action);
+    void unbind_action(const EAction action);
 
     /**
      * Unbinds a key from the action
@@ -199,7 +199,7 @@ public:
      *
      * @return true if the action is in the context else false
      */
-    bool has_action(const Action action);
+    bool has_action(const EAction action);
     /**
      * Given a live action, checks if this context has that action
      *
@@ -207,7 +207,7 @@ public:
      *
      * @return true if the live action is in the context else false
      */
-    bool has_live_action(const Action action);
+    bool has_live_action(const EAction action);
 
     /**
      * Clears the key bindings
@@ -268,7 +268,7 @@ public:
      */
     void fast_bind_key(const EKeyContext context,
                        const SDL_Scancode scancode,
-                       const Action action,
+                       const EAction action,
                        const std::function<void()>& function);
 
     /**
@@ -281,7 +281,8 @@ public:
      * @param action the Action to bind to the function
      * @param function the function you want to run when the scancode is pressed
      */
-    void fast_bind_btn(const EKeyContext context, const Mouse button, const Action action, const std::function<void()>& function);
+    void
+    fast_bind_btn(const EKeyContext context, const Mouse button, const EAction action, const std::function<void()>& function);
 
     /**
      * Bind context to an action-function
@@ -290,7 +291,7 @@ public:
      * @param action The action you want to bind to the context
      * @param function The function you want you bind to the action
      */
-    void bind_action(const EKeyContext context, const Action action, const std::function<void()>& function);
+    void bind_action(const EKeyContext context, const EAction action, const std::function<void()>& function);
 
     /**
      * Bind context to an action-function
@@ -301,7 +302,7 @@ public:
      * @param action The action you want to bind to the context
      * @param function The function you want you bind to the action
      */
-    void bind_action(const EKeyContext context, const Action action, const std::function<void(float)>& function);
+    void bind_action(const EKeyContext context, const EAction action, const std::function<void(float)>& function);
 
     /**
      * Bind context to a key-action
@@ -310,7 +311,7 @@ public:
      * @param scancode The key you want to bind to action
      * @param action The action you want you bind to the key
      */
-    void bind_key(const EKeyContext context, const SDL_Scancode scancode, const Action action);
+    void bind_key(const EKeyContext context, const SDL_Scancode scancode, const EAction action);
 
     /**
      * Bind context to a mousebutton-action
@@ -319,7 +320,7 @@ public:
      * @param button The mousebutton you want to bind to action
      * @param action The action you want you bind to the mousebutton
      */
-    void bind_btn(const EKeyContext context, const Mouse button, const Action action);
+    void bind_btn(const EKeyContext context, const Mouse button, const EAction action);
 
     /**
      * Unbind a action-function from a context
@@ -327,7 +328,7 @@ public:
      * @param context The context you want to unbind from
      * @param action The action you want to unbind from the context and its function
      */
-    void unbind_action(const EKeyContext context, const Action action);
+    void unbind_action(const EKeyContext context, const EAction action);
 
     /**
      * Unbind a key-action from a context

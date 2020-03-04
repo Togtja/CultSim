@@ -141,16 +141,16 @@ void bind_input(sol::state_view lua)
                                       {"AgentOnHover", input::EKeyContext::AgentOnHover},
                                       {"ScenarioScene", input::EKeyContext::ScenarioScene}});
 
-    lua.new_enum<input::Action>("EAction",
-                                {{"MoveUp", input::Action::MoveUp},
-                                 {"MoveDown", input::Action::MoveDown},
-                                 {"MoveLeft", input::Action::MoveLeft},
-                                 {"MoveRight", input::Action::MoveRight},
-                                 {"Pause", input::Action::Pause},
-                                 {"ZoomIn", input::Action::ZoomIn},
-                                 {"ZoomOut", input::Action::ZoomOut},
-                                 {"SelectEntity", input::Action::SelectEntity},
-                                 {"FollowEntity", input::Action::FollowEntity}});
+    lua.new_enum<input::EAction>("EAction",
+                                 {{"MoveUp", input::EAction::MoveUp},
+                                  {"MoveDown", input::EAction::MoveDown},
+                                  {"MoveLeft", input::EAction::MoveLeft},
+                                  {"MoveRight", input::EAction::MoveRight},
+                                  {"Pause", input::EAction::Pause},
+                                  {"ZoomIn", input::EAction::ZoomIn},
+                                  {"ZoomOut", input::EAction::ZoomOut},
+                                  {"SelectEntity", input::EAction::SelectEntity},
+                                  {"FollowEntity", input::EAction::FollowEntity}});
 
     lua.new_enum<input::Mouse>("EMouse",
                                {{"Left", input::Mouse::Left},

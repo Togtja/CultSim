@@ -19,27 +19,27 @@ void ActionHandler::set_blocking(const bool blocking)
     m_blocking = blocking;
 }
 
-void ActionHandler::bind_action(const Action action, const std::function<void()>& function)
+void ActionHandler::bind_action(const EAction action, const std::function<void()>& function)
 {
     m_action_binding[action] = function;
 }
 
-void ActionHandler::bind_action(const Action action, const std::function<void(float)>& function)
+void ActionHandler::bind_action(const EAction action, const std::function<void(float)>& function)
 {
     m_live_action_binding[action] = function;
 }
 
-void ActionHandler::bind_key(const SDL_Scancode scancode, const Action action)
+void ActionHandler::bind_key(const SDL_Scancode scancode, const EAction action)
 {
     m_key_binding[scancode] = action;
 }
 
-void ActionHandler::bind_btn(const Mouse button, const Action action)
+void ActionHandler::bind_btn(const Mouse button, const EAction action)
 {
     m_mouse_binding[button] = action;
 }
 
-void ActionHandler::unbind_action(const Action action)
+void ActionHandler::unbind_action(const EAction action)
 {
     auto&& it  = m_action_binding.find(action);
     auto&& it2 = m_live_action_binding.find(action);
@@ -141,12 +141,12 @@ bool ActionHandler::has_event(const Mouse button)
     return m_mouse_binding.contains(button);
 }
 
-bool ActionHandler::has_action(const Action action)
+bool ActionHandler::has_action(const EAction action)
 {
     return m_action_binding.contains(action);
 }
 
-bool ActionHandler::has_live_action(const Action action)
+bool ActionHandler::has_live_action(const EAction action)
 {
     return m_live_action_binding.contains(action);
 }
@@ -220,7 +220,7 @@ void ContextHandler::pop_context()
 
 void ContextHandler::fast_bind_key(const EKeyContext context,
                                    const SDL_Scancode scancode,
-                                   const Action action,
+                                   const EAction action,
                                    const std::function<void()>& function)
 {
     bind_key(context, scancode, action);
@@ -229,34 +229,34 @@ void ContextHandler::fast_bind_key(const EKeyContext context,
 
 void ContextHandler::fast_bind_btn(const EKeyContext context,
                                    const Mouse button,
-                                   const Action action,
+                                   const EAction action,
                                    const std::function<void()>& function)
 {
     bind_btn(context, button, action);
     bind_action(context, action, function);
 }
 
-void ContextHandler::bind_action(EKeyContext context, const Action action, const std::function<void()>& function)
+void ContextHandler::bind_action(EKeyContext context, const EAction action, const std::function<void()>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_action(EKeyContext context, const Action action, const std::function<void(float)>& function)
+void ContextHandler::bind_action(EKeyContext context, const EAction action, const std::function<void(float)>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_key(const EKeyContext context, const SDL_Scancode scancode, const Action action)
+void ContextHandler::bind_key(const EKeyContext context, const SDL_Scancode scancode, const EAction action)
 {
     get_action_handler(context).bind_key(scancode, action);
 }
 
-void ContextHandler::bind_btn(const EKeyContext context, const Mouse button, const Action action)
+void ContextHandler::bind_btn(const EKeyContext context, const Mouse button, const EAction action)
 {
     get_action_handler(context).bind_btn(button, action);
 }
 
-void ContextHandler::unbind_action(const EKeyContext context, const Action action)
+void ContextHandler::unbind_action(const EKeyContext context, const EAction action)
 {
     if (has_context(context))
     {
