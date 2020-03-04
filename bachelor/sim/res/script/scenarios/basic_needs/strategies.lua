@@ -3,5 +3,5 @@
 strategies.consume_self = {
     name = "Consume Self",
     tags = Tag.Food,
-    actions = { actions.consume_self }
+    actions = { "consume_self" }
 }

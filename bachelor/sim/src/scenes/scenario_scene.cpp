@@ -16,6 +16,7 @@
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
+#include "lua/parsers.h"
 #include "preferences.h"
 #include "random_engine.h"
 #include "scene_manager.h"
@@ -255,6 +256,8 @@ void ScenarioScene::on_enter()
                                    {},
                                    ETag(TAG_Reproduce | TAG_Human),
                                    std::vector<action::Action>{action_reproduce}};
+
+    auto lua_strategy = lua::parse_strategy("consume_self", m_context->lua_state);
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
