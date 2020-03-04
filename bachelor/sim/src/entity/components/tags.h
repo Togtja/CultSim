@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-
+#include <string>
 namespace cs
 {
 enum ETag : uint64_t
@@ -18,4 +18,24 @@ enum ETag : uint64_t
     TAG_Human     = 1 << 10,
     TAG_Tag       = 1 << 11
 };
+
+inline std::string tag_to_string(ETag tag)
+{
+    switch (uint64_t(tag))
+    {
+        case 0: return "None";
+        case 2: return "Food"; 
+        case 4: return "Drink"; 
+        case 8: return "Sleep";
+        case 16: return "Joy";
+        case 32: return "Location";
+        case 64: return "Find";
+        case 128: return "Vision";
+        case 256: return "Avoidable";
+        case 512: return "Reproduce";
+        case 1024: return "Human";
+        case 2048: return "Tag";
+        default: return "Error";
+    }
+}
 } // namespace cs
