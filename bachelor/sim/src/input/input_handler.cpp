@@ -409,17 +409,17 @@ void ContextHandler::clear()
     add_context(KeyContext::DefaultContext);
 }
 
-glm::ivec2 ContextHandler::get_mouse_click()
+glm::ivec2 ContextHandler::get_mouse_click_pos()
 {
     return m_mouse_click_pos;
 }
 
-glm::ivec2 ContextHandler::get_mouse_right_click()
+glm::ivec2 ContextHandler::get_mouse_rclick_pos()
 {
     return m_right_click_pos;
 }
 
-glm::ivec2 ContextHandler::get_mouse_left_click()
+glm::ivec2 ContextHandler::get_mouse_lclick_pos()
 {
     return m_left_click_pos;
 }
