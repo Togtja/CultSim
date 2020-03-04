@@ -29,7 +29,7 @@ void bind_dataonly(sol::state_view lua)
                                 "z",
                                 &glm::vec3::z);
 
-    lua.new_enum<ETag>("Tag",
+    lua.new_enum<ETag>("ETag",
                        {{"Food", ETag::TAG_Food},
                         {"Drink", ETag::TAG_Drink},
                         {"Sleep", ETag::TAG_Sleep},
@@ -39,7 +39,7 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable}});
     lua.new_enum<component::Reproduction::ESex>(
-        "Sex",
+        "ESex",
         {{"Male", component::Reproduction::ESex::Male}, {"Female", component::Reproduction::Female}});
 }
 
@@ -77,6 +77,7 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Hearing>("HearingComponent", "hearing radius", &component::Hearing::sound_radius);
     lua.new_usertype<component::Smell>("SmellComponent", "smell radius", &component::Smell::smell_radius);
+
     lua.new_usertype<component::Reproduction>("ReproductionComponent",
                                               "sex",
                                               &component::Reproduction::sex,
@@ -118,13 +119,13 @@ void bind_systems(sol::state_view lua)
 }
 void bind_input(sol::state_view lua)
 {
-    lua.new_enum<input::KeyContext>("KeyContext",
+    lua.new_enum<input::KeyContext>("EKeyContext",
                                     {{"DefaultContext", input::KeyContext::DefaultContext},
                                      {"Agent", input::KeyContext::Agent},
                                      {"AgentOnHover", input::KeyContext::AgentOnHover},
                                      {"ScenarioScene", input::KeyContext::ScenarioScene}});
 
-    lua.new_enum<input::Action>("Action",
+    lua.new_enum<input::Action>("EAction",
                                 {{"MoveUp", input::Action::MoveUp},
                                  {"MoveDown", input::Action::MoveDown},
                                  {"MoveLeft", input::Action::MoveLeft},
@@ -135,7 +136,7 @@ void bind_input(sol::state_view lua)
                                  {"SelectEntity", input::Action::SelectEntity},
                                  {"FollowEntity", input::Action::FollowEntity}});
 
-    lua.new_enum<input::Mouse>("Mouse",
+    lua.new_enum<input::Mouse>("EMouse",
                                {{"Left", input::Mouse::Left},
                                 {"Right", input::Mouse::Right},
                                 {"Middle", input::Mouse::Middle},
