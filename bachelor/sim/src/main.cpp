@@ -12,6 +12,15 @@ int main(int argc, char* argv[])
 {
     const auto args = std::vector(argv, argv + argc);
 
+    auto lua_logger        = spdlog::stdout_color_st("lua");
+    auto default_logger    = spdlog::stdout_color_st("default");
+    auto input_logger      = spdlog::stdout_color_st("input");
+    auto graphics_logger   = spdlog::stdout_color_st("graphics");
+    auto filesystem_logger = spdlog::stdout_color_st("filesystem");
+    auto scenario_logger   = spdlog::stdout_color_st("scenario");
+    auto agent_logger      = spdlog::stdout_color_st("agent");
+    auto test_logger       = spdlog::stdout_color_st("test");
+
     /** Disable logs before running tests as we don't want them to pollute test information */
     spdlog::set_level(spdlog::level::off);
 
@@ -35,8 +44,6 @@ int main(int argc, char* argv[])
     spdlog::set_level(spdlog::level::info);
 #endif
 
-    auto lua_logger     = spdlog::stdout_color_st("lua");
-    auto default_logger = spdlog::stdout_color_st("default");
     spdlog::set_pattern("[%D | %H:%M:%S.%e] [%^%n %l%$] - %v");
     spdlog::set_default_logger(default_logger);
 
