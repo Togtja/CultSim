@@ -146,6 +146,16 @@ struct Tags
     ETag tags{};
 };
 
+struct Inventory
+{
+    uint16_t size{};
+    uint16_t max_size{};
+
+    std::vector<entt::entity> contents{};
+
+    ETag tags{};
+};
+
 struct AI
 {
 };
