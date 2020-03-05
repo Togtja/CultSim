@@ -285,7 +285,7 @@ void ContextHandler::unbind_btn(const EKeyContext context, const EMouse button)
 
 void ContextHandler::handle_input(const SDL_Event& event)
 {
-    bool break_event = false;
+    bool block = false;
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         // Handled the input
@@ -293,7 +293,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         {
             if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
             {
-                break_event = true;
+                block = true;
             }
         }
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
@@ -312,7 +312,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (m_input_map.at(*it).handle_input(click))
             {
-                break_event = true;
+                block = true;
             }
         }
         if (event.type == SDL_MOUSEWHEEL)
@@ -328,28 +328,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             {
                 if (m_input_map.at(*it).handle_input(EMouse::WheelRight))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (x < 0)
             {
                 if (m_input_map.at(*it).handle_input(EMouse::WheelLeft))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (y > 0)
             {
                 if (m_input_map.at(*it).handle_input(EMouse::WheelUp))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
             if (y < 0)
             {
                 if (m_input_map.at(*it).handle_input(EMouse::WheelDown))
                 {
-                    break_event = true;
+                    block = true;
                 }
             }
         }
@@ -358,10 +358,10 @@ void ContextHandler::handle_input(const SDL_Event& event)
             mouse_pos = {event.motion.x, event.motion.y};
             if (m_input_map.at(*it).handle_input(EMouse::Move))
             {
-                break_event = true;
+                block = true;
             }
         }
-        if (break_event)
+        if (block)
         {
             return;
         }
