@@ -79,17 +79,20 @@ void ScenarioScene::on_enter()
         });
 
     /** Move to selected entity */
-    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_F, input::EAction::FollowEntity, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
         if (!m_registry.valid(select_helper.selected_entity))
         {
             return;
         }
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
-        gfx::get_renderer().set_camera_position_2d({pos_comp.position.x, pos_comp.position.y});
+        auto& pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.5f);
+
+        gfx::get_renderer().set_camera_position_2d(pos);
     });
 
-    input::get_input().fast_bind_key(input::EKeyContext::ScenarioScene, SDL_SCANCODE_P, input::EAction::Pause, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);

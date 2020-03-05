@@ -7,7 +7,9 @@ action_key_bindings = {
         ["w"] = EAction.MoveUp,
         ["a"] = EAction.MoveLeft,
         ["s"] = EAction.MoveDown,
-        ["d"] = EAction.MoveRight
+        ["d"] = EAction.MoveRight,
+        ["f"] = EAction.FollowEntity,
+        ["p"] = EAction.Pause
     }
 }
 action_mouse_bindings = {
