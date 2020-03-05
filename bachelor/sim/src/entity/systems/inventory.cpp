@@ -11,9 +11,9 @@ void Inventory::update(float dt)
     CS_AUTOTIMER(Inventory System);
 
     auto& registry = *m_context.registry;
-    auto group     = registry.group<component::Tags, component::Inventory>();
+    auto view     = registry.view<component::Inventory>();
 
-    group.each([this, dt, &registry](entt::entity e, component::Inventory& inventory) {
+    view.each([this, dt, &registry](entt::entity e, component::Inventory& inventory) {
         if (inventory.size != inventory.contents.size())
         {
             inventory.size = inventory.contents.size();

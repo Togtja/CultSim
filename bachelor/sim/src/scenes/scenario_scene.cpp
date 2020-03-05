@@ -159,7 +159,7 @@ void ScenarioScene::on_enter()
             {
                 if (need.tags & TAG_Sleep)
                 {
-                    spdlog::warn("Agent {} has sleept", e);
+                    spdlog::warn("Agent {} has slept", e);
                     need.status += 69.f;
                 }
             }
@@ -208,6 +208,17 @@ void ScenarioScene::on_enter()
                                     auto& child_reprd  = r.get<component::Reproduction>(child);
                                     auto& child_health = r.get<component::Health>(child);
                                     auto& child_pos    = r.get<component::Position>(child);
+                                    auto& child_strat  = r.get<component::Strategies>(child);
+                                    for (auto strat : child_strat.strategies)
+                                    {
+                                        for (auto action : strat.actions)
+                                        {
+                                            if (action.target != entt::null) 
+                                            {
+                                                action.target = child;
+                                            }
+                                        }
+                                    }
                                     for (auto need : child_needs.needs)
                                     {
                                         need.status = 100.f;
@@ -559,10 +570,23 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 5.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("!!", {24, 24}))
+    if (ImGui::Button(">>>>", {36, 24}))
     {
-        m_timescale = 25.f;
+        m_timescale = 10.f;
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Turbo", {36, 24}))
+        if (ImGui::Button("!!", {24, 24}))
+        {
+            m_timescale = 25.f;
+        }
+    ImGui::SameLine();
+    if (ImGui::Button("!!!", {24, 24}))
+    {
+        m_timescale = 100.f;
+    }
+    ImGui::End();
+
     ImGui::End();
 }
 
