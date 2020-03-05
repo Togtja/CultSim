@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
     auto graphics_logger   = spdlog::stdout_color_st("graphics");
     auto filesystem_logger = spdlog::stdout_color_st("filesystem");
     auto scenario_logger   = spdlog::stdout_color_st("scenario");
+    auto agent_logger      = spdlog::stdout_color_st("agent");
     auto test_logger       = spdlog::stdout_color_st("test");
 
     /** Disable logs before running tests as we don't want them to pollute test information */

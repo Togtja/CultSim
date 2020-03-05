@@ -118,11 +118,11 @@ void ScenarioScene::on_enter()
                                   }
                               },
                               [](entt::entity e, entt::registry& r) {
-                                  spdlog::warn("We failed to finish action: eat");
+                                  spdlog::get("agent")->warn("We failed to finish action: eat");
                                   r.destroy(e);
                               },
                               []() {
-                                  spdlog::warn("We aborted our action");
+                                  spdlog::get("agent")->warn("We aborted our action");
                               }};
 
     action::Action action_drink{static_cast<std::string>("Drink"),
@@ -141,33 +141,34 @@ void ScenarioScene::on_enter()
                                     }
                                 },
                                 [](entt::entity e, entt::registry& r) {
-                                    spdlog::warn("We failed to finish action: drink");
+                                    spdlog::get("agent")->warn("We failed to finish action: drink");
                                     r.destroy(e);
                                 },
                                 []() {
-                                    spdlog::warn("We aborted our action");
+                                    spdlog::get("agent")->warn("We aborted our action");
                                 }};
 
-    action::Action action_sleep{static_cast<std::string>("Sleep"),
-                                TAG_None,
-                                10.f,
-                                0.f,
-                                {},
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("SUCCESS SLEEP!");
-                                    for (auto& need : r.get<component::Needs>(e).needs)
-                                    {
-                                        if (need.tags & TAG_Sleep)
-                                        {
-                                            spdlog::warn("SUCCESS ADD TO SLEEP!");
-                                            need.status += 69.f;
-                                        }
-                                    }
-                                },
-                                [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: sleep"); },
-                                []() {
-                                    spdlog::warn("We aborted our action");
-                                }};
+    action::Action action_sleep{
+        static_cast<std::string>("Sleep"),
+        TAG_None,
+        10.f,
+        0.f,
+        {},
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            spdlog::get("agent")->warn("SUCCESS SLEEP!");
+            for (auto& need : r.get<component::Needs>(e).needs)
+            {
+                if (need.tags & TAG_Sleep)
+                {
+                    spdlog::get("agent")->warn("SUCCESS ADD TO SLEEP!");
+                    need.status += 69.f;
+                }
+            }
+        },
+        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("We failed to finish action: sleep"); },
+        []() {
+            spdlog::get("agent")->warn("We aborted our action");
+        }};
 
     action::Action action_reproduce{
         static_cast<std::string>("Reproduce"),
@@ -242,9 +243,9 @@ void ScenarioScene::on_enter()
                 }
             }
         },
-        [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: reproduce"); },
+        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("We failed to finish action: reproduce"); },
         []() {
-            spdlog::warn("We aborted our action: reproduce");
+            spdlog::get("agent")->warn("We aborted our action: reproduce");
         }};
 
     ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
