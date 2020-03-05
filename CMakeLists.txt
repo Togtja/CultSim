@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
-project(bachelor VERSION 0.0.0)
+project(bachelor VERSION 0.1.0)
 
 # Project CMake Options
 option(CULTSIM_BUILD_DOCS "Build documentation for Cultsim" OFF)
