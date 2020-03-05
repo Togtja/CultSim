@@ -16,6 +16,7 @@ int main(int argc, char* argv[])
     auto default_logger    = spdlog::stdout_color_st("default");
     auto input_logger      = spdlog::stdout_color_st("input");
     auto graphics_logger   = spdlog::stdout_color_st("graphics");
+    auto filesystem_logger = spdlog::stdout_color_st("filesystem");
     /** Disable logs before running tests as we don't want them to pollute test information */
     spdlog::set_level(spdlog::level::off);
 
