@@ -94,8 +94,8 @@ void Application::draw()
 bool Application::init(const std::vector<char*>& args)
 {
     return init_subsystem(&Application::init_physfs, "PhysFS", args) &&     // Init PhysFS
-           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_lua, "Lua") &&                 // Init Lua
+           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_gl, "OpenGL") &&               // Init OpenGL
            init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
            init_subsystem(&Application::init_imgui, "ImGui");               // Init ImGui
@@ -110,35 +110,26 @@ bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
 
-    /** For now we bind default camera controls here ( TODO: Preferences ) */
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_W, input::Action::MoveUp);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_A, input::Action::MoveLeft);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_S, input::Action::MoveDown);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_D, input::Action::MoveRight);
-
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_Q, input::Action::ZoomIn);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_E, input::Action::ZoomOut);
-
-    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelUp, input::Action::ZoomIn);
-    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelDown, input::Action::ZoomOut);
+    // Load the bindings from a keybinding preference file
+    inputs.load_binding_from_file(m_lua.lua_state());
 
     /** Likewise with actions */
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveUp, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveLeft, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveDown, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveRight, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomIn, [] {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomOut, [] {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, .05f});
     });
 
@@ -172,6 +163,7 @@ bool Application::init_lua()
     lua::bind_dataonly(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
     lua::bind_systems(m_lua.lua_state());
+    lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
 
     meta::reflect_data_types();

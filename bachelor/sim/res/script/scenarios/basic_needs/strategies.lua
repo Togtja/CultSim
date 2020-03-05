@@ -2,6 +2,6 @@
 
 strategies.consume_self = {
     name = "Consume Self",
-    tags = Tag.Food,
+    tags = ETag.Food,
     actions = { "consume_self" }
 }
