@@ -22,8 +22,8 @@ TEST_CASE("Test case for regular action system setup")
         5.f,
         0.f,
         {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
+        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
