@@ -102,6 +102,22 @@ void ScenarioScene::on_enter()
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
+    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
+                                      TAG_Find,
+                                      1.f,
+                                      0.f,
+                                      {},
+                                      [](entt::entity e, entt::entity n, entt::registry& r) {
+                                          r.remove<component::Position>(n);
+                                          r.remove<component::Sprite>(n);
+                                          r.get<component::Inventory>(e).contents.push_back(n);
+                                      },
+                                      [](entt::entity e, entt::registry& r) {
+                                          spdlog::debug("Agent {} failed to finish action: gather food", e);
+                                          r.destroy(e);
+                                      },
+                                      {}};
+
     action::Action action_eat{static_cast<std::string>("Eat"),
                               TAG_Find,
                               5.f,
@@ -141,7 +157,7 @@ void ScenarioScene::on_enter()
                                                      {
                                                          for (auto& need : r.get<component::Needs>(e).needs)
                                                          {
-                                                             if (need.tags | TAG_Food) 
+                                                             if (need.tags | TAG_Food)
                                                              {
                                                                  need.status += 80.f;
                                                              }
@@ -160,15 +176,15 @@ void ScenarioScene::on_enter()
                                                  int i = 0;
                                                  for (auto& content : inventory->contents)
                                                  {
-                                                     if (r.get<component::Tags>(content).tags | TAG_Food) {
+                                                     if (r.get<component::Tags>(content).tags | TAG_Food)
+                                                     {
                                                          inventory->contents.erase(inventory->contents.begin() + i);
                                                          return;
                                                      }
                                                      i++;
                                                  }
                                              }
-                                         }
-                        ,
+                                         },
                                          {}};
     action::Action action_drink{static_cast<std::string>("Drink"),
                                 TAG_Find,
