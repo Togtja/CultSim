@@ -16,6 +16,8 @@ struct Need
 
     float decay_rate{};
 
+    float vitality{};
+
     ETag tags{};
 };
 

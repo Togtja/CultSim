@@ -25,7 +25,7 @@ void Reproduction::update(float dt)
             }
             else
             {
-                spdlog::error("There was an error finding the reproduction need of entity: {}", e);
+                spdlog::info("There was an error finding the reproduction need of entity: {}", e);
             }
             m_context.registry->remove<component::Reproduction>(e);
         }

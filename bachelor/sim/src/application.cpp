@@ -16,6 +16,10 @@
 #include "gfx/ImGUI/imgui_impl_opengl3.h"
 #include "gfx/ImGUI/imgui_impl_sdl.h"
 
+/** Header font for ImGui purposes */
+ImFont* g_header_font = nullptr;
+ImFont* g_light_font  = nullptr;
+
 namespace cs
 {
 void Application::run(const std::vector<char*>& args)
@@ -41,8 +45,6 @@ void Application::run(const std::vector<char*>& args)
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame(m_window.get());
         ImGui::NewFrame();
-
-        ImGui::ShowDemoWindow();
 
         update(dt_clock.restart());
         AutoTimer::show_debug_ui();
@@ -92,8 +94,8 @@ void Application::draw()
 bool Application::init(const std::vector<char*>& args)
 {
     return init_subsystem(&Application::init_physfs, "PhysFS", args) &&     // Init PhysFS
-           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_lua, "Lua") &&                 // Init Lua
+           init_subsystem(&Application::init_input, "Input Manager") &&     // Init Input Manager
            init_subsystem(&Application::init_gl, "OpenGL") &&               // Init OpenGL
            init_subsystem(&Application::init_preferences, "Preferences") && // Init Preferences
            init_subsystem(&Application::init_imgui, "ImGui");               // Init ImGui
@@ -108,35 +110,26 @@ bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
 
-    /** For now we bind default camera controls here ( TODO: Preferences ) */
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_W, input::Action::MoveUp);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_A, input::Action::MoveLeft);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_S, input::Action::MoveDown);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_D, input::Action::MoveRight);
-
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_Q, input::Action::ZoomIn);
-    inputs.bind_key(input::KeyContext::ScenarioScene, SDL_SCANCODE_E, input::Action::ZoomOut);
-
-    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelUp, input::Action::ZoomIn);
-    inputs.bind_btn(input::KeyContext::ScenarioScene, input::Mouse::WheelDown, input::Action::ZoomOut);
+    // Load the bindings from a keybinding preference file
+    inputs.load_binding_from_file(m_lua.lua_state());
 
     /** Likewise with actions */
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveUp, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveLeft, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveDown, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::MoveRight, [](float dt) {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
         gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomIn, [] {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
     });
-    inputs.bind_action(input::KeyContext::ScenarioScene, input::Action::ZoomOut, [] {
+    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, .05f});
     });
 
@@ -170,6 +163,7 @@ bool Application::init_lua()
     lua::bind_dataonly(m_lua.lua_state());
     lua::bind_components(m_lua.lua_state());
     lua::bind_systems(m_lua.lua_state());
+    lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
 
     meta::reflect_data_types();
@@ -225,14 +219,22 @@ bool Application::init_imgui()
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
     /** Load custom UI Font */
-    auto font_file = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto font_file       = fs::read_byte_file("fonts/CenturyGothicGras700.ttf");
+    auto light_font_file = fs::read_byte_file("fonts/CenturyGothicRegular400.ttf");
 
     /** Malloc because ImGui uses it under the hood, and will take ownership */
-    auto font_memory = malloc(font_file.size());
+    auto font_memory   = malloc(font_file.size());
+    auto font_memory_2 = malloc(font_file.size());
+    auto font_memory_3 = malloc(light_font_file.size());
     memcpy(font_memory, font_file.data(), font_file.size());
+    memcpy(font_memory_2, font_file.data(), font_file.size());
+    memcpy(font_memory_3, light_font_file.data(), light_font_file.size());
 
     /** Give font ot ImGui (do not free above memory! ImGui does it) */
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
+    g_header_font = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_2), 20, 20);
+    g_light_font  = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_3), 16, 16);
+    io.Fonts->Build();
 
     /** Set up Style colors */
     ImGui::GetStyle().WindowRounding       = 0.f;
@@ -275,7 +277,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_TabActive]             = ImVec4(0.92f, 0.59f, 0.00f, 1.00f);
     colors[ImGuiCol_TabUnfocused]          = ImVec4(0.11f, 0.06f, 0.07f, 0.97f);
     colors[ImGuiCol_TabUnfocusedActive]    = ImVec4(0.42f, 0.14f, 0.29f, 1.00f);
-    colors[ImGuiCol_PlotLines]             = ImVec4(0.87f, 0.87f, 0.87f, 1.00f);
+    colors[ImGuiCol_PlotLines]             = ImVec4(0.19f, 0.86f, 0.51f, 1.00f);
     colors[ImGuiCol_PlotLinesHovered]      = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
     colors[ImGuiCol_PlotHistogram]         = ImVec4(0.90f, 0.51f, 0.00f, 1.00f);
     colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);

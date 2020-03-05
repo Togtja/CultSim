@@ -1,8 +1,8 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <glm/vec2.hpp>
 #include <glm/glm.hpp>
+#include <glm/vec2.hpp>
 
 namespace cs::gfx
 {
@@ -29,6 +29,11 @@ public:
      * @return Current view-projection matrix based on the camera state
      */
     [[nodiscard]] glm::mat4 get_view_matrix() const;
+
+    void set_position_2d(glm::vec2 position);
+
+    void set_position(glm::vec3 position);
+    glm::vec3 Camera::get_position();
 
     /**
      * Move the camera by an arbitrary amount

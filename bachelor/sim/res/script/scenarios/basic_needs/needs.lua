@@ -7,20 +7,31 @@ needs = {
         weight = 3.0,
         status = random:uniform(50.0, 100.0),
         decay_rate = 1.0,
-        tags = Tag.Food
+        vitality = 0.5,
+        tags = ETag.Food
     },
     thirst = {
         name = "Thirst",
         weight = 4.0,
         status = random:uniform(50.0, 100.0),
         decay_rate = 1.5,
-        tags = Tag.Drink
+        vitality = 1.0,
+        tags = ETag.Drink
     },
     sleep = {
         name = "Sleep",
         weight = 1.0,
         status = random:uniform(50.0, 100.0),
         decay_rate = 0.5,
-        tags = Tag.Sleep
+        vitality = 0.1,
+        tags = ETag.Sleep
+    },
+    reproduce = {
+        name = "Reproduction",
+        weight = 1.0,
+        status = random:uniform(50.0, 100.0),
+        decay_rate = 0.5,
+        vitality = 0.0,
+        tags = ETag.Reproduce
     }
 }

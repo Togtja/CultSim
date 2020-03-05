@@ -28,10 +28,10 @@ struct SpriteTextureID
     uint16_t flag_lit : 1;
 
     /** Unspecified flag */
-    uint16_t flag_b : 1;
+    uint16_t flag_hovered : 1;
 
     /** Unspecified flag */
-    uint16_t flag_c : 1;
+    uint16_t flag_selected : 1;
 
     uint8_t bigrees{0};
 
@@ -71,4 +71,4 @@ struct PrimitiveVertex
     glm::vec3 color{};
 };
 
-} // namespace cs
+} // namespace cs::gfx

@@ -26,9 +26,8 @@ void Action::update(float dt)
                 if (!strategy.actions.empty())
                 {
                     auto& action = strategy.actions.back();
-                    if (action.requirements != 0)
+                    if (action.requirements != TAG_None)
                     {
-                        spdlog::warn("Pushing back requirement {}", action.requirements);
                         if (action.requirements & TAG_Tag)
                         {
                             m_context.registry->assign<component::TagRequirement>(e, strategy.tags);
