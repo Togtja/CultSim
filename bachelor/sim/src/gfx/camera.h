@@ -33,6 +33,7 @@ public:
     void set_position_2d(glm::vec2 position);
 
     void set_position(glm::vec3 position);
+    glm::vec3 Camera::get_position();
 
     /**
      * Move the camera by an arbitrary amount

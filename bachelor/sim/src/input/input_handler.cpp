@@ -1,6 +1,9 @@
 #include "input_handler.h"
+#include "filesystem/filesystem.h"
 
 #include <algorithm>
+#include <string>
+#include <string_view>
 
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
@@ -9,7 +12,7 @@ namespace cs::input
 {
 namespace detail
 {
-ActionHandler::ActionHandler(const KeyContext type)
+ActionHandler::ActionHandler(const EKeyContext type)
 {
     m_context_type = type;
 }
@@ -19,27 +22,27 @@ void ActionHandler::set_blocking(const bool blocking)
     m_blocking = blocking;
 }
 
-void ActionHandler::bind_action(const Action action, const std::function<void()>& function)
+void ActionHandler::bind_action(const EAction action, const std::function<void()>& function)
 {
     m_action_binding[action] = function;
 }
 
-void ActionHandler::bind_action(const Action action, const std::function<void(float)>& function)
+void ActionHandler::bind_action(const EAction action, const std::function<void(float)>& function)
 {
     m_live_action_binding[action] = function;
 }
 
-void ActionHandler::bind_key(const SDL_Scancode scancode, const Action action)
+void ActionHandler::bind_key(const SDL_Scancode scancode, const EAction action)
 {
     m_key_binding[scancode] = action;
 }
 
-void ActionHandler::bind_btn(const Mouse button, const Action action)
+void ActionHandler::bind_btn(const EMouse button, const EAction action)
 {
     m_mouse_binding[button] = action;
 }
 
-void ActionHandler::unbind_action(const Action action)
+void ActionHandler::unbind_action(const EAction action)
 {
     auto&& it  = m_action_binding.find(action);
     auto&& it2 = m_live_action_binding.find(action);
@@ -72,7 +75,7 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     m_key_binding.erase(it);
 }
 
-void ActionHandler::unbind_btn(const Mouse button)
+void ActionHandler::unbind_btn(const EMouse button)
 {
     auto&& it = m_mouse_binding.find(button);
     if (it == m_mouse_binding.end())
@@ -119,7 +122,7 @@ bool ActionHandler::handle_live_input(const float dt)
     return m_blocking || found_key;
 }
 
-bool ActionHandler::handle_input(const Mouse button)
+bool ActionHandler::handle_input(const EMouse button)
 {
     if (has_event(button))
     {
@@ -136,17 +139,17 @@ bool ActionHandler::has_event(const SDL_Scancode scancode)
     return m_key_binding.contains(scancode);
 }
 
-bool ActionHandler::has_event(const Mouse button)
+bool ActionHandler::has_event(const EMouse button)
 {
     return m_mouse_binding.contains(button);
 }
 
-bool ActionHandler::has_action(const Action action)
+bool ActionHandler::has_action(const EAction action)
 {
     return m_action_binding.contains(action);
 }
 
-bool ActionHandler::has_live_action(const Action action)
+bool ActionHandler::has_live_action(const EAction action)
 {
     return m_live_action_binding.contains(action);
 }
@@ -167,9 +170,9 @@ std::string ActionHandler::get_key_name(SDL_Scancode scancode)
 
 /******** CONTEXT HANDLER *********/
 
-void ContextHandler::add_context(const KeyContext context, bool blocking)
+void ContextHandler::add_context(const EKeyContext context, bool blocking)
 {
-    if (!m_active_stack.empty() && context == KeyContext::DefaultContext)
+    if (!m_active_stack.empty() && context == EKeyContext::DefaultContext)
     {
         spdlog::warn("can not add default context on top of something else");
         return;
@@ -189,9 +192,9 @@ void ContextHandler::add_context(const KeyContext context, bool blocking)
     m_active_stack.push_back(context);
 }
 
-void ContextHandler::remove_context(const KeyContext context)
+void ContextHandler::remove_context(const EKeyContext context)
 {
-    if (context == KeyContext::DefaultContext)
+    if (context == EKeyContext::DefaultContext)
     {
         spdlog::warn("trying to remove the default context");
         return;
@@ -218,45 +221,45 @@ void ContextHandler::pop_context()
     m_active_stack.pop_back();
 }
 
-void ContextHandler::fast_bind_key(const KeyContext context,
+void ContextHandler::fast_bind_key(const EKeyContext context,
                                    const SDL_Scancode scancode,
-                                   const Action action,
+                                   const EAction action,
                                    const std::function<void()>& function)
 {
     bind_key(context, scancode, action);
     bind_action(context, action, function);
 }
 
-void ContextHandler::fast_bind_btn(const KeyContext context,
-                                   const Mouse button,
-                                   const Action action,
+void ContextHandler::fast_bind_btn(const EKeyContext context,
+                                   const EMouse button,
+                                   const EAction action,
                                    const std::function<void()>& function)
 {
     bind_btn(context, button, action);
     bind_action(context, action, function);
 }
 
-void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void()>& function)
+void ContextHandler::bind_action(EKeyContext context, const EAction action, const std::function<void()>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_action(KeyContext context, const Action action, const std::function<void(float)>& function)
+void ContextHandler::bind_action(EKeyContext context, const EAction action, const std::function<void(float)>& function)
 {
     get_action_handler(context).bind_action(action, function);
 }
 
-void ContextHandler::bind_key(const KeyContext context, const SDL_Scancode scancode, const Action action)
+void ContextHandler::bind_key(const EKeyContext context, const SDL_Scancode scancode, const EAction action)
 {
     get_action_handler(context).bind_key(scancode, action);
 }
 
-void ContextHandler::bind_btn(const KeyContext context, const Mouse button, const Action action)
+void ContextHandler::bind_btn(const EKeyContext context, const EMouse button, const EAction action)
 {
     get_action_handler(context).bind_btn(button, action);
 }
 
-void ContextHandler::unbind_action(const KeyContext context, const Action action)
+void ContextHandler::unbind_action(const EKeyContext context, const EAction action)
 {
     if (has_context(context))
     {
@@ -264,7 +267,7 @@ void ContextHandler::unbind_action(const KeyContext context, const Action action
     }
 }
 
-void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode scancode)
+void ContextHandler::unbind_key(const EKeyContext context, const SDL_Scancode scancode)
 {
     if (has_context(context))
     {
@@ -272,7 +275,7 @@ void ContextHandler::unbind_key(const KeyContext context, const SDL_Scancode sca
     }
 }
 
-void ContextHandler::unbind_btn(const KeyContext context, const Mouse button)
+void ContextHandler::unbind_btn(const EKeyContext context, const EMouse button)
 {
     if (has_context(context))
     {
@@ -296,14 +299,14 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
-            auto click = static_cast<Mouse>(event.button.button - 1);
+            auto click = static_cast<EMouse>(event.button.button - 1);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};
-            if (click == Mouse::Left)
+            if (click == EMouse::Left)
             {
                 m_left_click_pos = m_mouse_click_pos;
             }
-            if (click == Mouse::Right)
+            if (click == EMouse::Right)
             {
                 m_right_click_pos = m_mouse_click_pos;
             }
@@ -323,28 +326,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (x > 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelRight))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelRight))
                 {
                     break_event = true;
                 }
             }
             if (x < 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelLeft))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelLeft))
                 {
                     break_event = true;
                 }
             }
             if (y > 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelUp))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelUp))
                 {
                     break_event = true;
                 }
             }
             if (y < 0)
             {
-                if (m_input_map.at(*it).handle_input(Mouse::WheelDown))
+                if (m_input_map.at(*it).handle_input(EMouse::WheelDown))
                 {
                     break_event = true;
                 }
@@ -353,7 +356,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEMOTION)
         {
             mouse_pos = {event.motion.x, event.motion.y};
-            if (m_input_map.at(*it).handle_input(Mouse::Move))
+            if (m_input_map.at(*it).handle_input(EMouse::Move))
             {
                 break_event = true;
             }
@@ -379,12 +382,12 @@ void ContextHandler::handle_live_input(float dt)
     }
 }
 
-bool ContextHandler::has_context(const KeyContext context)
+bool ContextHandler::has_context(const EKeyContext context)
 {
     return m_input_map.contains(context);
 }
 
-void ContextHandler::clear_context(const KeyContext context)
+void ContextHandler::clear_context(const EKeyContext context)
 {
     if (has_context(context))
     {
@@ -406,7 +409,7 @@ void ContextHandler::clear()
     m_input_map.clear();
     m_active_stack.clear();
     // There always need to be a DefaultContext at the bottom of the stack
-    add_context(KeyContext::DefaultContext);
+    add_context(EKeyContext::DefaultContext);
 }
 
 glm::ivec2 ContextHandler::get_mouse_click_pos()
@@ -429,12 +432,47 @@ glm::ivec2 ContextHandler::get_mouse_pos()
     return mouse_pos;
 }
 
-ContextHandler::ContextHandler()
+void ContextHandler::load_binding_from_file(sol::state_view lua)
 {
-    add_context(KeyContext::DefaultContext);
+    const auto& file = fs::read_file("script/keybinding.lua");
+    lua.script(file);
+    sol::table key_bindings = lua["action_key_bindings"];
+    for (auto&& [context, key_action] : key_bindings)
+    {
+        for (auto&& [key, action] : key_action.as<sol::table>())
+        {
+            auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
+            spdlog::trace("Trying to bind {} to {} in {}",
+                          SDL_GetScancodeName(scancode),
+                          action.as<EAction>(),
+                          context.as<EKeyContext>());
+
+            if (scancode == SDL_SCANCODE_UNKNOWN)
+            {
+                spdlog::warn("invalid key name {} when reading key bindings", key.as<std::string>());
+                continue;
+            }
+            bind_key(context.as<EKeyContext>(), scancode, action.as<EAction>());
+        }
+    }
+
+    sol::table mouse_bindings = lua["action_mouse_bindings"];
+    for (auto&& [context, btn_action] : mouse_bindings)
+    {
+        for (auto&& [btn, action] : btn_action.as<sol::table>())
+        {
+            spdlog::trace("Trying to bind {} to {} in {}", btn.as<EMouse>(), action.as<EAction>(), context.as<EKeyContext>());
+            bind_btn(context.as<EKeyContext>(), btn.as<EMouse>(), action.as<EAction>());
+        }
+    }
 }
 
-detail::ActionHandler& ContextHandler::get_action_handler(KeyContext context)
+ContextHandler::ContextHandler()
+{
+    add_context(EKeyContext::DefaultContext);
+}
+
+detail::ActionHandler& ContextHandler::get_action_handler(EKeyContext context)
 {
     const auto& input_it = m_input_map.find(context);
     if (input_it == m_input_map.end())

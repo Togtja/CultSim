@@ -39,6 +39,11 @@ void Renderer::set_camera_position_2d(glm::vec2 position)
     m_camera.set_position_2d(position);
 }
 
+glm::vec2 Renderer::get_camera_position2d()
+{
+    return m_camera.get_position();
+}
+
 void Renderer::set_camera_bounds(glm::vec2 bounds)
 {
     m_camera.set_boundaries(bounds);

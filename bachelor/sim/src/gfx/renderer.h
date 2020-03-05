@@ -44,6 +44,7 @@ public:
     void move_camera(glm::vec3 delta);
 
     void set_camera_position_2d(glm::vec2 position);
+    glm::vec2 get_camera_position2d();
 
     void set_camera_bounds(glm::vec2 bounds);
 
