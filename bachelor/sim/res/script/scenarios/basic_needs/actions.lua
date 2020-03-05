@@ -4,14 +4,14 @@
 
 actions.sleep = {
     name = "Sleep",
-    requirements = Tag.None,
+    requirements = ETag.None,
     time_to_complete = 10.0,
     success = function(owner, target, registry) end
 }
 
 actions.consume_self = {
     name = "Consume Self",
-    requirements = Tag.None,
+    requirements = ETag.None,
     time_to_complete = 7.5,
     success = function(owner, target, registry) log.info("Consuming self!") end
 }
