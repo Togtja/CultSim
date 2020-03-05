@@ -362,7 +362,7 @@ void ScenarioScene::on_enter()
         }
         else
         {
-            spdlog::warn("adding system \"{}\" that is unknown", system);
+            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
 
