@@ -14,6 +14,7 @@ int main(int argc, char* argv[])
 
     auto lua_logger        = spdlog::stdout_color_st("lua");
     auto default_logger    = spdlog::stdout_color_st("default");
+    auto input_logger      = spdlog::stdout_color_st("input");
     /** Disable logs before running tests as we don't want them to pollute test information */
     spdlog::set_level(spdlog::level::off);
 
