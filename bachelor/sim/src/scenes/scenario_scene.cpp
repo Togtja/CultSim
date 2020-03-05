@@ -120,7 +120,7 @@ void ScenarioScene::on_enter()
 
     action::Action action_eat{static_cast<std::string>("Eat"),
                               TAG_Find,
-                              5.f,
+                              5.f, 
                               0.f,
                               {},
                               [](entt::entity e, entt::entity n, entt::registry& r) {
@@ -323,7 +323,7 @@ void ScenarioScene::on_enter()
                                       0,
                                       {},
                                       TAG_Food,
-                                      std::vector<action::Action>{action_inventory_food, action_eat}};
+                                      std::vector<action::Action>{action_eat, action_inventory_food}};
     ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
                                        0,
                                        {},
