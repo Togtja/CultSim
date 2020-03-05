@@ -15,7 +15,7 @@ Scenario quick_load_scenario(sol::state_view lua, std::string_view rpath)
     for (const auto& lua_file : fs::list_directory(rpath))
     {
         const auto& full_path = rpath.data() + std::string("/") + lua_file.data();
-        spdlog::debug("loading scenario resource: {}", full_path);
+        spdlog::get("scenario")->debug("loading scenario resource: {}", full_path);
 
         const auto& data = fs::read_file(full_path);
         lua.script(data);

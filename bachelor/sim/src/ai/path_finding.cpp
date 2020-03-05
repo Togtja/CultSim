@@ -77,7 +77,6 @@ bool find_path_astar(const glm::vec2& start_vec, const glm::vec2& goal_vec, std:
                 int new_cost = a_star_cost[curr] + 1; // + cost of graph node needs to be computed
                 if (a_star_cost.find(next) == a_star_cost.end() || new_cost < a_star_cost[next])
                 {
-                    // spdlog::warn("Found a node to check");
                     a_star_cost[next] = new_cost;
                     a_star_grid[next] = curr;
                     int priority      = new_cost + path_heuristic(next, goal);

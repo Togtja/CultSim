@@ -28,7 +28,7 @@ GLuint compile_shader(std::string_view source, GLenum type)
         auto log = std::string(len, '\0');
 
         glGetShaderInfoLog(shader, len, &len, log.data());
-        spdlog::error("{} shader compile error: {}", get_gl_shader_type_name(type).c_str(), log);
+        spdlog::get("graphics")->error("{} shader compile error: {}", get_gl_shader_type_name(type).c_str(), log);
 
         glDeleteShader(shader);
         return 0;
@@ -74,7 +74,7 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 
         /* Get the log text and print it */
         glGetProgramInfoLog(program, len, &len, log.data());
-        spdlog::error("program Link Error: {}", log);
+        spdlog::get("graphics")->error("program Link Error: {}", log);
 
         /* Cleanup and return an invalid GL Name */
         glDeleteProgram(program);
@@ -102,7 +102,7 @@ LoadedTexture load_texture(std::string_view rpath)
 {
     if (!fs::exists(rpath))
     {
-        spdlog::warn("texture does not exist: {}", rpath);
+        spdlog::get("graphics")->warn("texture does not exist: {}", rpath);
         return {};
     }
 
@@ -111,7 +111,7 @@ LoadedTexture load_texture(std::string_view rpath)
     auto out         = LoadedTexture{};
     const auto bytes = fs::read_byte_file(rpath);
     stbi_set_flip_vertically_on_load(true);
-    auto pixels      = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
+    auto pixels = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
 
     /** Copy pixels into output */
     out.pixels.resize(out.width * out.height * STBI_rgb_alpha);
@@ -139,9 +139,9 @@ static void APIENTRY gl_debug_callback(GLenum source,
 {
     switch (severity)
     {
-        case GL_DEBUG_SEVERITY_LOW: spdlog::debug(message); break;
-        case GL_DEBUG_SEVERITY_MEDIUM: spdlog::warn(message); break;
-        default: spdlog::error(message); break;
+        case GL_DEBUG_SEVERITY_LOW: spdlog::get("graphics")->debug(message); break;
+        case GL_DEBUG_SEVERITY_MEDIUM: spdlog::get("graphics")->warn(message); break;
+        default: spdlog::get("graphics")->error(message); break;
     }
 }
 

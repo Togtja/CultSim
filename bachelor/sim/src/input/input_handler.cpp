@@ -48,7 +48,9 @@ void ActionHandler::unbind_action(const EAction action)
     auto&& it2 = m_live_action_binding.find(action);
     if (it == m_action_binding.end() && it2 == m_live_action_binding.end())
     {
-        spdlog::trace("unbinding action {} for context id {}, not possible it does not exist", action, m_context_type);
+        spdlog::get("input")->trace("unbinding action {} for context id {}, not possible it does not exist",
+                                    action,
+                                    m_context_type);
         return;
     }
 
@@ -67,9 +69,9 @@ void ActionHandler::unbind_key(const SDL_Scancode scancode)
     auto&& it = m_key_binding.find(scancode);
     if (it == m_key_binding.end())
     {
-        spdlog::trace("unbinding key {} for context id {}, not possible it does not exist",
-                      get_key_name(scancode),
-                      m_context_type);
+        spdlog::get("input")->trace("unbinding key {} for context id {}, not possible it does not exist",
+                                    get_key_name(scancode),
+                                    m_context_type);
         return;
     }
     m_key_binding.erase(it);
@@ -80,7 +82,9 @@ void ActionHandler::unbind_btn(const EMouse button)
     auto&& it = m_mouse_binding.find(button);
     if (it == m_mouse_binding.end())
     {
-        spdlog::trace("unbinding mouse button id {} for context id {}, not possible it does not exist", button, m_context_type);
+        spdlog::get("input")->trace("unbinding mouse button id {} for context id {}, not possible it does not exist",
+                                    button,
+                                    m_context_type);
         return;
     }
     m_mouse_binding.erase(it);
@@ -174,7 +178,7 @@ void ContextHandler::add_context(const EKeyContext context, bool blocking)
 {
     if (!m_active_stack.empty() && context == EKeyContext::DefaultContext)
     {
-        spdlog::warn("can not add default context on top of something else");
+        spdlog::get("input")->warn("can not add default context on top of something else");
         return;
     }
 
@@ -196,7 +200,7 @@ void ContextHandler::remove_context(const EKeyContext context)
 {
     if (context == EKeyContext::DefaultContext)
     {
-        spdlog::warn("trying to remove the default context");
+        spdlog::get("input")->warn("trying to remove the default context");
         return;
     }
     auto context_it = std::find(std::begin(m_active_stack), std::end(m_active_stack), context);
@@ -207,7 +211,7 @@ void ContextHandler::remove_context(const EKeyContext context)
     }
     else
     {
-        spdlog::trace("removing context id {} not possible it does not exist", context);
+        spdlog::get("input")->trace("removing context id {} not possible it does not exist", context);
     }
 }
 
@@ -215,7 +219,7 @@ void ContextHandler::pop_context()
 {
     if (m_active_stack.size() <= 1)
     {
-        spdlog::warn("trying to remove the default context");
+        spdlog::get("input")->warn("trying to remove the default context");
         return;
     }
     m_active_stack.pop_back();
@@ -395,7 +399,7 @@ void ContextHandler::clear_context(const EKeyContext context)
     }
     else
     {
-        spdlog::trace("clearing context {}, however it does not exist in the mapping", context);
+        spdlog::get("input")->trace("clearing context {}, however it does not exist in the mapping", context);
     }
 }
 
@@ -442,14 +446,14 @@ void ContextHandler::load_binding_from_file(sol::state_view lua)
         for (auto&& [key, action] : key_action.as<sol::table>())
         {
             auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
-            spdlog::trace("Trying to bind {} to {} in {}",
-                          SDL_GetScancodeName(scancode),
-                          action.as<EAction>(),
-                          context.as<EKeyContext>());
+            spdlog::get("input")->trace("Trying to bind {} to {} in {}",
+                                        SDL_GetScancodeName(scancode),
+                                        action.as<EAction>(),
+                                        context.as<EKeyContext>());
 
             if (scancode == SDL_SCANCODE_UNKNOWN)
             {
-                spdlog::warn("invalid key name {} when reading key bindings", key.as<std::string>());
+                spdlog::get("input")->warn("invalid key name {} when reading key bindings", key.as<std::string>());
                 continue;
             }
             bind_key(context.as<EKeyContext>(), scancode, action.as<EAction>());
@@ -461,7 +465,10 @@ void ContextHandler::load_binding_from_file(sol::state_view lua)
     {
         for (auto&& [btn, action] : btn_action.as<sol::table>())
         {
-            spdlog::trace("Trying to bind {} to {} in {}", btn.as<EMouse>(), action.as<EAction>(), context.as<EKeyContext>());
+            spdlog::get("input")->trace("Trying to bind {} to {} in {}",
+                                        btn.as<EMouse>(),
+                                        action.as<EAction>(),
+                                        context.as<EKeyContext>());
             bind_btn(context.as<EKeyContext>(), btn.as<EMouse>(), action.as<EAction>());
         }
     }
