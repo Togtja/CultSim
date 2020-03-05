@@ -186,7 +186,6 @@ void ScenarioScene::on_enter()
                     {
                         if (repr->sex == component::Reproduction::Female && target_repr->sex == component::Reproduction::Male)
                         {
-                            spdlog::warn("Pregnancy started");
                             r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e, entt::registry& r) {
                                 if (r.valid(e))
                                 {
@@ -199,8 +198,6 @@ void ScenarioScene::on_enter()
                                     {
                                         need.status = 100.f;
                                     }
-
-                                    spdlog::warn("Pregnancy finished");
 
                                     RandomEngine rng{};
                                     child_reprd.number_of_children = 0;
