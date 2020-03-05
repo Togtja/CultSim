@@ -118,7 +118,7 @@ void ScenarioScene::on_enter()
                                   }
                               },
                               [](entt::entity e, entt::registry& r) {
-                                  spdlog::warn("We failed to finish action: eat");
+                                  spdlog::debug("Agent {} failed to finish action: eat", e);
                                   r.destroy(e);
                               },
                               []() {
@@ -141,33 +141,33 @@ void ScenarioScene::on_enter()
                                     }
                                 },
                                 [](entt::entity e, entt::registry& r) {
-                                    spdlog::warn("We failed to finish action: drink");
+                                    spdlog::debug("Agent {} failed to finish action: drink", e);
                                     r.destroy(e);
                                 },
                                 []() {
                                     spdlog::warn("We aborted our action");
                                 }};
 
-    action::Action action_sleep{static_cast<std::string>("Sleep"),
-                                TAG_None,
-                                10.f,
-                                0.f,
-                                {},
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::warn("SUCCESS SLEEP!");
-                                    for (auto& need : r.get<component::Needs>(e).needs)
-                                    {
-                                        if (need.tags & TAG_Sleep)
-                                        {
-                                            spdlog::warn("SUCCESS ADD TO SLEEP!");
-                                            need.status += 69.f;
-                                        }
-                                    }
-                                },
-                                [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: sleep"); },
-                                []() {
-                                    spdlog::warn("We aborted our action");
-                                }};
+    action::Action action_sleep{
+        static_cast<std::string>("Sleep"),
+        TAG_None,
+        10.f,
+        0.f,
+        {},
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            for (auto& need : r.get<component::Needs>(e).needs)
+            {
+                if (need.tags & TAG_Sleep)
+                {
+                    spdlog::warn("Agent {} has sleept", e);
+                    need.status += 69.f;
+                }
+            }
+        },
+        [](entt::entity e, entt::registry& r) { spdlog::warn("Agent {} failed to finish action: sleep", e); },
+        []() {
+            spdlog::warn("We aborted our action");
+        }};
 
     action::Action action_reproduce{
         static_cast<std::string>("Reproduce"),
@@ -581,7 +581,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    ImGui::Text("Ola Normann");
+    auto text = fmt::format("Ola Normann nr {}", static_cast<int64_t>(selection_info.selected_entity));
+    ImGui::Text(text.c_str());
 
     if (health)
     {
