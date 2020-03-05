@@ -396,10 +396,10 @@ TEST_CASE("attempting to create blocking context")
     auto& input = get_input();
     int times0  = 0;
     int times1  = 0;
-    input.fast_bind_key(KeyContext::DefaultContext, SDL_SCANCODE_P, Action::MoveLeft, [&times0]() { times0++; });
-    input.fast_bind_key(KeyContext::Agent, SDL_SCANCODE_A, Action::MoveLeft, [&times1]() { times1++; });
+    input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_P, EAction::MoveLeft, [&times0]() { times0++; });
+    input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_A, EAction::MoveLeft, [&times1]() { times1++; });
     // Blocks everything "below" the stack, so Default should not trigger
-    input.add_context(KeyContext::Agent, true);
+    input.add_context(EKeyContext::Agent, true);
 
     input.handle_input(e);
     input.handle_input(e2);
@@ -416,7 +416,7 @@ TEST_CASE("attempting to bind mousebutton")
 
     auto& input  = get_input();
     bool success = false;
-    input.fast_bind_btn(KeyContext::DefaultContext, Mouse::Left, Action::MoveFWD, [&success]() { success = true; });
+    input.fast_bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp, [&success]() { success = true; });
     input.handle_input(e);
     CHECK(success == true);
     input.clear();
@@ -430,8 +430,8 @@ TEST_CASE("attempting to handle live input mousebutton")
     auto& input = get_input();
     float time  = 50;
 
-    input.bind_btn(KeyContext::DefaultContext, Mouse::Left, Action::MoveFWD);
-    input.bind_action(KeyContext::DefaultContext, Action::MoveFWD, [&time](float dt) { time += dt; });
+    input.bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp);
+    input.bind_action(EKeyContext::DefaultContext, EAction::MoveUp, [&time](float dt) { time += dt; });
 
     input.handle_live_input(0.5f);
     CHECK(time == 50.5f);
