@@ -28,6 +28,7 @@ void Health::update(float dt)
         {
             m_context.registry->destroy(e);
         }
+        health.hp = std::clamp(health.hp + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
     });
 }
 } // namespace cs::system
