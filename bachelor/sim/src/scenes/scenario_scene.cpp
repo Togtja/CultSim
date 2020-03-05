@@ -148,12 +148,12 @@ void ScenarioScene::on_enter()
                                          {},
                                          [](entt::entity e, entt::entity n, entt::registry& r) {
                                              auto inventory = r.try_get<component::Inventory>(e);
-                                             if (inventory && inventory->tags | TAG_Food)
+                                             if (inventory && inventory->tags & TAG_Food)
                                              {
                                                  int i = 0;
                                                  for (auto& content : inventory->contents)
                                                  {
-                                                     if (r.get<component::Tags>(content).tags | TAG_Food)
+                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
                                                      {
                                                          for (auto& need : r.get<component::Needs>(e).needs)
                                                          {
@@ -171,12 +171,12 @@ void ScenarioScene::on_enter()
                                          },
                                          [](entt::entity e, entt::registry& r) {
                                              auto inventory = r.try_get<component::Inventory>(e);
-                                             if (inventory && inventory->tags | TAG_Food)
+                                             if (inventory && inventory->tags & TAG_Food)
                                              {
                                                  int i = 0;
                                                  for (auto& content : inventory->contents)
                                                  {
-                                                     if (r.get<component::Tags>(content).tags | TAG_Food)
+                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
                                                      {
                                                          inventory->contents.erase(inventory->contents.begin() + i);
                                                          return;
@@ -323,7 +323,7 @@ void ScenarioScene::on_enter()
                                       0,
                                       {},
                                       TAG_Food,
-                                      std::vector<action::Action>{action_eat}};
+                                      std::vector<action::Action>{action_inventory_food, action_eat}};
     ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
                                        0,
                                        {},
@@ -340,6 +340,12 @@ void ScenarioScene::on_enter()
                                    {},
                                    ETag(TAG_Reproduce | TAG_Human),
                                    std::vector<action::Action>{action_reproduce}};
+
+    ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
+                                0,
+                                {},
+                                ETag(TAG_Food|TAG_Gather),
+                                std::vector<action::Action>{action_pickup_food}};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
