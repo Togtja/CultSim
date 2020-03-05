@@ -125,6 +125,51 @@ void ScenarioScene::on_enter()
                                   spdlog::warn("We aborted our action");
                               }};
 
+    action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
+                                         {},
+                                         2.0f,
+                                         0.f,
+                                         {},
+                                         [](entt::entity e, entt::entity n, entt::registry& r) {
+                                             auto inventory = r.try_get<component::Inventory>(e);
+                                             if (inventory && inventory->tags | TAG_Food)
+                                             {
+                                                 int i = 0;
+                                                 for (auto& content : inventory->contents)
+                                                 {
+                                                     if (r.get<component::Tags>(content).tags | TAG_Food)
+                                                     {
+                                                         for (auto& need : r.get<component::Needs>(e).needs)
+                                                         {
+                                                             if (need.tags | TAG_Food) 
+                                                             {
+                                                                 need.status += 80.f;
+                                                             }
+                                                         }
+                                                         inventory->contents.erase(inventory->contents.begin() + i);
+                                                         return;
+                                                     }
+                                                     i++;
+                                                 }
+                                             }
+                                         },
+                                         [](entt::entity e, entt::registry& r) {
+                                             auto inventory = r.try_get<component::Inventory>(e);
+                                             if (inventory && inventory->tags | TAG_Food)
+                                             {
+                                                 int i = 0;
+                                                 for (auto& content : inventory->contents)
+                                                 {
+                                                     if (r.get<component::Tags>(content).tags | TAG_Food) {
+                                                         inventory->contents.erase(inventory->contents.begin() + i);
+                                                         return;
+                                                     }
+                                                     i++;
+                                                 }
+                                             }
+                                         }
+                        ,
+                                         {}};
     action::Action action_drink{static_cast<std::string>("Drink"),
                                 TAG_Find,
                                 2.f,
@@ -213,7 +258,7 @@ void ScenarioScene::on_enter()
                                     {
                                         for (auto action : strat.actions)
                                         {
-                                            if (action.target != entt::null) 
+                                            if (action.target != entt::null)
                                             {
                                                 action.target = child;
                                             }
