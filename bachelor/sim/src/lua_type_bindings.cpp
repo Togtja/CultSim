@@ -5,6 +5,7 @@
 #include "entity/components/tags.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "input/input_handler.h"
 #include "random_engine.h"
 
 namespace cs::lua
@@ -28,15 +29,18 @@ void bind_dataonly(sol::state_view lua)
                                 "z",
                                 &glm::vec3::z);
 
-    lua.new_enum<ETag>("Tag",
-                       {{"Food", ETag::TAG_Food},
+    lua.new_enum<ETag>("ETag",
+                       {{"None", ETag::TAG_None},
+                        {"Food", ETag::TAG_Food},
                         {"Drink", ETag::TAG_Drink},
                         {"Sleep", ETag::TAG_Sleep},
                         {"Joy", ETag::TAG_Joy},
                         {"Location", ETag::TAG_Location},
                         {"Find", ETag::TAG_Find},
                         {"Vision", ETag::TAG_Vision},
-                        {"Avoidable", ETag::TAG_Avoidable}});
+                        {"Avoidable", ETag::TAG_Avoidable},
+                        {"Reproduce", ETag::TAG_Reproduce},
+                        {"Human", ETag::TAG_Human}});
 }
 
 void bind_components(sol::state_view lua)
@@ -51,12 +55,56 @@ void bind_components(sol::state_view lua)
                                &ai::Need::status,
                                "decay_rate",
                                &ai::Need::decay_rate,
+                               "vitality",
+                               &ai::Need::vitality,
                                "tags",
                                &ai::Need::tags);
+
+    lua.new_usertype<action::Action>("Action",
+                                     "name",
+                                     &action::Action::name,
+                                     "requirements",
+                                     &action::Action::requirements,
+                                     "time_to_complete",
+                                     &action::Action::time_to_complete,
+                                     "success",
+                                     &action::Action::success,
+                                     "failure",
+                                     &action::Action::failure,
+                                     "abort",
+                                     &action::Action::abort);
 
     /** Components */
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
+    // Ignoring Avoidance_cs and Avoid_count since those cna be change using the UI and ignoring desired_position as that is
+    // a part of the pathfinding algorithm
+    lua.new_usertype<component::Movement>("MovementComponent",
+                                          "direction",
+                                          &component::Movement::direction,
+                                          "speed",
+                                          &component::Movement::speed);
+
+    lua.new_usertype<component::Vision>("VisionComponent",
+                                        "vision radius",
+                                        &component::Vision::vision_radius,
+                                        "field of view",
+                                        &component::Vision::fov);
+
+    lua.new_usertype<component::Hearing>("HearingComponent", "hearing radius", &component::Hearing::sound_radius);
+    lua.new_usertype<component::Smell>("SmellComponent", "smell radius", &component::Smell::smell_radius);
+
+    lua.new_usertype<component::Reproduction>("ReproductionComponent",
+                                              "sex",
+                                              &component::Reproduction::sex,
+                                              "max children",
+                                              &component::Reproduction::number_of_children);
+
+    lua.new_usertype<component::Health>("HealthComponet",
+                                        "health",
+                                        &component::Health::hp,
+                                        "tickdown rate",
+                                        &component::Health::tickdown_rate);
 }
 
 void bind_systems(sol::state_view lua)
@@ -85,7 +133,37 @@ void bind_systems(sol::state_view lua)
                                "shutdown",
                                &Scenario::shutdown);
 }
+void bind_input(sol::state_view lua)
+{
+    lua.new_enum<input::EKeyContext>("EKeyContext",
+                                     {{"DefaultContext", input::EKeyContext::DefaultContext},
+                                      {"Agent", input::EKeyContext::Agent},
+                                      {"AgentOnHover", input::EKeyContext::AgentOnHover},
+                                      {"ScenarioScene", input::EKeyContext::ScenarioScene}});
 
+    lua.new_enum<input::EAction>("EAction",
+                                 {{"MoveUp", input::EAction::MoveUp},
+                                  {"MoveDown", input::EAction::MoveDown},
+                                  {"MoveLeft", input::EAction::MoveLeft},
+                                  {"MoveRight", input::EAction::MoveRight},
+                                  {"Pause", input::EAction::Pause},
+                                  {"ZoomIn", input::EAction::ZoomIn},
+                                  {"ZoomOut", input::EAction::ZoomOut},
+                                  {"SelectEntity", input::EAction::SelectEntity},
+                                  {"FollowEntity", input::EAction::FollowEntity}});
+
+    lua.new_enum<input::EMouse>("EMouse",
+                                {{"Left", input::EMouse::Left},
+                                 {"Right", input::EMouse::Right},
+                                 {"Middle", input::EMouse::Middle},
+                                 {"Move", input::EMouse::Move},
+                                 {"WheelUp", input::EMouse::WheelUp},
+                                 {"WheelDown", input::EMouse::WheelDown},
+                                 {"WheelLeft", input::EMouse::WheelLeft},
+                                 {"WheelRight", input::EMouse::WheelRight},
+                                 {"X1", input::EMouse::X1},
+                                 {"X2", input::EMouse::X2}});
+}
 void bind_utils(sol::state_view lua)
 {
     /** Enable use of random number generator */

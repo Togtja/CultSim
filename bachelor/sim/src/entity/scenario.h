@@ -13,6 +13,7 @@ struct Scenario
 {
     std::string name{};
     std::string description{};
+    std::string script_path{};
 
     /** Number of agents initially */
     int agent_count{};

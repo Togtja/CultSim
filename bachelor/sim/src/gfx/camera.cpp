@@ -34,6 +34,11 @@ void Camera::set_position(glm::vec3 position)
     m_pos = position;
 }
 
+glm::vec3 Camera::get_position()
+{
+    return m_pos;
+}
+
 void Camera::move(glm::vec3 delta)
 {
     m_pos += delta;
