@@ -48,7 +48,7 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
     /** If we alreadly loaded this texture, then give it back */
     if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
-        spdlog::info("used cached texture for {}", rpath);
+        spdlog::get("graphics")->info("used cached texture for {}", rpath);
         return itr->second;
     }
 
@@ -88,7 +88,7 @@ bool SpriteRenderer::increment_next_texture_id()
 
     if (m_next_texture_id.index > 7)
     {
-        spdlog::error("sprite renderer is full on textures!");
+        spdlog::get("graphics")->error("sprite renderer is full on textures!");
         return false;
     }
 
