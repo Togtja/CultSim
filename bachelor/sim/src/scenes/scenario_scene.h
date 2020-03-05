@@ -14,6 +14,8 @@
 
 namespace cs
 {
+struct Preference;
+
 /**
  * Generic Scene for running simulation scenarios
  */
@@ -40,6 +42,9 @@ private:
 
     /** The scenario we are running */
     lua::Scenario m_scenario;
+
+    /** Keep track of screen resolution */
+    glm::vec2 m_resolution{};
 
     /** Time sim has been running */
     float m_simtime = 0.f;
@@ -71,5 +76,7 @@ private:
     void draw_selected_entity_information_ui();
 
     void update_entity_hover();
+
+    void handle_preference_changed(const Preference& before, const Preference& after);
 };
 } // namespace cs

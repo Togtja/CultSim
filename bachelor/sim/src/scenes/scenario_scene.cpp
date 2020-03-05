@@ -34,6 +34,11 @@ extern ImFont* g_light_font;
 
 namespace cs
 {
+ScenarioScene::ScenarioScene(std::string_view scenario)
+{
+    m_scenario.script_path = scenario;
+}
+
 ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
 {
 }
@@ -42,13 +47,16 @@ void ScenarioScene::on_enter()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
-    m_context->lua_state.script(fs::read_file("script/needs.lua"));
+    m_scenario                     = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
     m_scenario.init();
 
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
+
+    m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     /** Select entity on click */
     input::get_input().fast_bind_btn(input::KeyContext::ScenarioScene, input::Mouse::Left, input::Action::SelectEntity, [this] {
@@ -85,12 +93,12 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::KeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("hunger"), 3.f, m_rng.uniform(60.f, 76.f), 1.f, 0.5f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("thirst"), 4.f, m_rng.uniform(60.f, 86.f), 1.5f, 1.f, TAG_Drink};
-    ai::Need need_sleep        = {static_cast<std::string>("sleep"), 1.f, 96.f, 0.5f, 0.1f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
+    ai::Need need_hunger       = {static_cast<std::string>("Hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
+    ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
+    ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
+    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
-    action::Action action_eat{static_cast<std::string>("eat"),
+    action::Action action_eat{static_cast<std::string>("Eat"),
                               TAG_Find,
                               5.f,
                               0.f,
@@ -113,7 +121,7 @@ void ScenarioScene::on_enter()
                                   spdlog::warn("We aborted our action");
                               }};
 
-    action::Action action_drink{static_cast<std::string>("drink"),
+    action::Action action_drink{static_cast<std::string>("Drink"),
                                 TAG_Find,
                                 2.f,
                                 0.f,
@@ -136,17 +144,19 @@ void ScenarioScene::on_enter()
                                     spdlog::warn("We aborted our action");
                                 }};
 
-    action::Action action_sleep{static_cast<std::string>("sleep"),
+    action::Action action_sleep{static_cast<std::string>("Sleep"),
                                 TAG_None,
-                                1.f,
+                                10.f,
                                 0.f,
                                 {},
                                 [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    spdlog::warn("SUCCESS SLEEP!");
                                     for (auto& need : r.get<component::Needs>(e).needs)
                                     {
                                         if (need.tags & TAG_Sleep)
                                         {
-                                            need.status += 10.f;
+                                            spdlog::warn("SUCCESS ADD TO SLEEP!");
+                                            need.status += 69.f;
                                         }
                                     }
                                 },
@@ -233,23 +243,23 @@ void ScenarioScene::on_enter()
             spdlog::warn("We aborted our action: reproduce");
         }};
 
-    ai::Strategy strategy_findfood  = {static_cast<std::string>("eat food"),
+    ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
                                       0,
                                       {},
                                       TAG_Food,
                                       std::vector<action::Action>{action_eat}};
-    ai::Strategy strategy_finddrink = {static_cast<std::string>("drink water"),
+    ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
                                        0,
                                        {},
                                        TAG_Drink,
                                        std::vector<action::Action>{action_drink}};
-    ai::Strategy strategy_sleep     = {static_cast<std::string>("sleep"),
+    ai::Strategy strategy_sleep     = {static_cast<std::string>("Sleep"),
                                    0,
                                    {},
                                    TAG_Sleep,
                                    std::vector<action::Action>{action_sleep}};
 
-    ai::Strategy strategy_breed = {static_cast<std::string>("reproduce"),
+    ai::Strategy strategy_breed = {static_cast<std::string>("Looking for a mate"),
                                    0,
                                    {},
                                    ETag(TAG_Reproduce | TAG_Human),
@@ -352,16 +362,17 @@ void ScenarioScene::on_enter()
         }
     }
 
-    /** Update systems */
-    for (auto&& system : m_active_systems)
-    {
-        system.type().func("update"_hs).invoke(system, 20.f);
-    }
+    //    /** Update systems */
+    //    for (auto&& system : m_active_systems)
+    //    {
+    //        system.type().func("update"_hs).invoke(system, 20.f);
+    //    }
 }
 
 void ScenarioScene::on_exit()
 {
     input::get_input().remove_context(input::KeyContext::ScenarioScene);
+    m_context->preferences->on_preference_changed.disconnect<&ScenarioScene::handle_preference_changed>(this);
 }
 
 bool ScenarioScene::update(float dt)
@@ -515,20 +526,12 @@ void ScenarioScene::draw_scenario_information_ui()
     }
 
     /** Plot number of living entities */
-    int offset = living_entities.size() > 100 ? living_entities.size() - 100u : 0;
-    ImGui::PlotLines("##Alive",
-                     living_entities.data(),
-                     living_entities.size(),
-                     offset,
-                     "Living Agents",
-                     FLT_MAX,
-                     FLT_MAX,
-                     {0, 75});
+    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
 {
-    ImGui::SetNextWindowPos({960.f, 0.f}, 0, {0.5f, 0.f});
+    ImGui::SetNextWindowPos({m_resolution.x / 2.f, 0.f}, 0, {0.5f, 0.f});
     ImGui::SetNextWindowSize({360, 64});
     ImGui::Begin("Time Control", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
     ImGui::Text("Time Scaling");
@@ -580,8 +583,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     const auto& [needs, health, strategy] =
         m_registry.try_get<component::Needs, component::Health, component::Strategies>(selection_info.selected_entity);
 
-    ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_Once);
-    ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_Once);
+    ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
     ImGui::Text("Ola Normann");
@@ -598,6 +601,19 @@ void ScenarioScene::draw_selected_entity_information_ui()
         if (!strategy->staged_strategies.empty())
         {
             ImGui::Text("Currently: %s", strategy->staged_strategies.front().name.c_str());
+            if (!strategy->staged_strategies.front().actions.empty())
+            {
+                const auto& action = strategy->staged_strategies.front().actions.front();
+                if (action.time_spent > 0.f)
+                {
+                    ImGui::Indent();
+                    ImGui::Text("%s", action.name.c_str());
+                    ImGui::TextColored({0.f, 0.749, 1.0, 1.0}, " (%4.2f/%4.2f)", action.time_spent, action.time_to_complete);
+                    ImGui::SameLine();
+                    ImGui::ProgressBar(action.time_spent / action.time_to_complete, {-1, 0}, "Progress");
+                    ImGui::Unindent();
+                }
+            }
         }
     }
 
@@ -626,7 +642,7 @@ void ScenarioScene::update_entity_hover()
 {
     auto&& selection_helper = m_registry.ctx<EntitySelectionHelper>();
     auto cursor_pos         = input::get_input().get_mouse_pos();
-    auto world_pos          = gfx::get_renderer().screen_to_world_pos({cursor_pos.x, 1080.f - cursor_pos.y});
+    auto world_pos = gfx::get_renderer().screen_to_world_pos({cursor_pos.x, m_resolution.y - cursor_pos.y}, m_resolution);
 
     auto hover_view = m_registry.view<component::Position, component::Sprite>();
     if (m_registry.valid(selection_helper.hovered_entity))
@@ -657,6 +673,14 @@ void ScenarioScene::update_entity_hover()
     ImGui::Text("Hovering: %u | Selected: %u",
                 static_cast<uint32_t>(selection_helper.hovered_entity),
                 static_cast<uint32_t>(selection_helper.selected_entity));
+}
+
+void ScenarioScene::handle_preference_changed(const Preference& before, const Preference& after)
+{
+    if (after.name == "Resolution")
+    {
+        m_resolution = std::get<glm::ivec2>(after.value);
+    }
 }
 
 } // namespace cs

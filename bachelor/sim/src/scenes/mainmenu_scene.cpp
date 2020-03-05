@@ -48,8 +48,7 @@ bool MainMenuScene::update(float dt)
     {
         if (ImGui::Button("Basic Needs", {150, 50}))
         {
-            auto&& scenario = lua::quick_load_scenario(m_context->lua_state, "script/scenarios/basic_needs.lua");
-            m_context->scene_manager->push<ScenarioScene>(scenario);
+            m_context->scene_manager->push<ScenarioScene>("script/scenarios/basic_needs");
         }
         if (ImGui::Button("Cancel", {150, 25}))
         {
