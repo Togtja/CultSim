@@ -1,0 +1,15 @@
+#pragma once
+
+#include "memory.h"
+#include <entity/components/tags.h>
+
+namespace cs
+{
+
+struct MemoryContainer
+{
+    ETag memory_tag{};
+
+    std::vector<IMemory> memory_Container{};
+};
+} // namespace cs
