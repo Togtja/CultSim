@@ -34,7 +34,7 @@ void Camera::set_position(glm::vec3 position)
     m_pos = position;
 }
 
-glm::vec3 Camera::get_position()
+glm::vec3 Camera::get_position() const
 {
     return m_pos;
 }
