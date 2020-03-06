@@ -19,7 +19,7 @@ void Health::update(float dt)
                 health.hp -= dt * health.tickdown_rate * need.vitality;
                 if (health.hp <= 0.f)
                 {
-                    spdlog::warn("Entity {} killed by need {}", e, need.name);
+                    spdlog::get("agent")->warn("Entity {} killed by need {}", e, need.name);
                 }
             }
         }
