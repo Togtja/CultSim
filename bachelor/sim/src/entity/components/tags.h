@@ -17,7 +17,8 @@ enum ETag : uint64_t
     TAG_Reproduce = 1 << 9,
     TAG_Human     = 1 << 10,
     TAG_Tag       = 1 << 11,
-    TAG_Gather    = 1 << 12
+    TAG_Gather    = 1 << 12,
+    TAG_Memory =1 << 13
 };
 
 inline std::string tag_to_string(ETag tag)
@@ -37,6 +38,7 @@ inline std::string tag_to_string(ETag tag)
         case 1<<10: return "Human";
         case 1<<11: return "Tag";
         case 1 << 12: return "Gather";
+        case 1 << 13: return "Memory";
         default: return "Error";
     }
 }
