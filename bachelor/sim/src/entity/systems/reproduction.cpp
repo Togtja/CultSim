@@ -18,10 +18,10 @@ void Reproduction::update(float dt)
             {
                 needs.needs.erase(need);
             }
-            auto pressing_need = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), temp);
-            if (pressing_need != needs.pressing_needs.end())
+            auto pressing_need = std::find(needs.vital_needs.begin(), needs.vital_needs.end(), temp);
+            if (pressing_need != needs.vital_needs.end())
             {
-                needs.pressing_needs.erase(pressing_need);
+                needs.vital_needs.erase(pressing_need);
             }
             else
             {

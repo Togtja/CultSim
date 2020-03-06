@@ -36,4 +36,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/reproduction.h
         ${CMAKE_CURRENT_LIST_DIR}/reproduction.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/inventory.h
+        ${CMAKE_CURRENT_LIST_DIR}/inventory.cpp
 )

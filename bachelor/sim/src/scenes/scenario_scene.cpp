@@ -102,6 +102,23 @@ void ScenarioScene::on_enter()
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
+
+    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
+                                      TAG_Find,
+                                      1.f,
+                                      0.f,
+                                      {},
+                                      [](entt::entity e, entt::entity n, entt::registry& r) {
+                                          r.remove<component::Position>(n);
+                                          r.remove<component::Sprite>(n);
+                                          r.get<component::Inventory>(e).contents.push_back(n);
+                                      },
+                                      [](entt::entity e, entt::registry& r) {
+                                          spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
+                                          r.destroy(e);
+                                      },
+                                      {}};
+
     action::Action action_eat{static_cast<std::string>("Eat"),
                               TAG_Find,
                               5.f,
@@ -125,6 +142,51 @@ void ScenarioScene::on_enter()
                                   spdlog::get("agent")->warn("We aborted our action");
                               }};
 
+    action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
+                                         {},
+                                         2.0f,
+                                         0.f,
+                                         {},
+                                         [](entt::entity e, entt::entity n, entt::registry& r) {
+                                             auto inventory = r.try_get<component::Inventory>(e);
+                                             if (inventory && inventory->tags & TAG_Food)
+                                             {
+                                                 int i = 0;
+                                                 for (auto& content : inventory->contents)
+                                                 {
+                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
+                                                     {
+                                                         for (auto& need : r.get<component::Needs>(e).needs)
+                                                         {
+                                                             if (need.tags | TAG_Food)
+                                                             {
+                                                                 need.status += 80.f;
+                                                             }
+                                                         }
+                                                         inventory->contents.erase(inventory->contents.begin() + i);
+                                                         return;
+                                                     }
+                                                     i++;
+                                                 }
+                                             }
+                                         },
+                                         [](entt::entity e, entt::registry& r) {
+                                             auto inventory = r.try_get<component::Inventory>(e);
+                                             if (inventory && inventory->tags & TAG_Food)
+                                             {
+                                                 int i = 0;
+                                                 for (auto& content : inventory->contents)
+                                                 {
+                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
+                                                     {
+                                                         inventory->contents.erase(inventory->contents.begin() + i);
+                                                         return;
+                                                     }
+                                                     i++;
+                                                 }
+                                             }
+                                         },
+                                         {}};
     action::Action action_drink{static_cast<std::string>("Drink"),
                                 TAG_Find,
                                 2.f,
@@ -165,7 +227,7 @@ void ScenarioScene::on_enter()
                 }
             }
         },
-        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("We failed to finish action: sleep"); },
+        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("Agent {} failed to finish action: sleep", e); },
         []() {
             spdlog::get("agent")->warn("We aborted our action");
         }};
@@ -209,6 +271,17 @@ void ScenarioScene::on_enter()
                                     auto& child_reprd  = r.get<component::Reproduction>(child);
                                     auto& child_health = r.get<component::Health>(child);
                                     auto& child_pos    = r.get<component::Position>(child);
+                                    auto& child_strat  = r.get<component::Strategies>(child);
+                                    for (auto strat : child_strat.strategies)
+                                    {
+                                        for (auto action : strat.actions)
+                                        {
+                                            if (action.target != entt::null)
+                                            {
+                                                action.target = child;
+                                            }
+                                        }
+                                    }
                                     for (auto need : child_needs.needs)
                                     {
                                         need.status = 100.f;
@@ -252,7 +325,7 @@ void ScenarioScene::on_enter()
                                       0,
                                       {},
                                       TAG_Food,
-                                      std::vector<action::Action>{action_eat}};
+                                      std::vector<action::Action>{action_eat, action_inventory_food}};
     ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
                                        0,
                                        {},
@@ -269,6 +342,12 @@ void ScenarioScene::on_enter()
                                    {},
                                    ETag(TAG_Reproduce | TAG_Human),
                                    std::vector<action::Action>{action_reproduce}};
+
+    ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
+                                0,
+                                {},
+                                ETag(TAG_Food|TAG_Gather),
+                                std::vector<action::Action>{action_pickup_food}};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
@@ -560,10 +639,23 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 5.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("!!", {24, 24}))
+    if (ImGui::Button(">>>>", {36, 24}))
     {
-        m_timescale = 25.f;
+        m_timescale = 10.f;
     }
+    ImGui::SameLine();
+    if (ImGui::Button("Turbo", {36, 24}))
+        if (ImGui::Button("!!", {24, 24}))
+        {
+            m_timescale = 25.f;
+        }
+    ImGui::SameLine();
+    if (ImGui::Button("!!!", {24, 24}))
+    {
+        m_timescale = 100.f;
+    }
+    ImGui::End();
+
     ImGui::End();
 }
 
@@ -582,7 +674,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    ImGui::Text("Ola Normann");
+    auto text = fmt::format("Ola Normann nr {}", static_cast<int64_t>(selection_info.selected_entity));
+    ImGui::Text(text.c_str());
 
     if (health)
     {
