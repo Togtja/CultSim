@@ -4,8 +4,8 @@ namespace cs
 {
 class IMemory
 {
-private:
 public:
-  
+    ETag tags{};
+    IMemory(ETag tag) : tags(tag){};
 };
 } // namespace cs
