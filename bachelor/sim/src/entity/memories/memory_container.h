@@ -10,6 +10,6 @@ struct MemoryContainer
 {
     ETag memory_tag{};
 
-    std::vector<IMemory> memory_Container{};
+    std::vector<std::unique_ptr<IMemory>> memory_Container{};
 };
 } // namespace cs
