@@ -493,7 +493,7 @@ bool ScenarioScene::update(float dt)
         system.type().func("update"_hs).invoke(system, dt);
     }
 
-    ImGui::End();
+
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);
