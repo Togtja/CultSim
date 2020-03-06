@@ -114,7 +114,7 @@ void ScenarioScene::on_enter()
                                           r.get<component::Inventory>(e).contents.push_back(n);
                                       },
                                       [](entt::entity e, entt::registry& r) {
-                                          spdlog::debug("Agent {} failed to finish action: gather food", e);
+                                          spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
                                           r.destroy(e);
                                       },
                                       {}};
