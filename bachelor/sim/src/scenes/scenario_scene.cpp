@@ -14,6 +14,8 @@
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
+#include "entity/memories/memory_container.h"
+#include"entity/memories/memory.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
 #include "preferences.h"
@@ -384,6 +386,10 @@ void ScenarioScene::on_enter()
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
             std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
+        m_registry.assign<component::Memory>(
+            agent,
+            std::vector<MemoryContainer>{
+                MemoryContainer{ETag(TAG_Food | TAG_Location | TAG_Memory), std::vector<std::unique_ptr<IMemory>>()}});
     }
 
     for (int j = 0; j < 75; j++)
