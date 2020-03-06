@@ -86,8 +86,9 @@ void ScenarioScene::on_enter()
             return;
         }
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
-        auto& pos =
-            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.5f);
+
+        // TODO: Steal UE4 FInterpretTo
+        auto pos = glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
