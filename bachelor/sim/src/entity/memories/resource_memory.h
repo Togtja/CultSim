@@ -1,6 +1,5 @@
 #pragma
 #include "memory.h"
-
 #include <glm/vec3.hpp>
 
 namespace cs
@@ -8,8 +7,8 @@ namespace cs
 class ResourceMemory : public IMemory
 {
 public:
-    ResourceMemory(Etag tags, float time_of_creation, glm::vec3 location, int number_of_matching_entities) :
-        IMemory(tags, float time_of_creation),
+    ResourceMemory(ETag tags, float time_of_creation, glm::vec3 location, int number_of_matching_entities) :
+        IMemory(tags, time_of_creation),
         m_location(location),
         m_number_of_matching_entities(number_of_matching_entities){};
 
