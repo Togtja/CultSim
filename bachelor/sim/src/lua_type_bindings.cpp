@@ -40,7 +40,10 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable},
                         {"Reproduce", ETag::TAG_Reproduce},
-                        {"Human", ETag::TAG_Human}});
+                        {"Human", ETag::TAG_Human},
+                        {"Tag", ETag::TAG_Tag},
+                        {"Gather", ETag::TAG_Gather},
+                        {"Memory", ETag::TAG_Memory}});
 }
 
 void bind_components(sol::state_view lua)
