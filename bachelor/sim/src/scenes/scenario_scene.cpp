@@ -101,7 +101,7 @@ void ScenarioScene::on_enter()
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
-   
+
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
@@ -121,7 +121,7 @@ void ScenarioScene::on_enter()
 
     action::Action action_eat{static_cast<std::string>("Eat"),
                               TAG_Find,
-                              5.f, 
+                              5.f,
                               0.f,
                               {},
                               [](entt::entity e, entt::entity n, entt::registry& r) {
@@ -135,11 +135,11 @@ void ScenarioScene::on_enter()
                                   }
                               },
                               [](entt::entity e, entt::registry& r) {
-                                  spdlog::debug("Agent {} failed to finish action: eat", e);
+                                  spdlog::get("agent")->warn("We failed to finish action: eat");
                                   r.destroy(e);
                               },
                               []() {
-                                  spdlog::warn("We aborted our action");
+                                  spdlog::get("agent")->warn("We aborted our action");
                               }};
 
     action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
@@ -203,11 +203,11 @@ void ScenarioScene::on_enter()
                                     }
                                 },
                                 [](entt::entity e, entt::registry& r) {
-                                    spdlog::debug("Agent {} failed to finish action: drink", e);
+                                    spdlog::get("agent")->warn("We failed to finish action: drink");
                                     r.destroy(e);
                                 },
                                 []() {
-                                    spdlog::warn("We aborted our action");
+                                    spdlog::get("agent")->warn("We aborted our action");
                                 }};
 
     action::Action action_sleep{
@@ -217,18 +217,19 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
+            spdlog::get("agent")->warn("SUCCESS SLEEP!");
             for (auto& need : r.get<component::Needs>(e).needs)
             {
                 if (need.tags & TAG_Sleep)
                 {
-                    spdlog::warn("Agent {} has slept", e);
+                    spdlog::get("agent")->warn("SUCCESS ADD TO SLEEP!");
                     need.status += 69.f;
                 }
             }
         },
-        [](entt::entity e, entt::registry& r) { spdlog::warn("Agent {} failed to finish action: sleep", e); },
+        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("Agent {} failed to finish action: sleep", e); },
         []() {
-            spdlog::warn("We aborted our action");
+            spdlog::get("agent")->warn("We aborted our action");
         }};
 
     action::Action action_reproduce{
@@ -315,9 +316,9 @@ void ScenarioScene::on_enter()
                 }
             }
         },
-        [](entt::entity e, entt::registry& r) { spdlog::warn("We failed to finish action: reproduce"); },
+        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("We failed to finish action: reproduce"); },
         []() {
-            spdlog::warn("We aborted our action: reproduce");
+            spdlog::get("agent")->warn("We aborted our action: reproduce");
         }};
 
     ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
@@ -441,7 +442,7 @@ void ScenarioScene::on_enter()
         }
         else
         {
-            spdlog::warn("adding system \"{}\" that is unknown", system);
+            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
 

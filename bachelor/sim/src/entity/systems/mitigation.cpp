@@ -34,7 +34,7 @@ void Mitigation::update(float dt)
             {
                 if (!(add_strategies(strategies, needs.vital_needs[0], tags)))
                 {
-                    spdlog::warn("Unable to add actions to fix need {}", needs.vital_needs[0].name);
+                    spdlog::get("agent")->warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
                 }
             }
         }

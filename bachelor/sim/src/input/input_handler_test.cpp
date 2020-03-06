@@ -1,4 +1,5 @@
 #include "input_handler.h"
+#include <gfx/ImGUI/imgui.h>
 
 #include <doctest/doctest.h>
 
@@ -8,7 +9,7 @@ TEST_CASE("attempting to get input handler")
     REQUIRE(&get_input() != nullptr);
 }
 
-TEST_CASE("attempting to create a key and use it")
+TEST_CASE("attempting to create a keybinding and use it")
 {
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
@@ -383,3 +384,62 @@ TEST_CASE("attempting to go back to default context")
 
     input.clear();
 }
+
+TEST_CASE("attempting to create blocking context")
+{
+    SDL_Event e{};
+    e.type                = SDL_KEYDOWN;
+    e.key.keysym.scancode = SDL_SCANCODE_A;
+    SDL_Event e2{};
+    e2.type                = SDL_KEYDOWN;
+    e2.key.keysym.scancode = SDL_SCANCODE_P;
+
+    auto& input = get_input();
+    int times0  = 0;
+    int times1  = 0;
+    input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_P, EAction::MoveLeft, [&times0]() { times0++; });
+    input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_A, EAction::MoveLeft, [&times1]() { times1++; });
+    // Blocks everything "below" the stack, so Default should not trigger
+    input.add_context(EKeyContext::Agent, true);
+
+    input.handle_input(e);
+    input.handle_input(e2);
+    CHECK(times0 == 0);
+    CHECK(times1 == 1);
+    input.clear();
+}
+
+TEST_CASE("attempting to bind mousebutton")
+{
+    SDL_Event e{};
+    e.type          = SDL_MOUSEBUTTONDOWN;
+    e.button.button = 1; // Left mouse click
+
+    auto& input  = get_input();
+    bool success = false;
+    input.fast_bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp, [&success]() { success = true; });
+    ImGui::CreateContext();
+    input.handle_input(e);
+    ImGui::DestroyContext();
+    CHECK(success == true);
+    input.clear();
+}
+
+/*
+TEST_CASE("attempting to handle live input mousebutton")
+{
+    SDL_Event e{};
+    e.type          = SDL_MOUSEBUTTONDOWN;
+    e.button.button = 1; // Left mouse click
+
+    auto& input = get_input();
+    float time  = 50;
+
+    input.bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp);
+    input.bind_action(EKeyContext::DefaultContext, EAction::MoveUp, [&time](float dt) { time += dt; });
+
+    input.handle_live_input(0.5f);
+    CHECK(time == 50.5f);
+    input.clear();
+}
+*/
