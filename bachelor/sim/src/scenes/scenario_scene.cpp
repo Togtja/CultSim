@@ -101,6 +101,7 @@ void ScenarioScene::on_enter()
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
+   
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,

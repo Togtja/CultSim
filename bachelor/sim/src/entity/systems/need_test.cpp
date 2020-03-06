@@ -29,7 +29,7 @@ TEST_CASE("testing the needs system initialization")
         CHECK(needs.needs.begin()->status == 100);
 
         // Check that there are no pressing_needs to begin with
-        REQUIRE(needs.pressing_needs.size() == 0);
+        REQUIRE(needs.vital_needs.size() == 0);
     });
 }
 
@@ -60,7 +60,7 @@ TEST_CASE("testing the needs system update function")
         CHECK(needs.needs.begin()->status == 100.f - needs.needs.begin()->decay_rate);
 
         // Check that there are no pressing_needs
-        REQUIRE(needs.pressing_needs.size() == 0);
+        REQUIRE(needs.vital_needs.size() == 0);
 
         // Clean up after test
         needs.needs.begin()->status += needs.needs.begin()->decay_rate;
@@ -81,7 +81,7 @@ TEST_CASE("testing the needs system update function")
         CHECK(needs.needs.begin()->status == 100.f - (55.f * needs.needs.begin()->decay_rate));
 
         // Check that there is a new pressing_need
-        REQUIRE(needs.pressing_needs.size() == 1);
+        REQUIRE(needs.vital_needs.size() == 1);
     });
 }
 
@@ -106,7 +106,7 @@ TEST_CASE("Testing outliers for dt")
         CHECK(needs.needs.begin()->status == 0.f);
 
         // Check that there is a new pressing_need
-        REQUIRE(needs.pressing_needs.size() == 1);
+        REQUIRE(needs.vital_needs.size() == 1);
 
         needs.needs.begin()->status += 100.f;
     });
@@ -121,7 +121,7 @@ TEST_CASE("Testing outliers for dt")
     need_system->update(1.f);
     view.each([](cs::component::Needs& needs) {
         REQUIRE(needs.needs.begin()->status == 100.f);
-        REQUIRE(needs.pressing_needs.size() == 0.f);
+        REQUIRE(needs.vital_needs.size() == 0.f);
     });
 }
 
@@ -149,7 +149,7 @@ TEST_CASE("pressing needs are correctly updated")
         {
             REQUIRE(need.status == 50.f);
         }
-        REQUIRE(needs.pressing_needs.size() == 4);
+        REQUIRE(needs.vital_needs.size() == 4);
     });
 
     need_system->update(-50.f);
@@ -158,6 +158,6 @@ TEST_CASE("pressing needs are correctly updated")
         {
             REQUIRE(need.status == 100.f);
         }
-        REQUIRE(needs.pressing_needs.size() == 0);
+        REQUIRE(needs.vital_needs.size() == 0);
     });
 }

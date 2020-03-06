@@ -17,24 +17,38 @@ void Mitigation::update(float dt)
 
     auto view = registry.view<component::Needs, component::Strategies, component::Tags>();
     view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
-        if (!needs.pressing_needs.empty())
+        if (!needs.vital_needs.empty())
         {
-            for (auto need : needs.pressing_needs) {}
-            auto temp = needs.pressing_needs;
+            for (auto need : needs.vital_needs) {}
+            auto temp = needs.vital_needs;
             // Put the most pressing needs to the front
-            std::sort(needs.pressing_needs.begin(), needs.pressing_needs.end(), std::greater<ai::Need>());
+            std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());
 
             // If the most pressing need has changed
-            if (!(temp[0] == needs.pressing_needs[0]))
+            if (!(temp[0] == needs.vital_needs[0]))
             {
                 strategies.staged_strategies.clear();
             }
 
             if (strategies.staged_strategies.empty())
             {
-                if (!(add_strategies(strategies, needs.pressing_needs[0], tags)))
+                if (!(add_strategies(strategies, needs.vital_needs[0], tags)))
                 {
-                    spdlog::warn("Unable to add actions to fix need {}", needs.pressing_needs[0].name);
+                    spdlog::warn("Unable to add actions to fix need {}", needs.vital_needs[0].name);
+                }
+            }
+        }
+        else if (!needs.leisure_needs.empty())
+        {
+            if (!strategies.staged_strategies.empty())
+            {
+                for (auto need : needs.leisure_needs)
+                {
+                    RandomEngine rng{};
+                    if (!(add_strategies(strategies, needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))], tags)))
+                    {
+                        spdlog::debug("Unable to add actions to satisfy leisure need");
+                    }
                 }
             }
         }

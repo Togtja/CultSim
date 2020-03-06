@@ -49,7 +49,8 @@ struct Animation
 struct Needs
 {
     std::vector<ai::Need> needs{};
-    std::vector<ai::Need> pressing_needs{};
+    std::vector<ai::Need> vital_needs{};
+    std::vector<ai::Need> leisure_needs{};
 };
 
 struct Vision

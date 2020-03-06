@@ -15,15 +15,15 @@ void Need::update(float dt)
         {
             // Ensure statuses cannot go below 0% or above 100%
             need.status = std::clamp(need.status - (need.decay_rate * dt), 0.f, 100.f);
-            auto found = std::find(needs.pressing_needs.begin(), needs.pressing_needs.end(), need);
+            auto found = std::find(needs.vital_needs.begin(), needs.vital_needs.end(), need);
             // If the need does not exist in pressing needs
-            if (found != needs.pressing_needs.end())
+            if (found != needs.vital_needs.end())
             {
                 found->status = need.status;
                 // Remove it if it should not be there
                 if (found->status > 50.f)
                 {
-                    needs.pressing_needs.erase(found);
+                    needs.vital_needs.erase(found);
                 }
             }
             // If the need does exist in pressing needs
@@ -32,7 +32,7 @@ void Need::update(float dt)
                 // Add it if it should be there
                 if (need.status <= 50.f)
                 {
-                    needs.pressing_needs.push_back(need);
+                    needs.vital_needs.push_back(need);
                 }
             }
         }
