@@ -8,17 +8,15 @@ namespace cs
 class ResourceMemory : public IMemory
 {
 public:
-    ResourceMemory(Etag tag, glm::vec3 pos, int count, float time) :
-        IMemory(tag),
-        location(pos),
-        number_of_matching_entities(count),
-        time_of_creation(time){};
+    ResourceMemory(Etag tags, float time_of_creation, glm::vec3 location, int number_of_matching_entities) :
+        IMemory(tags, float time_of_creation),
+        m_location(location),
+        m_number_of_matching_entities(number_of_matching_entities){};
 
-    glm::vec3 location{};
+    glm::vec3 m_location{};
 
-    int number_of_matching_entities{};
+    int m_number_of_matching_entities{};
 
-    float time_of_creation{};
     
 };
 } // namespace cs
