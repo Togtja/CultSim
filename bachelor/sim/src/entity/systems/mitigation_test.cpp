@@ -46,7 +46,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
     view.each([](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
         // Check that need has been added
         REQUIRE(needs.needs.size() == 1);
-        REQUIRE(needs.pressing_needs.size() == 1);
+        REQUIRE(needs.vital_needs.size() == 1);
 
         // Check that the strategy has been added
         REQUIRE(strategies.strategies.size() == 1);
@@ -55,7 +55,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
 
     mitigation_system->update(1.f);
     view.each([](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-        REQUIRE(!needs.pressing_needs.empty());
+        REQUIRE(!needs.vital_needs.empty());
         REQUIRE(strategies.strategies.size() == 1);
         REQUIRE(strategies.staged_strategies.size() == 1);
     });
@@ -103,7 +103,7 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
     mitigation_system->update(1.f);
     auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
     view.each([strategy](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-        REQUIRE(!needs.pressing_needs.empty());
+        REQUIRE(!needs.vital_needs.empty());
         REQUIRE(strategies.strategies.size() == 2);
         REQUIRE(strategies.staged_strategies.size() == 1);
         REQUIRE(strategies.staged_strategies.back() == strategy);
@@ -153,7 +153,7 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
     auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
     view.each(
         [strategy, strategy2](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-            REQUIRE(!needs.pressing_needs.empty());
+            REQUIRE(!needs.vital_needs.empty());
             REQUIRE(strategies.strategies.size() == 2);
             REQUIRE(strategies.staged_strategies.size() == 2);
             REQUIRE(strategies.staged_strategies.back() == strategy);
@@ -204,7 +204,7 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
     auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
     view.each(
         [strategy, strategy2](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-            REQUIRE(!needs.pressing_needs.empty());
+            REQUIRE(!needs.vital_needs.empty());
             REQUIRE(!strategies.staged_strategies.empty());
         });
 
@@ -212,7 +212,7 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
     mitigation_system->update(1.f);
     view.each(
         [strategy, strategy2](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.pressing_needs.empty());
+            REQUIRE(needs.vital_needs.empty());
             REQUIRE(strategies.staged_strategies.empty());
         });
 }
@@ -262,7 +262,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
     view.each(
         [strategy, strategy2](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.pressing_needs.size() == 1);
+            REQUIRE(needs.vital_needs.size() == 1);
             REQUIRE(strategies.staged_strategies.size() == 1);
             REQUIRE(strategies.staged_strategies.front() == strategy);
         });
@@ -271,7 +271,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     mitigation_system->update(1.f);
     view.each(
         [strategy, strategy2](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.pressing_needs.size() == 2);
+            REQUIRE(needs.vital_needs.size() == 2);
             REQUIRE(strategies.staged_strategies.size() == 1);
             REQUIRE(strategies.staged_strategies.front() == strategy2);
         });

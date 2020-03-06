@@ -49,7 +49,8 @@ struct Animation
 struct Needs
 {
     std::vector<ai::Need> needs{};
-    std::vector<ai::Need> pressing_needs{};
+    std::vector<ai::Need> vital_needs{};
+    std::vector<ai::Need> leisure_needs{};
 };
 
 struct Vision
@@ -143,6 +144,16 @@ struct TagRequirement
 
 struct Tags
 {
+    ETag tags{};
+};
+
+struct Inventory
+{
+    uint16_t size{};
+    uint16_t max_size{};
+
+    std::vector<entt::entity> contents{};
+
     ETag tags{};
 };
 

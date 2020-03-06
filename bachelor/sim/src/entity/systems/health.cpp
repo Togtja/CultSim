@@ -12,7 +12,7 @@ void Health::update(float dt)
 
     auto view = m_context.registry->view<component::Health, component::Needs, component::Tags>();
     view.each([this, dt](entt::entity e, component::Health& health, component::Needs& need, component::Tags tags) {
-        for (auto& need : need.pressing_needs)
+        for (auto& need : need.vital_needs)
         {
             if ((need.tags & health.need_tags) && need.status <= 0.f)
             {
