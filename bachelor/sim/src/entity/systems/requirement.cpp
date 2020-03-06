@@ -3,7 +3,7 @@
 #include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
-
+#include "entity/memories/resource_memory.h"
 #include "glm/glm.hpp"
 #include "spdlog/spdlog.h"
 
@@ -40,12 +40,26 @@ void Requirement::update(float dt)
         }
     });
 
-    auto view_find = registry.view<component::FindRequirement, component::Vision, component::Position, component::Movement>();
+    auto view_find =
+        registry
+            .view<component::FindRequirement, component::Vision, component::Position, component::Movement, component::Memory>();
     view_find.each([&registry, this](entt::entity e,
                                      component::FindRequirement findreqs,
                                      component::Vision vision,
                                      component::Position pos,
-                                     component::Movement& mov) {
+                                     component::Movement& mov,
+                                     component::Memory& memory) {
+        for (auto& memory_container : memory.memory_storage)
+        {
+            if (memory_container.memory_tag & findreqs.tags && memory_container.memory_tag & TAG_Location)
+            {
+                for (auto& memory : memory_container.memory_Container) 
+                {
+                    auto got = memory.get();
+                    (ResourceMemory*)got;
+                }
+            }
+        }
         for (auto& entity : vision.seen)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
