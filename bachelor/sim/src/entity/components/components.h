@@ -5,6 +5,7 @@
 #include "random_engine.h"
 #include "strategy.h"
 #include "tags.h"
+#include "entity/memories/memory_container.h"
 
 #include <vector>
 
@@ -155,6 +156,11 @@ struct Inventory
     std::vector<entt::entity> contents{};
 
     ETag tags{};
+};
+
+struct Memory
+{
+    std::vector<MemoryContainer> memory_storage{};
 };
 
 struct AI
