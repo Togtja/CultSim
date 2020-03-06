@@ -17,11 +17,13 @@ void Inventory::update(float dt)
         if (inventory.size != inventory.contents.size())
         {
             inventory.size = inventory.contents.size();
+            ETag tags{};
             for (entt::entity component : inventory.contents)
             {
                 auto component_tags = registry.get<component::Tags>(component);
-                inventory.tags      = ETag(inventory.tags | component_tags.tags);
+                tags                = ETag(tags | component_tags.tags);
             }
+                inventory.tags      = tags;
         }
     });
 }

@@ -47,7 +47,7 @@ void Mitigation::update(float dt)
                     RandomEngine rng{};
                     if (!(add_strategies(strategies, needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))], tags)))
                     {
-                        spdlog::debug("Unable to add actions to satisfy leisure need");
+                        spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
                     }
                 }
             }
