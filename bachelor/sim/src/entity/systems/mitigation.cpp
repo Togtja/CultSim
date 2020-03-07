@@ -15,8 +15,17 @@ void Mitigation::update(float dt)
 
     auto& registry = *m_context.registry;
 
-    auto view = registry.view<component::Needs, component::Strategies, component::Tags>();
-    view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
+    auto view = registry.view<component::Needs,
+                              component::Strategies,
+                              component::Tags>();
+    view.each([this, dt](entt::entity e,
+                         component::Needs& needs,
+                         component::Strategies& strategies,
+                         component::Tags tags
+                         
+                         
+
+                        ) {
         if (!needs.vital_needs.empty())
         {
             for (auto need : needs.vital_needs) {}
@@ -28,6 +37,22 @@ void Mitigation::update(float dt)
             if (!(temp[0] == needs.vital_needs[0]))
             {
                 strategies.staged_strategies.clear();
+                if (m_context.registry->has<component::LocationRequirement>(e))
+                {
+                    m_context.registry->remove<component::LocationRequirement>(e);
+                }
+                if (m_context.registry->has<component::VisionRequirement>(e))
+                {
+                    m_context.registry->remove<component::VisionRequirement>(e);
+                }
+                if (m_context.registry->has<component::TagRequirement>(e))
+                {
+                    m_context.registry->remove<component::TagRequirement>(e);
+                }
+                if (m_context.registry->has<component::FindRequirement>(e))
+                {
+                    m_context.registry->remove<component::FindRequirement>(e);
+                }
             }
 
             if (strategies.staged_strategies.empty())
