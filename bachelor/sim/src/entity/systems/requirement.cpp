@@ -7,6 +7,8 @@
 #include "glm/glm.hpp"
 #include "spdlog/spdlog.h"
 
+#include <ctime>
+
 namespace cs::system
 {
 void Requirement::update(float dt)
@@ -49,18 +51,7 @@ void Requirement::update(float dt)
                                      component::Position& pos,
                                      component::Movement& mov,
                                      component::Memory& memory) {
-        for (auto& memory_container : memory.memory_storage)
-        {
-            if (memory_container.memory_tag & findreqs.tags && memory_container.memory_tag & TAG_Location)
-            {
-                for (auto& memory : memory_container.memory_container)
-                {
-                    auto got = memory.get();
-                    (ResourceMemory*)got;
-                }
-            }
-        }
-
+        // STEP 1: Do we see the desired entity in this frame
         for (auto& entity : vision.seen)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
@@ -72,31 +63,67 @@ void Requirement::update(float dt)
 
                     strat.staged_strategies.front().actions.back().target = entity;
                 }
-
                 registry.remove<component::FindRequirement>(e);
                 mov.desired_position.clear();
+
                 registry.get<component::Tags>(entity).tags =
                     static_cast<ETag>(registry.get<component::Tags>(entity).tags & ~findreqs.tags);
                 return;
             }
         }
+
+        // STEP 2: Go through our Memories to see if we find food in those locations or on the way (STEP: 1)
+        for (auto& memory_container : memory.memory_storage)
+        {
+            // Find a container matching our tag
+            if (memory_container.memory_tag & findreqs.tags && memory_container.memory_tag & TAG_Location)
+            {
+                spdlog::get("agent")->warn("Number of memories: {}",memory_container.memory_container.size());
+                std::vector<bool> visited(memory_container.memory_container.size(), false);
+                int i = 0;
+
+                // Go through each memory in it
+                for (auto& memory : memory_container.memory_container)
+                {
+                    // Get a Memory we have not yet visited
+                    if (auto* res = dynamic_cast<ResourceMemory*>(memory.get()); res && !visited[i])
+                    {
+                        // STEP 2.5A: If we have arrived at our destination without finding food
+                        if (close_enough(pos.position, findreqs.desired_position, 5.f))
+                        {
+                            visited[i] = true;
+                            i++;
+                            findreqs.desired_position = glm::vec3{0.f};
+                        }
+
+                        // STEP 2.5B: If we have not yet set a destination
+                        else if (mov.desired_position.empty())
+                        {
+                            if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
+                            {
+                                findreqs.desired_position = res->m_location;
+                            }
+                            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
+                        }
+                    }
+                }
+            }
+        }
+
+        // STEP 3: Find a random location and go to it
         if (close_enough(pos.position, findreqs.desired_position, 5.f))
         {
-            registry.assign_or_replace<component::FindRequirement>(
-                e,
-                findreqs.tags,
-                glm::vec3(m_context.rng->uniform(-m_context.scenario->bounds.x, m_context.scenario->bounds.x),
-                          m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
-                          0.f));
+            findreqs.desired_position = glm::vec3{0.f, 0.f, 10.f};
         }
         else if (mov.desired_position.empty())
         {
-            if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
+            if (close_enough(findreqs.desired_position, glm::vec3{0.f, 0.f, 10.f}, 5.f) ||
+                close_enough(findreqs.desired_position, glm::vec3{0.f}, 5.f))
             {
                 findreqs.desired_position =
-                    glm::vec3(m_context.rng->uniform(-m_context.scenario->bounds.x, m_context.scenario->bounds.x),
+                    glm::vec3{m_context.rng->uniform(-m_context.scenario->bounds.x, m_context.scenario->bounds.x),
                               m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
-                              0.f);
+                              0.f};
             }
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
         }
