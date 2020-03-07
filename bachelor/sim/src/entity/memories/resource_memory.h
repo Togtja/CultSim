@@ -16,6 +16,6 @@ public:
 
     int m_number_of_matching_entities{};
 
-    
+    void update(float dt) override{};
 };
 } // namespace cs

@@ -17,5 +17,6 @@ class EntityMemory : public IMemory
     glm::vec3 m_location{};
     entt::entity m_target = entt::null;
 
+    void update(float dt) override;
 };
 } // namespace cs

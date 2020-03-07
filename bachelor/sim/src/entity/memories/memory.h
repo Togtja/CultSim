@@ -11,5 +11,7 @@ public:
 
     ETag m_tags{};
     float m_time_of_creation{};
+
+    virtual void update(float dt){};
 };
 } // namespace cs
