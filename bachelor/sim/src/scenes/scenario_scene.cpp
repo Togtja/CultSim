@@ -106,7 +106,7 @@ void ScenarioScene::on_enter()
     ai::Need need_hunger       = {static_cast<std::string>("Hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
+    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce)};
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
@@ -150,8 +150,8 @@ void ScenarioScene::on_enter()
                                               auto pos = r.get<component::Position>(e).position;
                                               for (auto entity : vision.seen)
                                               {
-                                                  auto entity_tags = r.get<component::Tags>(entity);
-                                                  if (entity_tags.tags & TAG_Food) 
+                                                  auto entity_tags = r.try_get<component::Tags>(entity);
+                                                  if (entity_tags && entity_tags->tags & TAG_Food) 
                                                   {
                                                       count++;
                                                   }
@@ -377,7 +377,7 @@ void ScenarioScene::on_enter()
     ai::Strategy strategy_breed = {static_cast<std::string>("Looking for a mate"),
                                    0,
                                    {},
-                                   ETag(TAG_Reproduce | TAG_Human),
+                                   ETag(TAG_Reproduce),
                                    std::vector<action::Action>{action_reproduce}};
 
     ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
