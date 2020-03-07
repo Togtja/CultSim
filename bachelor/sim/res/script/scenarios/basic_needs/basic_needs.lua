@@ -8,7 +8,7 @@ scenario.name = "Basic Needs"
 scenario.description = "Observe as your agents walk around in a forest looking for food and water to survive. How many can be sustained?"
 
 -- Decide how many agents should be used
-scenario.agent_count = 1
+scenario.agent_count = 100
 
 
 -- The bounds of the level on the X and Y in both directions based on the center 200,200 means the total world is 400,400 with 200 units on both sides of 0,0

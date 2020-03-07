@@ -238,6 +238,41 @@ void ScenarioScene::on_enter()
                                             need.status += 80.f;
                                         }
                                     }
+                                    if (auto memories = r.try_get<component::Memory>(e); memories)
+                                    {
+                                        for (auto& container : memories->memory_storage)
+                                        {
+                                            if (container.memory_tag & TAG_Drink && container.memory_tag & TAG_Location)
+                                            {
+                                                std::time_t timestamp = std::time(0);
+                                                auto vision           = r.get<component::Vision>(e);
+                                                int count{};
+                                                auto pos = r.get<component::Position>(e).position;
+                                                for (auto entity : vision.seen)
+                                                {
+                                                    auto entity_tags = r.try_get<component::Tags>(entity);
+                                                    if (entity_tags && entity_tags->tags & TAG_Drink)
+                                                    {
+                                                        count++;
+                                                    }
+                                                }
+                                                for (auto& memory : container.memory_container)
+                                                {
+                                                    if (auto* res = dynamic_cast<ResourceMemory*>(memory.get());
+                                                        res && close_enough(res->m_location, pos, 20.f))
+                                                    {
+                                                        res->m_time_of_creation            = static_cast<int>(timestamp);
+                                                        res->m_number_of_matching_entities = count;
+                                                    }
+                                                }
+                                                container.memory_container.push_back(std::unique_ptr<ResourceMemory>(
+                                                    new ResourceMemory(ETag(TAG_Drink | TAG_Location | TAG_Memory),
+                                                                       static_cast<int>(timestamp),
+                                                                       pos,
+                                                                       count)));
+                                            }
+                                        }
+                                    }
                                 },
                                 [](entt::entity e, entt::registry& r) {
                                     spdlog::get("agent")->warn("We failed to finish action: drink");
@@ -423,6 +458,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
         auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<MemoryContainer>{});
         memory_comp.memory_storage.emplace_back(ETag(TAG_Food | TAG_Location | TAG_Memory));
+        memory_comp.memory_storage.emplace_back(ETag(TAG_Drink | TAG_Location | TAG_Memory));
     }
 
     for (int j = 0; j < 75; j++)

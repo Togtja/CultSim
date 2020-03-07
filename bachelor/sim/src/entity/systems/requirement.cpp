@@ -46,7 +46,7 @@ void Requirement::update(float dt)
         registry
             .view<component::FindRequirement, component::Vision, component::Position, component::Movement, component::Memory>();
     view_find.each([&registry, this](entt::entity e,
-                                     component::FindRequirement findreqs,
+                                     component::FindRequirement& findreqs,
                                      component::Vision& vision,
                                      component::Position& pos,
                                      component::Movement& mov,
@@ -57,7 +57,6 @@ void Requirement::update(float dt)
             if (registry.valid(entity) &&
                               ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
             {
-                spdlog::get("agent")->warn("Found a target");
                 auto&& strat = registry.get<component::Strategies>(e);
                 if (strat.staged_strategies.size() != 0)
                 {
@@ -102,7 +101,6 @@ void Requirement::update(float dt)
                             pos.position.z);
                         if (findreqs.desired_position != res->m_location)
                         {
-                            spdlog::get("agent")->warn("We are moving towards a memory.");
                             findreqs.desired_position = res->m_location;
                             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
                         }
@@ -110,7 +108,6 @@ void Requirement::update(float dt)
                         // STEP 2.5A: If we have arrived at our destination without finding our target entity
                         if (close_enough(pos.position, findreqs.desired_position, 5.f))
                         {
-                            spdlog::get("agent")->warn("We are visiting a memory.");
                             memory_container.memory_container.erase(memory_container.memory_container.begin()+i);
                             mov.desired_position.clear();
                             continue;
