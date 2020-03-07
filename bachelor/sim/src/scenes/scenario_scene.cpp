@@ -4,6 +4,9 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/memories/memory.h"
+#include "entity/memories/memory_container.h"
+#include "entity/memories/resource_memory.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
 #include "entity/systems/health.h"
@@ -14,8 +17,6 @@
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
-#include "entity/memories/memory_container.h"
-#include "entity/memories/memory.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
 #include "preferences.h"
@@ -24,6 +25,7 @@
 #include "scenes/pausemenu_scene.h"
 
 #include <algorithm>
+#include <ctime>
 #include <functional>
 #include <memory>
 #include <random>
@@ -134,6 +136,38 @@ void ScenarioScene::on_enter()
                                       if (need.tags & TAG_Food)
                                       {
                                           need.status += 80.f;
+                                      }
+                                  }
+                                  if (auto memories = r.try_get<component::Memory>(e); memories)
+                                  {
+                                      for (auto& container : memories->memory_storage)
+                                      {
+                                          if (container.memory_tag & TAG_Food && container.memory_tag & TAG_Location)
+                                          {
+                                              std::time_t timestamp = std::time(0);
+                                              auto vision           = r.get<component::Vision>(e);
+                                              int count{};
+                                              auto pos = r.get<component::Position>(e).position;
+                                              for (auto entity : vision.seen)
+                                              {
+                                                  auto entity_tags = r.get<component::Tags>(entity);
+                                                  if (entity_tags.tags & TAG_Food) 
+                                                  {
+                                                      count++;
+                                                  }
+                                              }
+                                              for (auto& memory : container.memory_container)
+                                              {
+                                                  if (auto* res = dynamic_cast<ResourceMemory*>(memory.get());
+                                                      res &&
+                                                      close_enough(res->m_location,pos, 20.f))
+                                                  {
+                                                      res->m_time_of_creation = static_cast<int>(timestamp);
+                                                      res->m_number_of_matching_entities = count;
+                                                  }
+                                              }
+                                              container.memory_container.push_back(std::unique_ptr<ResourceMemory>(new ResourceMemory(ETag(TAG_Food|TAG_Location |TAG_Memory),static_cast<int>(timestamp),pos,count)));
+                                          }
                                       }
                                   }
                               },
@@ -356,7 +390,7 @@ void ScenarioScene::on_enter()
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
-
+    // m_scenario.agent_count
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = m_registry.create();
