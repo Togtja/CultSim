@@ -15,7 +15,7 @@
 #include "entity/systems/requirement.h"
 #include "entity/systems/timer.h"
 #include "entity/memories/memory_container.h"
-#include"entity/memories/memory.h"
+#include "entity/memories/memory.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
 #include "preferences.h"
@@ -90,7 +90,8 @@ void ScenarioScene::on_enter()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos = glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+        auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -104,7 +105,6 @@ void ScenarioScene::on_enter()
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
-
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
@@ -349,7 +349,7 @@ void ScenarioScene::on_enter()
     ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
                                 0,
                                 {},
-                                ETag(TAG_Food|TAG_Gather),
+                                ETag(TAG_Food | TAG_Gather),
                                 std::vector<action::Action>{action_pickup_food}};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
@@ -387,10 +387,8 @@ void ScenarioScene::on_enter()
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
             std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
-        m_registry.assign<component::Memory>(
-            agent,
-            std::vector<MemoryContainer>{
-                MemoryContainer{ETag(TAG_Food | TAG_Location | TAG_Memory), std::vector<std::unique_ptr<IMemory>>()}});
+        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<MemoryContainer>{});
+        memory_comp.memory_storage.emplace_back(ETag(TAG_Food | TAG_Location | TAG_Memory));
     }
 
     for (int j = 0; j < 75; j++)
@@ -499,8 +497,6 @@ bool ScenarioScene::update(float dt)
     {
         system.type().func("update"_hs).invoke(system, dt);
     }
-
-
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);

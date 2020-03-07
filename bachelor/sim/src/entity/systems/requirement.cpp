@@ -45,21 +45,22 @@ void Requirement::update(float dt)
             .view<component::FindRequirement, component::Vision, component::Position, component::Movement, component::Memory>();
     view_find.each([&registry, this](entt::entity e,
                                      component::FindRequirement findreqs,
-                                     component::Vision vision,
-                                     component::Position pos,
+                                     component::Vision& vision,
+                                     component::Position& pos,
                                      component::Movement& mov,
                                      component::Memory& memory) {
         for (auto& memory_container : memory.memory_storage)
         {
             if (memory_container.memory_tag & findreqs.tags && memory_container.memory_tag & TAG_Location)
             {
-                for (auto& memory : memory_container.memory_Container) 
+                for (auto& memory : memory_container.memory_container)
                 {
                     auto got = memory.get();
                     (ResourceMemory*)got;
                 }
             }
         }
+
         for (auto& entity : vision.seen)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
