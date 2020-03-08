@@ -88,17 +88,6 @@ void Requirement::update(float dt)
                     // Get a Memory we have not yet visited
                     if (auto* res = dynamic_cast<ResourceMemory*>(memory.get()); res)
                     {
-                        spdlog::get("agent")->warn(
-                            "findreg.desired_position: {},{},{} ; res->m_location : {},{},{} ; pos {},{},{}",
-                            findreqs.desired_position.x,
-                            findreqs.desired_position.y,
-                            findreqs.desired_position.z,
-                            res->m_location.x,
-                            res->m_location.y,
-                            res->m_location.z,
-                            pos.position.x,
-                            pos.position.y,
-                            pos.position.z);
                         if (findreqs.desired_position != res->m_location)
                         {
                             findreqs.desired_position = res->m_location;
