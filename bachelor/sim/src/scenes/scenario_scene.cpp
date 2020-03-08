@@ -106,7 +106,7 @@ void ScenarioScene::on_enter()
     ai::Need need_hunger       = {static_cast<std::string>("Hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce)};
+    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 0.5f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce)};
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
@@ -147,11 +147,12 @@ void ScenarioScene::on_enter()
                                               std::time_t timestamp = std::time(0);
                                               auto vision           = r.get<component::Vision>(e);
                                               int count{};
-                                              auto pos = r.get<component::Position>(e).position;
+                                              auto location  = r.get<component::Position>(e).position;
+                                              bool duplicate = false;
                                               for (auto entity : vision.seen)
                                               {
                                                   auto entity_tags = r.try_get<component::Tags>(entity);
-                                                  if (entity_tags && entity_tags->tags & TAG_Food) 
+                                                  if (entity_tags && entity_tags->tags & TAG_Food)
                                                   {
                                                       count++;
                                                   }
@@ -159,14 +160,21 @@ void ScenarioScene::on_enter()
                                               for (auto& memory : container.memory_container)
                                               {
                                                   if (auto* res = dynamic_cast<ResourceMemory*>(memory.get());
-                                                      res &&
-                                                      close_enough(res->m_location,pos, 20.f))
+                                                      res && close_enough(res->m_location, location, 50.f))
                                                   {
-                                                      res->m_time_of_creation = static_cast<int>(timestamp);
+                                                      res->m_time_of_creation            = static_cast<int>(timestamp);
                                                       res->m_number_of_matching_entities = count;
+                                                      duplicate                          = true;
                                                   }
                                               }
-                                              container.memory_container.push_back(std::unique_ptr<ResourceMemory>(new ResourceMemory(ETag(TAG_Food|TAG_Location |TAG_Memory),static_cast<int>(timestamp),pos,count)));
+                                              if (!duplicate)
+                                              {
+                                                  container.memory_container.push_back(std::unique_ptr<ResourceMemory>(
+                                                      new ResourceMemory(ETag(TAG_Food | TAG_Location | TAG_Memory),
+                                                                         static_cast<int>(timestamp),
+                                                                         location,
+                                                                         count)));
+                                              }
                                           }
                                       }
                                   }
@@ -247,7 +255,8 @@ void ScenarioScene::on_enter()
                                                 std::time_t timestamp = std::time(0);
                                                 auto vision           = r.get<component::Vision>(e);
                                                 int count{};
-                                                auto pos = r.get<component::Position>(e).position;
+                                                auto location  = r.get<component::Position>(e).position;
+                                                bool duplicate = false;
                                                 for (auto entity : vision.seen)
                                                 {
                                                     auto entity_tags = r.try_get<component::Tags>(entity);
@@ -259,17 +268,21 @@ void ScenarioScene::on_enter()
                                                 for (auto& memory : container.memory_container)
                                                 {
                                                     if (auto* res = dynamic_cast<ResourceMemory*>(memory.get());
-                                                        res && close_enough(res->m_location, pos, 20.f))
+                                                        res && close_enough(res->m_location, location, 50.f))
                                                     {
                                                         res->m_time_of_creation            = static_cast<int>(timestamp);
                                                         res->m_number_of_matching_entities = count;
+                                                        duplicate                          = true;
                                                     }
                                                 }
-                                                container.memory_container.push_back(std::unique_ptr<ResourceMemory>(
-                                                    new ResourceMemory(ETag(TAG_Drink | TAG_Location | TAG_Memory),
-                                                                       static_cast<int>(timestamp),
-                                                                       pos,
-                                                                       count)));
+                                                if (!duplicate)
+                                                {
+                                                    container.memory_container.push_back(std::unique_ptr<ResourceMemory>(
+                                                        new ResourceMemory(ETag(TAG_Drink | TAG_Location | TAG_Memory),
+                                                                           static_cast<int>(timestamp),
+                                                                           location,
+                                                                           count)));
+                                                }
                                             }
                                         }
                                     }
@@ -443,7 +456,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep, need_reproduction},
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep,need_reproduction},
                                             std::vector<ai::Need>{});
         cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
         if (i % 2 == 1)
@@ -473,7 +486,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
         m_registry.assign<component::Tags>(trees, TAG_Avoidable);
         m_registry
-            .assign<component::Timer>(trees, m_rng.uniform(50.f, 140.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
+            .assign<component::Timer>(trees, m_rng.uniform(60.f, 140.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
                 auto food = r.create();
                 auto pos  = r.get<component::Position>(e).position;
                 static RandomEngine rng;
@@ -496,7 +509,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Sprite>(ponds, t_tex, glm::vec3(0.1f, 0.2f, 0.6f));
         m_registry.assign<component::Tags>(ponds, TAG_Avoidable);
         m_registry
-            .assign<component::Timer>(ponds, m_rng.uniform(25.f, 120.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r) {
+            .assign<component::Timer>(ponds, m_rng.uniform(80.f, 120.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r) {
                 auto drink = r.create();
                 auto pos   = r.get<component::Position>(e).position;
                 static RandomEngine rng;
