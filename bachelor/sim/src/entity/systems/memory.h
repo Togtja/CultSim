@@ -6,6 +6,9 @@ namespace cs::system
 {
 class Memory : public ISystem
 {
+private:
+    float m_timer{};
+
 public:
     using ISystem::ISystem;
 
