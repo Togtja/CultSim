@@ -38,4 +38,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/inventory.h
         ${CMAKE_CURRENT_LIST_DIR}/inventory.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/memory.h
+        ${CMAKE_CURRENT_LIST_DIR}/memory.cpp
 )
