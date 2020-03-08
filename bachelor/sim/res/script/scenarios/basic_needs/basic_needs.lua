@@ -22,6 +22,7 @@ scenario.systems = {
     "MitigationSystem",
     "ActionSystem",
     "RequirementSystem",
+    "MemorySystem",
     "TimerSystem",
     "AiSystem",
     "MovementSystem",

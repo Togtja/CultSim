@@ -10,6 +10,7 @@
 #include "entity/systems/timer.h"
 #include "entity/systems/health.h"
 #include "entity/systems/reproduction.h"
+#include "entity/systems/memory.h"
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -75,6 +76,7 @@ void reflect_systems()
     entt::meta<system::Reproduction>().type("ReproductionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Requirement>().type("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Timer>().type("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Memory>().type("MemorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta
