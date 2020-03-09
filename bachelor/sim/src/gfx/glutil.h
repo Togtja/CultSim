@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -92,4 +93,22 @@ constexpr typename Container::size_type size_bytes(const Container& container)
     return container.size() * sizeof(typename Container::value_type);
 }
 
-} // namespace cs
+template<typename... Ts>
+std::vector<uint8_t> combine_buffers(const std::vector<Ts>&... vecs)
+{
+    static_assert(sizeof...(vecs) > 1, "must combine at least two vectors");
+
+    uint32_t offset = 0u;
+    std::vector<uint8_t> out((0u + ... + size_bytes(vecs)));
+
+    auto append = [&](auto& vec) {
+        std::memcpy(out.data() + offset, vec.data(), size_bytes(vec));
+        offset += size_bytes(vec);
+    };
+
+    (append(vecs), ...);
+
+    return out;
+}
+
+} // namespace cs::gfx
