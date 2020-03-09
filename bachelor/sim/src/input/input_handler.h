@@ -476,6 +476,7 @@ public:
      * @param
      */
     void load_binding_from_file(sol::state_view lua);
+    void save_binding_to_file();
 
 private:
     ContextHandler();

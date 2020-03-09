@@ -445,7 +445,44 @@ glm::ivec2 ContextHandler::get_mouse_pos()
 {
     return mouse_pos;
 }
+void ContextHandler::save_binding_to_file()
+{
+    std::stringstream lua_key_script;
+    lua_key_script << "action_key_bindings = {\n";
+    for (auto&& [context, action_h] : m_input_map)
+    {
+        auto&& map = action_h.get_key_binding();
+        if (map.empty())
+        {
+            continue;
+        }
 
+        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", KeyContext_to_string(context));
+        for (auto&& [key, action] : map)
+        {
+            lua_key_script << fmt::format("\t\t[\"{}\"] = EAction.{},\n", SDL_GetScancodeName(key), Action_to_string(action));
+        }
+        lua_key_script << "\t},\n";
+    }
+    lua_key_script << "}\naction_mouse_bindings = {\n";
+    for (auto&& [context, action_h] : m_input_map)
+    {
+        auto&& map = action_h.get_mouse_binding();
+        if (map.empty())
+        {
+            continue;
+        }
+
+        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", KeyContext_to_string(context));
+        for (auto&& [btn, action] : map)
+        {
+            lua_key_script << fmt::format("\t\t[EMouse.{}] = EAction.{},\n", Mouse_to_string(btn), Action_to_string(action));
+        }
+        lua_key_script << "\t},\n";
+    }
+    lua_key_script << "}";
+    fs::write_file("keybinding.lua", lua_key_script.str());
+}
 void ContextHandler::load_binding_from_file(sol::state_view lua)
 {
     const auto& file = fs::read_file("keybinding.lua");
