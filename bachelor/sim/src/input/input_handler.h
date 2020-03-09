@@ -21,7 +21,8 @@ enum class EKeyContext
     AgentOnHover,
     ScenarioScene
 };
-inline std::string KeyContext_to_string(EKeyContext context)
+
+inline std::string key_context_to_string(EKeyContext context)
 {
     switch (context)
     {
@@ -32,6 +33,7 @@ inline std::string KeyContext_to_string(EKeyContext context)
     }
     return "KeyContext not added to to_string";
 }
+
 /**
  * Action, the step between a key and a functions
  * A key (Keyboard key/MouseBtn) gets mapped to an Action
@@ -49,7 +51,8 @@ enum class EAction
     SelectEntity,
     FollowEntity
 };
-inline std::string Action_to_string(EAction action)
+
+inline std::string action_to_string(EAction action)
 {
     switch (action)
     {
@@ -65,6 +68,7 @@ inline std::string Action_to_string(EAction action)
     }
     return "Action not added to to_string";
 }
+
 /**
  * Mouse, a easier way to use the diffrent SDL_events
  */
@@ -82,7 +86,8 @@ enum class EMouse
     Move        // Any mouse movement
 
 };
-inline std::string Mouse_to_string(EMouse btn)
+
+inline std::string mouse_to_string(EMouse btn)
 {
     switch (btn)
     {

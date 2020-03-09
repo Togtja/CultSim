@@ -457,10 +457,10 @@ void ContextHandler::save_binding_to_file()
             continue;
         }
 
-        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", KeyContext_to_string(context));
+        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", key_context_to_string(context));
         for (auto&& [key, action] : map)
         {
-            lua_key_script << fmt::format("\t\t[\"{}\"] = EAction.{},\n", SDL_GetScancodeName(key), Action_to_string(action));
+            lua_key_script << fmt::format("\t\t[\"{}\"] = EAction.{},\n", SDL_GetScancodeName(key), action_to_string(action));
         }
         lua_key_script << "\t},\n";
     }
@@ -473,10 +473,10 @@ void ContextHandler::save_binding_to_file()
             continue;
         }
 
-        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", KeyContext_to_string(context));
+        lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", key_context_to_string(context));
         for (auto&& [btn, action] : map)
         {
-            lua_key_script << fmt::format("\t\t[EMouse.{}] = EAction.{},\n", Mouse_to_string(btn), Action_to_string(action));
+            lua_key_script << fmt::format("\t\t[EMouse.{}] = EAction.{},\n", mouse_to_string(btn), action_to_string(action));
         }
         lua_key_script << "\t},\n";
     }
