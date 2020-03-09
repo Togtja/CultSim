@@ -4,6 +4,7 @@
 #include "need.h"
 #include "random_engine.h"
 #include "strategy.h"
+#include "entity/memories/container.h"
 #include "tags.h"
 
 #include <vector>
@@ -155,6 +156,15 @@ struct Inventory
     std::vector<entt::entity> contents{};
 
     ETag tags{};
+};
+
+struct Memory
+{
+    std::vector <std::unique_ptr<memory::Container>> memory_container{};
+    Memory(Memory&&) = default;
+    Memory& operator=(Memory&&) = default;
+    Memory(const Memory&)       = delete;
+    Memory& operator=(const Memory&) = delete;
 };
 
 struct AI
