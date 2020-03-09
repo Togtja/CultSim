@@ -88,7 +88,8 @@ void ScenarioScene::on_enter()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos = glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+        auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -535,18 +536,7 @@ bool ScenarioScene::draw()
     r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
     r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
+    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
 
     m_scenario.draw();
     return false;
