@@ -477,6 +477,8 @@ public:
      */
     void clear();
 
+    const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& get_input_map() const;
+
     /**
      * Get the last mouse click
      *

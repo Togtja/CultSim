@@ -426,6 +426,11 @@ void ContextHandler::clear()
     add_context(EKeyContext::DefaultContext);
 }
 
+const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& ContextHandler::get_input_map() const
+{
+    return m_input_map;
+}
+
 glm::ivec2 ContextHandler::get_mouse_click_pos()
 {
     return m_mouse_click_pos;
