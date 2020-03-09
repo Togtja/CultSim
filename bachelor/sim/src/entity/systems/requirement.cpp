@@ -3,6 +3,7 @@
 #include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/memories/resource_location.h"
 
 #include "glm/glm.hpp"
 #include "spdlog/spdlog.h"
@@ -40,12 +41,15 @@ void Requirement::update(float dt)
         }
     });
 
-    auto view_find = registry.view<component::FindRequirement, component::Vision, component::Position, component::Movement>();
+    auto view_find =
+        registry
+            .view<component::FindRequirement, component::Vision, component::Position, component::Movement, component::Memory>();
     view_find.each([&registry, this](entt::entity e,
                                      component::FindRequirement findreqs,
                                      component::Vision vision,
                                      component::Position pos,
-                                     component::Movement& mov) {
+                                     component::Movement& mov,
+                                     component::Memory& memories) {
         for (auto& entity : vision.seen)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
@@ -63,6 +67,39 @@ void Requirement::update(float dt)
                 return;
             }
         }
+
+        for (auto& memory_container : memories.memory_container)
+        {
+            // Find a container matching our tag
+            if (memory_container.memory_tags & findreqs.tags && memory_container.memory_tags & TAG_Location)
+            {
+                // spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_container.size());
+                int i = 0;
+
+                // Go through each memory in it
+                for (auto& memory : memory_container.memory_storage)
+                {
+                    if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
+                    {
+                        if (findreqs.desired_position != res->m_location)
+                        {
+                            findreqs.desired_position = res->m_location;
+                            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
+                        }
+
+                        if (close_enough(pos.position, findreqs.desired_position, 5.f))
+                        {
+                            res->m_number_of_entities = 0.f;
+                            mov.desired_position.clear();
+                            continue;
+                        }
+                        break;
+                    }
+                    i++;
+                }
+            }
+        }
+
         if (close_enough(pos.position, findreqs.desired_position, 5.f))
         {
             registry.assign_or_replace<component::FindRequirement>(
