@@ -59,24 +59,23 @@ void ScenarioScene::on_enter()
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     /** Select entity on click */
-    input::get_input()
-        .fast_bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::Left, input::EAction::SelectEntity, [this] {
-            auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SelectEntity, [this] {
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
 
-            if (m_registry.valid(select_helper.selected_entity))
-            {
-                m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-                m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
-            }
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
+        }
 
-            select_helper.selected_entity = select_helper.hovered_entity;
+        select_helper.selected_entity = select_helper.hovered_entity;
 
-            if (m_registry.valid(select_helper.selected_entity))
-            {
-                m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-                m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
-            }
-        });
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
+        }
+    });
 
     /** Move to selected entity */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
@@ -88,7 +87,8 @@ void ScenarioScene::on_enter()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos = glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+        auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -102,7 +102,6 @@ void ScenarioScene::on_enter()
     ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
-
 
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
@@ -347,7 +346,7 @@ void ScenarioScene::on_enter()
     ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
                                 0,
                                 {},
-                                ETag(TAG_Food|TAG_Gather),
+                                ETag(TAG_Food | TAG_Gather),
                                 std::vector<action::Action>{action_pickup_food}};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
