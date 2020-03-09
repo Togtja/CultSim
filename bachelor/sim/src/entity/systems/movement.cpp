@@ -24,14 +24,14 @@ void Movement::update(float dt)
     static float avoid_dist     = 10.f;
     static float avoid_start    = 15.f;
 
+    if (ImGui::TreeNode("Path Adjustments"))
     {
-        ImGui::BeginGroup();
         ImGui::Checkbox("Draw Paths", &draw_paths);
         ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);
         ImGui::DragFloat("Avoid CD", &avoid_cd, 0.01f, 0.01f, 1.f);
         ImGui::DragFloat("Avoid Dist", &avoid_dist, 1.f, 1.f, 256.f);
         ImGui::DragFloat("Avoid Start", &avoid_start, 1.f, 1.f, 64.f);
-        ImGui::EndGroup();
+        ImGui::TreePop();
     }
 
     auto& registry = *m_context.registry;
