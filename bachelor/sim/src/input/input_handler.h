@@ -125,8 +125,8 @@ public:
      */
     explicit ActionHandler(const EKeyContext type);
 
-    robin_hood::unordered_map<SDL_Scancode, EAction> get_key_binding() const;
-    robin_hood::unordered_map<EMouse, EAction> get_mouse_binding() const;
+    const robin_hood::unordered_map<SDL_Scancode, EAction>& get_key_binding() const;
+    const robin_hood::unordered_map<EMouse, EAction>& get_mouse_binding() const;
 
     /**
      * set if the ActionHandler should block the stack search for keybindings

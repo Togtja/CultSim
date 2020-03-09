@@ -17,12 +17,12 @@ ActionHandler::ActionHandler(const EKeyContext type)
     m_context_type = type;
 }
 
-robin_hood::unordered_map<SDL_Scancode, EAction> ActionHandler::get_key_binding()
+const robin_hood::unordered_map<SDL_Scancode, EAction>& ActionHandler::get_key_binding() const
 {
     return m_key_binding;
 }
 
-robin_hood::unordered_map<EMouse, EAction> ActionHandler::get_mouse_binding()
+const robin_hood::unordered_map<EMouse, EAction>& ActionHandler::get_mouse_binding() const
 {
     return m_mouse_binding;
 }
