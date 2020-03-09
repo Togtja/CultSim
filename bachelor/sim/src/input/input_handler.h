@@ -21,7 +21,17 @@ enum class EKeyContext
     AgentOnHover,
     ScenarioScene
 };
-
+inline std::string KeyContext_to_string(EKeyContext context)
+{
+    switch (context)
+    {
+        case EKeyContext::DefaultContext: return "DefaultContext";
+        case EKeyContext::Agent: return "Agent";
+        case EKeyContext::AgentOnHover: return "AgentOnHover";
+        case EKeyContext::ScenarioScene: return "ScenarioScene";
+    }
+    return "KeyContext not added to to_string";
+}
 /**
  * Action, the step between a key and a functions
  * A key (Keyboard key/MouseBtn) gets mapped to an Action
@@ -39,7 +49,22 @@ enum class EAction
     SelectEntity,
     FollowEntity
 };
-
+inline std::string Action_to_string(EAction action)
+{
+    switch (action)
+    {
+        case EAction::MoveUp: return "MoveUp";
+        case EAction::MoveLeft: return "MoveLeft";
+        case EAction::MoveRight: return "MoveRight";
+        case EAction::MoveDown: return "MoveDown";
+        case EAction::ZoomIn: return "ZoomIn";
+        case EAction::ZoomOut: return "ZoomOut";
+        case EAction::Pause: return "Pause";
+        case EAction::SelectEntity: return "SelectEntity";
+        case EAction::FollowEntity: return "FollowEntity";
+    }
+    return "Action not added to to_string";
+}
 /**
  * Mouse, a easier way to use the diffrent SDL_events
  */
@@ -57,6 +82,23 @@ enum class EMouse
     Move        // Any mouse movement
 
 };
+inline std::string Mouse_to_string(EMouse btn)
+{
+    switch (btn)
+    {
+        case EMouse::Left: return "Left";
+        case EMouse::Middle: return "Middle";
+        case EMouse::Right: return "Right";
+        case EMouse::X1: return "X1";
+        case EMouse::X2: return "X2";
+        case EMouse::WheelUp: return "WheelUp";
+        case EMouse::WheelDown: return "WheelDown";
+        case EMouse::WheelRight: return "WheelRight";
+        case EMouse::WheelLeft: return "WheelLeft";
+        case EMouse::Move: return "Move";
+    }
+    return "Mouse not added to to_string";
+}
 namespace detail
 {
 /** Handles Actions for a certain context */
