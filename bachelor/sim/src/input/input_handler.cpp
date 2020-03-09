@@ -449,6 +449,11 @@ glm::ivec2 ContextHandler::get_mouse_pos()
 void ContextHandler::load_binding_from_file(sol::state_view lua)
 {
     const auto& file = fs::read_file("keybinding.lua");
+    if (file == "")
+    {
+        spdlog::get("input")->critical("failed to find key bindings, program running witout any key bindings");
+        return;
+    }
     lua.script(file);
     sol::table key_bindings = lua["action_key_bindings"];
     for (auto&& [context, key_action] : key_bindings)
