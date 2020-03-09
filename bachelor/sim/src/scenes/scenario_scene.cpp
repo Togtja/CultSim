@@ -103,7 +103,6 @@ void ScenarioScene::on_enter()
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
-
     action::Action action_pickup_food{static_cast<std::string>("Gather food"),
                                       TAG_Find,
                                       1.f,
@@ -218,12 +217,10 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
-            spdlog::get("agent")->warn("SUCCESS SLEEP!");
             for (auto& need : r.get<component::Needs>(e).needs)
             {
                 if (need.tags & TAG_Sleep)
                 {
-                    spdlog::get("agent")->warn("SUCCESS ADD TO SLEEP!");
                     need.status += 69.f;
                 }
             }
@@ -273,13 +270,17 @@ void ScenarioScene::on_enter()
                                     auto& child_health = r.get<component::Health>(child);
                                     auto& child_pos    = r.get<component::Position>(child);
                                     auto& child_strat  = r.get<component::Strategies>(child);
-                                    for (auto strat : child_strat.strategies)
+                                    for (auto& strat : child_strat.strategies)
                                     {
-                                        for (auto action : strat.actions)
+                                        for (auto& action : strat.actions)
                                         {
                                             if (action.target != entt::null)
                                             {
                                                 action.target = child;
+                                            }
+                                            if (action.target != child)
+                                            {
+                                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
                                             }
                                         }
                                     }
@@ -347,7 +348,7 @@ void ScenarioScene::on_enter()
     ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
                                 0,
                                 {},
-                                ETag(TAG_Food|TAG_Gather),
+                                ETag(TAG_Food | TAG_Gather),
                                 std::vector<action::Action>{action_pickup_food}};
 
     auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
@@ -493,8 +494,6 @@ bool ScenarioScene::update(float dt)
     {
         system.type().func("update"_hs).invoke(system, dt);
     }
-
-    ImGui::End();
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);
