@@ -125,6 +125,9 @@ public:
      */
     explicit ActionHandler(const EKeyContext type);
 
+    robin_hood::unordered_map<SDL_Scancode, EAction> get_key_binding() const;
+    robin_hood::unordered_map<EMouse, EAction> get_mouse_binding() const;
+
     void set_blocking(const bool blocking);
 
     /**
