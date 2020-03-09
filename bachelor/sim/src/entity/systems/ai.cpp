@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <execution>
 
+#include <gfx/ImGUI/imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
 
@@ -28,6 +29,15 @@ bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 void AI::update(float dt)
 {
     CS_AUTOTIMER(AI System);
+    static bool draw_fov  = false;
+    static bool draw_seen = false;
+
+    if (ImGui::TreeNode("Sensor Info"))
+    {
+        ImGui::Checkbox("Draw FoV", &draw_fov);
+        ImGui::Checkbox("Draw Vision Lines", &draw_seen);
+        ImGui::TreePop();
+    }
 
     m_collision_grid.clear();
     auto& registry = *m_context.registry;
@@ -72,11 +82,24 @@ void AI::update(float dt)
         }
     });
 
-#if 1
-    vis_view.each([& renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
-        renderer.draw_circle(pos.position, vis.vision_radius, {1.f, 0.f, 0.f});
-    });
-#endif
+    /** Debug drawing */
+    if (draw_fov)
+    {
+        vis_view.each(
+            [this, &renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
+                renderer.draw_circle(pos.position, vis.vision_radius, {.33f, .33f, .33f});
+
+                if (draw_seen)
+                {
+                    for (auto seen : vis.seen)
+                    {
+                        renderer.draw_line(pos.position,
+                                           m_context.registry->get<component::Position>(seen).position,
+                                           {0.2f, 1.f, 0.2f});
+                    }
+                }
+            });
+    }
 }
 
 bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
