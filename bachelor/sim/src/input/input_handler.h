@@ -48,6 +48,7 @@ inline std::string key_context_to_string(const EKeyContext context)
  */
 enum class EAction
 {
+    None = 0,
     MoveUp,
     MoveLeft,
     MoveRight,
@@ -56,7 +57,9 @@ enum class EAction
     ZoomOut,
     Pause,
     SelectEntity,
-    FollowEntity
+    FollowEntity,
+
+    Count
 };
 
 /**
