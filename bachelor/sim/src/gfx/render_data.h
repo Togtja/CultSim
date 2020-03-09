@@ -71,4 +71,11 @@ struct PrimitiveVertex
     glm::vec3 color{};
 };
 
+struct DebugInstanceVertex
+{
+    glm::vec3 offset{};
+    glm::vec3 scale{};
+    glm::vec3 color{};
+};
+
 } // namespace cs::gfx
