@@ -88,7 +88,8 @@ void ScenarioScene::on_enter()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos = glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+        auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -447,12 +448,6 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
-
-    //    /** Update systems */
-    //    for (auto&& system : m_active_systems)
-    //    {
-    //        system.type().func("update"_hs).invoke(system, 20.f);
-    //    }
 }
 
 void ScenarioScene::on_exit()
@@ -500,6 +495,8 @@ bool ScenarioScene::update(float dt)
     m_dispatcher.update();
     m_scenario.update(dt);
 
+    /** It's supposed to be two of these here, do not change - not a bug */
+    ImGui::End();
     ImGui::End();
 
     return false;
@@ -535,18 +532,7 @@ bool ScenarioScene::draw()
     r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
     r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
+    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
 
     m_scenario.draw();
     return false;
@@ -645,17 +631,14 @@ void ScenarioScene::draw_time_control_ui()
     }
     ImGui::SameLine();
     if (ImGui::Button("Turbo", {36, 24}))
-        if (ImGui::Button("!!", {24, 24}))
-        {
-            m_timescale = 25.f;
-        }
+    {
+        m_timescale = 25.f;
+    }
     ImGui::SameLine();
     if (ImGui::Button("!!!", {24, 24}))
     {
         m_timescale = 100.f;
     }
-    ImGui::End();
-
     ImGui::End();
 }
 
