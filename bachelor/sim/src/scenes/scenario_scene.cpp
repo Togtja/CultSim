@@ -217,12 +217,10 @@ void ScenarioScene::on_enter()
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) {
-            spdlog::get("agent")->warn("SUCCESS SLEEP!");
             for (auto& need : r.get<component::Needs>(e).needs)
             {
                 if (need.tags & TAG_Sleep)
                 {
-                    spdlog::get("agent")->warn("SUCCESS ADD TO SLEEP!");
                     need.status += 69.f;
                 }
             }
@@ -272,13 +270,17 @@ void ScenarioScene::on_enter()
                                     auto& child_health = r.get<component::Health>(child);
                                     auto& child_pos    = r.get<component::Position>(child);
                                     auto& child_strat  = r.get<component::Strategies>(child);
-                                    for (auto strat : child_strat.strategies)
+                                    for (auto& strat : child_strat.strategies)
                                     {
-                                        for (auto action : strat.actions)
+                                        for (auto& action : strat.actions)
                                         {
                                             if (action.target != entt::null)
                                             {
                                                 action.target = child;
+                                            }
+                                            if (action.target != child)
+                                            {
+                                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
                                             }
                                         }
                                     }
@@ -492,8 +494,6 @@ bool ScenarioScene::update(float dt)
     {
         system.type().func("update"_hs).invoke(system, dt);
     }
-
-    ImGui::End();
 
     /** Deal with long running tasks, then events */
     m_scheduler.update(dt);

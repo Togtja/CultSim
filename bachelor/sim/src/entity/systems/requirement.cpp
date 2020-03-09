@@ -60,8 +60,6 @@ void Requirement::update(float dt)
 
                 registry.remove<component::FindRequirement>(e);
                 mov.desired_position.clear();
-                registry.get<component::Tags>(entity).tags =
-                    static_cast<ETag>(registry.get<component::Tags>(entity).tags & ~findreqs.tags);
                 return;
             }
         }
