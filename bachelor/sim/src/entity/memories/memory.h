@@ -1,5 +1,5 @@
 #pragma once
-
+#include <entity/components/tags.h>
 
 namespace cs::memory
 {
