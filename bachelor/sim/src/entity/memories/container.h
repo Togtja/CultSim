@@ -9,7 +9,7 @@ struct Container
 public:
     ETag memory_tags{};
 
-    std::vector<IMemory> memory_storage{};
+    std::vector<std::unique_ptr<IMemory>> memory_storage{};
 
     Container() = default;
     Container(ETag tags) : memory_tags(tags){};
