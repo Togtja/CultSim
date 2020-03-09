@@ -17,7 +17,5 @@ public:
 
     int m_number_of_enities{};
 
-    void update(float dt){};
-
 };
 } // namespace cs::memory

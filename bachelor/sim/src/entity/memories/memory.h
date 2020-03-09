@@ -11,7 +11,7 @@ public:
     float m_time_since_creation{};
     Etag m_tags{};
 
-    virtual update(float dt) = 0;
+    void update(float dt){m_time_since_creation += dt};
 
     virtual ~IMemory(){};
 };
