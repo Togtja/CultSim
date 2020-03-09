@@ -44,9 +44,11 @@ void DebugRenderer::display()
     glBindVertexBuffer(0, m_linevbo, 0, sizeof(PrimitiveVertex));
     glUseProgram(m_shader);
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
+    glUniform1f(1, 1.f);
 
     glDrawArrays(GL_LINES, 0, m_nlines);
 
+    glUniform1f(1, 0.f);
     glVertexArrayElementBuffer(m_vao, m_circlevbo);
     glBindVertexBuffer(0, m_circlevbo, 13 * sizeof(uint32_t), sizeof(PrimitiveVertex));
     glBindVertexBuffer(1, m_circlevbo, m_circle_buffer_offset, sizeof(DebugInstanceVertex));
@@ -69,6 +71,7 @@ void DebugRenderer::init()
                 .attribute(1, 0, 3, GL_FLOAT, offsetof(PrimitiveVertex, color))
                 .attribute(2, 1, 3, GL_FLOAT, offsetof(DebugInstanceVertex, offset))
                 .attribute(3, 1, 3, GL_FLOAT, offsetof(DebugInstanceVertex, scale))
+                .attribute(4, 1, 3, GL_FLOAT, offsetof(DebugInstanceVertex, color))
                 .divisor(1, 1)
                 .build();
 
