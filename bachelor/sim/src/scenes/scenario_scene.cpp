@@ -149,10 +149,13 @@ void ScenarioScene::on_enter()
                         bool duplicate = false;
                         for (auto entity : vision.seen)
                         {
-                            auto entity_tags = r.try_get<component::Tags>(entity);
-                            if (entity_tags && entity_tags->tags & TAG_Food)
+                            if (r.valid(entity))
                             {
-                                count++;
+                                auto entity_tags = r.try_get<component::Tags>(entity);
+                                if (entity_tags && entity_tags->tags & TAG_Food)
+                                {
+                                    count++;
+                                }
                             }
                         }
                         for (auto& memory : container.memory_storage)
@@ -253,10 +256,13 @@ void ScenarioScene::on_enter()
                             bool duplicate = false;
                             for (auto entity : vision.seen)
                             {
-                                auto entity_tags = r.try_get<component::Tags>(entity);
-                                if (entity_tags && entity_tags->tags & TAG_Drink)
+                                if (r.valid(entity))
                                 {
-                                    count++;
+                                    auto entity_tags = r.try_get<component::Tags>(entity);
+                                    if (entity_tags && entity_tags->tags & TAG_Drink)
+                                    {
+                                        count++;
+                                    }
                                 }
                             }
                             for (auto& memory : container.memory_storage)
@@ -462,6 +468,9 @@ void ScenarioScene::on_enter()
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
             std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
+        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<memory::Container>{});
+        memory_comp.memory_container.emplace_back(ETag(TAG_Food | TAG_Location));
+        memory_comp.memory_container.emplace_back(ETag(TAG_Drink | TAG_Location));
     }
 
     for (int j = 0; j < 75; j++)
