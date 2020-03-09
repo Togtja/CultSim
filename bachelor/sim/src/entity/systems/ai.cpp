@@ -3,6 +3,7 @@
 #include "constants.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "gfx/renderer.h"
 
 #include <algorithm>
 #include <execution>
@@ -40,7 +41,7 @@ void AI::update(float dt)
     registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = registry.group<component::Vision, component::Position>();
 
-    std::for_each(std::execution::par_unseq, vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
+    std::for_each(std::execution::par, vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
@@ -65,30 +66,17 @@ void AI::update(float dt)
                     if (is_visible(pos.position, pos2.position, vis.vision_radius))
                     {
                         vis.seen.push_back(e2);
-
-                        // Collision avoidance
-                        // if (is_visible(pos.position, pos2.position, vis.vision_radius * 0.5f))
-                        //{
-                        //    auto move = m_registry.try_get<component::Movement>(e);
-                        //    if (move == nullptr)
-                        //    {
-                        //        continue;
-                        //    }
-                        //    // How much ahead we see
-                        //    auto ahead = glm::vec2(pos.position.x, pos.position.y) + move->direction * (vis.vision_radius / 2);
-                        //    // 5 should be the size of the entt on pos2
-                        //    if (is_visible(ahead, pos2.position, 5 + 4))
-                        //    {
-                        //        auto avoid_force = ahead - glm::vec2(pos2.position.x, pos2.position.y);
-                        //        move->desired_position.push_back(pos.position + glm::normalize(glm::vec3(avoid_force, 0))
-                        //        * 2.f);
-                        //    }
-                        //}
                     }
                 }
             }
         }
     });
+
+#if 1
+    vis_view.each([& renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
+        renderer.draw_circle(pos.position, vis.vision_radius, {1.f, 0.f, 0.f});
+    });
+#endif
 }
 
 bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
