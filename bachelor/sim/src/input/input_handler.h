@@ -22,7 +22,14 @@ enum class EKeyContext
     ScenarioScene
 };
 
-inline std::string key_context_to_string(EKeyContext context)
+/**
+ * Converts an EKeyContext Enum to string of its name
+ *
+ * @param context the EKeyContext you want to convert
+ *
+ * @return the string name of the context you sent as a parameter
+ */
+inline std::string key_context_to_string(const EKeyContext context)
 {
     switch (context)
     {
@@ -52,7 +59,14 @@ enum class EAction
     FollowEntity
 };
 
-inline std::string action_to_string(EAction action)
+/**
+ * Converts an EAction Enum to string of its name
+ *
+ * @param action the EAction you want to convert
+ *
+ * @return the string name of the action you sent as a parameter
+ */
+inline std::string action_to_string(const EAction action)
 {
     switch (action)
     {
@@ -87,7 +101,14 @@ enum class EMouse
 
 };
 
-inline std::string mouse_to_string(EMouse btn)
+/**
+ * Converts an EMouse Enum to string of its name
+ *
+ * @param btn the EMouse button you want to convert
+ *
+ * @return the string name of the button you sent as a parameter
+ */
+inline std::string mouse_to_string(const EMouse btn)
 {
     switch (btn)
     {
@@ -130,7 +151,18 @@ public:
      */
     explicit ActionHandler(const EKeyContext type);
 
+    /**
+     * Get the Action handler's key binding
+     *
+     * @return the key binding unsorted map
+     */
     const robin_hood::unordered_map<SDL_Scancode, EAction>& get_key_binding() const;
+
+    /**
+     * Get the Action handler's mouse binding
+     *
+     * @return the mouse binding unsorted map
+     */
     const robin_hood::unordered_map<EMouse, EAction>& get_mouse_binding() const;
 
     /**
