@@ -160,7 +160,7 @@ struct Inventory
 
 struct Memory
 {
-    std::vector <std::unique_ptr<memory::Container>> memory_container{};
+    std::vector <memory::Container> memory_container{};
     Memory(Memory&&) = default;
     Memory& operator=(Memory&&) = default;
     Memory(const Memory&)       = delete;
