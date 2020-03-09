@@ -448,12 +448,6 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
-
-    //    /** Update systems */
-    //    for (auto&& system : m_active_systems)
-    //    {
-    //        system.type().func("update"_hs).invoke(system, 20.f);
-    //    }
 }
 
 void ScenarioScene::on_exit()
@@ -501,6 +495,8 @@ bool ScenarioScene::update(float dt)
     m_dispatcher.update();
     m_scenario.update(dt);
 
+    /** It's supposed to be two of these here, do not change - not a bug */
+    ImGui::End();
     ImGui::End();
 
     return false;
@@ -635,17 +631,14 @@ void ScenarioScene::draw_time_control_ui()
     }
     ImGui::SameLine();
     if (ImGui::Button("Turbo", {36, 24}))
-        if (ImGui::Button("!!", {24, 24}))
-        {
-            m_timescale = 25.f;
-        }
+    {
+        m_timescale = 25.f;
+    }
     ImGui::SameLine();
     if (ImGui::Button("!!!", {24, 24}))
     {
         m_timescale = 100.f;
     }
-    ImGui::End();
-
     ImGui::End();
 }
 
