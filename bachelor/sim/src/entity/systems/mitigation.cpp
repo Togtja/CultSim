@@ -5,6 +5,8 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 
+#include "entt/entt.hpp"
+
 #include "spdlog/spdlog.h"
 
 namespace cs::system
@@ -16,7 +18,7 @@ void Mitigation::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Needs, component::Strategies, component::Tags>();
-    view.each([this, dt](component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
+    view.each([this, dt](entt::entity e, component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
         if (!needs.vital_needs.empty())
         {
             for (auto need : needs.vital_needs) {}
@@ -28,6 +30,10 @@ void Mitigation::update(float dt)
             if (!(temp[0] == needs.vital_needs[0]))
             {
                 strategies.staged_strategies.clear();
+                m_context.registry->reset<component::LocationRequirement>(e);
+                m_context.registry->reset<component::VisionRequirement>(e);
+                m_context.registry->reset<component::FindRequirement>(e);
+                m_context.registry->reset<component::TagRequirement>(e);
             }
 
             if (strategies.staged_strategies.empty())
@@ -45,7 +51,9 @@ void Mitigation::update(float dt)
                 for (auto need : needs.leisure_needs)
                 {
                     RandomEngine rng{};
-                    if (!(add_strategies(strategies, needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))], tags)))
+                    if (!(add_strategies(strategies,
+                                         needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
+                                         tags)))
                     {
                         spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
                     }
