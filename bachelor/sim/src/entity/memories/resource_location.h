@@ -5,17 +5,16 @@
 
 namespace cs::memory
 {
-class ReourceLocation : public IMemory
+class ResourceLocation : public IMemory
 {
 public:
-    ReourceLocation(ETag tags, glm::vec3 location, int number_of_entities) :
+    ResourceLocation(ETag tags, glm::vec3 location, int number_of_entities) :
         IMemory(tags),
         m_location(location),
-        m_number_of_enities(number_of_entities){};
+        m_number_of_entities(number_of_entities){};
 
     glm::vec3 m_location{};
 
-    int m_number_of_enities{};
-
+    int m_number_of_entities{};
 };
 } // namespace cs::memory
