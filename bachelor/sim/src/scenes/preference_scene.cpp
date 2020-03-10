@@ -1,4 +1,5 @@
 #include "preference_scene.h"
+#include "preferences.h"
 #include "scene_manager.h"
 
 #include <common_helpers.h>
@@ -18,6 +19,12 @@ void PreferenceScene::on_exit()
 bool PreferenceScene::update(float dt)
 {
     key_binding();
+    auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    ImGui::SetNextWindowPos(glm::vec2(res.x / 2, res.y / 1.1f), 0, {.5f, .5f});
+    ImGui::Begin("Option##quit",
+                 nullptr,
+                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+    bool success = true;
     if (ImGui::Button("Save"))
     {
         auto&& input = input::get_input();
@@ -27,6 +34,12 @@ bool PreferenceScene::update(float dt)
             for (auto&& [key, action] : action_h.get_key_binding())
             {
                 auto curr_key = m_key_buff[context][i];
+                spdlog::critical("Key {} is {} big", curr_key, curr_key.size());
+                if (curr_key.empty())
+                {
+                    success = false;
+                    ImGui::OpenPopup("Empty#Binding");
+                }
                 if (SDL_GetScancodeName(key) != curr_key)
                 {
                     input.unbind_key(context, key);
@@ -35,9 +48,22 @@ bool PreferenceScene::update(float dt)
                 i++;
             }
         }
-
-        m_context->scene_manager->pop();
+        if (success)
+        {
+            m_context->scene_manager->pop();
+        }
     }
+
+    if (ImGui::BeginPopupModal("Empty#Binding", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+    {
+        spdlog::critical("I am being run");
+        if (ImGui::Button("Ok##id", {150, 50}))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+    ImGui::End();
     return false;
 }
 
@@ -83,10 +109,10 @@ void PreferenceScene::key_binding()
         ImGui::EndTable();
         if (ImGui::Button("Add new Binding"))
         {
-            ImGui::OpenPopup(fmt::format("Select Action{}", context).c_str());
+            ImGui::OpenPopup(fmt::format("Select Action##{}", context).c_str());
         }
 
-        if (ImGui::BeginPopupModal(fmt::format("Select Action{}", context).c_str(),
+        if (ImGui::BeginPopupModal(fmt::format("Select Action##{}", context).c_str(),
                                    nullptr,
                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
         {
