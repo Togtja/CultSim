@@ -447,12 +447,6 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
-
-    //    /** Update systems */
-    //    for (auto&& system : m_active_systems)
-    //    {
-    //        system.type().func("update"_hs).invoke(system, 20.f);
-    //    }
 }
 
 void ScenarioScene::on_exit()
@@ -500,6 +494,8 @@ bool ScenarioScene::update(float dt)
     m_dispatcher.update();
     m_scenario.update(dt);
 
+    /** It's supposed to be two of these here, do not change - not a bug */
+    ImGui::End();
     ImGui::End();
 
     return false;
@@ -535,18 +531,7 @@ bool ScenarioScene::draw()
     r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
     r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({-m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {-m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
-    r_debug.draw_line({m_scenario.bounds.x, -m_scenario.bounds.y, 0.f},
-                      {m_scenario.bounds.x, m_scenario.bounds.y, 0.f},
-                      {0.f, 1.f, 0.f});
+    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
 
     m_scenario.draw();
     return false;
@@ -624,38 +609,35 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 0.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">", {36, 24}))
+    if (ImGui::Button("1x", {36, 24}))
     {
         m_timescale = 1.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>", {36, 24}))
+    if (ImGui::Button("2.5x", {36, 24}))
     {
         m_timescale = 2.5f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>>", {36, 24}))
+    if (ImGui::Button("5x", {36, 24}))
     {
         m_timescale = 5.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>>>", {36, 24}))
+    if (ImGui::Button("10x", {36, 24}))
     {
         m_timescale = 10.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("Turbo", {36, 24}))
-        if (ImGui::Button("!!", {24, 24}))
-        {
-            m_timescale = 25.f;
-        }
+    if (ImGui::Button("25x", {36, 24}))
+    {
+        m_timescale = 25.f;
+    }
     ImGui::SameLine();
-    if (ImGui::Button("!!!", {24, 24}))
+    if (ImGui::Button("100x", {36, 24}))
     {
         m_timescale = 100.f;
     }
-    ImGui::End();
-
     ImGui::End();
 }
 
