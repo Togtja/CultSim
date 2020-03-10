@@ -1,4 +1,10 @@
 #include "preference_scene.h"
+#include "scene_manager.h"
+
+#include <common_helpers.h>
+#include <gfx/ImGUI/imgui.h>
+#include <spdlog/spdlog.h>
+
 namespace cs
 {
 void PreferenceScene::on_enter()
@@ -11,6 +17,27 @@ void PreferenceScene::on_exit()
 
 bool PreferenceScene::update(float dt)
 {
+    key_binding();
+    if (ImGui::Button("Save"))
+    {
+        auto&& input = input::get_input();
+        for (auto&& [context, action_h] : m_key_map)
+        {
+            int i = 0;
+            for (auto&& [key, action] : action_h.get_key_binding())
+            {
+                auto curr_key = m_key_buff[context][i];
+                if (SDL_GetScancodeName(key) != curr_key)
+                {
+                    input.unbind_key(context, key);
+                    input.bind_key(context, SDL_GetScancodeFromName(curr_key.c_str()), action);
+                }
+                i++;
+            }
+        }
+
+        m_context->scene_manager->pop();
+    }
     return false;
 }
 
@@ -57,7 +84,7 @@ void PreferenceScene::key_binding()
         if (ImGui::Button("Add new Binding"))
         {
             ImGui::OpenPopup(fmt::format("Select Action{}", context).c_str());
-}
+        }
 
         if (ImGui::BeginPopupModal(fmt::format("Select Action{}", context).c_str(),
                                    nullptr,
