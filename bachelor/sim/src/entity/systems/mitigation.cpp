@@ -30,10 +30,10 @@ void Mitigation::update(float dt)
             if (!(temp[0] == needs.vital_needs[0]))
             {
                 strategies.staged_strategies.clear();
-                m_context.registry->reset<component::LocationRequirement>(e);
-                m_context.registry->reset<component::VisionRequirement>(e);
-                m_context.registry->reset<component::FindRequirement>(e);
-                m_context.registry->reset<component::TagRequirement>(e);
+                m_context.registry->remove_if_exists<component::LocationRequirement>(e);
+                m_context.registry->remove_if_exists<component::VisionRequirement>(e);
+                m_context.registry->remove_if_exists<component::FindRequirement>(e);
+                m_context.registry->remove_if_exists<component::TagRequirement>(e);
             }
 
             if (strategies.staged_strategies.empty())

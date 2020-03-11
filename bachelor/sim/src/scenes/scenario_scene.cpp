@@ -267,7 +267,10 @@ void ScenarioScene::on_enter()
                             r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e, entt::registry& r) {
                                 if (r.valid(e))
                                 {
-                                    auto child         = r.create(e, r);
+                                    /** Clone child */
+                                    auto child = r.create();
+                                    r.stamp(child, r, e);
+
                                     auto& child_needs  = r.get<component::Needs>(child);
                                     auto& child_reprd  = r.get<component::Reproduction>(child);
                                     auto& child_health = r.get<component::Health>(child);
@@ -542,18 +545,47 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Bind component type identifiers to the component table */
     sol::table component      = lua.create_table("component");
-    component["position"]     = m_registry.type<component::Position>();
-    component["movement"]     = m_registry.type<component::Movement>();
-    component["sprite"]       = m_registry.type<component::Sprite>();
-    component["vision"]       = m_registry.type<component::Vision>();
-    component["tag"]          = m_registry.type<component::Tags>();
-    component["need"]         = m_registry.type<component::Needs>();
-    component["reproduction"] = m_registry.type<component::Reproduction>();
-    component["strategy"]     = m_registry.type<component::Strategies>();
-    component["health"]       = m_registry.type<component::Health>();
+    component["position"]     = entt::type_info<component::Position>::id();
+    component["movement"]     = entt::type_info<component::Movement>::id();
+    component["sprite"]       = entt::type_info<component::Sprite>::id();
+    component["vision"]       = entt::type_info<component::Vision>::id();
+    component["tag"]          = entt::type_info<component::Tags>::id();
+    component["need"]         = entt::type_info<component::Needs>::id();
+    component["reproduction"] = entt::type_info<component::Reproduction>::id();
+    component["strategy"]     = entt::type_info<component::Strategies>::id();
+    component["health"]       = entt::type_info<component::Health>::id();
 
+    /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
-    cultsim.set_function("get_component", [this](const std::string& name) { entt::resolve(entt::hashed_string(name.c_str())); });
+    cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
+        switch (id)
+        {
+            case entt::type_info<component::Position>::id():
+                return sol::make_object(s, m_registry.get<component::Position>(e));
+                break;
+            case entt::type_info<component::Movement>::id():
+                return sol::make_object(s, m_registry.get<component::Movement>(e));
+                break;
+            case entt::type_info<component::Sprite>::id():
+                return sol::make_object(s, m_registry.get<component::Sprite>(e));
+                break;
+            case entt::type_info<component::Vision>::id():
+                return sol::make_object(s, m_registry.get<component::Vision>(e));
+                break;
+            case entt::type_info<component::Tags>::id(): return sol::make_object(s, m_registry.get<component::Tags>(e)); break;
+            case entt::type_info<component::Needs>::id(): return sol::make_object(s, m_registry.get<component::Needs>(e)); break;
+            case entt::type_info<component::Reproduction>::id():
+                return sol::make_object(s, m_registry.get<component::Reproduction>(e));
+                break;
+            case entt::type_info<component::Strategies>::id():
+                return sol::make_object(s, m_registry.get<component::Strategies>(e));
+                break;
+            case entt::type_info<component::Health>::id():
+                return sol::make_object(s, m_registry.get<component::Health>(e));
+                break;
+            default: return sol::nil; break;
+        }
+    });
 }
 
 void ScenarioScene::setup_docking_ui()
