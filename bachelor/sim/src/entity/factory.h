@@ -25,7 +25,7 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
 } // namespace detail
 
 /**
- * Spawn a new entity of the given type
+ * Spawn a new entity of the given type at a given location
  *
  * @param reg The resgistry in which to create an entity
  * @param lua The lua state to operate on
@@ -34,4 +34,14 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
  * @return Handle to spawned entity
  */
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position);
+
+/**
+ * Spawn a new entity of the given type
+ *
+ * @param reg The resgistry in which to create an entity
+ * @param lua The lua state to operate on
+ * @param entity The name of the entity lua file to run
+ * @return Handle to spawned entity
+ */
+entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity);
 }; // namespace cs

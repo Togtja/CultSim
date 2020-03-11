@@ -135,6 +135,19 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
 
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)
 {
+    auto out = spawn_entity(reg, lua, entity);
+
+    /** Set position if it has one */
+    if (auto* pos = reg.try_get<component::Position>(out); pos)
+    {
+        pos->position = glm::vec3(position, 0.f);
+    }
+
+    return out;
+}
+
+entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity)
+{
     auto out = reg.create();
 
     lua.script(fs::read_file(entity));
@@ -147,12 +160,6 @@ entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_
         {
             spdlog::get("agent")->warn("failed to create {}. correct spelling?", k.as<std::string>());
         }
-    }
-
-    /** Set position if it has one */
-    if (auto* pos = reg.try_get<component::Position>(out); pos)
-    {
-        pos->position = glm::vec3(position, 0.f);
     }
 
     spdlog::get("agent")->debug("created entity '{}' with {} components", entity, entity_info.size());

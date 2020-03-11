@@ -4,6 +4,7 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/factory.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
 #include "entity/systems/health.h"
@@ -352,41 +353,40 @@ void ScenarioScene::on_enter()
                                 ETag(TAG_Food | TAG_Gather),
                                 std::vector<action::Action>{action_pickup_food}};
 
-    auto tex   = gfx::get_renderer().sprite().get_texture("sprites/agent_c.png");
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
-        auto agent = m_registry.create();
-        int i1     = i;
-        if (i % 2 == 1)
-        {
-            i1 = -i;
-        }
-        strategy_sleep.actions.front().target = agent;
-        glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
-                      m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
-        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
-        m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
-        m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
-        m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep, need_reproduction},
-                                            std::vector<ai::Need>{});
-        cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
-        if (i % 2 == 1)
-        {
-            gender = cs::component::Reproduction::Female;
-        }
-        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(5));
-        m_registry.assign<component::Strategies>(
-            agent,
-            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
-            std::vector<ai::Strategy>{});
-        m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
+        auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
+        //        int i1 = i;
+        //        if (i % 2 == 1)
+        //        {
+        //            i1 = -i;
+        //        }
+        //        strategy_sleep.actions.front().target = agent;
+        //        glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
+        //                      m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
+        //        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
+        //        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
+        //        m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
+        //        m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
+        //        m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
+        //        m_registry.assign<component::Needs>(agent,
+        //                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep,
+        //                                            need_reproduction}, std::vector<ai::Need>{});
+        //        cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
+        //        if (i % 2 == 1)
+        //        {
+        //            gender = cs::component::Reproduction::Female;
+        //        }
+        //        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(5));
+        //        m_registry.assign<component::Strategies>(
+        //            agent,
+        //            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
+        //            std::vector<ai::Strategy>{});
+        //        m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
     for (int j = 0; j < 75; j++)
