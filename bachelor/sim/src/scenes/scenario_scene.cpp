@@ -95,7 +95,7 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d(pos);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MainMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
@@ -532,6 +532,15 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    auto& input = input::get_input();
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
+        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
+        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
 }
 
 void ScenarioScene::on_exit()

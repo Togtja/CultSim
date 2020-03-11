@@ -9,7 +9,10 @@ action_key_bindings = {
         ["s"] = EAction.MoveDown,
         ["d"] = EAction.MoveRight,
         ["f"] = EAction.FollowEntity,
-        ["p"] = EAction.Pause
+        ["p"] = EAction.MainMenu,
+        ["."] = EAction.SpeedUp,
+        [","] = EAction.SpeedDown,
+        ["Space"] = EAction.Pause
     }
 }
 action_mouse_bindings = {
