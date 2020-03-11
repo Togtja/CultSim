@@ -60,7 +60,6 @@ void PreferenceScene::key_binding()
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
         ImGui::TableAutoHeaders();
-        int i = 0;
         for (auto&& [key, action] : action_h.get_key_binding())
         {
             ImGui::TableNextCell();
@@ -75,12 +74,31 @@ void PreferenceScene::key_binding()
             ImGui::Text(action_s.c_str());
 
             ImGui::TableNextCell();
-            if (ImGui::Button(fmt::format("X##{}", i).c_str()))
+            if (ImGui::Button(fmt::format("X##key{}", key).c_str()))
             {
                 action_h.unbind_key(key);
             }
         }
+        for (auto&& [btn, action] : action_h.get_mouse_binding())
+        {
+            ImGui::TableNextCell();
+            if (ImGui::Button(("Mouse " + input::mouse_to_string(btn)).c_str()))
+            {
+                m_bind_btn    = btn;
+                m_bind_action = action;
+                ImGui::OpenPopup(fmt::format("Change Binding##{}", context).c_str());
+            }
 
+            ImGui::TableNextCell();
+            auto action_s = input::action_to_string(action);
+            ImGui::Text(action_s.c_str());
+
+            ImGui::TableNextCell();
+            if (ImGui::Button(fmt::format("X##btn{}", btn).c_str()))
+            {
+                action_h.unbind_btn(btn);
+            }
+        }
         ImGui::NewLine();
         // TODO: Do this for mouse bindings
         ImGui::TableNextCell();
@@ -88,6 +106,8 @@ void PreferenceScene::key_binding()
         {
             ImGui::OpenPopup(fmt::format("Select Action##{}", context).c_str());
         }
+
+        // Used to open binding popup
         bool open_up = false;
         if (ImGui::BeginPopupModal(fmt::format("Select Action##{}", context).c_str(),
                                    nullptr,
@@ -136,6 +156,8 @@ void PreferenceScene::key_binding()
             {
                 action_h.unbind_key(n_key);
                 action_h.unbind_key(m_bind_key);
+                action_h.unbind_btn(m_bind_btn);
+
                 action_h.bind_key(n_key, m_bind_action);
                 m_bind_key    = SDL_SCANCODE_UNKNOWN;
                 m_bind_action = input::EAction::None;
@@ -143,6 +165,10 @@ void PreferenceScene::key_binding()
             }
             else if (bind_mouse != input::EMouse::None)
             {
+                action_h.unbind_key(m_bind_key);
+                action_h.unbind_btn(bind_mouse);
+                action_h.unbind_btn(m_bind_btn);
+
                 action_h.bind_btn(bind_mouse, m_bind_action);
                 m_bind_key    = SDL_SCANCODE_UNKNOWN;
                 m_bind_action = input::EAction::None;

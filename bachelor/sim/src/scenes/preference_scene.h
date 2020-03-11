@@ -14,6 +14,7 @@ private:
     robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map;
 
     SDL_Scancode m_bind_key      = SDL_SCANCODE_UNKNOWN;
+    input::EMouse m_bind_btn     = input::EMouse::None;
     input::EAction m_bind_action = input::EAction::None;
 
 public:
