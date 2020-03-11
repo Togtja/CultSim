@@ -5,3 +5,9 @@ strategies.consume_self = {
     tags = ETag.Food,
     actions = { actions.consume_self }
 }
+
+strategies.find_water = {
+    name = "Looking for Water",
+    tags = ETag.Drink,
+    actions = { actions.drink }
+}

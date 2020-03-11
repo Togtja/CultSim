@@ -34,3 +34,15 @@ actions.consume_self = {
         health = health - 2.0
     end
 }
+
+actions.drink = {
+    name = "Drink",
+    requirements = ETag.Find,
+    time_to_complete = 2.0,
+    success = function(owner, target, registry)
+        cultsim.modify_need(owner, ETag.Drink, 85.0)
+    end,
+    failure = function(owner, target, registry)
+        cultsim.modify_need(owner, ETag.Drink, 5.0)
+    end
+}
