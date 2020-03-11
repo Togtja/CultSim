@@ -315,6 +315,9 @@ public:
      */
     void clear();
 
+    std::string key_bindings_to_lua();
+    std::string btn_bindings_to_lua();
+
 private:
     std::string get_key_name(SDL_Scancode scancode);
 };
