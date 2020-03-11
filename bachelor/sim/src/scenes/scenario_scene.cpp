@@ -4,6 +4,7 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
 #include "entity/systems/health.h"
@@ -93,7 +94,7 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d(pos);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
@@ -386,6 +387,9 @@ void ScenarioScene::on_enter()
             std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
             std::vector<ai::Strategy>{});
         m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
+        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<memory::Container>{});
+        memory_comp.memory_container.emplace_back(ETag(TAG_Food | TAG_Location));
+        memory_comp.memory_container.emplace_back(ETag(TAG_Drink | TAG_Location));
     }
 
     for (int j = 0; j < 75; j++)
@@ -447,6 +451,15 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    auto& input = input::get_input();
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
+        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
+        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
 }
 
 void ScenarioScene::on_exit()
