@@ -41,15 +41,12 @@ void Requirement::update(float dt)
         }
     });
 
-    auto view_find =
-        registry
-            .view<component::FindRequirement, component::Vision, component::Position, component::Movement, component::Memory>();
+    auto view_find = registry.view<component::FindRequirement, component::Vision, component::Position, component::Movement>();
     view_find.each([&registry, this](entt::entity e,
                                      component::FindRequirement findreqs,
                                      component::Vision vision,
                                      component::Position pos,
-                                     component::Movement& mov,
-                                     component::Memory& memories) {
+                                     component::Movement& mov) {
         for (auto& entity : vision.seen)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
@@ -68,34 +65,41 @@ void Requirement::update(float dt)
             }
         }
 
-        for (auto& memory_container : memories.memory_container)
+        if (auto memories = registry.try_get<component::Memory>(e); memories)
         {
-            // Find a container matching our tag
-            if (memory_container.memory_tags & findreqs.tags && memory_container.memory_tags & TAG_Location)
+            for (auto& memory_container : memories->memory_container)
             {
-                // spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_container.size());
-                int i = 0;
-
-                // Go through each memory in it
-                for (auto& memory : memory_container.memory_storage)
+                // Find a container matching our tag
+                if (memory_container.memory_tags & findreqs.tags && memory_container.memory_tags & TAG_Location)
                 {
-                    if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
-                    {
-                        if (findreqs.desired_position != res->m_location)
-                        {
-                            findreqs.desired_position = res->m_location;
-                            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
-                        }
+                    // spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_container.size());
+                    int i = 0;
 
-                        if (close_enough(pos.position, findreqs.desired_position, 5.f))
+                    // Go through each memory in it
+                    for (auto& memory : memory_container.memory_storage)
+                    {
+                        if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                         {
-                            res->m_number_of_entities = 0.f;
-                            mov.desired_position.clear();
-                            continue;
+                            if (findreqs.desired_position != res->m_location)
+                            {
+                                findreqs.desired_position = res->m_location;
+                                ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
+                            }
+
+                            if (close_enough(pos.position, findreqs.desired_position, 5.f))
+                            {
+                                res->m_number_of_entities = 0.f;
+                                mov.desired_position.clear();
+                                spdlog::get("agent")->warn(
+                                    "Number of Entities in res : {}, Number of Entities in memory: {}",
+                                    res->m_number_of_entities,
+                                    dynamic_cast<memory::ResourceLocation*>(memory.get())->m_number_of_entities);
+                                continue;
+                            }
+                            break;
                         }
-                        break;
+                        i++;
                     }
-                    i++;
                 }
             }
         }
@@ -109,8 +113,10 @@ void Requirement::update(float dt)
                           m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
                           0.f));
         }
+
         else if (mov.desired_position.empty())
         {
+            //  spdlog::get("agent")->warn("We are searching randomly");
             if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
             {
                 findreqs.desired_position =

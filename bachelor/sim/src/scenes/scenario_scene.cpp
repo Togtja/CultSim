@@ -243,42 +243,42 @@ void ScenarioScene::on_enter()
                 {
                     need.status += 80.f;
                 }
-                if (auto memories = r.try_get<component::Memory>(e); memories)
+            }
+            if (auto memories = r.try_get<component::Memory>(e); memories)
+            {
+                for (auto& container : memories->memory_container)
                 {
-                    for (auto& container : memories->memory_container)
+                    if (container.memory_tags & TAG_Drink && container.memory_tags & TAG_Location)
                     {
-                        if (container.memory_tags & TAG_Drink && container.memory_tags & TAG_Location)
+                        std::time_t timestamp = std::time(0);
+                        auto vision           = r.get<component::Vision>(e);
+                        int count{};
+                        auto location  = r.get<component::Position>(e).position;
+                        bool duplicate = false;
+                        for (auto entity : vision.seen)
                         {
-                            std::time_t timestamp = std::time(0);
-                            auto vision           = r.get<component::Vision>(e);
-                            int count{};
-                            auto location  = r.get<component::Position>(e).position;
-                            bool duplicate = false;
-                            for (auto entity : vision.seen)
+                            if (r.valid(entity))
                             {
-                                if (r.valid(entity))
+                                auto entity_tags = r.try_get<component::Tags>(entity);
+                                if (entity_tags && entity_tags->tags & TAG_Drink)
                                 {
-                                    auto entity_tags = r.try_get<component::Tags>(entity);
-                                    if (entity_tags && entity_tags->tags & TAG_Drink)
-                                    {
-                                        count++;
-                                    }
+                                    count++;
                                 }
                             }
-                            for (auto& memory : container.memory_storage)
+                        }
+                        for (auto& memory : container.memory_storage)
+                        {
+                            if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
+                                res && close_enough(res->m_location, location, 50.f))
                             {
-                                if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                    res && close_enough(res->m_location, location, 50.f))
-                                {
-                                    res->m_number_of_entities = count;
-                                    duplicate                 = true;
-                                }
+                                res->m_number_of_entities = count;
+                                duplicate                 = true;
                             }
-                            if (!duplicate)
-                            {
-                                container.memory_storage.push_back(std::unique_ptr<memory::ResourceLocation>(
-                                    new memory::ResourceLocation(ETag(TAG_Drink | TAG_Location), location, count)));
-                            }
+                        }
+                        if (!duplicate)
+                        {
+                            container.memory_storage.push_back(std::unique_ptr<memory::ResourceLocation>(
+                                new memory::ResourceLocation(ETag(TAG_Drink | TAG_Location), location, count)));
                         }
                     }
                 }
@@ -455,7 +455,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep, need_reproduction},
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
                                             std::vector<ai::Need>{});
         cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
         if (i % 2 == 1)

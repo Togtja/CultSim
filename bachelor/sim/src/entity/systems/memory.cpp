@@ -23,6 +23,10 @@ void Memory::update(float dt)
             {
                 if (memory_container.memory_storage.size() != 0)
                 {
+                    // spdlog::get("agent")->warn("Size of memory storage {}: {}",
+                    //                           tag_to_string(ETag(memory_container.memory_tags & ~TAG_Location)),
+                    //                           memory_container.memory_storage.size());
+
                     if (dynamic_cast<memory::ResourceLocation*>(memory_container.memory_storage.front().get()))
                     {
                         auto pos = registry->get<component::Position>(e).position;
@@ -48,18 +52,20 @@ void Memory::update(float dt)
                         int i = 0;
                         for (auto& memory : memory_container.memory_storage)
                         {
-                            memory->update(1.f);
-
                             if (auto res = dynamic_cast<memory::ResourceLocation*>(memory.get());
                                 res && res->m_number_of_entities == 0)
                             {
+                                memory->update(1.f);
+                                //  spdlog::get("agent")->warn("We are deleting a {} Memory. Memories left : {}",
+                                //                             tag_to_string(ETag(memory_container.memory_tags & ~TAG_Location)),
+                                //                             memory_container.memory_storage.size());
                                 memory_container.memory_storage.erase(memory_container.memory_storage.begin() + i);
                             }
                             i++;
                         }
 
                         // TODO: Remove magic number and put limit of memories remembered into Lua
-                        while (memory_container.memory_storage.size() >= 10)
+                        while (memory_container.memory_storage.size() > 10)
                         {
                             memory_container.memory_storage.erase(memory_container.memory_storage.end() - 1);
                         }
