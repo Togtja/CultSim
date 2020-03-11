@@ -175,6 +175,26 @@ void ActionHandler::clear()
     m_mouse_binding.clear();
 }
 
+std::string ActionHandler::key_bindings_to_lua()
+{
+    std::string ret = "";
+    for (auto&& [key, action] : m_key_binding)
+    {
+        ret += fmt::format("\t\t[\"{}\"] = EAction.{},\n", SDL_GetScancodeName(key), action_to_string(action));
+    }
+    return ret;
+}
+
+std::string ActionHandler::btn_bindings_to_lua()
+{
+    std::string ret = "";
+    for (auto&& [btn, action] : m_mouse_binding)
+    {
+        ret += fmt::format("\t\t[EMouse.{}] = EAction.{},\n", mouse_to_string(btn), action_to_string(action));
+    }
+    return ret;
+}
+
 std::string ActionHandler::get_key_name(SDL_Scancode scancode)
 {
     return SDL_GetKeyName(SDL_GetKeyFromScancode(scancode));
@@ -451,38 +471,22 @@ void ContextHandler::save_binding_to_file()
     lua_key_script << "action_key_bindings = {\n";
     for (auto&& [context, action_h] : m_input_map)
     {
-        auto&& map = action_h.get_key_binding();
-        if (map.empty())
-        {
-            continue;
-        }
-
         lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", key_context_to_string(context));
-        for (auto&& [key, action] : map)
-        {
-            lua_key_script << fmt::format("\t\t[\"{}\"] = EAction.{},\n", SDL_GetScancodeName(key), action_to_string(action));
-        }
+        lua_key_script << action_h.key_bindings_to_lua();
         lua_key_script << "\t},\n";
     }
+
     lua_key_script << "}\naction_mouse_bindings = {\n";
     for (auto&& [context, action_h] : m_input_map)
     {
-        auto&& map = action_h.get_mouse_binding();
-        if (map.empty())
-        {
-            continue;
-        }
-
         lua_key_script << fmt::format("\t[EKeyContext.{}] = {{\n", key_context_to_string(context));
-        for (auto&& [btn, action] : map)
-        {
-            lua_key_script << fmt::format("\t\t[EMouse.{}] = EAction.{},\n", mouse_to_string(btn), action_to_string(action));
-        }
+        lua_key_script << action_h.btn_bindings_to_lua();
         lua_key_script << "\t},\n";
     }
     lua_key_script << "}";
     fs::write_file("keybinding.lua", lua_key_script.str());
 }
+
 void ContextHandler::load_binding_from_file(sol::state_view lua)
 {
     const auto& file = fs::read_file("keybinding.lua");
