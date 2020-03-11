@@ -22,7 +22,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
@@ -75,7 +75,7 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
@@ -124,7 +124,7 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
@@ -175,7 +175,7 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
@@ -233,7 +233,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
         0.f,
         {},
         [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
         {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),

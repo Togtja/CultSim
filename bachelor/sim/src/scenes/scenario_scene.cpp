@@ -116,7 +116,7 @@ void ScenarioScene::on_enter()
                                           r.remove<component::Sprite>(n);
                                           r.get<component::Inventory>(e).contents.push_back(n);
                                       },
-                                      [](entt::entity e, entt::registry& r) {
+                                      [](entt::entity e, entt::entity n, entt::registry& r) {
                                           spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
                                           r.destroy(e);
                                       },
@@ -137,7 +137,7 @@ void ScenarioScene::on_enter()
                                       }
                                   }
                               },
-                              [](entt::entity e, entt::registry& r) {
+                              [](entt::entity e, entt::entity n, entt::registry& r) {
                                   spdlog::get("agent")->warn("We failed to finish action: eat");
                                   r.destroy(e);
                               },
@@ -173,7 +173,7 @@ void ScenarioScene::on_enter()
                                                  }
                                              }
                                          },
-                                         [](entt::entity e, entt::registry& r) {
+                                         [](entt::entity e, entt::entity n, entt::registry& r) {
                                              auto inventory = r.try_get<component::Inventory>(e);
                                              if (inventory && inventory->tags & TAG_Food)
                                              {
@@ -205,7 +205,7 @@ void ScenarioScene::on_enter()
                                         }
                                     }
                                 },
-                                [](entt::entity e, entt::registry& r) {
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
                                     spdlog::get("agent")->warn("We failed to finish action: drink");
                                     r.destroy(e);
                                 },
@@ -213,25 +213,26 @@ void ScenarioScene::on_enter()
                                     spdlog::get("agent")->warn("We aborted our action");
                                 }};
 
-    action::Action action_sleep{
-        static_cast<std::string>("Sleep"),
-        TAG_None,
-        10.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) {
-            for (auto& need : r.get<component::Needs>(e).needs)
-            {
-                if (need.tags & TAG_Sleep)
-                {
-                    need.status += 69.f;
-                }
-            }
-        },
-        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("Agent {} failed to finish action: sleep", e); },
-        []() {
-            spdlog::get("agent")->warn("We aborted our action");
-        }};
+    action::Action action_sleep{static_cast<std::string>("Sleep"),
+                                TAG_None,
+                                10.f,
+                                0.f,
+                                {},
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    for (auto& need : r.get<component::Needs>(e).needs)
+                                    {
+                                        if (need.tags & TAG_Sleep)
+                                        {
+                                            need.status += 69.f;
+                                        }
+                                    }
+                                },
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    spdlog::get("agent")->warn("Agent {} failed to finish action: sleep", e);
+                                },
+                                []() {
+                                    spdlog::get("agent")->warn("We aborted our action");
+                                }};
 
     action::Action action_reproduce{
         static_cast<std::string>("Reproduce"),
@@ -324,7 +325,9 @@ void ScenarioScene::on_enter()
                 }
             }
         },
-        [](entt::entity e, entt::registry& r) { spdlog::get("agent")->warn("We failed to finish action: reproduce"); },
+        [](entt::entity e, entt::entity n, entt::registry& r) {
+            spdlog::get("agent")->warn("We failed to finish action: reproduce");
+        },
         []() {
             spdlog::get("agent")->warn("We aborted our action: reproduce");
         }};
@@ -600,6 +603,20 @@ void ScenarioScene::bind_scenario_lua_functions()
             }
         }
     });
+
+    /** Spawn entity functions */
+    cultsim.set_function("spawn", [this](const std::string& entity_name) {
+        const auto& final_path = m_scenario.script_path + entity_name + ".lua";
+        spawn_entity(m_registry, m_context->lua_state, final_path);
+    });
+
+    cultsim.set_function("spawn_at", [this](const std::string& entity_name, glm::vec2 position) {
+        const auto& final_path = m_scenario.script_path + entity_name + ".lua";
+        spawn_entity(m_registry, m_context->lua_state, final_path, position);
+    });
+
+    /** Destroy entity */
+    cultsim.set_function("kill", [this](entt::entity e) { m_registry.destroy(e); });
 }
 
 void ScenarioScene::setup_docking_ui()
