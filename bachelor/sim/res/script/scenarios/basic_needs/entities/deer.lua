@@ -7,7 +7,7 @@ entity = {
         speed = 80.0
     },
     SpriteComponent = {
-        color = Vec3:new(1.0, 1.0, 1.0),
+        color = Vec3:new(1.0, 0.50, 0.60),
         texture = "sprites/agent_c.png"
     },
     VisionComponent = {
