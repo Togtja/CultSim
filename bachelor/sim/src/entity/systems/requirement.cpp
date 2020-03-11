@@ -80,7 +80,12 @@ void Requirement::update(float dt)
                     {
                         if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                         {
-                            if (findreqs.desired_position != res->m_location)
+                            spdlog::get("agent")->warn("Target position: {},{},{}",
+                                                       mov.desired_position.back().x,
+                                                       mov.desired_position.back().y,
+                                                       mov.desired_position.back().z);
+
+                            if (findreqs.desired_position != res->m_location && mov.desired_position.empty())
                             {
                                 findreqs.desired_position = res->m_location;
                                 ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
