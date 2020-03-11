@@ -1,7 +1,7 @@
 #include "primitives.h"
 
-#include <glm/trigonometric.hpp>
 #include <glm/gtc/constants.hpp>
+#include <glm/trigonometric.hpp>
 
 namespace cs::gfx
 {
@@ -37,7 +37,7 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> cs::gfx::Primiti
     std::vector<PrimitiveVertex> verts{};
     std::vector<unsigned> indices{};
 
-    for (int i = 0; i < m_detail; ++i)
+    for (int i = 0; i <= m_detail; ++i)
     {
         const auto ratio = static_cast<float>(i) / static_cast<float>(m_detail);
         verts.push_back({{glm::cos(ratio * glm::two_pi<float>()), glm::sin(ratio * glm::two_pi<float>()), 0.f}, {1.f, 1.f, 1.f}});
@@ -91,4 +91,4 @@ std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> PrimitiveQuad::g
 
     return {verts, indices};
 }
-} // namespace cs
+} // namespace cs::gfx
