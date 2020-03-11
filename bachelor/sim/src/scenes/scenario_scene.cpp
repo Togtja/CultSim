@@ -161,7 +161,7 @@ void ScenarioScene::on_enter()
                         for (auto& memory : container.memory_storage)
                         {
                             if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                res && close_enough(res->m_location, location, 25.f))
+                                res && close_enough(res->m_location, location, 20.f))
                             {
                                 res->m_number_of_entities = count;
                                 duplicate                 = true;
@@ -269,7 +269,7 @@ void ScenarioScene::on_enter()
                         for (auto& memory : container.memory_storage)
                         {
                             if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                res && close_enough(res->m_location, location, 50.f))
+                                res && close_enough(res->m_location, location, 20.f))
                             {
                                 res->m_number_of_entities = count;
                                 duplicate                 = true;
@@ -455,7 +455,7 @@ void ScenarioScene::on_enter()
         m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
         m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
         m_registry.assign<component::Needs>(agent,
-                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep},
+                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep, need_reproduction},
                                             std::vector<ai::Need>{});
         cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
         if (i % 2 == 1)

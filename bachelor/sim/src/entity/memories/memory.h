@@ -1,4 +1,5 @@
 #pragma once
+#include <common_helpers.h>
 #include <entity/components/tags.h>
 
 namespace cs::memory
