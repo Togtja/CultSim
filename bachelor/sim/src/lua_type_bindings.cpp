@@ -146,7 +146,7 @@ void bind_input(sol::state_view lua)
                                   {"MoveDown", input::EAction::MoveDown},
                                   {"MoveLeft", input::EAction::MoveLeft},
                                   {"MoveRight", input::EAction::MoveRight},
-                                  {"MainMenu", input::EAction::MainMenu},
+                                  {"PauseMenu", input::EAction::PauseMenu},
                                   {"ZoomIn", input::EAction::ZoomIn},
                                   {"ZoomOut", input::EAction::ZoomOut},
                                   {"SelectEntity", input::EAction::SelectEntity},

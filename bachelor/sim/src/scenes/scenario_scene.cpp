@@ -95,7 +95,7 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d(pos);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MainMenu, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);

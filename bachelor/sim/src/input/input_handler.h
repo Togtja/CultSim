@@ -35,7 +35,7 @@ enum class EAction
     MoveDown,
     ZoomIn,
     ZoomOut,
-    MainMenu,
+    PauseMenu,
     SelectEntity,
     FollowEntity,
     SpeedUp,
