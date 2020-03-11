@@ -15,6 +15,7 @@ action_key_bindings = {
 action_mouse_bindings = {
     [EKeyContext.ScenarioScene] = {
         [EMouse.WheelUp] = EAction.ZoomIn,
-        [EMouse.WheelDown] = EAction.ZoomOut
+        [EMouse.WheelDown] = EAction.ZoomOut,
+        [EMouse.Left] = EAction.SelectEntity
     }
 }
