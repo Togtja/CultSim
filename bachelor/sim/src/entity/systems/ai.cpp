@@ -55,8 +55,8 @@ void AI::update(float dt)
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0));
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0));
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
@@ -73,7 +73,7 @@ void AI::update(float dt)
                     {
                         continue;
                     }
-                    if (is_visible(pos.position, pos2.position, vis.vision_radius))
+                    if (is_visible(pos.position, pos2.position, vis.radius))
                     {
                         vis.seen.push_back(e2);
                     }

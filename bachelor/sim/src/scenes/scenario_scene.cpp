@@ -292,7 +292,7 @@ void ScenarioScene::on_enter()
 
                                     RandomEngine rng{};
                                     child_reprd.number_of_children = 0;
-                                    child_health.hp                = 100.f;
+                                    child_health.health            = 100.f;
                                     child_pos.position             = r.get<component::Position>(e).position +
                                                          glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
 
@@ -663,7 +663,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     if (health)
     {
         ImGui::PushFont(g_header_font);
-        ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->hp);
+        ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->health);
         ImGui::PopFont();
     }
 

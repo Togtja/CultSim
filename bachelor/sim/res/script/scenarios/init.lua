@@ -4,5 +4,4 @@
 actions = {}
 needs = {}
 strategies = {}
-entity = {}
 scenario = nil

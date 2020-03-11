@@ -1,8 +1,7 @@
-entity.deer = {
+entity = {
     PositionComponent = {
-        position = Vec3:new(random.uniform(-scenario.bounds.x, scenario.bounds.x),
-                            random.uniform(-scenario.bounds.y, scenario.bounds.y),
-                            0.0)
+        position = Vec2:new(random.uniform(-scenario.bounds.x, scenario.bounds.x),
+                            random.uniform(-scenario.bounds.y, scenario.bounds.y))
     },
     MovementComponent = {
         speed = 80.0
@@ -20,14 +19,14 @@ entity.deer = {
     },
     NeedComponent = {
         -- Corresponds to keys in the needs.lua file
-        needs = { "hunger", "thirst", "sleep", "reproduce" }
+        needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce }
     },
     ReproductionComponent = {
         sex = random.randint(0, 1),
         max_children = 10
     },
     StrategyComponent = {
-        strategies = { "consume_self", "sleep" }
+        strategies = { strategies.consume_self }
     },
     HealthComponent = {
         health = 100.0
