@@ -121,68 +121,28 @@ void ScenarioScene::on_enter()
                                       },
                                       {}};
 
-    action::Action action_eat{
-        static_cast<std::string>("Eat"),
-        TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) {
-            r.destroy(n);
-            for (auto& need : r.get<component::Needs>(e).needs)
-            {
-                if (need.tags & TAG_Food)
-                {
-                    need.status += 80.f;
-                }
-            }
-
-            if (auto memories = r.try_get<component::Memory>(e); memories)
-            {
-                for (auto& container : memories->memory_container)
-                {
-                    if (container.memory_tags & TAG_Food && container.memory_tags & TAG_Location)
-                    {
-                        auto vision = r.get<component::Vision>(e);
-                        int count{};
-                        auto location  = r.get<component::Position>(e).position;
-                        bool duplicate = false;
-                        for (auto entity : vision.seen)
-                        {
-                            if (r.valid(entity))
-                            {
-                                auto entity_tags = r.try_get<component::Tags>(entity);
-                                if (entity_tags && entity_tags->tags & TAG_Food)
-                                {
-                                    count++;
-                                }
-                            }
-                        }
-                        for (auto& memory : container.memory_storage)
-                        {
-                            if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                res && close_enough(res->m_location, location, 20.f))
-                            {
-                                res->m_number_of_entities = count;
-                                duplicate                 = true;
-                            }
-                        }
-                        if (!duplicate)
-                        {
-                            container.memory_storage.push_back(std::unique_ptr<memory::ResourceLocation>(
-                                new memory::ResourceLocation(ETag(TAG_Food | TAG_Location), location, count)));
-                        }
-                    }
-                }
-            }
-        },
-        [](entt::entity e, entt::registry& r) {
-            spdlog::get("agent")->warn("We failed to finish action: eat");
-            r.destroy(e);
-        },
-        []() {
-            spdlog::get("agent")->warn("We aborted our action");
-        }};
+    action::Action action_eat{static_cast<std::string>("Eat"),
+                              TAG_Find,
+                              5.f,
+                              0.f,
+                              {},
+                              [](entt::entity e, entt::entity n, entt::registry& r) {
+                                  r.destroy(n);
+                                  for (auto& need : r.get<component::Needs>(e).needs)
+                                  {
+                                      if (need.tags & TAG_Food)
+                                      {
+                                          need.status += 80.f;
+                                      }
+                                  }
+                              },
+                              [](entt::entity e, entt::registry& r) {
+                                  spdlog::get("agent")->warn("We failed to finish action: eat");
+                                  r.destroy(e);
+                              },
+                              []() {
+                                  spdlog::get("agent")->warn("We aborted our action");
+                              }};
 
     action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
                                          {},
@@ -229,68 +189,28 @@ void ScenarioScene::on_enter()
                                              }
                                          },
                                          {}};
-    action::Action action_drink{
-        static_cast<std::string>("Drink"),
-        TAG_Find,
-        2.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) {
-            r.destroy(n);
-            for (auto& need : r.get<component::Needs>(e).needs)
-            {
-                if (need.tags & TAG_Drink)
-                {
-                    need.status += 80.f;
-                }
-            }
-            if (auto memories = r.try_get<component::Memory>(e); memories)
-            {
-                for (auto& container : memories->memory_container)
-                {
-                    if (container.memory_tags & TAG_Drink && container.memory_tags & TAG_Location)
-                    {
-                        std::time_t timestamp = std::time(0);
-                        auto vision           = r.get<component::Vision>(e);
-                        int count{};
-                        auto location  = r.get<component::Position>(e).position;
-                        bool duplicate = false;
-                        for (auto entity : vision.seen)
-                        {
-                            if (r.valid(entity))
-                            {
-                                auto entity_tags = r.try_get<component::Tags>(entity);
-                                if (entity_tags && entity_tags->tags & TAG_Drink)
-                                {
-                                    count++;
-                                }
-                            }
-                        }
-                        for (auto& memory : container.memory_storage)
-                        {
-                            if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                res && close_enough(res->m_location, location, 20.f))
-                            {
-                                res->m_number_of_entities = count;
-                                duplicate                 = true;
-                            }
-                        }
-                        if (!duplicate)
-                        {
-                            container.memory_storage.push_back(std::unique_ptr<memory::ResourceLocation>(
-                                new memory::ResourceLocation(ETag(TAG_Drink | TAG_Location), location, count)));
-                        }
-                    }
-                }
-            }
-        },
-        [](entt::entity e, entt::registry& r) {
-            spdlog::get("agent")->warn("We failed to finish action: drink");
-            r.destroy(e);
-        },
-        []() {
-            spdlog::get("agent")->warn("We aborted our action");
-        }};
+    action::Action action_drink{static_cast<std::string>("Drink"),
+                                TAG_Find,
+                                2.f,
+                                0.f,
+                                {},
+                                [](entt::entity e, entt::entity n, entt::registry& r) {
+                                    r.destroy(n);
+                                    for (auto& need : r.get<component::Needs>(e).needs)
+                                    {
+                                        if (need.tags & TAG_Drink)
+                                        {
+                                            need.status += 80.f;
+                                        }
+                                    }
+                                },
+                                [](entt::entity e, entt::registry& r) {
+                                    spdlog::get("agent")->warn("We failed to finish action: drink");
+                                    r.destroy(e);
+                                },
+                                []() {
+                                    spdlog::get("agent")->warn("We aborted our action");
+                                }};
 
     action::Action action_sleep{
         static_cast<std::string>("Sleep"),

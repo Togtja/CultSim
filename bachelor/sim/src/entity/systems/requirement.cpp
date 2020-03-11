@@ -72,7 +72,7 @@ void Requirement::update(float dt)
                 // Find a container matching our tag
                 if (memory_container.memory_tags & findreqs.tags && memory_container.memory_tags & TAG_Location)
                 {
-                    // spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_container.size());
+                    spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_storage.size());
                     int i = 0;
 
                     // Go through each memory in it
@@ -80,10 +80,13 @@ void Requirement::update(float dt)
                     {
                         if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                         {
-                            spdlog::get("agent")->warn("Target position: {},{},{}",
-                                                       mov.desired_position.back().x,
-                                                       mov.desired_position.back().y,
-                                                       mov.desired_position.back().z);
+                            if (mov.desired_position.size())
+                            {
+                                spdlog::get("agent")->warn("Target position: {},{},{}",
+                                                           mov.desired_position.back().x,
+                                                           mov.desired_position.back().y,
+                                                           mov.desired_position.back().z);
+                            }
 
                             if (findreqs.desired_position != res->m_location && mov.desired_position.empty())
                             {
