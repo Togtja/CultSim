@@ -16,10 +16,13 @@ namespace cs::input
  */
 enum class EKeyContext
 {
+    None, // No KeyContext set
     DefaultContext,
     Agent,
     AgentOnHover,
-    ScenarioScene
+    ScenarioScene,
+
+    Count
 };
 
 /**
@@ -91,6 +94,7 @@ inline std::string action_to_string(const EAction action)
  */
 enum class EMouse
 {
+    None = 0,   // No Press
     Left,       // Left mouse btn
     Middle,     // Middle mouse btn
     Right,      // Right mouse btn
@@ -100,7 +104,9 @@ enum class EMouse
     WheelDown,  // Scroll wheel down
     WheelRight, // Scroll wheel right
     WheelLeft,  // Scroll wheel left
-    Move        // Any mouse movement
+    Move,       // Any mouse movement
+
+    Count
 
 };
 

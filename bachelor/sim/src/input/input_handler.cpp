@@ -313,7 +313,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
             // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
-            auto click = static_cast<EMouse>(event.button.button - 1);
+            auto click = static_cast<EMouse>(event.button.button);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};
             if (click == EMouse::Left)
