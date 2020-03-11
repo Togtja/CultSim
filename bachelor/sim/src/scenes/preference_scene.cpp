@@ -52,7 +52,7 @@ void PreferenceScene::key_binding()
 {
     ImGui::Begin("Key Bindings", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
-    for (auto&& [context, action_h] : m_key_map)
+    for (auto&& [context, action_h] : m_display_map)
     {
         ImGui::Text(input::key_context_to_string(context).c_str());
         ImGui::BeginTable(input::key_context_to_string(context).c_str(), 3);
@@ -60,13 +60,13 @@ void PreferenceScene::key_binding()
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
         ImGui::TableAutoHeaders();
-        for (auto&& [key, action] : action_h.get_key_binding())
+        int i = 0;
+        for (auto&& [key, action] : action_h)
         {
             ImGui::TableNextCell();
-            if (ImGui::Button(SDL_GetScancodeName(key)))
+            if (ImGui::Button(key.c_str()))
             {
-                m_bind_key    = key;
-                m_bind_action = action;
+                m_bind_index = i;
                 ImGui::OpenPopup(fmt::format("Change Binding##{}", context).c_str());
             }
             ImGui::TableNextCell();
@@ -76,31 +76,16 @@ void PreferenceScene::key_binding()
             ImGui::TableNextCell();
             if (ImGui::Button(fmt::format("X##key{}", key).c_str()))
             {
-                action_h.unbind_key(key);
+                auto scan_key  = SDL_GetScancodeFromName(key.c_str());
+                auto mouse_btn = input::string_to_mouse(key);
+                m_key_map.at(context).unbind_btn(mouse_btn);
+                m_key_map.at(context).unbind_key(scan_key);
+                action_h.erase(action_h.begin() + i--);
             }
-        }
-        for (auto&& [btn, action] : action_h.get_mouse_binding())
-        {
-            ImGui::TableNextCell();
-            if (ImGui::Button(("Mouse " + input::mouse_to_string(btn)).c_str()))
-            {
-                m_bind_btn    = btn;
-                m_bind_action = action;
-                ImGui::OpenPopup(fmt::format("Change Binding##{}", context).c_str());
-            }
-
-            ImGui::TableNextCell();
-            auto action_s = input::action_to_string(action);
-            ImGui::Text(action_s.c_str());
-
-            ImGui::TableNextCell();
-            if (ImGui::Button(fmt::format("X##btn{}", btn).c_str()))
-            {
-                action_h.unbind_btn(btn);
-            }
+            i++;
         }
         ImGui::NewLine();
-        // TODO: Do this for mouse bindings
+
         ImGui::TableNextCell();
         if (ImGui::Button("Add new Binding"))
         {
@@ -118,6 +103,7 @@ void PreferenceScene::key_binding()
                 if (ImGui::Button(input::action_to_string(static_cast<input::EAction>(i)).c_str()))
                 {
                     m_bind_action = static_cast<input::EAction>(i);
+                    m_bind_index  = m_display_map[context].size();
                     ImGui::CloseCurrentPopup();
 
                     open_up = true;
@@ -154,24 +140,66 @@ void PreferenceScene::key_binding()
             }
             if (n_key != SDL_SCANCODE_UNKNOWN)
             {
-                action_h.unbind_key(n_key);
-                action_h.unbind_key(m_bind_key);
-                action_h.unbind_btn(m_bind_btn);
+                // Remove what ever old binding was there
+                m_key_map.at(context).unbind_key(n_key);
 
-                action_h.bind_key(n_key, m_bind_action);
-                m_bind_key    = SDL_SCANCODE_UNKNOWN;
+                // The binding it a replacemnt
+                if (m_bind_index >= 0 && m_bind_index < m_display_map[context].size())
+                {
+                    auto old_key_s = m_display_map[context][m_bind_index].first;
+                    m_bind_action  = m_display_map[context][m_bind_index].second;
+
+                    // Find if that key has been used before
+                    auto&& it = std::find_if(m_display_map[context].begin(),
+                                             m_display_map[context].end(),
+                                             [n_key](const auto& p) { return p.first == SDL_GetScancodeName(n_key); });
+
+                    // If a binding with the key already exist, Flip the actions
+                    if (it != m_display_map[context].end())
+                    {
+                        m_display_map[context][m_bind_index].first = (*it).first;
+                        // The old key get the n_key's old action
+                        m_key_map.at(context).bind_key(SDL_GetScancodeFromName(old_key_s.c_str()), (*it).second);
+                        (*it).first = old_key_s;
+                    }
+                    else
+                    {
+                        m_display_map[context][m_bind_index] = std::pair(SDL_GetScancodeName(n_key), m_bind_action);
+                    }
+
+                    // bind the action to a new key
+                    m_key_map.at(context).bind_key(n_key, m_bind_action);
+                }
+                // The bindings is a new binding
+                else if (m_bind_index == m_display_map[context].size())
+                {
+                    auto&& it = std::find_if(m_display_map[context].begin(),
+                                             m_display_map[context].end(),
+                                             [n_key](const auto& p) { return p.first == SDL_GetScancodeName(n_key); });
+
+                    // If a binding with the key already exist, remove it
+                    if (it != m_display_map[context].end())
+                    {
+                        m_display_map[context].erase(it);
+                        m_key_map.at(context).unbind_key(n_key);
+                    }
+                    m_display_map[context].emplace_back(std::pair(SDL_GetScancodeName(n_key), m_bind_action));
+                    m_key_map.at(context).bind_key(n_key, m_bind_action);
+                }
+
+                m_bind_index  = -1;
                 m_bind_action = input::EAction::None;
                 ImGui::CloseCurrentPopup();
             }
             else if (bind_mouse != input::EMouse::None)
             {
-                action_h.unbind_key(m_bind_key);
-                action_h.unbind_btn(bind_mouse);
-                action_h.unbind_btn(m_bind_btn);
-
-                action_h.bind_btn(bind_mouse, m_bind_action);
-                m_bind_key    = SDL_SCANCODE_UNKNOWN;
-                m_bind_action = input::EAction::None;
+                // m_key_map.at(context).unbind_key(m_bind_key);
+                // m_key_map.at(context).unbind_btn(bind_mouse);
+                // m_key_map.at(context).unbind_btn(m_bind_btn);
+                //
+                // m_key_map.at(context).bind_btn(bind_mouse, m_bind_action);
+                // m_bind_key    = SDL_SCANCODE_UNKNOWN;
+                // m_bind_action = input::EAction::None;
 
                 ImGui::CloseCurrentPopup();
             }
