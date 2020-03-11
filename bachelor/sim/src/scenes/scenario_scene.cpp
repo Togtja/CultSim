@@ -540,7 +540,7 @@ bool ScenarioScene::draw()
 
 void ScenarioScene::bind_scenario_lua_functions()
 {
-    /** Helpful to make following code shorter and more readable, copying is fine here */
+    /** Helpful to make following code shorter and more readable, copying is fine here, it's just a pointer */
     auto lua = m_context->lua_state;
 
     /** Bind component type identifiers to the component table */
@@ -584,6 +584,20 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return sol::make_object(s, m_registry.get<component::Health>(e));
                 break;
             default: return sol::nil; break;
+        }
+    });
+
+    /** Helper action to modify an entity need */
+    cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
+        if (auto* needs = m_registry.try_get<component::Needs>(e); needs)
+        {
+            for (auto& need : needs->needs)
+            {
+                if (need.tags & need_tags)
+                {
+                    need.status += delta;
+                }
+            }
         }
     });
 }

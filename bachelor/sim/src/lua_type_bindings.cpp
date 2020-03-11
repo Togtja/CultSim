@@ -114,7 +114,14 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Strategies>("StrategyComponent", "strategies", &component::Strategies::strategies);
 
-    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
+    /** Entity registry, we only expose a limited number of functions here */
+    lua.new_usertype<entt::registry>("Registry",
+                                     "valid",
+                                     &entt::registry::valid,
+                                     "view",
+                                     &entt::registry::runtime_view<entt::entity>,
+                                     "destroy",
+                                     &entt::registry::destroy<entt::entity>);
 }
 
 void bind_systems(sol::state_view lua)

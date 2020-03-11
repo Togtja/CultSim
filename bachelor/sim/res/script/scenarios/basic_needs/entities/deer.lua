@@ -18,7 +18,7 @@ entity = {
         tags = ETag.Avoidable
     },
     NeedComponent = {
-        -- Corresponds to keys in the needs.lua file
+        -- Corresponds to entires in the needs.lua file
         needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce }
     },
     ReproductionComponent = {
@@ -26,6 +26,7 @@ entity = {
         max_children = 10
     },
     StrategyComponent = {
+        -- Corresponds to entries in the strategies.lua file
         strategies = { strategies.consume_self }
     },
     HealthComponent = {
