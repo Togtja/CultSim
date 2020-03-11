@@ -23,7 +23,7 @@ struct Action
     entt::entity target{};
 
     std::function<void(entt::entity owner, entt::entity target, entt::registry& registry)> success{};
-    std::function<void(entt::entity target, entt::registry& registry)> failure{};
+    std::function<void(entt::entity owner, entt::entity target, entt::registry& registry)> failure{};
     std::function<void(void)> abort{};
 };
 

@@ -63,7 +63,7 @@ void Action::update(float dt)
 
                                 else
                                 {
-                                    action.failure(action.target, *m_context.registry);
+                                    action.failure(e, action.target, *m_context.registry);
                                 }
                             }
                             strategy.actions.pop_back();

@@ -6,13 +6,19 @@ actions.sleep = {
     name = "Sleep",
     requirements = ETag.None,
     time_to_complete = 10.0,
-    success = function(owner, target, registry) end
+    success = function(owner, target, registry)
+        cultsim.modify_need(owner, ETag.Sleep, 69.0)
+    end,
+    failure = function(owner, target, registry)
+        cultsim.modify_need(owner, ETag.Sleep, 5.0)
+    end
 }
 
 actions.consume_self = {
     name = "Consume Self",
     requirements = ETag.None,
     time_to_complete = 7.5,
+    -- You manage to eat yourself without too much damage caused
     success = function(owner, target, registry)
         -- Roll for how much we ate
         local chunk_eaten = random:uniform(5.0, 25.0)
@@ -21,5 +27,10 @@ actions.consume_self = {
         -- Negatively impact health because we are eating ourselves
         local health = cultsim.get_component(owner, component.health)
         health.health = health.health - chunk_eaten / 2.0
+    end,
+    -- Take some damage when you fail to swallow yourself
+    failure = function(owner, target, registry)
+        local health = cultsim.get_component(owner, component.health)
+        health = health - 2.0
     end
 }

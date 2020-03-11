@@ -114,6 +114,7 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
                                                       action_table["time_to_complete"].get<float>()});
 
             strategy.actions.back().success = action_table["success"];
+            strategy.actions.back().failure = action_table["failure"];
         }
 
         strat.strategies.push_back(strategy);
