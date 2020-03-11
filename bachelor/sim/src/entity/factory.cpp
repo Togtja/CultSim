@@ -11,16 +11,16 @@ namespace cs
 namespace detail
 {
 /** Map of component factories */
-static robin_hood::unordered_map<entt::hashed_string, std::function<bool(entt::entity, entt::registry&, sol::table)>>
-    s_component_factories{{"PositionComponent"_hs, spawn_position_component},
-                          {"MovementComponent"_hs, spawn_movement_component},
-                          {"SpriteComponent"_hs, spawn_sprite_component},
-                          {"VisionComponent"_hs, spawn_vision_component},
-                          {"TagComponent"_hs, spawn_tag_component},
-                          {"NeedComponent"_hs, spawn_need_component},
-                          {"ReproductionComponent"_hs, spawn_reproduction_component},
-                          {"StrategyComponent"_hs, spawn_strategy_component},
-                          {"HealthComponent"_hs, spawn_health_component}};
+static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, entt::registry&, sol::table)>>
+    s_component_factories{{"PositionComponent", spawn_position_component},
+                          {"MovementComponent", spawn_movement_component},
+                          {"SpriteComponent", spawn_sprite_component},
+                          {"VisionComponent", spawn_vision_component},
+                          {"TagComponent", spawn_tag_component},
+                          {"NeedComponent", spawn_need_component},
+                          {"ReproductionComponent", spawn_reproduction_component},
+                          {"StrategyComponent", spawn_strategy_component},
+                          {"HealthComponent", spawn_health_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -140,12 +140,19 @@ entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_
     lua.script(fs::read_file(entity));
     sol::table entity_info = lua["entity"];
 
+    /** Iterate components and spawn them with their factory functions */
     for (const auto& [k, v] : entity_info)
     {
-        if (!detail::s_component_factories.at(entt::hashed_string(k.as<std::string>().c_str()))(out, v))
+        if (!detail::s_component_factories.at(k.as<std::string>().c_str())(out, reg, v))
         {
             spdlog::get("agent")->warn("failed to create {}. correct spelling?", k.as<std::string>());
         }
+    }
+
+    /** Set position if it has one */
+    if (auto* pos = reg.try_get<component::Position>(out); pos)
+    {
+        pos->position = glm::vec3(position, 0.f);
     }
 
     spdlog::get("agent")->debug("created entity '{}' with {} components", entity, entity_info.size());
