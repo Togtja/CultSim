@@ -30,39 +30,15 @@ bool PreferenceScene::update(float dt)
         auto&& input = input::get_input();
         for (auto&& [context, action_h] : m_key_map)
         {
-            int i = 0;
             for (auto&& [key, action] : action_h.get_key_binding())
             {
-                auto curr_key = m_key_buff[context][i];
-                spdlog::critical("Key {} is {} big", curr_key, curr_key.size());
-                if (curr_key.empty())
-                {
-                    success = false;
-                    ImGui::OpenPopup("Empty#Binding");
-                }
-                if (SDL_GetScancodeName(key) != curr_key)
-                {
                     input.unbind_key(context, key);
-                    input.bind_key(context, SDL_GetScancodeFromName(curr_key.c_str()), action);
+                input.bind_key(context, key, action);
                 }
-                i++;
             }
-        }
-        if (success)
-        {
             m_context->scene_manager->pop();
         }
-    }
 
-    if (ImGui::BeginPopupModal("Empty#Binding", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
-    {
-        spdlog::critical("I am being run");
-        if (ImGui::Button("Ok##id", {150, 50}))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
-    }
     ImGui::End();
     return false;
 }
@@ -100,11 +76,8 @@ void PreferenceScene::key_binding()
             if (ImGui::Button(fmt::format("X##{}", i).c_str()))
             {
                 action_h.unbind_key(key);
-                m_key_buff[context].erase(m_key_buff[context].begin() + i--);
             }
-            i++;
         }
-        // TODO: Do this for mouse bindings
 
         ImGui::EndTable();
         if (ImGui::Button("Add new Binding"))

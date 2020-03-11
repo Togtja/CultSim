@@ -12,8 +12,7 @@ class PreferenceScene : public IScene
 {
 private:
     robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map;
-    robin_hood::unordered_map<input::EKeyContext, std::vector<std::string>> m_key_buff;
-    int free_codes = 287;
+
 
 public:
     PreferenceScene()
