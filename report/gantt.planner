@@ -50,7 +50,7 @@
       <task id="11" name="Define Scope" note="" work="230400" start="20200113T000000Z" end="20200122T170000Z" work-start="20200113T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200113T000000Z"/>
       </task>
-      <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="50" priority="0" type="normal" scheduling="fixed-work">
+      <task id="12" name="Internal Technology Mentoring / Research" note="" work="288000" start="20200116T000000Z" end="20200129T170000Z" work-start="20200116T080000Z" percent-complete="65" priority="0" type="normal" scheduling="fixed-work">
         <constraint type="start-no-earlier-than" time="20200116T000000Z"/>
       </task>
       <task id="13" name="Set up Development Environments" note="" work="144000" start="20200115T000000Z" end="20200121T170000Z" work-start="20200115T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
@@ -92,7 +92,7 @@
             <predecessor id="1" predecessor-id="22" type="FS"/>
           </predecessors>
         </task>
-        <task id="24" name="Sprint 05" note="" work="144000" start="20200221T170000Z" end="20200228T170000Z" work-start="20200224T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="24" name="Sprint 05" note="" work="144000" start="20200221T170000Z" end="20200228T170000Z" work-start="20200224T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="23" type="FS"/>
           </predecessors>
@@ -102,8 +102,8 @@
         <predecessors>
           <predecessor id="1" predecessor-id="19" type="FS"/>
         </predecessors>
-        <task id="26" name="Sprint 06" note="" work="144000" start="20200228T170000Z" end="20200306T170000Z" work-start="20200302T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work"/>
-        <task id="27" name="Sprint 07" note="" work="144000" start="20200306T170000Z" end="20200313T170000Z" work-start="20200309T080000Z" percent-complete="0" priority="0" type="normal" scheduling="fixed-work">
+        <task id="26" name="Sprint 06" note="" work="144000" start="20200228T170000Z" end="20200306T170000Z" work-start="20200302T080000Z" percent-complete="100" priority="0" type="normal" scheduling="fixed-work"/>
+        <task id="27" name="Sprint 07" note="" work="144000" start="20200306T170000Z" end="20200313T170000Z" work-start="20200309T080000Z" percent-complete="10" priority="0" type="normal" scheduling="fixed-work">
           <predecessors>
             <predecessor id="1" predecessor-id="26" type="FS"/>
           </predecessors>
