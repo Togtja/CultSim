@@ -87,7 +87,7 @@ void AI::update(float dt)
     {
         vis_view.each(
             [this, &renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
-                renderer.draw_circle(pos.position, vis.vision_radius, {.33f, .33f, .33f});
+                renderer.draw_circle(pos.position, vis.radius, {.33f, .33f, .33f});
 
                 if (draw_seen)
                 {

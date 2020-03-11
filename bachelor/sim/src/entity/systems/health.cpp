@@ -16,19 +16,19 @@ void Health::update(float dt)
         {
             if ((need.tags & health.need_tags) && need.status <= 0.f)
             {
-                health.hp -= dt * health.tickdown_rate * need.vitality;
-                if (health.hp <= 0.f)
+                health.health -= dt * health.tickdown_rate * need.vitality;
+                if (health.health <= 0.f)
                 {
                     spdlog::get("agent")->warn("Entity {} killed by need {}", e, need.name);
                 }
             }
         }
 
-        if (health.hp <= 0.f)
+        if (health.health <= 0.f)
         {
             m_context.registry->destroy(e);
         }
-        health.hp = std::clamp(health.hp + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
+        health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
     });
 }
 } // namespace cs::system

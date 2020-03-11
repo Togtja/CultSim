@@ -56,18 +56,18 @@ struct Needs
 struct Vision
 {
     std::vector<entt::entity> seen{};
-    float vision_radius{};
+    float radius{};
     uint8_t fov{};
 };
 
 struct Smell
 {
-    float smell_radius{};
+    float radius{};
 };
 
 struct Hearing
 {
-    float sound_radius{};
+    float radius{};
 };
 
 struct Reproduction
@@ -96,7 +96,7 @@ struct Timer
 
 struct Health
 {
-    float hp{};
+    float health{};
 
     float tickdown_rate{};
 

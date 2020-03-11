@@ -51,7 +51,7 @@ void reflect_data_types()
     /** Ignoring "seen" on vision as it's only going to be populated by sensor systems */
     entt::meta<component::Vision>()
         .type("VisionComponent"_hs)
-        .data<&component::Vision::vision_radius>("vision_radius"_hs)
+        .data<&component::Vision::radius>("vision_radius"_hs)
         .data<&component::Vision::fov>("fov"_hs);
 
     entt::meta<component::Needs>()

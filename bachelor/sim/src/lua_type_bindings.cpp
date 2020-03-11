@@ -77,34 +77,39 @@ void bind_components(sol::state_view lua)
     /** Components */
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
-    // Ignoring Avoidance_cs and Avoid_count since those cna be change using the UI and ignoring desired_position as that is
-    // a part of the pathfinding algorithm
+
+    /**
+     * Ignoring avoidance_cd and avoid_count since those can be changed using the UI and ignoring desired_position as that is
+     * a part of the pathfinding algorithm
+     */
     lua.new_usertype<component::Movement>("MovementComponent",
                                           "direction",
                                           &component::Movement::direction,
                                           "speed",
                                           &component::Movement::speed);
 
-    lua.new_usertype<component::Vision>("VisionComponent",
-                                        "vision radius",
-                                        &component::Vision::vision_radius,
-                                        "field of view",
-                                        &component::Vision::fov);
+    lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
 
-    lua.new_usertype<component::Hearing>("HearingComponent", "hearing radius", &component::Hearing::sound_radius);
-    lua.new_usertype<component::Smell>("SmellComponent", "smell radius", &component::Smell::smell_radius);
+    lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
+    lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
 
     lua.new_usertype<component::Reproduction>("ReproductionComponent",
                                               "sex",
                                               &component::Reproduction::sex,
-                                              "max children",
-                                              &component::Reproduction::number_of_children);
+                                              "max_children",
+                                              &component::Reproduction::max_children);
 
     lua.new_usertype<component::Health>("HealthComponet",
                                         "health",
-                                        &component::Health::hp,
-                                        "tickdown rate",
+                                        &component::Health::health,
+                                        "tickdown_rate",
                                         &component::Health::tickdown_rate);
+
+    lua.new_usertype<component::Tags>("TagComponent", "tags", &component::Tags::tags);
+
+    lua.new_usertype<component::Needs>("NeedComponent", "needs", &component::Needs::needs);
+
+    lua.new_usertype<component::Strategies>("StrategyComponent", "strategies", &component::Strategies::strategies);
 }
 
 void bind_systems(sol::state_view lua)

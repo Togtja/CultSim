@@ -60,7 +60,7 @@ void Rendering::update(float dt)
     else if (m_visualization_mode == EVisualizationMode::Health)
     {
         registry.view<component::Sprite, component::Health>().each([](component::Sprite& spr, const component::Health& hp) {
-            spr.color = glm::mix(noseecolor, seecolor, glm::clamp(glm::vec3(hp.hp / 100.f), glm::vec3(0.f), glm::vec3(1.f)));
+            spr.color = glm::mix(noseecolor, seecolor, glm::clamp(glm::vec3(hp.health / 100.f), glm::vec3(0.f), glm::vec3(1.f)));
         });
     }
 

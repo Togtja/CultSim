@@ -3,5 +3,5 @@
 strategies.consume_self = {
     name = "Consume Self",
     tags = ETag.Food,
-    actions = { actions.consume_self }
+    actions = { "consume_self" } -- Correspond to keys in actions
 }
