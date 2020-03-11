@@ -8,6 +8,9 @@
 #include "input/input_handler.h"
 #include "random_engine.h"
 
+#include <entt/entity/registry.hpp>
+#include <entt/entity/runtime_view.hpp>
+
 namespace cs::lua
 {
 void bind_dataonly(sol::state_view lua)
@@ -110,6 +113,8 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Needs>("NeedComponent", "needs", &component::Needs::needs);
 
     lua.new_usertype<component::Strategies>("StrategyComponent", "strategies", &component::Strategies::strategies);
+
+    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
 }
 
 void bind_systems(sol::state_view lua)

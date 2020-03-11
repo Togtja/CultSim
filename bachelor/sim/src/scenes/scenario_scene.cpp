@@ -48,7 +48,8 @@ void ScenarioScene::on_enter()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
-    m_scenario                     = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
+    bind_scenario_lua_functions();
+    m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
     m_scenario.init();
@@ -357,14 +358,10 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
+    /** Spawn initial agents for this scenario */
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
-        //        int i1 = i;
-        //        if (i % 2 == 1)
-        //        {
-        //            i1 = -i;
-        //        }
         //        strategy_sleep.actions.front().target = agent;
         //        glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
         //                      m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
@@ -536,6 +533,27 @@ bool ScenarioScene::draw()
 
     m_scenario.draw();
     return false;
+}
+
+void ScenarioScene::bind_scenario_lua_functions()
+{
+    /** Helpful to make following code shorter and more readable, copying is fine here */
+    auto lua = m_context->lua_state;
+
+    /** Bind component type identifiers to the component table */
+    sol::table component      = lua.create_table("component");
+    component["position"]     = m_registry.type<component::Position>();
+    component["movement"]     = m_registry.type<component::Movement>();
+    component["sprite"]       = m_registry.type<component::Sprite>();
+    component["vision"]       = m_registry.type<component::Vision>();
+    component["tag"]          = m_registry.type<component::Tags>();
+    component["need"]         = m_registry.type<component::Needs>();
+    component["reproduction"] = m_registry.type<component::Reproduction>();
+    component["strategy"]     = m_registry.type<component::Strategies>();
+    component["health"]       = m_registry.type<component::Health>();
+
+    sol::table cultsim = lua.create_table("cultsim");
+    cultsim.set_function("get_component", [this](const std::string& name) { entt::resolve(entt::hashed_string(name.c_str())); });
 }
 
 void ScenarioScene::setup_docking_ui()

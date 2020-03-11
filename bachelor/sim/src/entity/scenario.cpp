@@ -21,6 +21,9 @@ Scenario quick_load_scenario(sol::state_view lua, std::string_view rpath)
         lua.script(data);
     }
 
-    return lua["scenario"].get<Scenario>();
+    /** Get scenario from Lua */
+    auto scenario        = lua["scenario"].get<Scenario>();
+    scenario.script_path = rpath;
+    return scenario;
 }
 } // namespace cs::lua
