@@ -134,6 +134,51 @@ inline std::string mouse_to_string(const EMouse btn)
     }
     return "Mouse not added to to_string";
 }
+
+inline EMouse string_to_mouse(std::string_view btn_name)
+{
+    if (btn_name == "Left")
+    {
+        return EMouse::Left;
+    }
+    else if (btn_name == "Middle")
+    {
+        return EMouse::Middle;
+    }
+    else if (btn_name == "Right")
+    {
+        return EMouse::Right;
+    }
+    else if (btn_name == "X1")
+    {
+        return EMouse::X1;
+    }
+    else if (btn_name == "X2")
+    {
+        return EMouse::X2;
+    }
+    else if (btn_name == "WheelUp")
+    {
+        return EMouse::WheelUp;
+    }
+    else if (btn_name == "WheelDown")
+    {
+        return EMouse::WheelDown;
+    }
+    else if (btn_name == "WheelRight")
+    {
+        return EMouse::WheelRight;
+    }
+    else if (btn_name == "WheelLeft")
+    {
+        return EMouse::WheelLeft;
+    }
+    else if (btn_name == "Move")
+    {
+        return EMouse::Move;
+    }
+    return EMouse::None;
+}
 namespace detail
 {
 /** Handles Actions for a certain context */
