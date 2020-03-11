@@ -13,6 +13,8 @@ class PreferenceScene : public IScene
 private:
     robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map;
 
+    SDL_Scancode m_bind_key      = SDL_SCANCODE_UNKNOWN;
+    input::EAction m_bind_action = input::EAction::None;
 
 public:
     PreferenceScene()
