@@ -545,6 +545,8 @@ public:
 
     const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& get_input_map() const;
 
+    void set_input_map(const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& map);
+
     /**
      * Get the last mouse click
      *

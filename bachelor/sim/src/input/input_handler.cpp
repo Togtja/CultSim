@@ -133,6 +133,23 @@ bool ActionHandler::handle_live_input(const float dt)
             }
         }
     }
+    auto mouse_state = SDL_GetMouseState(nullptr, nullptr);
+    for (auto&& [b, a] : m_mouse_binding)
+    {
+        if (b == EMouse::BtnX1)
+        {
+            break;
+        }
+        if (mouse_state & SDL_BUTTON(static_cast<int>(b)))
+        {
+            if (has_live_action(a))
+            {
+                m_live_action_binding[a](dt);
+                found_key = true;
+            }
+        }
+    }
+
     return m_blocking || found_key;
 }
 
@@ -170,10 +187,8 @@ bool ActionHandler::has_live_action(const EAction action)
 
 void ActionHandler::clear()
 {
-    m_action_binding.clear();
-    m_live_action_binding.clear();
-    m_key_binding.clear();
-    m_mouse_binding.clear();
+    clear_key_action();
+    clear_action_func();
 }
 
 void ActionHandler::clear_key_action()
@@ -183,8 +198,8 @@ void ActionHandler::clear_key_action()
 }
 void ActionHandler::clear_action_func()
 {
-    m_key_binding.clear();
-    m_mouse_binding.clear();
+    m_action_binding.clear();
+    m_live_action_binding.clear();
 }
 
 std::string ActionHandler::key_bindings_to_lua()
@@ -461,6 +476,11 @@ void ContextHandler::clear()
 const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& ContextHandler::get_input_map() const
 {
     return m_input_map;
+}
+
+void ContextHandler::set_input_map(const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& map)
+{
+    m_input_map = map;
 }
 
 glm::ivec2 ContextHandler::get_mouse_click_pos()
