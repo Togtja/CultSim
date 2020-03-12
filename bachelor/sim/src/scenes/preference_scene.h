@@ -19,6 +19,8 @@ private:
     int m_bind_index             = -1;
     input::EAction m_bind_action = input::EAction::None;
 
+    bool m_unsaved_changes = false;
+
 public:
     PreferenceScene()
     {
@@ -45,5 +47,7 @@ public:
     bool draw() override;
 
     void key_binding();
+
+    void quit_btn();
 };
 } // namespace cs

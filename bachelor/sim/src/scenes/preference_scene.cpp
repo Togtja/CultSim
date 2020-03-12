@@ -19,32 +19,7 @@ void PreferenceScene::on_exit()
 bool PreferenceScene::update(float dt)
 {
     key_binding();
-    auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
-    ImGui::SetNextWindowPos(glm::vec2(res.x / 2, res.y / 1.1f), 0, {.5f, .5f});
-    ImGui::Begin("Option##quit",
-                 nullptr,
-                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    bool success = true;
-    if (ImGui::Button("Save"))
-    {
-        auto&& input = input::get_input();
-        input.clear();
-        for (auto&& [context, action_h] : m_key_map)
-        {
-            for (auto&& [key, action] : action_h.get_key_binding())
-            {
-                input.bind_key(context, key, action);
-            }
-            for (auto&& [btn, action] : action_h.get_mouse_binding())
-            {
-                input.bind_btn(context, btn, action);
-            }
-        }
-        input.save_binding_to_file();
-        m_context->scene_manager->pop();
-    }
-
-    ImGui::End();
+    quit_btn();
     return false;
 }
 
@@ -128,6 +103,7 @@ void PreferenceScene::key_binding()
                                    nullptr,
                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
         {
+            m_unsaved_changes = true;
             ImGui::Text("Press a Key");
             input::EMouse bind_mouse = input::EMouse::BtnNone;
             SDL_Scancode n_key       = SDL_SCANCODE_UNKNOWN;
@@ -269,6 +245,53 @@ void PreferenceScene::key_binding()
 
         ImGui::EndTable();
         ImGui::NewLine();
+    }
+
+    ImGui::End();
+}
+void PreferenceScene::quit_btn()
+{
+    auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    ImGui::SetNextWindowPos(glm::vec2(res.x / 2, res.y / 1.2f), 0, {.5f, .5f});
+    ImGui::SetNextWindowSize({230, 100});
+    ImGui::Begin("Option##quit",
+                 nullptr,
+                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
+    bool success = true;
+    if (ImGui::Button("Save##ps", {100, 50}))
+    {
+        auto&& input = input::get_input();
+        input.set_input_map(m_key_map);
+        input.save_binding_to_file();
+        m_unsaved_changes = false;
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Back##ps", {100, 50}))
+    {
+        if (m_unsaved_changes)
+        {
+            ImGui::OpenPopup("Unsaved Changes");
+        }
+        else
+        {
+            m_context->scene_manager->pop();
+        }
+    }
+
+    if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
+    {
+        ImGui::Text("You have unsaved changes\nAre you sure you want quit without saving");
+        if (ImGui::Button("Yes##ps"))
+        {
+            m_context->scene_manager->pop();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("No##ps"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
 
     ImGui::End();
