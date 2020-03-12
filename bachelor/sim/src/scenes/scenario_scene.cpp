@@ -268,34 +268,6 @@ void ScenarioScene::on_enter()
     //            spdlog::get("agent")->warn("We aborted our action: reproduce");
     //        }};
 
-    //    ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
-    //                                      0,
-    //                                      {},
-    //                                      TAG_Food,
-    //                                      std::vector<action::Action>{action_eat, action_inventory_food}};
-    //    ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
-    //                                       0,
-    //                                       {},
-    //                                       TAG_Drink,
-    //                                       std::vector<action::Action>{action_drink}};
-    //    ai::Strategy strategy_sleep     = {static_cast<std::string>("Sleep"),
-    //                                   0,
-    //                                   {},
-    //                                   TAG_Sleep,
-    //                                   std::vector<action::Action>{action_sleep}};
-
-    //    ai::Strategy strategy_breed = {static_cast<std::string>("Looking for a mate"),
-    //                                   0,
-    //                                   {},
-    //                                   ETag(TAG_Reproduce | TAG_Human),
-    //                                   std::vector<action::Action>{action_reproduce}};
-
-    //    ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
-    //                                0,
-    //                                {},
-    //                                ETag(TAG_Food | TAG_Gather),
-    //                                std::vector<action::Action>{action_pickup_food}};
-
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
@@ -304,11 +276,6 @@ void ScenarioScene::on_enter()
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
-        //        strategy_sleep.actions.front().target = agent;
-        //        m_registry.assign<component::Strategies>(
-        //            agent,
-        //            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
-        //            std::vector<ai::Strategy>{});
     }
 
     for (int j = 0; j < 75; j++)
