@@ -85,9 +85,12 @@ inline std::string action_to_string(const EAction action)
         case EAction::MoveDown: return "MoveDown";
         case EAction::ZoomIn: return "ZoomIn";
         case EAction::ZoomOut: return "ZoomOut";
-        case EAction::Pause: return "Pause";
+        case EAction::PauseMenu: return "PauseMenu";
         case EAction::SelectEntity: return "SelectEntity";
         case EAction::FollowEntity: return "FollowEntity";
+        case EAction::SpeedUp: return "SpeedUp";
+        case EAction::SpeedDown: return "SpeedDown";
+        case EAction::Pause: return "Pause";
     }
     return "Action not added to to_string";
 }
