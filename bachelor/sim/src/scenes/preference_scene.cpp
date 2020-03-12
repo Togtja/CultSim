@@ -124,7 +124,7 @@ void PreferenceScene::key_binding()
                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
         {
             ImGui::Text("Press a Key");
-            input::EMouse bind_mouse = input::EMouse::None;
+            input::EMouse bind_mouse = input::EMouse::BtnNone;
             SDL_Scancode n_key       = SDL_SCANCODE_UNKNOWN;
             SDL_Event e{};
             if (SDL_WaitEvent(&e))
@@ -191,7 +191,7 @@ void PreferenceScene::key_binding()
                 m_bind_action = input::EAction::None;
                 ImGui::CloseCurrentPopup();
             }
-            else if (bind_mouse != input::EMouse::None)
+            else if (bind_mouse != input::EMouse::BtnNone)
             {
                 // m_key_map.at(context).unbind_key(m_bind_key);
                 // m_key_map.at(context).unbind_btn(bind_mouse);

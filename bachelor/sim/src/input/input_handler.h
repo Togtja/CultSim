@@ -94,17 +94,17 @@ inline std::string action_to_string(const EAction action)
  */
 enum class EMouse
 {
-    None = 0,   // No Press
-    Left,       // Left mouse btn
-    Middle,     // Middle mouse btn
-    Right,      // Right mouse btn
-    X1,         // Optional mouse btn 1
-    X2,         // Optional mouse btn 2
-    WheelUp,    // Scroll wheel up
-    WheelDown,  // Scroll wheel down
-    WheelRight, // Scroll wheel right
-    WheelLeft,  // Scroll wheel left
-    Move,       // Any mouse movement
+    BtnNone = 0,   // No Press
+    BtnLeft,       // Left mouse btn
+    BtnMiddle,     // Middle mouse btn
+    BtnRight,      // Right mouse btn
+    BtnX1,         // Optional mouse btn 1
+    BtnX2,         // Optional mouse btn 2
+    BtnWheelUp,    // Scroll wheel up
+    BtnWheelDown,  // Scroll wheel down
+    BtnWheelRight, // Scroll wheel right
+    BtnWheelLeft,  // Scroll wheel left
+    BtnMove,       // Any mouse movement
 
     Count
 
@@ -121,63 +121,66 @@ inline std::string mouse_to_string(const EMouse btn)
 {
     switch (btn)
     {
-        case EMouse::Left: return "Left";
-        case EMouse::Middle: return "Middle";
-        case EMouse::Right: return "Right";
-        case EMouse::X1: return "X1";
-        case EMouse::X2: return "X2";
-        case EMouse::WheelUp: return "WheelUp";
-        case EMouse::WheelDown: return "WheelDown";
-        case EMouse::WheelRight: return "WheelRight";
-        case EMouse::WheelLeft: return "WheelLeft";
-        case EMouse::Move: return "Move";
+        case EMouse::BtnLeft: return "BtnLeft";
+        case EMouse::BtnMiddle: return "BtnMiddle";
+        case EMouse::BtnRight: return "BtnRight";
+        case EMouse::BtnX1: return "BtnX1";
+        case EMouse::BtnX2: return "BtnX2";
+        case EMouse::BtnWheelUp: return "BtnWheelUp";
+        case EMouse::BtnWheelDown: return "BtnWheelDown";
+        case EMouse::BtnWheelRight: return "BtnWheelRight";
+        case EMouse::BtnWheelLeft: return "BtnWheelLeft";
+        case EMouse::BtnMove: return "BtnMove";
+
+        case EMouse::BtnNone:
+        case EMouse::Count: return "Error Button";
     }
     return "Mouse not added to to_string";
 }
 
 inline EMouse string_to_mouse(std::string_view btn_name)
 {
-    if (btn_name == "Left")
+    if (btn_name == "BtnLeft")
     {
-        return EMouse::Left;
+        return EMouse::BtnLeft;
     }
-    else if (btn_name == "Middle")
+    else if (btn_name == "BtnMiddle")
     {
-        return EMouse::Middle;
+        return EMouse::BtnMiddle;
     }
-    else if (btn_name == "Right")
+    else if (btn_name == "BtnRight")
     {
-        return EMouse::Right;
+        return EMouse::BtnRight;
     }
-    else if (btn_name == "X1")
+    else if (btn_name == "BtnX1")
     {
-        return EMouse::X1;
+        return EMouse::BtnX1;
     }
-    else if (btn_name == "X2")
+    else if (btn_name == "BtnX2")
     {
-        return EMouse::X2;
+        return EMouse::BtnX2;
     }
-    else if (btn_name == "WheelUp")
+    else if (btn_name == "BtnWheelUp")
     {
-        return EMouse::WheelUp;
+        return EMouse::BtnWheelUp;
     }
-    else if (btn_name == "WheelDown")
+    else if (btn_name == "BtnWheelDown")
     {
-        return EMouse::WheelDown;
+        return EMouse::BtnWheelDown;
     }
-    else if (btn_name == "WheelRight")
+    else if (btn_name == "BtnWheelRight")
     {
-        return EMouse::WheelRight;
+        return EMouse::BtnWheelRight;
     }
-    else if (btn_name == "WheelLeft")
+    else if (btn_name == "BtnWheelLeft")
     {
-        return EMouse::WheelLeft;
+        return EMouse::BtnWheelLeft;
     }
-    else if (btn_name == "Move")
+    else if (btn_name == "BtnMove")
     {
-        return EMouse::Move;
+        return EMouse::BtnMove;
     }
-    return EMouse::None;
+    return EMouse::BtnNone;
 }
 namespace detail
 {

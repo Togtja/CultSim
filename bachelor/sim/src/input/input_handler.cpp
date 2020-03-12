@@ -336,11 +336,11 @@ void ContextHandler::handle_input(const SDL_Event& event)
             auto click = static_cast<EMouse>(event.button.button);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};
-            if (click == EMouse::Left)
+            if (click == EMouse::BtnLeft)
             {
                 m_left_click_pos = m_mouse_click_pos;
             }
-            if (click == EMouse::Right)
+            if (click == EMouse::BtnRight)
             {
                 m_right_click_pos = m_mouse_click_pos;
             }
@@ -360,28 +360,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (x > 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelRight))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelRight))
                 {
                     block = true;
                 }
             }
             if (x < 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelLeft))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelLeft))
                 {
                     block = true;
                 }
             }
             if (y > 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelUp))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelUp))
                 {
                     block = true;
                 }
             }
             if (y < 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelDown))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelDown))
                 {
                     block = true;
                 }
@@ -390,7 +390,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEMOTION)
         {
             mouse_pos = {event.motion.x, event.motion.y};
-            if (m_input_map.at(*it).handle_input(EMouse::Move))
+            if (m_input_map.at(*it).handle_input(EMouse::BtnMove))
             {
                 block = true;
             }
