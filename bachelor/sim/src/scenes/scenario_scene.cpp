@@ -106,259 +106,195 @@ void ScenarioScene::on_enter()
     ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
     ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
 
-    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
-                                      TAG_Find,
-                                      1.f,
-                                      0.f,
-                                      {},
-                                      [](entt::entity e, entt::entity n, entt::registry& r) {
-                                          r.remove<component::Position>(n);
-                                          r.remove<component::Sprite>(n);
-                                          r.get<component::Inventory>(e).contents.push_back(n);
-                                      },
-                                      [](entt::entity e, entt::entity n, entt::registry& r) {
-                                          spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
-                                          r.destroy(e);
-                                      },
-                                      {}};
+    //    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
+    //                                      TAG_Find,
+    //                                      1.f,
+    //                                      0.f,
+    //                                      {},
+    //                                      [](entt::entity e, entt::entity n) {
+    //                                          r.remove<component::Position>(n);
+    //                                          r.remove<component::Sprite>(n);
+    //                                          r.get<component::Inventory>(e).contents.push_back(n);
+    //                                      },
+    //                                      [](entt::entity e, entt::entity n) {
+    //                                          spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
+    //                                          r.destroy(e);
+    //                                      },
+    //                                      {}};
 
-    action::Action action_eat{static_cast<std::string>("Eat"),
-                              TAG_Find,
-                              5.f,
-                              0.f,
-                              {},
-                              [](entt::entity e, entt::entity n, entt::registry& r) {
-                                  r.destroy(n);
-                                  for (auto& need : r.get<component::Needs>(e).needs)
-                                  {
-                                      if (need.tags & TAG_Food)
-                                      {
-                                          need.status += 80.f;
-                                      }
-                                  }
-                              },
-                              [](entt::entity e, entt::entity n, entt::registry& r) {
-                                  spdlog::get("agent")->warn("We failed to finish action: eat");
-                                  r.destroy(e);
-                              },
-                              []() {
-                                  spdlog::get("agent")->warn("We aborted our action");
-                              }};
+    //    action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
+    //                                         {},
+    //                                         2.0f,
+    //                                         0.f,
+    //                                         {},
+    //                                         [](entt::entity e, entt::entity n) {
+    //                                             auto inventory = r.try_get<component::Inventory>(e);
+    //                                             if (inventory && inventory->tags & TAG_Food)
+    //                                             {
+    //                                                 int i = 0;
+    //                                                 for (auto& content : inventory->contents)
+    //                                                 {
+    //                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
+    //                                                     {
+    //                                                         for (auto& need : r.get<component::Needs>(e).needs)
+    //                                                         {
+    //                                                             if (need.tags | TAG_Food)
+    //                                                             {
+    //                                                                 need.status += 80.f;
+    //                                                             }
+    //                                                         }
+    //                                                         inventory->contents.erase(inventory->contents.begin() + i);
+    //                                                         return;
+    //                                                     }
+    //                                                     i++;
+    //                                                 }
+    //                                             }
+    //                                         },
+    //                                         [](entt::entity e, entt::entity n) {
+    //                                             auto inventory = r.try_get<component::Inventory>(e);
+    //                                             if (inventory && inventory->tags & TAG_Food)
+    //                                             {
+    //                                                 int i = 0;
+    //                                                 for (auto& content : inventory->contents)
+    //                                                 {
+    //                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
+    //                                                     {
+    //                                                         inventory->contents.erase(inventory->contents.begin() + i);
+    //                                                         return;
+    //                                                     }
+    //                                                     i++;
+    //                                                 }
+    //                                             }
+    //                                         },
+    //                                         {}};
 
-    action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
-                                         {},
-                                         2.0f,
-                                         0.f,
-                                         {},
-                                         [](entt::entity e, entt::entity n, entt::registry& r) {
-                                             auto inventory = r.try_get<component::Inventory>(e);
-                                             if (inventory && inventory->tags & TAG_Food)
-                                             {
-                                                 int i = 0;
-                                                 for (auto& content : inventory->contents)
-                                                 {
-                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
-                                                     {
-                                                         for (auto& need : r.get<component::Needs>(e).needs)
-                                                         {
-                                                             if (need.tags | TAG_Food)
-                                                             {
-                                                                 need.status += 80.f;
-                                                             }
-                                                         }
-                                                         inventory->contents.erase(inventory->contents.begin() + i);
-                                                         return;
-                                                     }
-                                                     i++;
-                                                 }
-                                             }
-                                         },
-                                         [](entt::entity e, entt::entity n, entt::registry& r) {
-                                             auto inventory = r.try_get<component::Inventory>(e);
-                                             if (inventory && inventory->tags & TAG_Food)
-                                             {
-                                                 int i = 0;
-                                                 for (auto& content : inventory->contents)
-                                                 {
-                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
-                                                     {
-                                                         inventory->contents.erase(inventory->contents.begin() + i);
-                                                         return;
-                                                     }
-                                                     i++;
-                                                 }
-                                             }
-                                         },
-                                         {}};
-    action::Action action_drink{static_cast<std::string>("Drink"),
-                                TAG_Find,
-                                2.f,
-                                0.f,
-                                {},
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    r.destroy(n);
-                                    for (auto& need : r.get<component::Needs>(e).needs)
-                                    {
-                                        if (need.tags & TAG_Drink)
-                                        {
-                                            need.status += 80.f;
-                                        }
-                                    }
-                                },
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::get("agent")->warn("We failed to finish action: drink");
-                                    r.destroy(e);
-                                },
-                                []() {
-                                    spdlog::get("agent")->warn("We aborted our action");
-                                }};
+    //    action::Action action_reproduce{
+    //        static_cast<std::string>("Reproduce"),
+    //            ETag(TAG_Find | TAG_Tag),
+    //        5.f,
+    //        0.f,
+    //        {},
+    //        [](entt::entity e, entt::entity n) {
+    //            if (r.valid(e) && r.valid(n))
+    //            {
+    //                auto repr = r.try_get<component::Reproduction>(e);
 
-    action::Action action_sleep{static_cast<std::string>("Sleep"),
-                                TAG_None,
-                                10.f,
-                                0.f,
-                                {},
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    for (auto& need : r.get<component::Needs>(e).needs)
-                                    {
-                                        if (need.tags & TAG_Sleep)
-                                        {
-                                            need.status += 69.f;
-                                        }
-                                    }
-                                },
-                                [](entt::entity e, entt::entity n, entt::registry& r) {
-                                    spdlog::get("agent")->warn("Agent {} failed to finish action: sleep", e);
-                                },
-                                []() {
-                                    spdlog::get("agent")->warn("We aborted our action");
-                                }};
+    //                auto target_repr = r.try_get<component::Reproduction>(n);
 
-    action::Action action_reproduce{
-        static_cast<std::string>("Reproduce"),
-        ETag(TAG_Find | TAG_Tag),
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) {
-            if (r.valid(e) && r.valid(n))
-            {
-                auto repr = r.try_get<component::Reproduction>(e);
+    //                if (repr != nullptr)
+    //                {
+    //                    auto needs = r.try_get<component::Needs>(e);
+    //                    if (needs != nullptr)
+    //                    {
+    //                        for (auto& need : needs->needs)
+    //                        {
+    //                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+    //                            {
+    //                                need.status += 100.f;
+    //                            }
+    //                        }
+    //                    }
 
-                auto target_repr = r.try_get<component::Reproduction>(n);
+    //                    if (target_repr != nullptr)
+    //                    {
+    //                        if (repr->sex == component::Reproduction::Female && target_repr->sex ==
+    //                        component::Reproduction::Male)
+    //                        {
+    //                            r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e) {
+    //                                if (r.valid(e))
+    //                                {
+    //                                    /** Clone child */
+    //                                    auto child = r.create();
+    //                                    r.stamp(child, r, e);
 
-                if (repr != nullptr)
-                {
-                    auto needs = r.try_get<component::Needs>(e);
-                    if (needs != nullptr)
-                    {
-                        for (auto& need : needs->needs)
-                        {
-                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-                            {
-                                need.status += 100.f;
-                            }
-                        }
-                    }
+    //                                    auto& child_needs  = r.get<component::Needs>(child);
+    //                                    auto& child_reprd  = r.get<component::Reproduction>(child);
+    //                                    auto& child_health = r.get<component::Health>(child);
+    //                                    auto& child_pos    = r.get<component::Position>(child);
+    //                                    auto& child_strat  = r.get<component::Strategies>(child);
+    //                                    for (auto& strat : child_strat.strategies)
+    //                                    {
+    //                                        for (auto& action : strat.actions)
+    //                                        {
+    //                                            if (action.target != entt::null)
+    //                                            {
+    //                                                action.target = child;
+    //                                            }
+    //                                            if (action.target != child)
+    //                                            {
+    //                                                spdlog::get("agent")->error("child: {}, action.target: {}", child,
+    //                                                action.target);
+    //                                            }
+    //                                        }
+    //                                    }
+    //                                    for (auto need : child_needs.needs)
+    //                                    {
+    //                                        need.status = 100.f;
+    //                                    }
 
-                    if (target_repr != nullptr)
-                    {
-                        if (repr->sex == component::Reproduction::Female && target_repr->sex == component::Reproduction::Male)
-                        {
-                            r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e, entt::registry& r) {
-                                if (r.valid(e))
-                                {
-                                    /** Clone child */
-                                    auto child = r.create();
-                                    r.stamp(child, r, e);
+    //                                    RandomEngine rng{};
+    //                                    child_reprd.number_of_children = 0;
+    //                                    child_health.health            = 100.f;
+    //                                    child_pos.position             = r.get<component::Position>(e).position +
+    //                                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
 
-                                    auto& child_needs  = r.get<component::Needs>(child);
-                                    auto& child_reprd  = r.get<component::Reproduction>(child);
-                                    auto& child_health = r.get<component::Health>(child);
-                                    auto& child_pos    = r.get<component::Position>(child);
-                                    auto& child_strat  = r.get<component::Strategies>(child);
-                                    for (auto& strat : child_strat.strategies)
-                                    {
-                                        for (auto& action : strat.actions)
-                                        {
-                                            if (action.target != entt::null)
-                                            {
-                                                action.target = child;
-                                            }
-                                            if (action.target != child)
-                                            {
-                                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
-                                            }
-                                        }
-                                    }
-                                    for (auto need : child_needs.needs)
-                                    {
-                                        need.status = 100.f;
-                                    }
+    //                                    if (rng.trigger(0.5f))
+    //                                    {
+    //                                        child_reprd.sex = component::Reproduction::Male;
+    //                                    }
+    //                                    repr->number_of_children++;
+    //                                    target_repr->number_of_children++;
+    //                                }
+    //                            });
+    //                        }
 
-                                    RandomEngine rng{};
-                                    child_reprd.number_of_children = 0;
-                                    child_health.health            = 100.f;
-                                    child_pos.position             = r.get<component::Position>(e).position +
-                                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
+    //                        auto& target_needs = r.get<component::Needs>(n);
+    //                        auto& target_tags  = r.get<component::Tags>(n);
+    //                        for (auto& need : target_needs.needs)
+    //                        {
+    //                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
+    //                            {
+    //                                need.status += 100.f;
+    //                            }
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //        },
+    //        [](entt::entity e, entt::entity n) {
+    //            spdlog::get("agent")->warn("We failed to finish action: reproduce");
+    //        },
+    //        []() {
+    //            spdlog::get("agent")->warn("We aborted our action: reproduce");
+    //        }};
 
-                                    if (rng.trigger(0.5f))
-                                    {
-                                        child_reprd.sex = component::Reproduction::Male;
-                                    }
-                                    repr->number_of_children++;
-                                    target_repr->number_of_children++;
-                                }
-                            });
-                        }
+    //    ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
+    //                                      0,
+    //                                      {},
+    //                                      TAG_Food,
+    //                                      std::vector<action::Action>{action_eat, action_inventory_food}};
+    //    ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
+    //                                       0,
+    //                                       {},
+    //                                       TAG_Drink,
+    //                                       std::vector<action::Action>{action_drink}};
+    //    ai::Strategy strategy_sleep     = {static_cast<std::string>("Sleep"),
+    //                                   0,
+    //                                   {},
+    //                                   TAG_Sleep,
+    //                                   std::vector<action::Action>{action_sleep}};
 
-                        auto& target_needs = r.get<component::Needs>(n);
-                        auto& target_tags  = r.get<component::Tags>(n);
-                        for (auto& need : target_needs.needs)
-                        {
-                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-                            {
-                                need.status += 100.f;
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        [](entt::entity e, entt::entity n, entt::registry& r) {
-            spdlog::get("agent")->warn("We failed to finish action: reproduce");
-        },
-        []() {
-            spdlog::get("agent")->warn("We aborted our action: reproduce");
-        }};
+    //    ai::Strategy strategy_breed = {static_cast<std::string>("Looking for a mate"),
+    //                                   0,
+    //                                   {},
+    //                                   ETag(TAG_Reproduce | TAG_Human),
+    //                                   std::vector<action::Action>{action_reproduce}};
 
-    ai::Strategy strategy_findfood  = {static_cast<std::string>("Looking for Food"),
-                                      0,
-                                      {},
-                                      TAG_Food,
-                                      std::vector<action::Action>{action_eat, action_inventory_food}};
-    ai::Strategy strategy_finddrink = {static_cast<std::string>("Looking for Water"),
-                                       0,
-                                       {},
-                                       TAG_Drink,
-                                       std::vector<action::Action>{action_drink}};
-    ai::Strategy strategy_sleep     = {static_cast<std::string>("Sleep"),
-                                   0,
-                                   {},
-                                   TAG_Sleep,
-                                   std::vector<action::Action>{action_sleep}};
-
-    ai::Strategy strategy_breed = {static_cast<std::string>("Looking for a mate"),
-                                   0,
-                                   {},
-                                   ETag(TAG_Reproduce | TAG_Human),
-                                   std::vector<action::Action>{action_reproduce}};
-
-    ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
-                                0,
-                                {},
-                                ETag(TAG_Food | TAG_Gather),
-                                std::vector<action::Action>{action_pickup_food}};
+    //    ai::Strategy gather_food = {static_cast<std::string>("Gathering Food"),
+    //                                0,
+    //                                {},
+    //                                ETag(TAG_Food | TAG_Gather),
+    //                                std::vector<action::Action>{action_pickup_food}};
 
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
@@ -369,27 +305,10 @@ void ScenarioScene::on_enter()
     {
         auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
         //        strategy_sleep.actions.front().target = agent;
-        //        glm::vec2 pos(m_rng.uniform(-m_scenario.bounds.x, m_scenario.bounds.x),
-        //                      m_rng.uniform(-m_scenario.bounds.y, m_scenario.bounds.y));
-        //        m_registry.assign<component::Position>(agent, glm::vec3(pos, 0));
-        //        m_registry.assign<component::Movement>(agent, std::vector<glm::vec3>{}, glm::vec2{}, 80.f, 0.f);
-        //        m_registry.assign<component::Sprite>(agent, tex, glm::vec3(1.f, 0.f, 0.f));
-        //        m_registry.assign<component::Vision>(agent, std::vector<entt::entity>{}, 40.f, static_cast<uint8_t>(0));
-        //        m_registry.assign<component::Tags>(agent, ETag(TAG_Avoidable));
-        //        m_registry.assign<component::Needs>(agent,
-        //                                            std::vector<ai::Need>{need_hunger, need_thirst, need_sleep,
-        //                                            need_reproduction}, std::vector<ai::Need>{});
-        //        cs::component::Reproduction::ESex gender = cs::component::Reproduction::Male;
-        //        if (i % 2 == 1)
-        //        {
-        //            gender = cs::component::Reproduction::Female;
-        //        }
-        //        m_registry.assign<component::Reproduction>(agent, gender, uint16_t(0), uint16_t(5));
         //        m_registry.assign<component::Strategies>(
         //            agent,
         //            std::vector<ai::Strategy>({strategy_findfood, strategy_finddrink, strategy_sleep, strategy_breed}),
         //            std::vector<ai::Strategy>{});
-        //        m_registry.assign<component::Health>(agent, 100.f, 1.f, ETag(TAG_Food | TAG_Drink | TAG_Sleep));
     }
 
     for (int j = 0; j < 75; j++)
@@ -604,6 +523,14 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
+    /** Apply Damage */
+    cultsim.set_function("apply_basic_damage", [this](sol::this_state s, entt::entity e, float damage) {
+        if (auto* health = m_registry.try_get<component::Health>(e); health)
+        {
+            health->health -= damage;
+        }
+    });
+
     /** Spawn entity functions */
     cultsim.set_function("spawn", [this](const std::string& entity_name) {
         const auto& final_path = m_scenario.script_path + entity_name + ".lua";
@@ -616,7 +543,12 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](entt::entity e) { m_registry.destroy(e); });
+    cultsim.set_function("kill", [this](entt::entity e) {
+        if (m_registry.valid(e))
+        {
+            m_registry.destroy(e);
+        }
+    });
 }
 
 void ScenarioScene::setup_docking_ui()

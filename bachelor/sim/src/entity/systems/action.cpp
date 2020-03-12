@@ -58,12 +58,12 @@ void Action::update(float dt)
                             {
                                 if (m_context.rng->trigger(0.9))
                                 {
-                                    action.success(e, action.target, *m_context.registry);
+                                    action.success(e, action.target);
                                 }
 
                                 else
                                 {
-                                    action.failure(e, action.target, *m_context.registry);
+                                    action.failure(e, action.target);
                                 }
                             }
                             strategy.actions.pop_back();
