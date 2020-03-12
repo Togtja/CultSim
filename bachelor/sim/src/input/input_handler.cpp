@@ -159,8 +159,11 @@ bool ActionHandler::handle_input(const EMouse button)
     {
         // Call the function the button maps to
         auto& action = m_mouse_binding[button];
-        m_action_binding[action]();
-        return true;
+        if (has_action(action))
+        {
+            m_action_binding[action]();
+            return true;
+        }
     }
     return m_blocking;
 }
