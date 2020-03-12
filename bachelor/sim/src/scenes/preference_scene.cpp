@@ -164,7 +164,15 @@ void PreferenceScene::key_binding()
                     {
                         m_display_map[context][m_bind_index].first = (*it).first;
                         // The old key get the n_key's old action
-                        m_key_map.at(context).bind_key(SDL_GetScancodeFromName(old_key_s.c_str()), (*it).second);
+                        auto scan_c = SDL_GetScancodeFromName(old_key_s.c_str());
+                        if (scan_c != SDL_SCANCODE_UNKNOWN)
+                        {
+                            m_key_map.at(context).bind_key(scan_c, (*it).second);
+                        }
+                        else
+                        {
+                            m_key_map.at(context).bind_btn(input::string_to_mouse(old_key_s), (*it).second);
+                        }
                         (*it).first = old_key_s;
                     }
                     else
