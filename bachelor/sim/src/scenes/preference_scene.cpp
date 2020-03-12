@@ -28,14 +28,19 @@ bool PreferenceScene::update(float dt)
     if (ImGui::Button("Save"))
     {
         auto&& input = input::get_input();
+        input.clear();
         for (auto&& [context, action_h] : m_key_map)
         {
             for (auto&& [key, action] : action_h.get_key_binding())
             {
-                input.unbind_key(context, key);
                 input.bind_key(context, key, action);
             }
+            for (auto&& [btn, action] : action_h.get_mouse_binding())
+            {
+                input.bind_btn(context, btn, action);
         }
+        }
+        input.save_binding_to_file();
         m_context->scene_manager->pop();
     }
 
