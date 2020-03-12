@@ -30,6 +30,9 @@ bool PreferenceScene::draw()
 
 void PreferenceScene::key_binding()
 {
+    auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    ImGui::SetNextWindowPos(glm::vec2(res.x / 2.f, res.y / 2.f - 100), 0, {.5f, .5f});
+    ImGui::SetNextWindowSize({res.x / 1.5f, res.y / 1.5f});
     ImGui::Begin("Key Bindings", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
     for (auto&& [context, action_h] : m_display_map)
