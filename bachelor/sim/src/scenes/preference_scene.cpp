@@ -38,7 +38,7 @@ bool PreferenceScene::update(float dt)
             for (auto&& [btn, action] : action_h.get_mouse_binding())
             {
                 input.bind_btn(context, btn, action);
-        }
+            }
         }
         input.save_binding_to_file();
         m_context->scene_manager->pop();
@@ -206,13 +206,61 @@ void PreferenceScene::key_binding()
             }
             else if (bind_mouse != input::EMouse::BtnNone)
             {
-                // m_key_map.at(context).unbind_key(m_bind_key);
-                // m_key_map.at(context).unbind_btn(bind_mouse);
-                // m_key_map.at(context).unbind_btn(m_bind_btn);
-                //
-                // m_key_map.at(context).bind_btn(bind_mouse, m_bind_action);
-                // m_bind_key    = SDL_SCANCODE_UNKNOWN;
-                // m_bind_action = input::EAction::None;
+                m_key_map.at(context).unbind_btn(bind_mouse);
+
+                // The binding it a replacemnt
+                if (m_bind_index >= 0 && m_bind_index < m_display_map[context].size())
+                {
+                    auto old_key_s = m_display_map[context][m_bind_index].first;
+                    m_bind_action  = m_display_map[context][m_bind_index].second;
+
+                    // Find if that key has been used before
+                    auto&& it =
+                        std::find_if(m_display_map[context].begin(), m_display_map[context].end(), [bind_mouse](const auto& p) {
+                            return p.first == input::mouse_to_string(bind_mouse);
+                        });
+
+                    // If a binding with the key already exist, Flip the actions
+                    if (it != m_display_map[context].end())
+                    {
+                        m_display_map[context][m_bind_index].first = (*it).first;
+                        // The old key get the bind_mouse's old action
+                        auto scan_c = SDL_GetScancodeFromName(old_key_s.c_str());
+                        if (scan_c != SDL_SCANCODE_UNKNOWN)
+                        {
+                            m_key_map.at(context).bind_key(scan_c, (*it).second);
+                        }
+                        else
+                        {
+                            m_key_map.at(context).bind_btn(input::string_to_mouse(old_key_s), (*it).second);
+                        }
+                        (*it).first = old_key_s;
+                    }
+                    else
+                    {
+                        m_display_map[context][m_bind_index] = std::pair(input::mouse_to_string(bind_mouse), m_bind_action);
+                    }
+
+                    // bind the action to a new key
+                    m_key_map.at(context).bind_btn(bind_mouse, m_bind_action);
+                }
+                // The bindings is a new binding
+                else if (m_bind_index == m_display_map[context].size())
+                {
+                    auto&& it =
+                        std::find_if(m_display_map[context].begin(), m_display_map[context].end(), [bind_mouse](const auto& p) {
+                            return p.first == input::mouse_to_string(bind_mouse);
+                        });
+
+                    // If a binding with the key already exist, remove it
+                    if (it != m_display_map[context].end())
+                    {
+                        m_display_map[context].erase(it);
+                        m_key_map.at(context).unbind_btn(bind_mouse);
+                    }
+                    m_display_map[context].emplace_back(std::pair(input::mouse_to_string(bind_mouse), m_bind_action));
+                    m_key_map.at(context).bind_btn(bind_mouse, m_bind_action);
+                }
 
                 ImGui::CloseCurrentPopup();
             }
