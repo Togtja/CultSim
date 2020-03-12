@@ -7,8 +7,8 @@ scenario.name = "Basic Needs"
 -- Describe the scenario with a sensible amount of text
 scenario.description = "Observe as your agents walk around in a forest looking for food and water to survive. How many can be sustained?"
 
--- Decide how many agents should be used
-scenario.agent_count = 20
+-- Decide how many agents should be usedS
+scenario.agent_count = 100
 
 -- The bounds of the level on the X and Y in both directions based on the center 200,200 means the total world is 400,400 with 200 units on both sides of 0,0
 scenario.bounds = Vec2:new(500.0, 500.0)
@@ -21,6 +21,7 @@ scenario.systems = {
     "MitigationSystem",
     "ActionSystem",
     "RequirementSystem",
+    "MemorySystem",
     "TimerSystem",
     "AiSystem",
     "MovementSystem",

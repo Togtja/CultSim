@@ -58,9 +58,12 @@ enum class EAction
     MoveDown,
     ZoomIn,
     ZoomOut,
-    Pause,
+    PauseMenu,
     SelectEntity,
     FollowEntity,
+    SpeedUp,
+    SpeedDown,
+    Pause,
 
     Count
 };
