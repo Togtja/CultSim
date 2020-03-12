@@ -22,22 +22,7 @@ private:
     bool m_unsaved_changes = false;
 
 public:
-    PreferenceScene()
-    {
-        m_key_map = input::get_input().get_input_map();
-        for (auto&& [context, action_h] : m_key_map)
-        {
-            m_display_map[context];
-            for (auto&& [key, action] : action_h.get_key_binding())
-            {
-                m_display_map[context].emplace_back(std::pair(SDL_GetScancodeName(key), action));
-            }
-            for (auto&& [btn, action] : action_h.get_mouse_binding())
-            {
-                m_display_map[context].emplace_back(std::pair(input::mouse_to_string(btn), action));
-            }
-        }
-    }
+    PreferenceScene();
 
     void on_enter() override;
 
