@@ -366,6 +366,9 @@ public:
      */
     void clear();
 
+    void clear_key_action();
+    void clear_action_func();
+
     std::string key_bindings_to_lua();
     std::string btn_bindings_to_lua();
 

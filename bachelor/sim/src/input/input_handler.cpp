@@ -171,6 +171,18 @@ bool ActionHandler::has_live_action(const EAction action)
 void ActionHandler::clear()
 {
     m_action_binding.clear();
+    m_live_action_binding.clear();
+    m_key_binding.clear();
+    m_mouse_binding.clear();
+}
+
+void ActionHandler::clear_key_action()
+{
+    m_key_binding.clear();
+    m_mouse_binding.clear();
+}
+void ActionHandler::clear_action_func()
+{
     m_key_binding.clear();
     m_mouse_binding.clear();
 }
