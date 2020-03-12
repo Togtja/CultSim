@@ -67,7 +67,11 @@ void PreferenceScene::key_binding()
             }
             i++;
         }
-        ImGui::NewLine();
+        // Does not look good with new line when empty action.h
+        if (!action_h.empty())
+        {
+            ImGui::NewLine();
+        }
 
         ImGui::TableNextCell();
         if (ImGui::Button("Add new Binding"))
