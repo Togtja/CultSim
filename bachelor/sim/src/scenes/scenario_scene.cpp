@@ -103,53 +103,30 @@ void ScenarioScene::on_enter()
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
-    for (int j = 0; j < 75; j++)
-    {
-        auto trees = m_registry.create();
-        m_registry.assign<component::Position>(trees,
-                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x + m_scenario.bounds.x / 20.f,
-                                                                       m_scenario.bounds.x - m_scenario.bounds.x / 20.f),
-                                                         m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
-                                                                       m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
-                                                         0.f));
-        m_registry.assign<component::Sprite>(trees, t_tex, glm::vec3(0.8f, 0.5f, 0.1f));
-        m_registry.assign<component::Tags>(trees, TAG_Avoidable);
-        m_registry
-            .assign<component::Timer>(trees, m_rng.uniform(50.f, 140.f), 0.f, -1, [f_tex](entt::entity e, entt::registry& r) {
-                auto food = r.create();
-                auto pos  = r.get<component::Position>(e).position;
-                static RandomEngine rng;
-                r.assign<component::Position>(food,
-                                              glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f), 0.f));
-                r.assign<component::Sprite>(food, f_tex, glm::vec3(0.9f, 0.6f, 0.1f));
-                r.assign<component::Tags>(food, TAG_Food);
-            });
-    }
-
-    for (int k = 0; k < 75; k++)
-    {
-        auto ponds = m_registry.create();
-        m_registry.assign<component::Position>(ponds,
-                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x + m_scenario.bounds.x / 20.f,
-                                                                       m_scenario.bounds.x - m_scenario.bounds.x / 20.f),
-                                                         m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
-                                                                       m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
-                                                         0.f));
-        m_registry.assign<component::Sprite>(ponds, t_tex, glm::vec3(0.1f, 0.2f, 0.6f));
-        m_registry.assign<component::Tags>(ponds, TAG_Avoidable);
-        m_registry
-            .assign<component::Timer>(ponds, m_rng.uniform(25.f, 120.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r) {
-                auto drink = r.create();
-                auto pos   = r.get<component::Position>(e).position;
-                static RandomEngine rng;
-                r.assign<component::Position>(drink,
-                                              glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f), 0.f));
-                r.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
-                r.assign<component::Tags>(drink, TAG_Drink);
-            });
-    }
-
-    auto& input = input::get_input();
+    //    for (int k = 0; k < 75; k++)
+    //    {
+    //        auto ponds = m_registry.create();
+    //        m_registry.assign<component::Position>(ponds,
+    //                                               glm::vec3(m_rng.uniform(-m_scenario.bounds.x + m_scenario.bounds.x / 20.f,
+    //                                                                       m_scenario.bounds.x - m_scenario.bounds.x / 20.f),
+    //                                                         m_rng.uniform(-m_scenario.bounds.y + m_scenario.bounds.y / 20.f,
+    //                                                                       m_scenario.bounds.y - m_scenario.bounds.x / 20.f),
+    //                                                         0.f));
+    //        m_registry.assign<component::Sprite>(ponds, t_tex, glm::vec3(0.1f, 0.2f, 0.6f));
+    //        m_registry.assign<component::Tags>(ponds, TAG_Avoidable);
+    //        m_registry
+    //            .assign<component::Timer>(ponds, m_rng.uniform(25.f, 120.f), 0.f, -1, [d_tex](entt::entity e, entt::registry& r)
+    //            {
+    //                auto drink = r.create();
+    //                auto pos   = r.get<component::Position>(e).position;
+    //                static RandomEngine rng;
+    //                r.assign<component::Position>(drink,
+    //                                              glm::vec3(pos.x + rng.uniform(-10.f, 10.f), pos.y + rng.uniform(-10.f, 10.f),
+    //                                              0.f));
+    //                r.assign<component::Sprite>(drink, d_tex, glm::vec3(0.1f, 0.7f, 1.f));
+    //                r.assign<component::Tags>(drink, TAG_Drink);
+    //            });
+    //    }
 }
 
 void ScenarioScene::on_exit()
@@ -404,7 +381,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 }
 
                 auto child = r.create();
-                r.stamp(child, r, e);
+                r.stamp(child, r, mother);
 
                 /** Reset action targets */
                 if (auto* action_comp = r.try_get<component::Strategy>(child); action_comp)
