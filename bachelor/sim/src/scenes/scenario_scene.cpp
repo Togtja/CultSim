@@ -49,11 +49,11 @@ void ScenarioScene::on_enter()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
+    bind_actions_for_scene();
     bind_scenario_lua_functions();
     m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
-    m_scenario.init();
 
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
@@ -61,17 +61,18 @@ void ScenarioScene::on_enter()
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
-    bind_actions_for_scene();
+    /** Call lua init function for this scenario */
+    m_scenario.init();
 
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
 
     /** Spawn initial agents for this scenario */
-    for (int i = 1; i <= m_scenario.agent_count; i++)
-    {
-        spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
-    }
+    //    for (int i = 1; i <= m_scenario.agent_count; i++)
+    //    {
+    //        spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
+    //    }
 
     for (int j = 0; j < 75; j++)
     {
@@ -347,12 +348,12 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Spawn entity functions */
     cultsim.set_function("spawn", [this](const std::string& entity_name) {
-        const auto& final_path = m_scenario.script_path + entity_name + ".lua";
+        const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
         spawn_entity(m_registry, m_context->lua_state, final_path);
     });
 
     cultsim.set_function("spawn_at", [this](const std::string& entity_name, glm::vec2 position) {
-        const auto& final_path = m_scenario.script_path + entity_name + ".lua";
+        const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
         spawn_entity(m_registry, m_context->lua_state, final_path, position);
     });
 

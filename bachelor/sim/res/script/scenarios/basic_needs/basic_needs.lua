@@ -32,7 +32,11 @@ scenario.systems = {
 scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
-scenario.init = function() log.info("Starting scenario " .. scenario.name .. "!") end
+scenario.init = function()
+    for i=1,100 do
+        cultsim.spawn("deer")
+    end
+end
 
 -- This function is called every frame of the simulation
 scenario.update = function(dt) end
