@@ -136,9 +136,10 @@ bool ActionHandler::handle_live_input(const float dt)
     auto mouse_state = SDL_GetMouseState(nullptr, nullptr);
     for (auto&& [b, a] : m_mouse_binding)
     {
-        if (b == EMouse::BtnX1)
+        // If our enum is not apart of the SDL_Button's continue
+        if (static_cast<int>(b) > SDL_BUTTON_X2)
         {
-            break;
+            continue;
         }
         if (mouse_state & SDL_BUTTON(static_cast<int>(b)))
         {
@@ -362,7 +363,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         }
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
-            // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
+            // Translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<EMouse>(event.button.button);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};

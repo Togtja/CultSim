@@ -13,7 +13,8 @@ class PreferenceScene : public IScene
 {
 private:
     robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map;
-    // To keep things looking consistent in the main menu ther is a display map
+
+    /** Brief To keep things looking consistent in the main menu ther is a display map */
     robin_hood::unordered_map<input::EKeyContext, std::vector<std::pair<std::string, input::EAction>>> m_display_map;
 
     int m_bind_index             = -1;

@@ -46,9 +46,11 @@ bool PreferenceScene::draw()
 
 void PreferenceScene::key_binding()
 {
+    // Set window size and position
     auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     ImGui::SetNextWindowPos(glm::vec2(res.x / 2.f, res.y / 2.f - 100), 0, {.5f, .5f});
     ImGui::SetNextWindowSize({res.x / 1.5f, res.y / 1.5f});
+
     ImGui::Begin("Key Bindings", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
 
     for (auto&& [context, action_h] : m_display_map)
@@ -59,6 +61,7 @@ void PreferenceScene::key_binding()
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
         ImGui::TableAutoHeaders();
+
         int i = 0;
         for (auto&& [key, action] : action_h)
         {
@@ -83,7 +86,8 @@ void PreferenceScene::key_binding()
             }
             i++;
         }
-        // Does not look good with new line when empty action.h
+
+        // Does not look good with new line when empty action_h
         if (!action_h.empty())
         {
             ImGui::NewLine();
@@ -130,6 +134,7 @@ void PreferenceScene::key_binding()
             ImGui::Text("Press a Key");
             input::EMouse bind_mouse = input::EMouse::BtnNone;
             SDL_Scancode n_key       = SDL_SCANCODE_UNKNOWN;
+
             SDL_Event e{};
             if (SDL_WaitEvent(&e))
             {
@@ -142,6 +147,7 @@ void PreferenceScene::key_binding()
                     bind_mouse = static_cast<input::EMouse>(e.button.button);
                 }
             }
+
             if (n_key != SDL_SCANCODE_UNKNOWN)
             {
                 // Remove what ever old binding was there
