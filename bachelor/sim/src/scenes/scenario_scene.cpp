@@ -433,8 +433,15 @@ void ScenarioScene::bind_scenario_lua_functions()
                 }
 
                 /** Give a child to the parents */
-                ++m_registry.get<component::Reproduction>(father).number_of_children;
-                ++m_registry.get<component::Reproduction>(mother).number_of_children;
+                if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
+                {
+                    ++rc->number_of_children;
+                }
+
+                if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
+                {
+                    ++rc->number_of_children;
+                }
             });
     });
 }
