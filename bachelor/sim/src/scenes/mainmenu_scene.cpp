@@ -1,6 +1,7 @@
 #include "mainmenu_scene.h"
 #include "editor_scene.h"
 #include "entity/scenario.h"
+#include "preference_scene.h"
 #include "preferences.h"
 #include "scenario_scene.h"
 #include "scene_manager.h"
@@ -31,6 +32,11 @@ bool MainMenuScene::update(float dt)
     if (ImGui::Button("Load Scenario", {150, 50}))
     {
         ImGui::OpenPopup("Select##Scenario");
+    }
+
+    if (ImGui::Button("Preferences", {150, 50}))
+    {
+        m_context->scene_manager->push<PreferenceScene>();
     }
 
     if (ImGui::Button("Development Editor", {150, 50}))

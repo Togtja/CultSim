@@ -133,6 +133,24 @@ bool ActionHandler::handle_live_input(const float dt)
             }
         }
     }
+    auto mouse_state = SDL_GetMouseState(nullptr, nullptr);
+    for (auto&& [b, a] : m_mouse_binding)
+    {
+        // If our enum is not apart of the SDL_Button's continue
+        if (static_cast<int>(b) > SDL_BUTTON_X2)
+        {
+            continue;
+        }
+        if (mouse_state & SDL_BUTTON(static_cast<int>(b)))
+        {
+            if (has_live_action(a))
+            {
+                m_live_action_binding[a](dt);
+                found_key = true;
+            }
+        }
+    }
+
     return m_blocking || found_key;
 }
 
@@ -142,8 +160,11 @@ bool ActionHandler::handle_input(const EMouse button)
     {
         // Call the function the button maps to
         auto& action = m_mouse_binding[button];
-        m_action_binding[action]();
-        return true;
+        if (has_action(action))
+        {
+            m_action_binding[action]();
+            return true;
+        }
     }
     return m_blocking;
 }
@@ -170,9 +191,19 @@ bool ActionHandler::has_live_action(const EAction action)
 
 void ActionHandler::clear()
 {
-    m_action_binding.clear();
+    clear_key_action();
+    clear_action_func();
+}
+
+void ActionHandler::clear_key_action()
+{
     m_key_binding.clear();
     m_mouse_binding.clear();
+}
+void ActionHandler::clear_action_func()
+{
+    m_action_binding.clear();
+    m_live_action_binding.clear();
 }
 
 std::string ActionHandler::key_bindings_to_lua()
@@ -332,15 +363,15 @@ void ContextHandler::handle_input(const SDL_Event& event)
         }
         if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
         {
-            // Subtract 1 to translate from SDL Mouse Enum to our Mouse enum
-            auto click = static_cast<EMouse>(event.button.button - 1);
+            // Translate from SDL Mouse Enum to our Mouse enum
+            auto click = static_cast<EMouse>(event.button.button);
             // Update last mouse positions
             m_mouse_click_pos = {event.button.x, event.button.y};
-            if (click == EMouse::Left)
+            if (click == EMouse::BtnLeft)
             {
                 m_left_click_pos = m_mouse_click_pos;
             }
-            if (click == EMouse::Right)
+            if (click == EMouse::BtnRight)
             {
                 m_right_click_pos = m_mouse_click_pos;
             }
@@ -360,28 +391,28 @@ void ContextHandler::handle_input(const SDL_Event& event)
             }
             if (x > 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelRight))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelRight))
                 {
                     block = true;
                 }
             }
             if (x < 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelLeft))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelLeft))
                 {
                     block = true;
                 }
             }
             if (y > 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelUp))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelUp))
                 {
                     block = true;
                 }
             }
             if (y < 0)
             {
-                if (m_input_map.at(*it).handle_input(EMouse::WheelDown))
+                if (m_input_map.at(*it).handle_input(EMouse::BtnWheelDown))
                 {
                     block = true;
                 }
@@ -390,7 +421,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
         if (event.type == SDL_MOUSEMOTION)
         {
             mouse_pos = {event.motion.x, event.motion.y};
-            if (m_input_map.at(*it).handle_input(EMouse::Move))
+            if (m_input_map.at(*it).handle_input(EMouse::BtnMove))
             {
                 block = true;
             }
@@ -444,6 +475,16 @@ void ContextHandler::clear()
     m_active_stack.clear();
     // There always need to be a DefaultContext at the bottom of the stack
     add_context(EKeyContext::DefaultContext);
+}
+
+const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& ContextHandler::get_input_map() const
+{
+    return m_input_map;
+}
+
+void ContextHandler::set_input_map(const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& map)
+{
+    m_input_map = map;
 }
 
 glm::ivec2 ContextHandler::get_mouse_click_pos()
