@@ -13,15 +13,25 @@ void Timer::update(float dt)
         timer.time_spent += dt;
         if (timer.time_spent > timer.time_to_complete)
         {
-            timer.number_of_loops--;
-            timer.time_spent = 0;
-            timer.on_complete(e, *m_context.registry);
+            /** on_complete - can either be lua or cpp function */
+            if (timer.on_complete.index() == 0)
+            {
+                std::get<component::Timer::OnCompleteFunction>(timer.on_complete)(e, *m_context.registry);
+            }
+            else
+            {
+                std::get<sol::function>(timer.on_complete)(e);
+            }
+
+            /** Reset */
+            timer.time_spent = 0.f;
             if (timer.number_of_loops > 0)
             {
                 timer.number_of_loops--;
             }
         }
 
+        /** Remove if we are out of loops */
         if (timer.number_of_loops == 0)
         {
             m_context.registry->remove<component::Timer>(e);

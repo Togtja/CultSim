@@ -86,11 +86,13 @@ struct Reproduction
 
 struct Timer
 {
+    using OnCompleteFunction = std::function<void(entt::entity, entt::registry&)>;
+
     float time_to_complete{};
     float time_spent{};
 
     int number_of_loops{};
-    std::function<void(entt::entity, entt::registry&)> on_complete{};
+    std::variant<OnCompleteFunction, sol::function> on_complete{};
 };
 
 struct Health
