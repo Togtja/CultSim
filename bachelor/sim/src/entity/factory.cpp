@@ -21,7 +21,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"ReproductionComponent", spawn_reproduction_component},
                           {"StrategyComponent", spawn_strategy_component},
                           {"HealthComponent", spawn_health_component},
-                          {"MemoryComponent", spawn_memory_component}};
+                          {"MemoryComponent", spawn_memory_component},
+                          {"TimerComponent", spawn_timer_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -147,6 +148,14 @@ bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table tabl
         memory_component.memory_container.emplace_back(tag);
     }
 
+    return true;
+}
+
+bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& timer_component           = reg.assign_or_replace<component::Timer>(e, table["time_to_complete"].get<float>());
+    timer_component.number_of_loops = table["number_of_loops"].get<int>();
+    timer_component.on_complete     = table["on_complete"].get<sol::function>();
     return true;
 }
 
