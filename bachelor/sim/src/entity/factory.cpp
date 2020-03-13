@@ -44,7 +44,10 @@ bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table tabl
     if (table["texture"].get_type() == sol::type::string)
     {
         spr.texture = gfx::get_renderer().sprite().get_texture(table["texture"].get<std::string>());
-        spdlog::get("agent")->info("texture not provided for SpriteComponent");
+    }
+    else
+    {
+        spdlog::get("agent")->info("texture not provided for SpriteComponent, or is not a string");
     }
 
     spr.color = table["color"].get<glm::vec3>();
@@ -170,15 +173,17 @@ entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_
     sol::table entity_info = lua["entity"];
 
     /** Iterate components and spawn them with their factory functions */
+    uint32_t components = 0u;
     for (const auto& [k, v] : entity_info)
     {
         if (!detail::s_component_factories.at(k.as<std::string>().c_str())(out, reg, v))
         {
             spdlog::get("agent")->warn("failed to create {}. correct spelling?", k.as<std::string>());
         }
+        ++components;
     }
 
-    spdlog::get("agent")->debug("created entity '{}' with {} components", entity, entity_info.size());
+    spdlog::get("agent")->debug("created entity '{}' with {} components", entity, components);
 
     return out;
 }
