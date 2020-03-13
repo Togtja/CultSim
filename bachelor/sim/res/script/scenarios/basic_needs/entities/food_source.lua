@@ -4,7 +4,7 @@ entity = {
                             random:uniform(-scenario.bounds.y, scenario.bounds.y))
     },
     SpriteComponent = {
-        color = Vec3:new(0.30, 0.40, 0.10),
+        color = Vec3:new(0.80, 0.50, 0.10),
         texture = "sprites/circle.png"
     },
     TagComponent = {

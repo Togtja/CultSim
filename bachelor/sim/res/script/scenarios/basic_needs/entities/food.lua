@@ -3,7 +3,7 @@ entity = {
         position = Vec2:new(0.0, 0.0)
     },
     SpriteComponent = {
-        color = Vec3:new(0.20, 1.00, 0.10),
+        color = Vec3:new(0.90, 0.60, 0.10),
         texture = "sprites/food_c.png"
     },
     TagComponent = {
