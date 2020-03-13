@@ -170,7 +170,7 @@ void ScenarioScene::on_enter()
     /** Spawn initial agents for this scenario */
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
-        auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
+        spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
     }
 
     for (int j = 0; j < 75; j++)

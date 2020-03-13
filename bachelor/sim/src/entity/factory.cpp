@@ -20,7 +20,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"NeedComponent", spawn_need_component},
                           {"ReproductionComponent", spawn_reproduction_component},
                           {"StrategyComponent", spawn_strategy_component},
-                          {"HealthComponent", spawn_health_component}};
+                          {"HealthComponent", spawn_health_component},
+                          {"MemoryComponent", spawn_memory_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
