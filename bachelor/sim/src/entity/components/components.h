@@ -154,11 +154,11 @@ struct Inventory
 
 struct Memory
 {
-    std::vector <memory::Container> memory_container{};
+    std::vector<memory::Container> memory_container{};
     Memory(Memory&&) = default;
     Memory& operator=(Memory&&) = default;
-    Memory(const Memory&)       = delete;
-    Memory& operator=(const Memory&) = delete;
+    Memory(const Memory&)       = default;
+    Memory& operator=(const Memory&) = default;
 };
 
 struct AI

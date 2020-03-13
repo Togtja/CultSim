@@ -8,7 +8,6 @@ struct Container
 {
 public:
     ETag memory_tags{};
-
     std::vector<std::unique_ptr<IMemory>> memory_storage{};
 
     Container() = default;

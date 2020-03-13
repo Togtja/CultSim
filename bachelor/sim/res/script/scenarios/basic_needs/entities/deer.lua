@@ -33,5 +33,8 @@ entity = {
         health = 100.0,
         tickdown_rate = 1.0,
         vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
+    },
+    MemoryComponent = {
+        allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location }
     }
 }
