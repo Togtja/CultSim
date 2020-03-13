@@ -101,11 +101,6 @@ void ScenarioScene::on_enter()
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
 
-    ai::Need need_hunger       = {static_cast<std::string>("Hunger"), 3.f, 100.f, 1.f, 0.5f, TAG_Food};
-    ai::Need need_thirst       = {static_cast<std::string>("Thirst"), 4.f, 100.f, 1.5f, 1.f, TAG_Drink};
-    ai::Need need_sleep        = {static_cast<std::string>("Sleep"), 1.f, 55.f, 0.5f, 0.1f, TAG_Sleep};
-    ai::Need need_reproduction = {static_cast<std::string>("Reproduce"), 1.f, 100.f, 0.5f, 0.f, ETag(TAG_Reproduce | TAG_Human)};
-
     //    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
     //                                      TAG_Find,
     //                                      1.f,
@@ -167,106 +162,6 @@ void ScenarioScene::on_enter()
     //                                             }
     //                                         },
     //                                         {}};
-
-    //    action::Action action_reproduce{
-    //        static_cast<std::string>("Reproduce"),
-    //            ETag(TAG_Find | TAG_Tag),
-    //        5.f,
-    //        0.f,
-    //        {},
-    //        [](entt::entity e, entt::entity n) {
-    //            if (r.valid(e) && r.valid(n))
-    //            {
-    //                auto repr = r.try_get<component::Reproduction>(e);
-
-    //                auto target_repr = r.try_get<component::Reproduction>(n);
-
-    //                if (repr != nullptr)
-    //                {
-    //                    auto needs = r.try_get<component::Needs>(e);
-    //                    if (needs != nullptr)
-    //                    {
-    //                        for (auto& need : needs->needs)
-    //                        {
-    //                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-    //                            {
-    //                                need.status += 100.f;
-    //                            }
-    //                        }
-    //                    }
-
-    //                    if (target_repr != nullptr)
-    //                    {
-    //                        if (repr->sex == component::Reproduction::Female && target_repr->sex ==
-    //                        component::Reproduction::Male)
-    //                        {
-    //                            r.assign<component::Timer>(e, 20.f, 0.f, 1, [repr, target_repr](entt::entity e) {
-    //                                if (r.valid(e))
-    //                                {
-    //                                    /** Clone child */
-    //                                    auto child = r.create();
-    //                                    r.stamp(child, r, e);
-
-    //                                    auto& child_needs  = r.get<component::Needs>(child);
-    //                                    auto& child_reprd  = r.get<component::Reproduction>(child);
-    //                                    auto& child_health = r.get<component::Health>(child);
-    //                                    auto& child_pos    = r.get<component::Position>(child);
-    //                                    auto& child_strat  = r.get<component::Strategies>(child);
-    //                                    for (auto& strat : child_strat.strategies)
-    //                                    {
-    //                                        for (auto& action : strat.actions)
-    //                                        {
-    //                                            if (action.target != entt::null)
-    //                                            {
-    //                                                action.target = child;
-    //                                            }
-    //                                            if (action.target != child)
-    //                                            {
-    //                                                spdlog::get("agent")->error("child: {}, action.target: {}", child,
-    //                                                action.target);
-    //                                            }
-    //                                        }
-    //                                    }
-    //                                    for (auto need : child_needs.needs)
-    //                                    {
-    //                                        need.status = 100.f;
-    //                                    }
-
-    //                                    RandomEngine rng{};
-    //                                    child_reprd.number_of_children = 0;
-    //                                    child_health.health            = 100.f;
-    //                                    child_pos.position             = r.get<component::Position>(e).position +
-    //                                                         glm::vec3(rng.uniform(-10.f, 10.f), rng.uniform(-10.f, 10.f), 0.f);
-
-    //                                    if (rng.trigger(0.5f))
-    //                                    {
-    //                                        child_reprd.sex = component::Reproduction::Male;
-    //                                    }
-    //                                    repr->number_of_children++;
-    //                                    target_repr->number_of_children++;
-    //                                }
-    //                            });
-    //                        }
-
-    //                        auto& target_needs = r.get<component::Needs>(n);
-    //                        auto& target_tags  = r.get<component::Tags>(n);
-    //                        for (auto& need : target_needs.needs)
-    //                        {
-    //                            if ((need.tags & TAG_Reproduce) && need.status < 50.f)
-    //                            {
-    //                                need.status += 100.f;
-    //                            }
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        },
-    //        [](entt::entity e, entt::entity n) {
-    //            spdlog::get("agent")->warn("We failed to finish action: reproduce");
-    //        },
-    //        []() {
-    //            spdlog::get("agent")->warn("We aborted our action: reproduce");
-    //        }};
 
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
@@ -516,6 +411,74 @@ void ScenarioScene::bind_scenario_lua_functions()
             m_registry.destroy(e);
         }
     });
+
+    /** Impregnate */
+    cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
+        m_registry
+            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
+                /** Don't do anything if e became invalid */
+                if (!r.valid(e))
+                {
+                    return;
+                }
+
+                auto child = r.create();
+                r.stamp(child, r, e);
+
+                /** Reset action targets */
+                if (auto* action_comp = r.try_get<component::Strategies>(child); action_comp)
+                {
+                    for (auto& strategy : action_comp->strategies)
+                    {
+                        for (auto& action : strategy.actions)
+                        {
+                            if (action.target != entt::null)
+                            {
+                                action.target = child;
+                            }
+                            if (action.target != child)
+                            {
+                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
+                            }
+                        }
+                    }
+                }
+
+                /** Reset all needs to 100.0 */
+                if (auto* need_comp = r.try_get<component::Needs>(child); need_comp)
+                {
+                    for (auto& need : need_comp->needs)
+                    {
+                        need.status = 100.f;
+                    }
+                }
+
+                /** Reset health */
+                if (auto* health_comp = r.try_get<component::Health>(child); health_comp)
+                {
+                    health_comp->health = 100.f;
+                }
+
+                /** Reset reproduction stats */
+                if (auto* repro_copm = r.try_get<component::Reproduction>(child); repro_copm)
+                {
+                    repro_copm->sex                = static_cast<component::Reproduction::ESex>(m_rng.uniform(0, 1));
+                    repro_copm->number_of_children = 0;
+                }
+
+                /** Set new child position */
+                if (auto* pos_comp = r.try_get<component::Position>(child); pos_comp)
+                {
+                    const auto new_pos = r.get<component::Position>(e).position +
+                                         glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
+                    pos_comp->position = new_pos;
+                }
+
+                /** Give a child to the parents */
+                ++m_registry.get<component::Reproduction>(father).number_of_children;
+                ++m_registry.get<component::Reproduction>(mother).number_of_children;
+            });
+    });
 }
 
 void ScenarioScene::setup_docking_ui()
@@ -630,8 +593,9 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy] =
-        m_registry.try_get<component::Needs, component::Health, component::Strategies>(selection_info.selected_entity);
+    const auto& [needs, health, strategy, reproduction] =
+        m_registry.try_get<component::Needs, component::Health, component::Strategies, component::Reproduction>(
+            selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -645,6 +609,13 @@ void ScenarioScene::draw_selected_entity_information_ui()
         ImGui::PushFont(g_header_font);
         ImGui::TextColored({.486f, .988f, 0.f, 1.f}, "%3.0f/100 HP", health->health);
         ImGui::PopFont();
+    }
+
+    if (reproduction)
+    {
+        ImGui::Text("I am a %s, and I have %d children.",
+                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                    reproduction->number_of_children);
     }
 
     if (strategy)

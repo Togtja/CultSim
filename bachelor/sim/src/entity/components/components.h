@@ -79,7 +79,6 @@ struct Reproduction
     };
 
     ESex sex = Male;
-
     uint16_t number_of_children{};
     uint16_t max_children{};
 };
@@ -90,16 +89,13 @@ struct Timer
     float time_spent{};
 
     int number_of_loops{};
-
     std::function<void(entt::entity, entt::registry&)> on_complete{};
 };
 
 struct Health
 {
     float health{};
-
     float tickdown_rate{};
-
     ETag need_tags{};
 };
 
@@ -149,11 +145,9 @@ struct Tags
 
 struct Inventory
 {
+    std::vector<entt::entity> contents{};
     uint16_t size{};
     uint16_t max_size{};
-
-    std::vector<entt::entity> contents{};
-
     ETag tags{};
 };
 

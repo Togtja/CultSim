@@ -79,6 +79,10 @@ void bind_components(sol::state_view lua)
                                      "abort",
                                      &action::Action::abort);
 
+    lua.new_enum<component::Reproduction::ESex>(
+        "ESex",
+        {{"Male", component::Reproduction::ESex::Male}, {"Female", component::Reproduction::ESex::Female}});
+
     /** Components */
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
@@ -146,6 +150,7 @@ void bind_systems(sol::state_view lua)
                                "shutdown",
                                &Scenario::shutdown);
 }
+
 void bind_input(sol::state_view lua)
 {
     lua.new_enum<input::EKeyContext>("EKeyContext",
@@ -177,6 +182,7 @@ void bind_input(sol::state_view lua)
                                  {"X1", input::EMouse::X1},
                                  {"X2", input::EMouse::X2}});
 }
+
 void bind_utils(sol::state_view lua)
 {
     /** Enable use of random number generator */

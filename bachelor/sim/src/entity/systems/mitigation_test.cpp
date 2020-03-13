@@ -15,15 +15,7 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
-    cs::action::Action action{
-        static_cast<std::string>("eat"),
-        cs::TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
-        {}};
+    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
@@ -68,15 +60,7 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
-    cs::action::Action action{
-        static_cast<std::string>("eat"),
-        cs::TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
-        {}};
+    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
@@ -117,15 +101,7 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
     auto agent = test_registry.create();
     cs::ai::Need need =
         {static_cast<std::string>("hunger & thirst"), 3.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
-    cs::action::Action action{
-        static_cast<std::string>("eat"),
-        cs::TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
-        {}};
+    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
@@ -168,15 +144,7 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
     auto agent = test_registry.create();
     cs::ai::Need need =
         {static_cast<std::string>("hunger & thirst"), 3.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
-    cs::action::Action action{
-        static_cast<std::string>("eat"),
-        cs::TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
-        {}};
+    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
@@ -226,15 +194,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
 
     cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Drink)};
 
-    cs::action::Action action{
-        static_cast<std::string>("eat"),
-        cs::TAG_Find,
-        5.f,
-        0.f,
-        {},
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We failed to finish action: eat"); },
-        [](entt::entity e, entt::entity n, entt::registry& r) { spdlog::get("test")->warn("We finished action: eat"); },
-        {}};
+    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,

@@ -64,7 +64,16 @@ actions.reproduce = {
     requirements = ETag.Find | ETag.Tag,
     time_to_complete = 5.0,
     success = function(owner, target)
+        local my_reproduction = cultsim.get_component(owner, component.reproduction)
+        local their_reproduction = cultsim.get_component(target, component.reproduction)
+
+        -- Increase need
         cultsim.modify_need(owner, ETag.Reproduce, 99.0)
+
+        -- If we have different sexes and we're the female, then we're impregnated (currently 100% chance)
+        if my_reproduction.sex == ESex.Female and their_reproduction.sex == ESex.Male then
+            cultsim.impregnate(target, owner)
+        end
     end,
     failure = function(owner, target) log.info(owner .. " failed to have sex with " .. target) end
 }
