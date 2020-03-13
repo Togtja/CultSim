@@ -291,6 +291,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["reproduction"] = entt::type_info<component::Reproduction>::id();
     component["strategy"]     = entt::type_info<component::Strategies>::id();
     component["health"]       = entt::type_info<component::Health>::id();
+    component["memory"]       = entt::type_info<component::Memory>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -319,6 +320,9 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
             case entt::type_info<component::Health>::id():
                 return sol::make_object(s, m_registry.get<component::Health>(e));
+                break;
+            case entt::type_info<component::Memory>::id():
+                return sol::make_object(s, m_registry.get<component::Memory>(e));
                 break;
             default: return sol::nil; break;
         }

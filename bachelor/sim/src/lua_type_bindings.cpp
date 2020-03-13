@@ -133,8 +133,6 @@ void bind_systems(sol::state_view lua)
                                &Scenario::name,
                                "description",
                                &Scenario::description,
-                               "agent_count",
-                               &Scenario::agent_count,
                                "systems",
                                &Scenario::systems,
                                "bounds",
