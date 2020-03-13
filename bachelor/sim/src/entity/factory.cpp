@@ -132,6 +132,20 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
     return true;
 }
 
+bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    const std::vector<ETag>& allowed_memories = table["allowed_memories"].get_or<std::vector<ETag>>({});
+    auto& memory_component                    = reg.assign_or_replace<component::Memory>(e);
+
+    /** Add allowed memories to memory compnent */
+    for (auto tag : allowed_memories)
+    {
+        memory_component.memory_container.emplace_back(tag);
+    }
+
+    return true;
+}
+
 } // namespace detail
 
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)

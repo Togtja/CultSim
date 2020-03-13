@@ -22,6 +22,7 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table);
 } // namespace detail
 
 /**
