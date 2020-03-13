@@ -46,6 +46,12 @@ scenario.init = function()
         cultsim.spawn("food_source")
         cultsim.spawn("water_source")
     end
+
+    -- Create some food / water initially
+    for i=1,50 do
+        cultsim.spawn_at("water", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
+        cultsim.spawn_at("food", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
+    end
 end
 
 -- This function is called every frame of the simulation
