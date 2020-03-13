@@ -15,6 +15,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/pausemenu_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/pausemenu_scene.cpp
 
+        ${CMAKE_CURRENT_LIST_DIR}/preference_scene.h
+        ${CMAKE_CURRENT_LIST_DIR}/preference_scene.cpp
+
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.cpp
 

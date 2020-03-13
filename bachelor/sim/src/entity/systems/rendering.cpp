@@ -23,7 +23,7 @@ void Rendering::update(float dt)
     auto& registry = *m_context.registry;
 
     /** Select visualization mode */
-    if (ImGui::TreeNode("Visualziation Mode"))
+    if (ImGui::TreeNode("Visualization Mode"))
     {
         ImGui::ListBoxHeader("##VisualizationListBox");
         for (int i = 0; i < visualization_mode_names.size(); ++i)

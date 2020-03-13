@@ -417,7 +417,7 @@ TEST_CASE("attempting to bind mousebutton")
 
     auto& input  = get_input();
     bool success = false;
-    input.fast_bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp, [&success]() { success = true; });
+    input.fast_bind_btn(EKeyContext::DefaultContext, EMouse::BtnLeft, EAction::MoveUp, [&success]() { success = true; });
     ImGui::CreateContext();
     input.handle_input(e);
     ImGui::DestroyContext();
@@ -435,7 +435,7 @@ TEST_CASE("attempting to handle live input mousebutton")
     auto& input = get_input();
     float time  = 50;
 
-    input.bind_btn(EKeyContext::DefaultContext, EMouse::Left, EAction::MoveUp);
+    input.bind_btn(EKeyContext::DefaultContext, EMouse::BtnLeft, EAction::MoveUp);
     input.bind_action(EKeyContext::DefaultContext, EAction::MoveUp, [&time](float dt) { time += dt; });
 
     input.handle_live_input(0.5f);
