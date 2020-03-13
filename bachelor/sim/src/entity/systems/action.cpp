@@ -13,12 +13,12 @@ void Action::update(float dt)
     CS_AUTOTIMER(Action System);
 
     auto& registry = *m_context.registry;
-    auto group     = registry.group<component::Strategies>(entt::exclude<component::LocationRequirement,
+    auto group     = registry.group<component::Strategy>(entt::exclude<component::LocationRequirement,
                                                                      component::VisionRequirement,
                                                                      component::FindRequirement,
                                                                      component::TagRequirement>);
 
-    group.each([this, dt](entt::entity e, component::Strategies& strategies) {
+    group.each([this, dt](entt::entity e, component::Strategy& strategies) {
         if (!strategies.staged_strategies.empty())
         {
             for (auto& strategy : strategies.staged_strategies)

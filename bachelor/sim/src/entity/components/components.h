@@ -47,7 +47,7 @@ struct Animation
     float current_progress{};
 };
 
-struct Needs
+struct Need
 {
     std::vector<ai::Need> needs{};
     std::vector<ai::Need> vital_needs{};
@@ -111,7 +111,7 @@ struct DropItems
     std::vector<EDeathDrops> deathdrops{};
 };
 
-struct Strategies
+struct Strategy
 {
     std::vector<ai::Strategy> strategies{};
 

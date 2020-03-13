@@ -55,10 +55,10 @@ void reflect_data_types()
         .data<&component::Vision::radius>("vision_radius"_hs)
         .data<&component::Vision::fov>("fov"_hs);
 
-    entt::meta<component::Needs>()
+    entt::meta<component::Need>()
         .alias("NeedComponent"_hs)
-        .data<&component::Needs::needs>("needs"_hs)
-        .data<&component::Needs::vital_needs>("pressing_needs"_hs);
+        .data<&component::Need::needs>("needs"_hs)
+        .data<&component::Need::vital_needs>("pressing_needs"_hs);
 
     /** Keep adding the components we've used so far (but only add members that make sense to set defaults for in Lua)... */
 }

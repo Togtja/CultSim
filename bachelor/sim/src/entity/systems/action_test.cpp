@@ -24,8 +24,8 @@ TEST_CASE("Test case for regular action system setup")
                                  cs::TAG_Food,
                                  std::vector<cs::action::Action>{action}};
 
-    test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
-    test_registry.assign<cs::component::Strategies>(agent,
+    test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
+    test_registry.assign<cs::component::Strategy>(agent,
                                                     std::vector<cs::ai::Strategy>({strategy}),
                                                     std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
@@ -38,8 +38,8 @@ TEST_CASE("Test case for regular action system setup")
     mitigation_system->update(1.f);
     action_system->update(1.f);
 
-    auto view = test_registry.view<cs::component::Needs, cs::component::Strategies, cs::component::Tags>();
-    view.each([action](cs::component::Needs& needs, cs::component::Strategies& strategies, cs::component::Tags& tags) {
+    auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
+    view.each([action](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
         REQUIRE(strategies.staged_strategies.front().actions.size() == 1);
         REQUIRE(strategies.staged_strategies.front().actions.back() == action);
     });

@@ -31,7 +31,9 @@ scenario.sampling_rate = 1.0;
 -- This function is called before starting the simulation, once
 scenario.init = function()
     for i=1,100 do
-        cultsim.spawn("deer")
+        local deer = cultsim.spawn("deer")
+        local health = cultsim.get_component(deer, component.health)
+        health.health = 1.0
     end
 end
 

@@ -47,7 +47,7 @@ void Rendering::update(float dt)
     }
     else if (m_visualization_mode == EVisualizationMode::Needs)
     {
-        registry.view<component::Sprite, component::Needs>().each([](component::Sprite& spr, const component::Needs& needs) {
+        registry.view<component::Sprite, component::Need>().each([](component::Sprite& spr, const component::Need& needs) {
             auto sum = std::accumulate(needs.needs.begin(), needs.needs.end(), 0.f, [](const auto& a, const auto& b) {
                 return a + b.status;
             });

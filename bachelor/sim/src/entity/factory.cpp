@@ -71,7 +71,7 @@ bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 
 bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& need = reg.assign_or_replace<component::Needs>(e);
+    auto& need = reg.assign_or_replace<component::Need>(e);
 
     const auto& required_needs = table["needs"].get_or<std::vector<sol::table>>({});
     for (const auto& need_table : required_needs)
@@ -99,7 +99,7 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& strat = reg.assign_or_replace<component::Strategies>(e);
+    auto& strat = reg.assign_or_replace<component::Strategy>(e);
 
     /** Populate all strategies */
     const auto& available_strategies = table["strategies"].get_or<std::vector<sol::table>>({});

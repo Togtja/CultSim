@@ -17,8 +17,8 @@ void Mitigation::update(float dt)
 
     auto& registry = *m_context.registry;
 
-    auto view = registry.view<component::Needs, component::Strategies, component::Tags>();
-    view.each([this, dt](entt::entity e, component::Needs& needs, component::Strategies& strategies, component::Tags tags) {
+    auto view = registry.view<component::Need, component::Strategy, component::Tags>();
+    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, component::Tags tags) {
         if (!needs.vital_needs.empty())
         {
             for (auto need : needs.vital_needs) {}
@@ -67,7 +67,7 @@ void Mitigation::update(float dt)
     });
 }
 
-bool Mitigation::add_strategies(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags)
+bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need& need, const component::Tags& tags)
 {
     ai::Strategy temp{};
 

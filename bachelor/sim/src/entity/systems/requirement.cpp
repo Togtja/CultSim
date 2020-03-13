@@ -51,7 +51,7 @@ void Requirement::update(float dt)
         {
             if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
             {
-                auto&& strat = registry.get<component::Strategies>(e);
+                auto&& strat = registry.get<component::Strategy>(e);
                 if (strat.staged_strategies.size() != 0)
                 {
                     registry.assign<component::LocationRequirement>(e, registry.get<component::Position>(entity).position);

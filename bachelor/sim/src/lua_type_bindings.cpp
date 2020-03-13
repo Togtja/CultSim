@@ -116,9 +116,9 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Tags>("TagComponent", "tags", &component::Tags::tags);
 
-    lua.new_usertype<component::Needs>("NeedComponent", "needs", &component::Needs::needs);
+    lua.new_usertype<component::Need>("NeedComponent", "needs", &component::Need::needs);
 
-    lua.new_usertype<component::Strategies>("StrategyComponent", "strategies", &component::Strategies::strategies);
+    lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
