@@ -5,6 +5,7 @@
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
 #include "entity/factory.h"
+#include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
 #include "entity/systems/ai.h"
 #include "entity/systems/health.h"
@@ -61,24 +62,23 @@ void ScenarioScene::on_enter()
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     /** Select entity on click */
-    input::get_input()
-        .fast_bind_btn(input::EKeyContext::ScenarioScene, input::EMouse::Left, input::EAction::SelectEntity, [this] {
-            auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SelectEntity, [this] {
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
 
-            if (m_registry.valid(select_helper.selected_entity))
-            {
-                m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-                m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
-            }
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
+        }
 
-            select_helper.selected_entity = select_helper.hovered_entity;
+        select_helper.selected_entity = select_helper.hovered_entity;
 
-            if (m_registry.valid(select_helper.selected_entity))
-            {
-                m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-                m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
-            }
-        });
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
+        }
+    });
 
     /** Move to selected entity */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
@@ -96,7 +96,7 @@ void ScenarioScene::on_enter()
         gfx::get_renderer().set_camera_position_2d(pos);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this] {
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
@@ -171,6 +171,11 @@ void ScenarioScene::on_enter()
     for (int i = 1; i <= m_scenario.agent_count; i++)
     {
         auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
+
+        /** TODO: Luafy */
+        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<memory::Container>{});
+        memory_comp.memory_container.emplace_back(ETag(TAG_Food | TAG_Location));
+        memory_comp.memory_container.emplace_back(ETag(TAG_Drink | TAG_Location));
     }
 
     for (int j = 0; j < 75; j++)
@@ -232,6 +237,15 @@ void ScenarioScene::on_enter()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    auto& input = input::get_input();
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
+        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
+        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+    });
+    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
 }
 
 void ScenarioScene::on_exit()

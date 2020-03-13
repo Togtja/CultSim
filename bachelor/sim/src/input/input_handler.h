@@ -23,6 +23,25 @@ enum class EKeyContext
 };
 
 /**
+ * Converts an EKeyContext Enum to string of its name
+ *
+ * @param context the EKeyContext you want to convert
+ *
+ * @return the string name of the context you sent as a parameter
+ */
+inline std::string key_context_to_string(const EKeyContext context)
+{
+    switch (context)
+    {
+        case EKeyContext::DefaultContext: return "DefaultContext";
+        case EKeyContext::Agent: return "Agent";
+        case EKeyContext::AgentOnHover: return "AgentOnHover";
+        case EKeyContext::ScenarioScene: return "ScenarioScene";
+    }
+    return "KeyContext not added to to_string";
+}
+
+/**
  * Action, the step between a key and a functions
  * A key (Keyboard key/MouseBtn) gets mapped to an Action
  * And an Action get mapped to a certain function
@@ -35,10 +54,37 @@ enum class EAction
     MoveDown,
     ZoomIn,
     ZoomOut,
-    Pause,
+    PauseMenu,
     SelectEntity,
-    FollowEntity
+    FollowEntity,
+    SpeedUp,
+    SpeedDown,
+    Pause
 };
+
+/**
+ * Converts an EAction Enum to string of its name
+ *
+ * @param action the EAction you want to convert
+ *
+ * @return the string name of the action you sent as a parameter
+ */
+inline std::string action_to_string(const EAction action)
+{
+    switch (action)
+    {
+        case EAction::MoveUp: return "MoveUp";
+        case EAction::MoveLeft: return "MoveLeft";
+        case EAction::MoveRight: return "MoveRight";
+        case EAction::MoveDown: return "MoveDown";
+        case EAction::ZoomIn: return "ZoomIn";
+        case EAction::ZoomOut: return "ZoomOut";
+        case EAction::Pause: return "Pause";
+        case EAction::SelectEntity: return "SelectEntity";
+        case EAction::FollowEntity: return "FollowEntity";
+    }
+    return "Action not added to to_string";
+}
 
 /**
  * Mouse, a easier way to use the diffrent SDL_events
@@ -57,6 +103,31 @@ enum class EMouse
     Move        // Any mouse movement
 
 };
+
+/**
+ * Converts an EMouse Enum to string of its name
+ *
+ * @param btn the EMouse button you want to convert
+ *
+ * @return the string name of the button you sent as a parameter
+ */
+inline std::string mouse_to_string(const EMouse btn)
+{
+    switch (btn)
+    {
+        case EMouse::Left: return "Left";
+        case EMouse::Middle: return "Middle";
+        case EMouse::Right: return "Right";
+        case EMouse::X1: return "X1";
+        case EMouse::X2: return "X2";
+        case EMouse::WheelUp: return "WheelUp";
+        case EMouse::WheelDown: return "WheelDown";
+        case EMouse::WheelRight: return "WheelRight";
+        case EMouse::WheelLeft: return "WheelLeft";
+        case EMouse::Move: return "Move";
+    }
+    return "Mouse not added to to_string";
+}
 namespace detail
 {
 /** Handles Actions for a certain context */
@@ -83,6 +154,27 @@ public:
      */
     explicit ActionHandler(const EKeyContext type);
 
+    /**
+     * Get the Action handler's key binding
+     *
+     * @return the key binding unsorted map
+     */
+    const robin_hood::unordered_map<SDL_Scancode, EAction>& get_key_binding() const;
+
+    /**
+     * Get the Action handler's mouse binding
+     *
+     * @return the mouse binding unsorted map
+     */
+    const robin_hood::unordered_map<EMouse, EAction>& get_mouse_binding() const;
+
+    /**
+     * set if the ActionHandler should block the stack search for keybindings
+     *
+     * @note default is non-blocking
+     *
+     * @param blocking true if you want the ActionHandler to be blocking
+     */
     void set_blocking(const bool blocking);
 
     /**
@@ -216,6 +308,9 @@ public:
      * Clears the key bindings
      */
     void clear();
+
+    std::string key_bindings_to_lua();
+    std::string btn_bindings_to_lua();
 
 private:
     std::string get_key_name(SDL_Scancode scancode);
@@ -424,6 +519,7 @@ public:
      * @param
      */
     void load_binding_from_file(sol::state_view lua);
+    void save_binding_to_file();
 
 private:
     ContextHandler();

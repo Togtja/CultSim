@@ -22,6 +22,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/src/entity/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/entity/components/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/entity/systems/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/entity/actions/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/src/entity/memories/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/filesystem/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/input/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/src/scenes/CMakeLists.txt)
@@ -81,7 +82,7 @@ target_compile_options(
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
 add_custom_target(
         cultsim_resource_copy ALL
-        COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n sprites fonts script
+        COMMAND ${CMAKE_COMMAND} -E tar cv ${CMAKE_CURRENT_BINARY_DIR}/data.zip --format=zip -- shader config.lua l10n sprites fonts script keybinding.lua
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
         DEPENDS cultsim
         BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/data.zip

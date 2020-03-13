@@ -9,12 +9,16 @@ action_key_bindings = {
         ["s"] = EAction.MoveDown,
         ["d"] = EAction.MoveRight,
         ["f"] = EAction.FollowEntity,
-        ["p"] = EAction.Pause
+        ["p"] = EAction.PauseMenu,
+        ["."] = EAction.SpeedUp,
+        [","] = EAction.SpeedDown,
+        ["Space"] = EAction.Pause
     }
 }
 action_mouse_bindings = {
     [EKeyContext.ScenarioScene] = {
         [EMouse.WheelUp] = EAction.ZoomIn,
-        [EMouse.WheelDown] = EAction.ZoomOut
+        [EMouse.WheelDown] = EAction.ZoomOut,
+        [EMouse.Left] = EAction.SelectEntity
     }
 }

@@ -298,6 +298,7 @@ bool Application::init_imgui()
 
 void Application::deinit()
 {
+    input::get_input().save_binding_to_file();
     deinit_preferences();
     deinit_imgui();
     deinit_gl();
