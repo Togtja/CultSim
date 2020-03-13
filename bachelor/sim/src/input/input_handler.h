@@ -16,10 +16,13 @@ namespace cs::input
  */
 enum class EKeyContext
 {
+    None, // No KeyContext set
     DefaultContext,
     Agent,
     AgentOnHover,
-    ScenarioScene
+    ScenarioScene,
+
+    Count
 };
 
 /**
@@ -48,6 +51,7 @@ inline std::string key_context_to_string(const EKeyContext context)
  */
 enum class EAction
 {
+    None = 0,
     MoveUp,
     MoveLeft,
     MoveRight,
@@ -59,7 +63,9 @@ enum class EAction
     FollowEntity,
     SpeedUp,
     SpeedDown,
-    Pause
+    Pause,
+
+    Count
 };
 
 /**
@@ -79,9 +85,12 @@ inline std::string action_to_string(const EAction action)
         case EAction::MoveDown: return "MoveDown";
         case EAction::ZoomIn: return "ZoomIn";
         case EAction::ZoomOut: return "ZoomOut";
-        case EAction::Pause: return "Pause";
+        case EAction::PauseMenu: return "PauseMenu";
         case EAction::SelectEntity: return "SelectEntity";
         case EAction::FollowEntity: return "FollowEntity";
+        case EAction::SpeedUp: return "SpeedUp";
+        case EAction::SpeedDown: return "SpeedDown";
+        case EAction::Pause: return "Pause";
     }
     return "Action not added to to_string";
 }
@@ -91,16 +100,19 @@ inline std::string action_to_string(const EAction action)
  */
 enum class EMouse
 {
-    Left,       // Left mouse btn
-    Middle,     // Middle mouse btn
-    Right,      // Right mouse btn
-    X1,         // Optional mouse btn 1
-    X2,         // Optional mouse btn 2
-    WheelUp,    // Scroll wheel up
-    WheelDown,  // Scroll wheel down
-    WheelRight, // Scroll wheel right
-    WheelLeft,  // Scroll wheel left
-    Move        // Any mouse movement
+    BtnNone = 0,   // No Press
+    BtnLeft,       // Left mouse btn
+    BtnMiddle,     // Middle mouse btn
+    BtnRight,      // Right mouse btn
+    BtnX1,         // Optional mouse btn 1
+    BtnX2,         // Optional mouse btn 2
+    BtnWheelUp,    // Scroll wheel up
+    BtnWheelDown,  // Scroll wheel down
+    BtnWheelRight, // Scroll wheel right
+    BtnWheelLeft,  // Scroll wheel left
+    BtnMove,       // Any mouse movement
+
+    Count
 
 };
 
@@ -115,18 +127,66 @@ inline std::string mouse_to_string(const EMouse btn)
 {
     switch (btn)
     {
-        case EMouse::Left: return "Left";
-        case EMouse::Middle: return "Middle";
-        case EMouse::Right: return "Right";
-        case EMouse::X1: return "X1";
-        case EMouse::X2: return "X2";
-        case EMouse::WheelUp: return "WheelUp";
-        case EMouse::WheelDown: return "WheelDown";
-        case EMouse::WheelRight: return "WheelRight";
-        case EMouse::WheelLeft: return "WheelLeft";
-        case EMouse::Move: return "Move";
+        case EMouse::BtnLeft: return "BtnLeft";
+        case EMouse::BtnMiddle: return "BtnMiddle";
+        case EMouse::BtnRight: return "BtnRight";
+        case EMouse::BtnX1: return "BtnX1";
+        case EMouse::BtnX2: return "BtnX2";
+        case EMouse::BtnWheelUp: return "BtnWheelUp";
+        case EMouse::BtnWheelDown: return "BtnWheelDown";
+        case EMouse::BtnWheelRight: return "BtnWheelRight";
+        case EMouse::BtnWheelLeft: return "BtnWheelLeft";
+        case EMouse::BtnMove: return "BtnMove";
+
+        case EMouse::BtnNone:
+        case EMouse::Count: return "Error Button";
     }
     return "Mouse not added to to_string";
+}
+
+inline EMouse string_to_mouse(std::string_view btn_name)
+{
+    if (btn_name == "BtnLeft")
+    {
+        return EMouse::BtnLeft;
+    }
+    else if (btn_name == "BtnMiddle")
+    {
+        return EMouse::BtnMiddle;
+    }
+    else if (btn_name == "BtnRight")
+    {
+        return EMouse::BtnRight;
+    }
+    else if (btn_name == "BtnX1")
+    {
+        return EMouse::BtnX1;
+    }
+    else if (btn_name == "BtnX2")
+    {
+        return EMouse::BtnX2;
+    }
+    else if (btn_name == "BtnWheelUp")
+    {
+        return EMouse::BtnWheelUp;
+    }
+    else if (btn_name == "BtnWheelDown")
+    {
+        return EMouse::BtnWheelDown;
+    }
+    else if (btn_name == "BtnWheelRight")
+    {
+        return EMouse::BtnWheelRight;
+    }
+    else if (btn_name == "BtnWheelLeft")
+    {
+        return EMouse::BtnWheelLeft;
+    }
+    else if (btn_name == "BtnMove")
+    {
+        return EMouse::BtnMove;
+    }
+    return EMouse::BtnNone;
 }
 namespace detail
 {
@@ -309,6 +369,9 @@ public:
      */
     void clear();
 
+    void clear_key_action();
+    void clear_action_func();
+
     std::string key_bindings_to_lua();
     std::string btn_bindings_to_lua();
 
@@ -482,6 +545,10 @@ public:
      * Clears KeyContext stack, and the mappings
      */
     void clear();
+
+    const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& get_input_map() const;
+
+    void set_input_map(const robin_hood::unordered_map<EKeyContext, detail::ActionHandler>& map);
 
     /**
      * Get the last mouse click

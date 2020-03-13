@@ -174,16 +174,16 @@ void bind_input(sol::state_view lua)
                                   {"Pause", input::EAction::Pause}});
 
     lua.new_enum<input::EMouse>("EMouse",
-                                {{"Left", input::EMouse::Left},
-                                 {"Right", input::EMouse::Right},
-                                 {"Middle", input::EMouse::Middle},
-                                 {"Move", input::EMouse::Move},
-                                 {"WheelUp", input::EMouse::WheelUp},
-                                 {"WheelDown", input::EMouse::WheelDown},
-                                 {"WheelLeft", input::EMouse::WheelLeft},
-                                 {"WheelRight", input::EMouse::WheelRight},
-                                 {"X1", input::EMouse::X1},
-                                 {"X2", input::EMouse::X2}});
+                                {{"BtnLeft", input::EMouse::BtnLeft},
+                                 {"BtnRight", input::EMouse::BtnRight},
+                                 {"BtnMiddle", input::EMouse::BtnMiddle},
+                                 {"BtnMove", input::EMouse::BtnMove},
+                                 {"BtnWheelUp", input::EMouse::BtnWheelUp},
+                                 {"BtnWheelDown", input::EMouse::BtnWheelDown},
+                                 {"BtnWheelLeft", input::EMouse::BtnWheelLeft},
+                                 {"BtnWheelRight", input::EMouse::BtnWheelRight},
+                                 {"BtnX1", input::EMouse::BtnX1},
+                                 {"BtnX2", input::EMouse::BtnX2}});
 }
 
 void bind_utils(sol::state_view lua)
