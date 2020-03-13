@@ -45,7 +45,7 @@ ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scen
 {
 }
 
-void ScenarioScene::on_enter()
+void ScenarioScene::initialize_simulation()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
@@ -58,21 +58,50 @@ void ScenarioScene::on_enter()
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
 
-    m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
-    m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
-
     /** Call lua init function for this scenario */
     m_scenario.init();
+
+    /** Add systems specified by scenario */
+    for (const auto& system : m_scenario.systems)
+    {
+        auto type = entt::resolve(entt::hashed_string(system.c_str()));
+        if (type)
+        {
+            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
+        }
+        else
+        {
+            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
+        }
+    }
+}
+
+void ScenarioScene::clean_simulation()
+{
+    m_registry.clear();
+    m_simtime   = 0.f;
+    m_timescale = 1.f;
+    m_active_systems.clear();
+    m_inactive_systems.clear();
+    m_next_data_sample = 0.f;
+}
+
+void ScenarioScene::reset_simulation()
+{
+    clean_simulation();
+    initialize_simulation();
+}
+
+void ScenarioScene::on_enter()
+{
+    initialize_simulation();
+
+    m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
     auto t_tex = gfx::get_renderer().sprite().get_texture("sprites/circle.png");
-
-    /** Spawn initial agents for this scenario */
-    //    for (int i = 1; i <= m_scenario.agent_count; i++)
-    //    {
-    //        spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
-    //    }
 
     for (int j = 0; j < 75; j++)
     {
@@ -120,28 +149,7 @@ void ScenarioScene::on_enter()
             });
     }
 
-    /** Add systems specified by scenario */
-    for (const auto& system : m_scenario.systems)
-    {
-        auto type = entt::resolve(entt::hashed_string(system.c_str()));
-        if (type)
-        {
-            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
-        }
-        else
-        {
-            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
-        }
-    }
-
     auto& input = input::get_input();
-    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
-        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
-    });
-    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
-        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
-    });
-    input.bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
 }
 
 void ScenarioScene::on_exit()
@@ -192,6 +200,11 @@ bool ScenarioScene::update(float dt)
     /** It's supposed to be two of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
+
+    if (ImGui::Button("Restart Simulation"))
+    {
+        reset_simulation();
+    }
 
     return false;
 }
@@ -272,7 +285,18 @@ void ScenarioScene::bind_actions_for_scene()
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
+
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
+        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
+        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
@@ -287,9 +311,9 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["sprite"]       = entt::type_info<component::Sprite>::id();
     component["vision"]       = entt::type_info<component::Vision>::id();
     component["tag"]          = entt::type_info<component::Tags>::id();
-    component["need"]         = entt::type_info<component::Needs>::id();
+    component["need"]         = entt::type_info<component::Need>::id();
     component["reproduction"] = entt::type_info<component::Reproduction>::id();
-    component["strategy"]     = entt::type_info<component::Strategies>::id();
+    component["strategy"]     = entt::type_info<component::Strategy>::id();
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
 
@@ -299,30 +323,30 @@ void ScenarioScene::bind_scenario_lua_functions()
         switch (id)
         {
             case entt::type_info<component::Position>::id():
-                return sol::make_object(s, m_registry.get<component::Position>(e));
+                return sol::make_object(s, &m_registry.get<component::Position>(e));
                 break;
             case entt::type_info<component::Movement>::id():
-                return sol::make_object(s, m_registry.get<component::Movement>(e));
+                return sol::make_object(s, &m_registry.get<component::Movement>(e));
                 break;
             case entt::type_info<component::Sprite>::id():
-                return sol::make_object(s, m_registry.get<component::Sprite>(e));
+                return sol::make_object(s, &m_registry.get<component::Sprite>(e));
                 break;
             case entt::type_info<component::Vision>::id():
-                return sol::make_object(s, m_registry.get<component::Vision>(e));
+                return sol::make_object(s, &m_registry.get<component::Vision>(e));
                 break;
-            case entt::type_info<component::Tags>::id(): return sol::make_object(s, m_registry.get<component::Tags>(e)); break;
-            case entt::type_info<component::Needs>::id(): return sol::make_object(s, m_registry.get<component::Needs>(e)); break;
+            case entt::type_info<component::Tags>::id(): return sol::make_object(s, &m_registry.get<component::Tags>(e)); break;
+            case entt::type_info<component::Need>::id(): return sol::make_object(s, &m_registry.get<component::Need>(e)); break;
             case entt::type_info<component::Reproduction>::id():
-                return sol::make_object(s, m_registry.get<component::Reproduction>(e));
+                return sol::make_object(s, &m_registry.get<component::Reproduction>(e));
                 break;
-            case entt::type_info<component::Strategies>::id():
-                return sol::make_object(s, m_registry.get<component::Strategies>(e));
+            case entt::type_info<component::Strategy>::id():
+                return sol::make_object(s, &m_registry.get<component::Strategy>(e));
                 break;
             case entt::type_info<component::Health>::id():
-                return sol::make_object(s, m_registry.get<component::Health>(e));
+                return sol::make_object(s, &m_registry.get<component::Health>(e));
                 break;
             case entt::type_info<component::Memory>::id():
-                return sol::make_object(s, m_registry.get<component::Memory>(e));
+                return sol::make_object(s, &m_registry.get<component::Memory>(e));
                 break;
             default: return sol::nil; break;
         }
@@ -330,7 +354,7 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Helper action to modify an entity need */
     cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
-        if (auto* needs = m_registry.try_get<component::Needs>(e); needs)
+        if (auto* needs = m_registry.try_get<component::Need>(e); needs)
         {
             for (auto& need : needs->needs)
             {
@@ -353,12 +377,12 @@ void ScenarioScene::bind_scenario_lua_functions()
     /** Spawn entity functions */
     cultsim.set_function("spawn", [this](const std::string& entity_name) {
         const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
-        spawn_entity(m_registry, m_context->lua_state, final_path);
+        return spawn_entity(m_registry, m_context->lua_state, final_path);
     });
 
     cultsim.set_function("spawn_at", [this](const std::string& entity_name, glm::vec2 position) {
         const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
-        spawn_entity(m_registry, m_context->lua_state, final_path, position);
+        return spawn_entity(m_registry, m_context->lua_state, final_path, position);
     });
 
     /** Destroy entity */
@@ -383,7 +407,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 r.stamp(child, r, e);
 
                 /** Reset action targets */
-                if (auto* action_comp = r.try_get<component::Strategies>(child); action_comp)
+                if (auto* action_comp = r.try_get<component::Strategy>(child); action_comp)
                 {
                     for (auto& strategy : action_comp->strategies)
                     {
@@ -402,7 +426,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 }
 
                 /** Reset all needs to 100.0 */
-                if (auto* need_comp = r.try_get<component::Needs>(child); need_comp)
+                if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
                 {
                     for (auto& need : need_comp->needs)
                     {
@@ -492,7 +516,7 @@ void ScenarioScene::draw_scenario_information_ui()
     if (m_next_data_sample > m_scenario.sampling_rate)
     {
         m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Needs>());
+        living_entities.push_back(m_registry.size<component::Need>());
     }
 
     /** Plot number of living entities */
@@ -551,7 +575,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     }
 
     const auto& [needs, health, strategy, reproduction] =
-        m_registry.try_get<component::Needs, component::Health, component::Strategies, component::Reproduction>(
+        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction>(
             selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
