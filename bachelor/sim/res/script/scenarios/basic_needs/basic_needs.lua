@@ -30,10 +30,21 @@ scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
 scenario.init = function()
+    -- Spawn 100 Deer
     for i=1,100 do
         local deer = cultsim.spawn("deer")
-        local health = cultsim.get_component(deer, component.health)
-        health.health = 1.0
+
+        -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
+        local need_comp = cultsim.get_component(deer, component.need)
+        for i, need in ipairs(need_comp.needs) do
+            need.status = random:normal(75.0, 25.0)
+        end
+    end
+
+    -- Spawn 75 Food Sources and Water Sources
+    for i=1,75 do
+        cultsim.spawn("food_source")
+        cultsim.spawn("water_source")
     end
 end
 
