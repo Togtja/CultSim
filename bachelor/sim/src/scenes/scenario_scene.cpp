@@ -61,107 +61,7 @@ void ScenarioScene::on_enter()
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
 
-    /** Select entity on click */
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SelectEntity, [this] {
-        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
-
-        if (m_registry.valid(select_helper.selected_entity))
-        {
-            m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
-        }
-
-        select_helper.selected_entity = select_helper.hovered_entity;
-
-        if (m_registry.valid(select_helper.selected_entity))
-        {
-            m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
-        }
-    });
-
-    /** Move to selected entity */
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
-        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
-        if (!m_registry.valid(select_helper.selected_entity))
-        {
-            return;
-        }
-        const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
-
-        // TODO: Steal UE4 FInterpretTo
-        auto pos =
-            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
-
-        gfx::get_renderer().set_camera_position_2d(pos);
-    });
-
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
-        m_context->scene_manager->push<PauseMenuScene>();
-    });
-    input::get_input().add_context(input::EKeyContext::ScenarioScene);
-
-    //    action::Action action_pickup_food{static_cast<std::string>("Gather food"),
-    //                                      TAG_Find,
-    //                                      1.f,
-    //                                      0.f,
-    //                                      {},
-    //                                      [](entt::entity e, entt::entity n) {
-    //                                          r.remove<component::Position>(n);
-    //                                          r.remove<component::Sprite>(n);
-    //                                          r.get<component::Inventory>(e).contents.push_back(n);
-    //                                      },
-    //                                      [](entt::entity e, entt::entity n) {
-    //                                          spdlog::get("agent")->debug("Agent {} failed to finish action: gather food", e);
-    //                                          r.destroy(e);
-    //                                      },
-    //                                      {}};
-
-    //    action::Action action_inventory_food{static_cast<std::string>("Check inventory for food"),
-    //                                         {},
-    //                                         2.0f,
-    //                                         0.f,
-    //                                         {},
-    //                                         [](entt::entity e, entt::entity n) {
-    //                                             auto inventory = r.try_get<component::Inventory>(e);
-    //                                             if (inventory && inventory->tags & TAG_Food)
-    //                                             {
-    //                                                 int i = 0;
-    //                                                 for (auto& content : inventory->contents)
-    //                                                 {
-    //                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
-    //                                                     {
-    //                                                         for (auto& need : r.get<component::Needs>(e).needs)
-    //                                                         {
-    //                                                             if (need.tags | TAG_Food)
-    //                                                             {
-    //                                                                 need.status += 80.f;
-    //                                                             }
-    //                                                         }
-    //                                                         inventory->contents.erase(inventory->contents.begin() + i);
-    //                                                         return;
-    //                                                     }
-    //                                                     i++;
-    //                                                 }
-    //                                             }
-    //                                         },
-    //                                         [](entt::entity e, entt::entity n) {
-    //                                             auto inventory = r.try_get<component::Inventory>(e);
-    //                                             if (inventory && inventory->tags & TAG_Food)
-    //                                             {
-    //                                                 int i = 0;
-    //                                                 for (auto& content : inventory->contents)
-    //                                                 {
-    //                                                     if (r.get<component::Tags>(content).tags & TAG_Food)
-    //                                                     {
-    //                                                         inventory->contents.erase(inventory->contents.begin() + i);
-    //                                                         return;
-    //                                                     }
-    //                                                     i++;
-    //                                                 }
-    //                                             }
-    //                                         },
-    //                                         {}};
+    bind_actions_for_scene();
 
     auto f_tex = gfx::get_renderer().sprite().get_texture("sprites/food_c.png");
     auto d_tex = gfx::get_renderer().sprite().get_texture("sprites/liquid_c.png");
@@ -329,6 +229,49 @@ bool ScenarioScene::draw()
 
     m_scenario.draw();
     return false;
+}
+
+void ScenarioScene::bind_actions_for_scene()
+{
+    /** Select entity on click */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SelectEntity, [this] {
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
+        }
+
+        select_helper.selected_entity = select_helper.hovered_entity;
+
+        if (m_registry.valid(select_helper.selected_entity))
+        {
+            m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
+            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
+        }
+    });
+
+    /** Move to selected entity */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
+        auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();
+        if (!m_registry.valid(select_helper.selected_entity))
+        {
+            return;
+        }
+        const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
+
+        // TODO: Steal UE4 FInterpretTo
+        auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+
+        gfx::get_renderer().set_camera_position_2d(pos);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
+        m_context->scene_manager->push<PauseMenuScene>();
+    });
+    input::get_input().add_context(input::EKeyContext::ScenarioScene);
 }
 
 void ScenarioScene::bind_scenario_lua_functions()

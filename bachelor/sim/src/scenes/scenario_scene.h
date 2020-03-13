@@ -67,6 +67,8 @@ public:
     bool draw() override;
 
 private:
+    void bind_actions_for_scene();
+
     void bind_scenario_lua_functions();
 
     void setup_docking_ui();
