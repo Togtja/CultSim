@@ -173,9 +173,9 @@ void ScenarioScene::on_enter()
         auto agent = spawn_entity(m_registry, m_context->lua_state, "script/scenarios/basic_needs/entities/deer.lua");
 
         /** TODO: Luafy */
-        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<memory::Container>{});
-        memory_comp.memory_container.emplace_back(ETag(TAG_Food | TAG_Location));
-        memory_comp.memory_container.emplace_back(ETag(TAG_Drink | TAG_Location));
+        //        auto& memory_comp = m_registry.assign<component::Memory>(agent, std::vector<memory::Container>{});
+        //        memory_comp.memory_container.emplace_back(ETag(TAG_Food | TAG_Location));
+        //        memory_comp.memory_container.emplace_back(ETag(TAG_Drink | TAG_Location));
     }
 
     for (int j = 0; j < 75; j++)
