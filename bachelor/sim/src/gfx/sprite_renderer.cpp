@@ -162,8 +162,8 @@ void SpriteRenderer::init_texture_slots()
     glCreateTextures(GL_TEXTURE_2D_ARRAY, num_textures, m_color_texture_handles.data());
     for (auto tex : m_color_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -177,13 +177,15 @@ void SpriteRenderer::init_texture_slots()
     glCreateTextures(GL_TEXTURE_2D_ARRAY, num_textures, m_normal_texture_handles.data());
     for (auto tex : m_normal_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         /** TODO: Fix Hard coded texture size and layers */
+        const uint8_t color_data[] = {128, 128, 255, 255};
         glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+        glClearTexSubImage(tex, 1, 0, 0, 0, 512, 512, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }
