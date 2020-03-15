@@ -36,12 +36,13 @@ vec4 sample_normal()
 
 void main()
 {
+    vec4 tex_color = sample_sprite();
     vec3 normal = sample_normal().rgb;
     float effect = dot(normal, normalize(light_dir));
 
     vec3 hover_color  = bitfieldExtract(vs_in.texture, 14, 1) * vec3(1.f, 0.5f, 0.f);
     vec3 select_color = bitfieldExtract(vs_in.texture, 15, 1) * vec3(0.f, 0.5f, 1.f);
-
     vec3 modifier_color = hover_color + select_color;
-    out_color           = sample_sprite() * vec4(vs_in.color, 1.f) * effect + vec4(modifier_color, 0.f);
+
+    out_color           = vec4(tex_color.rgb * vs_in.color * effect + vec3(modifier_color), tex_color.a);
 }
