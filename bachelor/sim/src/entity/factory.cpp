@@ -44,7 +44,15 @@ bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table tabl
     /** Only assign texture if provided as a string */
     if (table["texture"].get_type() == sol::type::string)
     {
-        spr.texture = gfx::get_renderer().sprite().get_texture(table["texture"].get<std::string>());
+        if (table["normal"].get_type() == sol::type::string)
+        {
+            spr.texture =
+                gfx::get_renderer().sprite().get_texture(table["texture"].get<std::string>(), table["normal"].get<std::string>());
+        }
+        else
+        {
+            spr.texture = gfx::get_renderer().sprite().get_texture(table["texture"].get<std::string>(), {});
+        }
     }
     else
     {
