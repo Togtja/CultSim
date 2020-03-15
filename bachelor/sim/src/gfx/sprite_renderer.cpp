@@ -43,29 +43,28 @@ void SpriteRenderer::display()
     m_nsprites = 0u;
 }
 
-SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
+SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std::string& nrpath)
 {
     /** If we alreadly loaded this texture, then give it back */
     if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
-        spdlog::get("graphics")->info("used cached texture for {}", rpath);
+        spdlog::get("graphics")->debug("used cached texture for {}", rpath);
         return itr->second;
     }
 
-    const auto color_data = load_texture(rpath);
-    // auto normal_data = load_texture(...);
-
     /** Set the texture ID to have appropriate values */
-    auto textureID     = m_next_texture_id;
-    textureID.length   = 0;
-    textureID.index    = 0;
-    textureID.flag_lit = 1;
+    auto texture_id     = m_next_texture_id;
+    texture_id.length   = 0;
+    texture_id.index    = 0;
+    texture_id.flag_lit = 1;
 
-    glTextureSubImage3D(m_color_texture_handles[textureID.bind_slot],
+    /** Load color data */
+    const auto color_data = load_texture(rpath);
+    glTextureSubImage3D(m_color_texture_handles[texture_id.bind_slot],
                         0,
                         0,
                         0,
-                        textureID.start,
+                        texture_id.start,
                         TEXTURE_WIDTH,
                         TEXTURE_HEIGHT,
                         1,
@@ -73,9 +72,27 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
                         GL_UNSIGNED_BYTE,
                         color_data.pixels.data());
 
+    /** Load normal map if provided */
+    if (!nrpath.empty())
+    {
+        spdlog::get("graphics")->debug("loading normal map {}", nrpath);
+        const auto normal_data = load_texture(nrpath);
+        glTextureSubImage3D(m_normal_texture_handles[texture_id.bind_slot],
+                            0,
+                            0,
+                            0,
+                            texture_id.start,
+                            TEXTURE_WIDTH,
+                            TEXTURE_HEIGHT,
+                            1,
+                            GL_RGBA,
+                            GL_UNSIGNED_BYTE,
+                            normal_data.pixels.data());
+    }
+
     increment_next_texture_id();
-    m_texture_cache[rpath] = textureID;
-    return textureID;
+    m_texture_cache[rpath] = texture_id;
+    return texture_id;
 }
 
 bool SpriteRenderer::increment_next_texture_id()
@@ -185,7 +202,7 @@ void SpriteRenderer::init_texture_slots()
         /** TODO: Fix Hard coded texture size and layers */
         const uint8_t color_data[] = {128, 128, 255, 255};
         glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
-        glClearTexSubImage(tex, 1, 0, 0, 0, 512, 512, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
+        glClearTexSubImage(tex, 0, 0, 0, 0, 512, 512, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }
