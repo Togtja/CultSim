@@ -12,6 +12,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
+#include <gfx/ImGUI/imgui.h>
+
 namespace cs::gfx
 {
 SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
@@ -31,6 +33,10 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
+    static glm::vec3 light_direction{1.f, 1.f, 1.f};
+    ImGui::DragFloat3("Light Direction", glm::value_ptr(light_direction), 0.01f, -1.f, 1.f, "%.2f");
+    light_direction = glm::normalize(light_direction);
+
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
@@ -38,6 +44,7 @@ void SpriteRenderer::display()
     glBindVertexArray(m_vao);
 
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
+    glUniform3fv(1, 1, glm::value_ptr(light_direction));
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
     m_nsprites = 0u;

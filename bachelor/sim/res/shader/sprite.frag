@@ -14,8 +14,7 @@ layout(location = 0) out vec4 out_color;
 /** Uniforms */
 layout(binding = 0) uniform sampler2DArray colorTextures[8];
 layout(binding = 8) uniform sampler2DArray normalTextures[8];
-
-const vec3 light_dir = normalize(vec3(1.f, 1.f, 1.f));
+layout(location = 1) uniform vec3 light_dir = vec3(1.f, 1.f, 1.f);
 
 /**
  * Sample a sprite based on the texture data from the vertex shader
@@ -38,7 +37,7 @@ vec4 sample_normal()
 void main()
 {
     vec3 normal = sample_normal().rgb;
-    float effect = dot(normal, light_dir);
+    float effect = dot(normal, normalize(light_dir));
 
     vec3 hover_color  = bitfieldExtract(vs_in.texture, 14, 1) * vec3(1.f, 0.5f, 0.f);
     vec3 select_color = bitfieldExtract(vs_in.texture, 15, 1) * vec3(0.f, 0.5f, 1.f);
