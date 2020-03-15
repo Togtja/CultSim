@@ -5,7 +5,7 @@ entity = {
     },
     SpriteComponent = {
         color = Vec3:new(0.80, 0.50, 0.10),
-        texture = "sprites/circle.png"
+        texture = "sprites/circle_c.png"
     },
     TagComponent = {
         tags = ETag.Avoidable
