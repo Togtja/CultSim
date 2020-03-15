@@ -98,7 +98,7 @@ std::string get_gl_shader_type_name(GLenum type)
     }
 }
 
-LoadedTexture load_texture(std::string_view rpath)
+LoadedTexture load_texture(std::string_view rpath, bool flip_y)
 {
     if (!fs::exists(rpath))
     {
@@ -110,7 +110,7 @@ LoadedTexture load_texture(std::string_view rpath)
     int c{};
     auto out         = LoadedTexture{};
     const auto bytes = fs::read_byte_file(rpath);
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(flip_y);
     auto pixels = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
 
     /** Copy pixels into output */

@@ -57,9 +57,10 @@ std::string get_gl_shader_type_name(GLenum type);
  * Load the texture at the given relative filepath
  *
  * @param rpath The relative filepath of the texture
+ * @param flip_y Set to true if you want the Y axis to be flipped when loading
  * @return Texture data with information and a vector of pixels laid out like: [R0,G0,B0,A0, R1,G1,B1,A1 ...]
  */
-LoadedTexture load_texture(std::string_view rpath);
+LoadedTexture load_texture(std::string_view rpath, bool flip_y = true);
 
 /**
  * Load multiple equally sized textures from a larger texture
