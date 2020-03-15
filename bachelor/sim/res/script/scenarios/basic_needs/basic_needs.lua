@@ -20,7 +20,7 @@ scenario.systems = {
     "RequirementSystem",
     "MemorySystem",
     "TimerSystem",
-    "AiSystem",
+    "SensorSystem",
     "MovementSystem",
     "RenderingSystem"
 }

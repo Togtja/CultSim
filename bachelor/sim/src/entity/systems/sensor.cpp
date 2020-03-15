@@ -1,4 +1,4 @@
-#include "ai.h"
+#include "sensor.h"
 #include "ai/path_finding.h"
 #include "constants.h"
 #include "debug/auto_timer.h"
@@ -14,21 +14,21 @@
 
 namespace cs::system
 {
-bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
+bool Sensor::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
 {
     float x = pos.x - pos2.x;
     float y = pos.y - pos2.y;
     return x * x + y * y <= rad * rad;
 }
 
-bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
+bool Sensor::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 {
     return is_visible(pos, pos2, size + size2);
 }
 
-void AI::update(float dt)
+void Sensor::update(float dt)
 {
-    CS_AUTOTIMER(AI System);
+    CS_AUTOTIMER(Sensor System);
     static bool draw_fov  = false;
     static bool draw_seen = false;
 
@@ -102,7 +102,7 @@ void AI::update(float dt)
     }
 }
 
-bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
+bool Sensor::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
 {
     glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
     return boolvec.x && boolvec.y;

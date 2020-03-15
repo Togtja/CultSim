@@ -1,7 +1,7 @@
 #include "reflection.h"
 #include "entity/components/components.h"
 #include "entity/systems/action.h"
-#include "entity/systems/ai.h"
+#include "entity/systems/sensor.h"
 #include "entity/systems/health.h"
 #include "entity/systems/memory.h"
 #include "entity/systems/mitigation.h"
@@ -67,7 +67,7 @@ void reflect_systems()
 {
     entt::meta<system::ISystem>().alias("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
     entt::meta<system::Action>().alias("ActionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
-    entt::meta<system::AI>().alias("AiSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Sensor>().alias("SensorSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Health>().alias("HealthSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Mitigation>().alias("MitigationSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Movement>().alias("MovementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();

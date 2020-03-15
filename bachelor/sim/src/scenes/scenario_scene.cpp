@@ -7,7 +7,7 @@
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
-#include "entity/systems/ai.h"
+#include "entity/systems/sensor.h"
 #include "entity/systems/health.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
@@ -130,7 +130,7 @@ bool ScenarioScene::update(float dt)
     {
         for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
         {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.17f, 0.1f), b_tex);
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.1f, 0.1f, 0.1f), b_tex);
         }
     }
 
