@@ -6,7 +6,7 @@ layout(location = 0) in VertexData
     vec3 color;
     vec2 texcoord;
     flat uint texture;
-    mat2 model_mat;
+    mat2 light_mat;
 } vs_in;
 
 /** Outputs */
@@ -44,7 +44,7 @@ void main()
     const vec4 diffuse = sample_sprite();
     const vec3 normal = sample_normal().rgb * 2.0 - 1.0;
 
-    const vec3 rotated_light = vec3(vs_in.model_mat * light_dir.xy, light_dir.z);
+    const vec3 rotated_light = normalize(vec3(vs_in.light_mat * light_dir.xy, light_dir.z));
 
     float effect = dot(normal, rotated_light);
 
