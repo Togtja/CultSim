@@ -47,8 +47,12 @@ void main()
 
     const vec3 rotated_light = normalize(vec3(vs_in.light_mat * light_dir.xy, light_dir.z));
 
-    float effect = dot(normal, rotated_light);
+    float d_coef = max(dot(normal, rotated_light), 0.0);
+
+    vec3 specular_direction = normalize(vec3(0, 0, 1) + rotated_light);
+    float s_coef = max(dot(normal, specular_direction), 0.0);
+    s_coef = pow(s_coef, 10.0);
 
     vec3 modifier_color = hover_color + select_color;
-    out_color = vec4(diffuse.rgb * vs_in.color * effect + ambient_col + vec3(modifier_color), diffuse.a);
+    out_color = vec4(diffuse.rgb * vs_in.color * d_coef + ambient_col + s_coef * 0.25f + vec3(modifier_color), diffuse.a);
 }
