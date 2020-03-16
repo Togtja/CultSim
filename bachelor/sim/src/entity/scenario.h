@@ -15,9 +15,6 @@ struct Scenario
     std::string description{};
     std::string script_path{};
 
-    /** Number of agents initially */
-    int agent_count{};
-
     /** Scenario Bounds */
     glm::vec2 bounds{};
 

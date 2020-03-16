@@ -12,6 +12,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
+#include <gfx/ImGUI/imgui.h>
+
 namespace cs::gfx
 {
 SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
@@ -31,6 +33,10 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
+    static glm::vec3 light_direction{1.f, 1.f, 1.f};
+    ImGui::DragFloat3("Light Direction", glm::value_ptr(light_direction), 0.01f, -1.f, 1.f, "%.2f");
+    light_direction = glm::normalize(light_direction);
+
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
@@ -38,34 +44,34 @@ void SpriteRenderer::display()
     glBindVertexArray(m_vao);
 
     glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
+    glUniform3fv(1, 1, glm::value_ptr(light_direction));
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
     m_nsprites = 0u;
 }
 
-SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
+SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std::string& nrpath)
 {
     /** If we alreadly loaded this texture, then give it back */
     if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
-        spdlog::get("graphics")->info("used cached texture for {}", rpath);
+        spdlog::get("graphics")->debug("used cached texture for {}", rpath);
         return itr->second;
     }
 
-    const auto color_data = load_texture(rpath);
-    // auto normal_data = load_texture(...);
-
     /** Set the texture ID to have appropriate values */
-    auto textureID     = m_next_texture_id;
-    textureID.length   = 0;
-    textureID.index    = 0;
-    textureID.flag_lit = 1;
+    auto texture_id     = m_next_texture_id;
+    texture_id.length   = 0;
+    texture_id.index    = 0;
+    texture_id.flag_lit = 1;
 
-    glTextureSubImage3D(m_color_texture_handles[textureID.bind_slot],
+    /** Load color data */
+    const auto color_data = load_texture(rpath);
+    glTextureSubImage3D(m_color_texture_handles[texture_id.bind_slot],
                         0,
                         0,
                         0,
-                        textureID.start,
+                        texture_id.start,
                         TEXTURE_WIDTH,
                         TEXTURE_HEIGHT,
                         1,
@@ -73,9 +79,27 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath)
                         GL_UNSIGNED_BYTE,
                         color_data.pixels.data());
 
+    /** Load normal map if provided */
+    if (!nrpath.empty())
+    {
+        spdlog::get("graphics")->debug("loading normal map {}", nrpath);
+        const auto normal_data = load_texture(nrpath);
+        glTextureSubImage3D(m_normal_texture_handles[texture_id.bind_slot],
+                            0,
+                            0,
+                            0,
+                            texture_id.start,
+                            TEXTURE_WIDTH,
+                            TEXTURE_HEIGHT,
+                            1,
+                            GL_RGBA,
+                            GL_UNSIGNED_BYTE,
+                            normal_data.pixels.data());
+    }
+
     increment_next_texture_id();
-    m_texture_cache[rpath] = textureID;
-    return textureID;
+    m_texture_cache[rpath] = texture_id;
+    return texture_id;
 }
 
 bool SpriteRenderer::increment_next_texture_id()
@@ -162,8 +186,8 @@ void SpriteRenderer::init_texture_slots()
     glCreateTextures(GL_TEXTURE_2D_ARRAY, num_textures, m_color_texture_handles.data());
     for (auto tex : m_color_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
@@ -177,13 +201,15 @@ void SpriteRenderer::init_texture_slots()
     glCreateTextures(GL_TEXTURE_2D_ARRAY, num_textures, m_normal_texture_handles.data());
     for (auto tex : m_normal_texture_handles)
     {
-        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         /** TODO: Fix Hard coded texture size and layers */
+        const uint8_t color_data[] = {128, 128, 255, 255};
         glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+        glClearTexSubImage(tex, 0, 0, 0, 0, 512, 512, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }

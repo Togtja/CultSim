@@ -5,7 +5,7 @@ message(STATUS "Could not find EnTT package so we are getting it from GitHub ins
 FetchContent_Declare(
     entt_external
     GIT_REPOSITORY https://github.com/skypjack/entt.git
-    GIT_TAG v3.2.2
+    GIT_TAG v3.3.2
     GIT_PROGRESS TRUE
 )
 

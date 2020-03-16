@@ -33,6 +33,6 @@ public:
      * strategies
      *
      */
-    bool add_strategies(component::Strategies& strategies, const ai::Need& need, const component::Tags& tags);
+    bool add_strategies(component::Strategy& strategies, const ai::Need& need, const component::Tags& tags);
 };
 } // namespace cs::system

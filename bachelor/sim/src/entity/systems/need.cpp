@@ -9,8 +9,8 @@ void Need::update(float dt)
 {
     CS_AUTOTIMER(Need System);
 
-    auto view = m_context.registry->view<component::Needs>();
-    view.each([dt](component::Needs& needs) {
+    auto view = m_context.registry->view<component::Need>();
+    view.each([dt](component::Need& needs) {
         for (auto& need : needs.needs)
         {
             // Ensure statuses cannot go below 0% or above 100%

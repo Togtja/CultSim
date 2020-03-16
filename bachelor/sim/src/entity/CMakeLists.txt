@@ -10,4 +10,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/scenario.h
         ${CMAKE_CURRENT_LIST_DIR}/scenario.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/factory.h
+        ${CMAKE_CURRENT_LIST_DIR}/factory.cpp
 )

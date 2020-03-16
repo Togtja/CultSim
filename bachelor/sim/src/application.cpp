@@ -192,7 +192,7 @@ bool Application::init_gl()
         return false;
     }
 
-    glClearColor(0.12f, 0.12f, 0.12f, 0.0f);
+    glClearColor(0.02f, 0.02f, 0.02f, 0.0f);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

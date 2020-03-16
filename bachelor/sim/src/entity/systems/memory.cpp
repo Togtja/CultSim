@@ -17,7 +17,7 @@ void Memory::update(float dt)
     if (m_timer / 0.5f > 0.0f && m_timer / 0.5 < 0.1f)
     {
         auto view = registry->view<component::Memory, component::Vision>();
-        view.each([dt, registry](entt::entity e, component::Memory& memory, component::Vision vision) {
+        view.each([dt, registry](entt::entity e, component::Memory& memory, const component::Vision& vision) {
             for (auto& container : memory.memory_container)
             {
                 int count{};

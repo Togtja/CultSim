@@ -8,6 +8,9 @@
 #include "input/input_handler.h"
 #include "random_engine.h"
 
+#include <entt/entity/registry.hpp>
+#include <entt/entity/runtime_view.hpp>
+
 namespace cs::lua
 {
 void bind_dataonly(sol::state_view lua)
@@ -40,7 +43,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable},
                         {"Reproduce", ETag::TAG_Reproduce},
-                        {"Human", ETag::TAG_Human}});
+                        {"Human", ETag::TAG_Human},
+                        {"Tag", ETag::TAG_Tag},
+                        {"Gather", ETag::TAG_Gather}});
 }
 
 void bind_components(sol::state_view lua)
@@ -74,37 +79,49 @@ void bind_components(sol::state_view lua)
                                      "abort",
                                      &action::Action::abort);
 
+    lua.new_enum<component::Reproduction::ESex>(
+        "ESex",
+        {{"Male", component::Reproduction::ESex::Male}, {"Female", component::Reproduction::ESex::Female}});
+
     /** Components */
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
-    // Ignoring Avoidance_cs and Avoid_count since those cna be change using the UI and ignoring desired_position as that is
-    // a part of the pathfinding algorithm
+
+    /**
+     * Ignoring avoidance_cd and avoid_count since those can be changed using the UI and ignoring desired_position as that is
+     * a part of the pathfinding algorithm
+     */
     lua.new_usertype<component::Movement>("MovementComponent",
                                           "direction",
                                           &component::Movement::direction,
                                           "speed",
                                           &component::Movement::speed);
 
-    lua.new_usertype<component::Vision>("VisionComponent",
-                                        "vision radius",
-                                        &component::Vision::vision_radius,
-                                        "field of view",
-                                        &component::Vision::fov);
+    lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
 
-    lua.new_usertype<component::Hearing>("HearingComponent", "hearing radius", &component::Hearing::sound_radius);
-    lua.new_usertype<component::Smell>("SmellComponent", "smell radius", &component::Smell::smell_radius);
+    lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
+    lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
 
     lua.new_usertype<component::Reproduction>("ReproductionComponent",
                                               "sex",
                                               &component::Reproduction::sex,
-                                              "max children",
-                                              &component::Reproduction::number_of_children);
+                                              "max_children",
+                                              &component::Reproduction::max_children);
 
     lua.new_usertype<component::Health>("HealthComponet",
                                         "health",
-                                        &component::Health::hp,
-                                        "tickdown rate",
+                                        &component::Health::health,
+                                        "tickdown_rate",
                                         &component::Health::tickdown_rate);
+
+    lua.new_usertype<component::Tags>("TagComponent", "tags", &component::Tags::tags);
+
+    lua.new_usertype<component::Need>("NeedComponent", "needs", &component::Need::needs);
+
+    lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
+
+    /** Entity registry, we only expose a limited number of functions here */
+    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
 }
 
 void bind_systems(sol::state_view lua)
@@ -116,8 +133,6 @@ void bind_systems(sol::state_view lua)
                                &Scenario::name,
                                "description",
                                &Scenario::description,
-                               "agent_count",
-                               &Scenario::agent_count,
                                "systems",
                                &Scenario::systems,
                                "bounds",
@@ -133,6 +148,7 @@ void bind_systems(sol::state_view lua)
                                "shutdown",
                                &Scenario::shutdown);
 }
+
 void bind_input(sol::state_view lua)
 {
     lua.new_enum<input::EKeyContext>("EKeyContext",
@@ -167,6 +183,7 @@ void bind_input(sol::state_view lua)
                                  {"BtnX1", input::EMouse::BtnX1},
                                  {"BtnX2", input::EMouse::BtnX2}});
 }
+
 void bind_utils(sol::state_view lua)
 {
     /** Enable use of random number generator */

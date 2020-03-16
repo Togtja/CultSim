@@ -47,7 +47,7 @@ struct Animation
     float current_progress{};
 };
 
-struct Needs
+struct Need
 {
     std::vector<ai::Need> needs{};
     std::vector<ai::Need> vital_needs{};
@@ -57,18 +57,18 @@ struct Needs
 struct Vision
 {
     std::vector<entt::entity> seen{};
-    float vision_radius{};
+    float radius{};
     uint8_t fov{};
 };
 
 struct Smell
 {
-    float smell_radius{};
+    float radius{};
 };
 
 struct Hearing
 {
-    float sound_radius{};
+    float radius{};
 };
 
 struct Reproduction
@@ -80,27 +80,25 @@ struct Reproduction
     };
 
     ESex sex = Male;
-
     uint16_t number_of_children{};
     uint16_t max_children{};
 };
 
 struct Timer
 {
+    using OnCompleteFunction = std::function<void(entt::entity, entt::registry&)>;
+
     float time_to_complete{};
     float time_spent{};
 
     int number_of_loops{};
-
-    std::function<void(entt::entity, entt::registry&)> on_complete{};
+    std::variant<OnCompleteFunction, sol::function> on_complete{};
 };
 
 struct Health
 {
-    float hp{};
-
+    float health{};
     float tickdown_rate{};
-
     ETag need_tags{};
 };
 
@@ -115,7 +113,7 @@ struct DropItems
     std::vector<EDeathDrops> deathdrops{};
 };
 
-struct Strategies
+struct Strategy
 {
     std::vector<ai::Strategy> strategies{};
 
@@ -150,21 +148,19 @@ struct Tags
 
 struct Inventory
 {
+    std::vector<entt::entity> contents{};
     uint16_t size{};
     uint16_t max_size{};
-
-    std::vector<entt::entity> contents{};
-
     ETag tags{};
 };
 
 struct Memory
 {
-    std::vector <memory::Container> memory_container{};
+    std::vector<memory::Container> memory_container{};
     Memory(Memory&&) = default;
     Memory& operator=(Memory&&) = default;
-    Memory(const Memory&)       = delete;
-    Memory& operator=(const Memory&) = delete;
+    Memory(const Memory&)       = default;
+    Memory& operator=(const Memory&) = default;
 };
 
 struct AI
