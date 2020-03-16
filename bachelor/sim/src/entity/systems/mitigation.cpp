@@ -21,13 +21,12 @@ void Mitigation::update(float dt)
     view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, component::Tags tags) {
         if (!needs.vital_needs.empty())
         {
-            for (auto need : needs.vital_needs) {}
-            auto temp = needs.vital_needs;
+            auto temp = needs.vital_needs[0];
             // Put the most pressing needs to the front
             std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());
 
             // If the most pressing need has changed
-            if (!(temp[0] == needs.vital_needs[0]))
+            if (temp != needs.vital_needs[0])
             {
                 strategies.staged_strategies.clear();
                 m_context.registry->remove_if_exists<component::LocationRequirement>(e);
@@ -46,23 +45,24 @@ void Mitigation::update(float dt)
         }
         else if (!needs.leisure_needs.empty())
         {
-            if (!strategies.staged_strategies.empty())
+            if (strategies.staged_strategies.empty())
             {
-                for (auto need : needs.leisure_needs)
+                RandomEngine rng{};
+                if (!(add_strategies(strategies,
+                                     needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
+                                     tags)))
                 {
-                    RandomEngine rng{};
-                    if (!(add_strategies(strategies,
-                                         needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
-                                         tags)))
-                    {
-                        spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
-                    }
+                    spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
                 }
             }
         }
-        else
+        else if (!strategies.staged_strategies.empty())
         {
             strategies.staged_strategies.clear();
+            m_context.registry->remove_if_exists<component::LocationRequirement>(e);
+            m_context.registry->remove_if_exists<component::VisionRequirement>(e);
+            m_context.registry->remove_if_exists<component::FindRequirement>(e);
+            m_context.registry->remove_if_exists<component::TagRequirement>(e);
         }
     });
 }
@@ -100,4 +100,23 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
     }
     return false;
 }
+
+void Mitigation::switch_need_context(const event::SwitchNeedContext& event)
+{
+    auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
+    if (strategies)
+    {
+        strategies->staged_strategies.clear();
+    }
+    else
+    {
+        spdlog::get("agent")->debug("tried to clear strategies from an entity that does not have that component. Entity: {}",
+                                    event.entity);
+    }
+    m_context.registry->remove_if_exists<component::LocationRequirement>(event.entity);
+    m_context.registry->remove_if_exists<component::VisionRequirement>(event.entity);
+    m_context.registry->remove_if_exists<component::FindRequirement>(event.entity);
+    m_context.registry->remove_if_exists<component::TagRequirement>(event.entity);
+}
+
 } // namespace cs::system
