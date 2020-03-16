@@ -26,13 +26,14 @@ TEST_CASE("Test case for regular action system setup")
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
+    entt::dispatcher dispatcher{};
 
-    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
-    auto action_system     = new cs::system::Action({&test_registry, nullptr, &rng});
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
+    auto action_system     = new cs::system::Action({&test_registry, &dispatcher, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);

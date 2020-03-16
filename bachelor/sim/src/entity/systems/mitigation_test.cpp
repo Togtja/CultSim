@@ -25,12 +25,14 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
+    entt::dispatcher dispatcher{};
+
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
 
     need_system->update(50.f);
     auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
@@ -76,12 +78,14 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy, strategy2}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy, strategy2}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need({&test_registry, nullptr, &rng});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry, nullptr, &rng});
+    entt::dispatcher dispatcher{};
+
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
@@ -97,6 +101,7 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
 TEST_CASE("Test case to ensure strategies are ordered correctly")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent = test_registry.create();
     cs::ai::Need need =
@@ -117,29 +122,31 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy, strategy2}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy, strategy2}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need({&test_registry});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
     auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
-    view.each(
-        [strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-            REQUIRE(!needs.vital_needs.empty());
-            REQUIRE(strategies.strategies.size() == 2);
-            REQUIRE(strategies.staged_strategies.size() == 2);
-            REQUIRE(strategies.staged_strategies.back() == strategy);
-            REQUIRE(strategies.staged_strategies.front() == strategy2);
-        });
+    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+        REQUIRE(!needs.vital_needs.empty());
+        REQUIRE(strategies.strategies.size() == 2);
+        REQUIRE(strategies.staged_strategies.size() == 2);
+        REQUIRE(strategies.staged_strategies.back() == strategy);
+        REQUIRE(strategies.staged_strategies.front() == strategy2);
+    });
 }
 
 TEST_CASE("Test case for strategies being removed if pressing needs becomes empty")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent = test_registry.create();
     cs::ai::Need need =
@@ -160,34 +167,35 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy, strategy2}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy, strategy2}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need({&test_registry});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
     auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
-    view.each(
-        [strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-            REQUIRE(!needs.vital_needs.empty());
-            REQUIRE(!strategies.staged_strategies.empty());
-        });
+    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+        REQUIRE(!needs.vital_needs.empty());
+        REQUIRE(!strategies.staged_strategies.empty());
+    });
 
     need_system->update(-50.f);
     mitigation_system->update(1.f);
-    view.each(
-        [strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.vital_needs.empty());
-            REQUIRE(strategies.staged_strategies.empty());
-        });
+    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+        REQUIRE(needs.vital_needs.empty());
+        REQUIRE(strategies.staged_strategies.empty());
+    });
 }
 
 TEST_CASE("Test case that strategies change based on pressing_needs")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 50.f, 0.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food)};
@@ -210,29 +218,29 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need, need2}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
-                                                    std::vector<cs::ai::Strategy>({strategy, strategy2}),
-                                                    std::vector<cs::ai::Strategy>{});
+                                                  std::vector<cs::ai::Strategy>({strategy, strategy2}),
+                                                  std::vector<cs::ai::Strategy>{});
     test_registry.assign<cs::component::Tags>(agent, cs::TAG_Food);
 
-    auto need_system       = new cs::system::Need({&test_registry});
-    auto mitigation_system = new cs::system::Mitigation({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system       = new cs::system::Need({&test_registry, &dispatcher, &rng});
+    auto mitigation_system = new cs::system::Mitigation({&test_registry, &dispatcher, &rng});
 
     need_system->update(1.f);
     mitigation_system->update(1.f);
     auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
-    view.each(
-        [strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.vital_needs.size() == 1);
-            REQUIRE(strategies.staged_strategies.size() == 1);
-            REQUIRE(strategies.staged_strategies.front() == strategy);
-        });
+    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+        REQUIRE(needs.vital_needs.size() == 1);
+        REQUIRE(strategies.staged_strategies.size() == 1);
+        REQUIRE(strategies.staged_strategies.front() == strategy);
+    });
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
-    view.each(
-        [strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-            REQUIRE(needs.vital_needs.size() == 2);
-            REQUIRE(strategies.staged_strategies.size() == 1);
-            REQUIRE(strategies.staged_strategies.front() == strategy2);
-        });
+    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+        REQUIRE(needs.vital_needs.size() == 2);
+        REQUIRE(strategies.staged_strategies.size() == 1);
+        REQUIRE(strategies.staged_strategies.front() == strategy2);
+    });
 }

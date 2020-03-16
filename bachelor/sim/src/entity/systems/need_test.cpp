@@ -8,13 +8,16 @@
 TEST_CASE("testing the needs system initialization")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system = new cs::system::Need({&test_registry, &dispatcher, &rng});
     auto view        = test_registry.view<cs::component::Need>();
     REQUIRE(view.size() == 1);
     view.each([](cs::component::Need& needs) {
@@ -36,13 +39,16 @@ TEST_CASE("testing the needs system initialization")
 TEST_CASE("testing the needs system update function")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system = new cs::system::Need({&test_registry, &dispatcher, &rng});
     auto view        = test_registry.view<cs::component::Need>();
 
     need_system->update(1.f);
@@ -88,13 +94,16 @@ TEST_CASE("testing the needs system update function")
 TEST_CASE("Testing outliers for dt")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system = new cs::system::Need({&test_registry, &dispatcher, &rng});
     auto view        = test_registry.view<cs::component::Need>();
 
     need_system->update(101.f);
@@ -128,6 +137,7 @@ TEST_CASE("Testing outliers for dt")
 TEST_CASE("pressing needs are correctly updated")
 {
     entt::registry test_registry;
+    cs::RandomEngine rng{};
 
     auto agent         = test_registry.create();
     cs::ai::Need need1 = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
@@ -135,10 +145,12 @@ TEST_CASE("pressing needs are correctly updated")
     cs::ai::Need need3 = {static_cast<std::string>("sad"), 1.f, 100.f, 1.f, 1.f, cs::TAG_Joy};
     cs::ai::Need need4 = {static_cast<std::string>("tired"), 2.f, 100.f, 1.f, 1.f, cs::TAG_Sleep};
     test_registry.assign<cs::component::Need>(agent,
-                                               std::vector<cs::ai::Need>({need1, need2, need3, need4}),
-                                               std::vector<cs::ai::Need>({}));
+                                              std::vector<cs::ai::Need>({need1, need2, need3, need4}),
+                                              std::vector<cs::ai::Need>({}));
 
-    auto need_system = new cs::system::Need({&test_registry});
+    entt::dispatcher dispatcher{};
+
+    auto need_system = new cs::system::Need({&test_registry, &dispatcher, &rng});
     auto view        = test_registry.view<cs::component::Need>();
 
     // Ensure that many needs are added into the needs list correctly and that many tests can be added to pressing needs
