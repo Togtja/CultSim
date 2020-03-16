@@ -12,12 +12,12 @@ TEST_CASE("testing the needs system initialization")
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
-    test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
+    test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
     auto need_system = new cs::system::Need({&test_registry});
-    auto view        = test_registry.view<cs::component::Needs>();
+    auto view        = test_registry.view<cs::component::Need>();
     REQUIRE(view.size() == 1);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         // Check that need has been added
         REQUIRE(needs.needs.size() == 1);
 
@@ -40,13 +40,13 @@ TEST_CASE("testing the needs system update function")
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
-    test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
+    test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
     auto need_system = new cs::system::Need({&test_registry});
-    auto view        = test_registry.view<cs::component::Needs>();
+    auto view        = test_registry.view<cs::component::Need>();
 
     need_system->update(1.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         // Check that need has not been removed
         REQUIRE(needs.needs.size() == 1);
 
@@ -67,7 +67,7 @@ TEST_CASE("testing the needs system update function")
     });
 
     need_system->update(55.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         // Check that need has not been removed
         REQUIRE(needs.needs.size() == 1);
 
@@ -92,13 +92,13 @@ TEST_CASE("Testing outliers for dt")
     auto agent        = test_registry.create();
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
 
-    test_registry.assign<cs::component::Needs>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
+    test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
     auto need_system = new cs::system::Need({&test_registry});
-    auto view        = test_registry.view<cs::component::Needs>();
+    auto view        = test_registry.view<cs::component::Need>();
 
     need_system->update(101.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         // Check that need has not been removed
         REQUIRE(needs.needs.size() == 1);
 
@@ -112,14 +112,14 @@ TEST_CASE("Testing outliers for dt")
     });
 
     // set status above maximum allowed value
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         needs.needs.begin()->status += 10.f;
         REQUIRE(needs.needs.begin()->status == 110.f);
     });
 
     // Ensure that next update drops it back to reasonable accepted levels
     need_system->update(1.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         REQUIRE(needs.needs.begin()->status == 100.f);
         REQUIRE(needs.vital_needs.size() == 0.f);
     });
@@ -134,16 +134,16 @@ TEST_CASE("pressing needs are correctly updated")
     cs::ai::Need need2 = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.f, 1.f, cs::TAG_Drink};
     cs::ai::Need need3 = {static_cast<std::string>("sad"), 1.f, 100.f, 1.f, 1.f, cs::TAG_Joy};
     cs::ai::Need need4 = {static_cast<std::string>("tired"), 2.f, 100.f, 1.f, 1.f, cs::TAG_Sleep};
-    test_registry.assign<cs::component::Needs>(agent,
+    test_registry.assign<cs::component::Need>(agent,
                                                std::vector<cs::ai::Need>({need1, need2, need3, need4}),
                                                std::vector<cs::ai::Need>({}));
 
     auto need_system = new cs::system::Need({&test_registry});
-    auto view        = test_registry.view<cs::component::Needs>();
+    auto view        = test_registry.view<cs::component::Need>();
 
     // Ensure that many needs are added into the needs list correctly and that many tests can be added to pressing needs
     need_system->update(50.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         REQUIRE(needs.needs.size() == 4);
         for (auto need : needs.needs)
         {
@@ -153,7 +153,7 @@ TEST_CASE("pressing needs are correctly updated")
     });
 
     need_system->update(-50.f);
-    view.each([](cs::component::Needs& needs) {
+    view.each([](cs::component::Need& needs) {
         for (auto need : needs.needs)
         {
             REQUIRE(need.status == 100.f);

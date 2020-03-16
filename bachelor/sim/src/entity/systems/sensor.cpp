@@ -1,4 +1,4 @@
-#include "ai.h"
+#include "sensor.h"
 #include "ai/path_finding.h"
 #include "constants.h"
 #include "debug/auto_timer.h"
@@ -14,21 +14,21 @@
 
 namespace cs::system
 {
-bool AI::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
+bool Sensor::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
 {
     float x = pos.x - pos2.x;
     float y = pos.y - pos2.y;
     return x * x + y * y <= rad * rad;
 }
 
-bool AI::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
+bool Sensor::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
 {
     return is_visible(pos, pos2, size + size2);
 }
 
-void AI::update(float dt)
+void Sensor::update(float dt)
 {
-    CS_AUTOTIMER(AI System);
+    CS_AUTOTIMER(Sensor System);
     static bool draw_fov  = false;
     static bool draw_seen = false;
 
@@ -55,8 +55,8 @@ void AI::update(float dt)
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.vision_radius, vis.vision_radius, 0));
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.vision_radius, vis.vision_radius, 0));
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0));
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0));
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
@@ -73,7 +73,7 @@ void AI::update(float dt)
                     {
                         continue;
                     }
-                    if (is_visible(pos.position, pos2.position, vis.vision_radius))
+                    if (is_visible(pos.position, pos2.position, vis.radius))
                     {
                         vis.seen.push_back(e2);
                     }
@@ -87,7 +87,7 @@ void AI::update(float dt)
     {
         vis_view.each(
             [this, &renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
-                renderer.draw_circle(pos.position, vis.vision_radius, {.33f, .33f, .33f});
+                renderer.draw_circle(pos.position, vis.radius, {.33f, .33f, .33f});
 
                 if (draw_seen)
                 {
@@ -102,7 +102,7 @@ void AI::update(float dt)
     }
 }
 
-bool AI::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
+bool Sensor::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
 {
     glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
     return boolvec.x && boolvec.y;

@@ -66,7 +66,17 @@ public:
 
     bool draw() override;
 
+    void initialize_simulation();
+
+    void clean_simulation();
+
+    void reset_simulation();
+
 private:
+    void bind_actions_for_scene();
+
+    void bind_scenario_lua_functions();
+
     void setup_docking_ui();
 
     void draw_scenario_information_ui();

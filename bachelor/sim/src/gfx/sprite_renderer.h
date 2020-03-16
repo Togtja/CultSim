@@ -67,9 +67,11 @@ public:
      * Get the texture id of a given texture
      *
      * @param rpath Relative path to the texture file you want the ID of
+     * @param nrpath Relative path to the normal map texture file you want the ID of, this parameter should be an empty string if
+     * no normal map is required
      * @return An ID to the given texture
      */
-    SpriteTextureID get_texture(const std::string &rpath);
+    SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath);
 
 private:
     bool increment_next_texture_id();
