@@ -6,6 +6,7 @@ layout(location = 0) in VertexData
     vec3 color;
     vec2 texcoord;
     flat uint texture;
+    mat2 model_mat;
 } vs_in;
 
 /** Outputs */
@@ -36,13 +37,17 @@ vec4 sample_normal()
 
 void main()
 {
-    vec4 tex_color = sample_sprite();
-    vec3 normal = sample_normal().rgb;
-    float effect = dot(normal, normalize(light_dir));
+    /**  Hover and selection */
+    const vec3 hover_color  = bitfieldExtract(vs_in.texture, 14, 1) * vec3(1.f, 0.5f, 0.f);
+    const vec3 select_color = bitfieldExtract(vs_in.texture, 15, 1) * vec3(0.f, 0.5f, 1.f);
 
-    vec3 hover_color  = bitfieldExtract(vs_in.texture, 14, 1) * vec3(1.f, 0.5f, 0.f);
-    vec3 select_color = bitfieldExtract(vs_in.texture, 15, 1) * vec3(0.f, 0.5f, 1.f);
+    const vec4 diffuse = sample_sprite();
+    const vec3 normal = sample_normal().rgb * 2.0 - 1.0;
+
+    const vec3 rotated_light = vec3(vs_in.model_mat * light_dir.xy, light_dir.z);
+
+    float effect = dot(normal, rotated_light);
+
     vec3 modifier_color = hover_color + select_color;
-
-    out_color           = vec4(tex_color.rgb * vs_in.color * effect + vec3(modifier_color), tex_color.a);
+    out_color = vec4(diffuse.rgb * vs_in.color * effect + vec3(modifier_color), diffuse.a);
 }
