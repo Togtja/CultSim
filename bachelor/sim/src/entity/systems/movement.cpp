@@ -79,7 +79,7 @@ void Movement::update(float dt)
                         {
                             auto target = mov.desired_position.front();
                             mov.desired_position.clear();
-                            ai::find_path_astar(pos.position, target, mov.desired_position, 16);
+                            ai::find_path_astar(pos.position, target, mov.desired_position, m_context.scenario->bounds, 16);
                             mov.avoid_count = 0;
                         }
                     }

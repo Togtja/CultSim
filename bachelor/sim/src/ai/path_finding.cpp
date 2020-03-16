@@ -30,14 +30,18 @@ void reconstruct_path(const glm::ivec2& start,
     } while (curr != start);
 }
 
-bool find_path_astar(const glm::vec2& start_vec, const glm::vec2& goal_vec, std::vector<glm::vec3>& poss, const int accuracy)
+bool find_path_astar(const glm::vec2& start_vec,
+                     const glm::vec2& goal_vec,
+                     std::vector<glm::vec3>& poss,
+                     const glm::vec2& bonds,
+                     const int accuracy)
 {
     robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
     robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
     auto start_grid = world_to_grid(start_vec, accuracy);
     auto goal_grid  = world_to_grid(goal_vec, accuracy);
-    glm::ivec2 start{start_grid.x, start_grid.y};
-    glm::ivec2 goal{goal_grid.x, goal_grid.y};
+
+    auto bonds_grid = world_to_grid(bonds, accuracy);
 
     auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
         return a.first > b.first;

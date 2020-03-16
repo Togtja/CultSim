@@ -15,18 +15,19 @@ void Requirement::update(float dt)
     CS_AUTOTIMER(Requirement System);
 
     auto& registry = *m_context.registry;
+    auto& bounds   = m_context.scenario->bounds;
     auto view_loc  = registry.view<component::LocationRequirement, component::Movement, component::Position>();
-    view_loc.each([&registry](entt::entity e,
-                              component::LocationRequirement locationreqs,
-                              component::Movement& mov,
-                              component::Position pos) {
+    view_loc.each([&registry, &bounds](entt::entity e,
+                                       component::LocationRequirement locationreqs,
+                                       component::Movement& mov,
+                                       component::Position pos) {
         if (close_enough(pos.position, locationreqs.desired_position, 5.f))
         {
             registry.remove<component::LocationRequirement>(e);
         }
         else if (mov.desired_position.empty())
         {
-            ai::find_path_astar(pos.position, locationreqs.desired_position, mov.desired_position);
+            ai::find_path_astar(pos.position, locationreqs.desired_position, mov.desired_position, bounds);
         }
     });
 
@@ -91,7 +92,10 @@ void Requirement::update(float dt)
                             if (findreqs.desired_position != res->m_location && mov.desired_position.empty())
                             {
                                 findreqs.desired_position = res->m_location;
-                                ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
+                                ai::find_path_astar(pos.position,
+                                                    findreqs.desired_position,
+                                                    mov.desired_position,
+                                                    m_context.scenario->bounds);
                             }
 
                             if (close_enough(pos.position, findreqs.desired_position, 5.f))
@@ -132,7 +136,7 @@ void Requirement::update(float dt)
                               m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
                               0.f);
             }
-            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
+            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position, m_context.scenario->bounds);
         }
     });
 

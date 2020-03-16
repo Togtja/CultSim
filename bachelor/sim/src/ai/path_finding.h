@@ -25,5 +25,6 @@ void reconstruct_path(const glm::ivec2& start,
 bool find_path_astar(const glm::vec2& start_vec,
                      const glm::vec2& goal_vec,
                      std::vector<glm::vec3>& poss,
+                     const glm::vec2& bonds,
                      const int accuracy = 32);
 } // namespace cs::ai
