@@ -1,6 +1,6 @@
 #pragma once
-#include "random_engine.h"
 #include "entity/scenario.h"
+#include "random_engine.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
@@ -27,6 +27,7 @@ public:
     ISystem(SystemContext context) : m_context(context)
     {
     }
+    virtual ~ISystem() noexcept = default;
 
     virtual void update(float dt) = 0;
 };
