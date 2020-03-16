@@ -107,6 +107,37 @@ void Movement::update(float dt)
 
         pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * dt;
 
+        /**Handle wrapping */
+        bool wrap = false;
+        if (pos.position.x < -m_context.scenario->bounds.x)
+        {
+            pos.position.x = m_context.scenario->bounds.x;
+            wrap           = true;
+        }
+        else if (pos.position.x > m_context.scenario->bounds.x)
+        {
+            pos.position.x = -m_context.scenario->bounds.x;
+            wrap           = true;
+        }
+        if (pos.position.y < -m_context.scenario->bounds.y)
+        {
+            pos.position.y = m_context.scenario->bounds.y;
+            wrap           = true;
+        }
+        else if (pos.position.y > m_context.scenario->bounds.y)
+        {
+            pos.position.y = -m_context.scenario->bounds.y;
+            wrap           = true;
+        }
+
+        /** If we wrapped around we recalculate the path */
+        if (wrap)
+        {
+            cur_head = mov.desired_position.front();
+            mov.desired_position.clear();
+            ai::find_path_astar(pos.position, cur_head, mov.desired_position, m_context.scenario->bounds);
+        }
+
         /** Draw paths */
         if (draw_paths)
         {

@@ -42,6 +42,32 @@ bool find_path_astar(const glm::vec2& start_vec,
     auto goal_grid  = world_to_grid(goal_vec, accuracy);
 
     auto bonds_grid = world_to_grid(bonds, accuracy);
+    glm::ivec2 alt_goal{goal_grid};
+    // Cheking for horizontal
+    if (goal_grid.x < 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
+        alt_goal.x = (bonds_grid.x * 2 + 1) + goal_grid.x;
+    }
+    else if (goal_grid.x > 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
+        alt_goal.x = -(bonds_grid.x * 2 + 1) + goal_grid.x;
+    }
+    if (goal_grid.y < 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
+        alt_goal.y = (bonds_grid.y * 2 + 1) + goal_grid.y;
+    }
+    else if (goal_grid.y > 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
+        alt_goal.y = -(bonds_grid.y * 2 + 1) + goal_grid.y;
+    }
+    if (path_heuristic(start_grid, alt_goal) < path_heuristic(start_grid, goal_grid))
+    {
+        goal_grid = alt_goal;
+    }
 
     auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
         return a.first > b.first;
@@ -50,21 +76,20 @@ bool find_path_astar(const glm::vec2& start_vec,
     std::priority_queue<std::pair<int, glm::ivec2>, std::vector<std::pair<int, glm::ivec2>>, decltype(priority_func)> open(
         priority_func);
 
-    open.emplace(0.f, start);
-    a_star_grid[start] = start;
-    a_star_cost[start] = 0;
+    open.emplace(0.f, start_grid);
+    a_star_grid[start_grid] = start_grid;
+    a_star_cost[start_grid] = 0;
 
     while (!open.empty())
     {
         glm::ivec2 curr = open.top().second;
         open.pop();
-        if (curr == goal)
+        if (curr == goal_grid)
         {
-            reconstruct_path(start, goal, goal_vec, poss, a_star_grid);
+            reconstruct_path(start_grid, goal_grid, goal_vec, poss, a_star_grid);
             return true;
         }
         glm::ivec2 next{};
-
         const auto max = glm::ivec2{curr.x + 1, curr.y + 1};
         const auto min = glm::ivec2{curr.x - 1, curr.y - 1};
 
@@ -83,7 +108,7 @@ bool find_path_astar(const glm::vec2& start_vec,
                 {
                     a_star_cost[next] = new_cost;
                     a_star_grid[next] = curr;
-                    int priority      = new_cost + path_heuristic(next, goal);
+                    int priority      = new_cost + path_heuristic(next, goal_grid);
 
                     open.emplace(priority, next);
                 }
