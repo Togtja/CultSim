@@ -35,4 +35,9 @@ inline bool operator==(Need const& lhs, Need const& rhs)
 {
     return lhs.name == rhs.name;
 }
+
+inline bool operator!=(Need const& lhs, Need const& rhs)
+{
+    return lhs.name != rhs.name;
+}
 } // namespace cs::ai
