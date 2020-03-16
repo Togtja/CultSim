@@ -1,8 +1,8 @@
 #pragma once
+#include "entity/components/tags.h"
 
 #include <entt/fwd.hpp>
 #include <glm/vec3.hpp>
-
 namespace cs::event
 {
 /**
@@ -16,6 +16,33 @@ struct ArrivedAtDestination
 };
 
 struct SensedEntity
+{
+    entt::entity entity{};
+};
+
+struct NeedCritical
+{
+    entt::entity entity{};
+
+    cs::ETag tag{};
+
+    float status{};
+
+    float weight{};
+};
+
+struct NeedNoLongerCritical
+{
+    entt::entity entity{};
+
+    cs::ETag tag{};
+
+    float status{};
+
+    float weight{};
+};
+
+struct SwitchNeedContext
 {
     entt::entity entity{};
 };
