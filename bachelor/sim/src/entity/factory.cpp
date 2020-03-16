@@ -60,6 +60,13 @@ bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table tabl
     }
 
     spr.color = table["color"].get<glm::vec3>();
+
+    /** Get scale if specified */
+    if (table["scale"].get_type() == sol::type::number)
+    {
+        spr.texture.scale = table["scale"].get<uint8_t>();
+    }
+
     return true;
 }
 

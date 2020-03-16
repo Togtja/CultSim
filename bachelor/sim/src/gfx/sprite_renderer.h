@@ -13,8 +13,8 @@ namespace cs::gfx
 class SpriteRenderer
 {
 private:
-    inline static constexpr int TEXTURE_WIDTH  = 512;
-    inline static constexpr int TEXTURE_HEIGHT = 512;
+    inline static constexpr int TEXTURE_WIDTH  = 64;
+    inline static constexpr int TEXTURE_HEIGHT = 64;
 
     Camera& m_camera;
 

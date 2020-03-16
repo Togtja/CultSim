@@ -4,7 +4,7 @@ entity = {
                             random:uniform(-scenario.bounds.y, scenario.bounds.y))
     },
     SpriteComponent = {
-        color = Vec3:new(0.80, 0.50, 0.10),
+        color = Vec3:new(1.0, 1.0, 1.0),
         texture = "sprites/bush_c.png",
         normal = "sprites/bush_n.png",
         scale = 50
