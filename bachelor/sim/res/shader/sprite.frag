@@ -16,6 +16,7 @@ layout(location = 0) out vec4 out_color;
 layout(binding = 0) uniform sampler2DArray colorTextures[8];
 layout(binding = 8) uniform sampler2DArray normalTextures[8];
 layout(location = 1) uniform vec3 light_dir = vec3(1.f, 1.f, 1.f);
+layout(location = 2) uniform vec3 ambient_col = vec3(0.05f, 0.05f, 0.1f);
 
 /**
  * Sample a sprite based on the texture data from the vertex shader
@@ -49,5 +50,5 @@ void main()
     float effect = dot(normal, rotated_light);
 
     vec3 modifier_color = hover_color + select_color;
-    out_color = vec4(diffuse.rgb * vs_in.color * effect + vec3(modifier_color), diffuse.a);
+    out_color = vec4(diffuse.rgb * vs_in.color * effect + ambient_col + vec3(modifier_color), diffuse.a);
 }
