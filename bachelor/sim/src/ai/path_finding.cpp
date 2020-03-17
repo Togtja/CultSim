@@ -4,6 +4,47 @@
 
 namespace cs::ai
 {
+std::vector<glm::ivec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bounds, const int grid_size)
+{
+    auto goal_grid   = world_to_grid(pos, grid_size);
+    auto bounds_grid = world_to_grid(bounds, grid_size);
+    std::vector<glm::ivec2> ret;
+
+    glm::ivec2 alt_goal{goal_grid};
+    if (goal_grid.x < 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
+        alt_goal.x = (bounds_grid.x * 2 + 1) + goal_grid.x;
+    }
+    else if (goal_grid.x > 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
+        alt_goal.x = -(bounds_grid.x * 2 + 1) + goal_grid.x;
+    }
+    ret.emplace_back(alt_goal);
+
+    glm::ivec2 alt_goal2{goal_grid};
+    // Cheking vertical
+    if (goal_grid.y < 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
+        alt_goal.y  = (bounds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal2.y = (bounds_grid.y * 2 + 1) + goal_grid.y;
+    }
+    else if (goal_grid.y > 0)
+    {
+        // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
+        alt_goal.y  = -(bounds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal2.y = -(bounds_grid.y * 2 + 1) + goal_grid.y;
+    }
+
+    ret.emplace_back(alt_goal);
+    ret.emplace_back(alt_goal2);
+    ret.emplace_back(goal_grid);
+
+    return ret;
+}
+
 glm::ivec2 world_to_grid(const glm::vec2& pos, int grid)
 {
     return {static_cast<int>(pos.x) / grid, static_cast<int>(pos.y) / grid};
@@ -34,49 +75,27 @@ void reconstruct_path(const glm::ivec2& start,
 bool find_path_astar(const glm::vec2& start_vec,
                      const glm::vec2& goal_vec,
                      std::vector<glm::vec3>& poss,
-                     const glm::vec2& bonds,
+                     const glm::vec2& bounds,
                      const int accuracy)
 {
     robin_hood::unordered_flat_map<glm::ivec2, glm::ivec2> a_star_grid{};
     robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
+
     auto start_grid = world_to_grid(start_vec, accuracy);
     auto goal_grid  = world_to_grid(goal_vec, accuracy);
-    auto bonds_grid = world_to_grid(bonds, accuracy);
 
     auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
         return a.first > b.first;
     };
+
     std::priority_queue<std::pair<int, glm::ivec2>, std::vector<std::pair<int, glm::ivec2>>, decltype(priority_func)> open(
         priority_func);
-    // Cheking for horizontal
-    glm::ivec2 alt_goal{goal_grid};
-    if (goal_grid.x < 0)
+
+    for (auto&& i : pos_to_wrap_grid(goal_vec, bounds, accuracy))
     {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
-        alt_goal.x = (bonds_grid.x * 2 + 1) + goal_grid.x;
+        open.emplace(path_heuristic(start_grid, i), i);
     }
-    else if (goal_grid.x > 0)
-    {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
-        alt_goal.x = -(bonds_grid.x * 2 + 1) + goal_grid.x;
-    }
-    open.emplace(path_heuristic(start_grid, alt_goal), alt_goal);
-    glm::ivec2 alt_goal2{goal_grid};
-    if (goal_grid.y < 0)
-    {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
-        alt_goal.y  = (bonds_grid.y * 2 + 1) + goal_grid.y;
-        alt_goal2.y = (bonds_grid.y * 2 + 1) + goal_grid.y;
-    }
-    else if (goal_grid.y > 0)
-    {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
-        alt_goal.y  = -(bonds_grid.y * 2 + 1) + goal_grid.y;
-        alt_goal2.y = -(bonds_grid.y * 2 + 1) + goal_grid.y;
-    }
-    open.emplace(path_heuristic(start_grid, alt_goal), alt_goal);
-    open.emplace(path_heuristic(start_grid, alt_goal2), alt_goal2);
-    open.emplace(path_heuristic(start_grid, goal_grid), goal_grid);
+
     goal_grid = open.top().second;
 
     // Priority_queue does not have a clear function
