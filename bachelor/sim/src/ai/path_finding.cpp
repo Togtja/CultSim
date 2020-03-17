@@ -4,43 +4,39 @@
 
 namespace cs::ai
 {
-std::vector<glm::ivec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bounds, const int grid_size)
+std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bounds, const int grid_size)
 {
-    auto goal_grid   = world_to_grid(pos, grid_size);
-    auto bounds_grid = world_to_grid(bounds, grid_size);
-    std::vector<glm::ivec2> ret;
+    std::vector<glm::vec2> ret;
 
-    glm::ivec2 alt_goal{goal_grid};
-    if (goal_grid.x < 0)
+    glm::vec2 alt_xpos{pos};
+    if (pos.x < 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
-        alt_goal.x = (bounds_grid.x * 2 + 1) + goal_grid.x;
+        alt_xpos.x = (bounds.x * 2 + grid_size) + pos.x;
     }
-    else if (goal_grid.x > 0)
+    else if (pos.x > 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
-        alt_goal.x = -(bounds_grid.x * 2 + 1) + goal_grid.x;
+        alt_xpos.x = -(bounds.x * 2 + grid_size) + pos.x;
     }
-    ret.emplace_back(alt_goal);
 
-    glm::ivec2 alt_goal2{goal_grid};
+    glm::vec2 alt_ypos{pos};
     // Cheking vertical
-    if (goal_grid.y < 0)
+    if (pos.y < 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
-        alt_goal.y  = (bounds_grid.y * 2 + 1) + goal_grid.y;
-        alt_goal2.y = (bounds_grid.y * 2 + 1) + goal_grid.y;
+        alt_ypos.y = (bounds.y * 2 + grid_size) + pos.y;
     }
-    else if (goal_grid.y > 0)
+    else if (pos.y > 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
-        alt_goal.y  = -(bounds_grid.y * 2 + 1) + goal_grid.y;
-        alt_goal2.y = -(bounds_grid.y * 2 + 1) + goal_grid.y;
+        alt_ypos.y = -(bounds.y * 2 + grid_size) + pos.y;
     }
 
-    ret.emplace_back(alt_goal);
-    ret.emplace_back(alt_goal2);
-    ret.emplace_back(goal_grid);
+    ret.emplace_back(alt_xpos);
+    ret.emplace_back(alt_ypos);
+    ret.emplace_back(glm::vec2(alt_xpos.x, alt_ypos.y));
+    ret.emplace_back(pos);
 
     return ret;
 }
