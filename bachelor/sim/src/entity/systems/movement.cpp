@@ -51,6 +51,7 @@ void Movement::update(float dt)
     CS_AUTOTIMER(Movement System);
 
     static bool draw_paths      = false;
+    static bool draw_direction  = false;
     static float avoid_rotation = 35.f;
     static float avoid_cd       = 0.14f;
     static float avoid_dist     = 10.f;
@@ -59,6 +60,7 @@ void Movement::update(float dt)
     if (ImGui::TreeNode("Path Adjustments"))
     {
         ImGui::Checkbox("Draw Paths", &draw_paths);
+        ImGui::Checkbox("Draw Direction", &draw_direction);
         ImGui::DragFloat("Avoid Rot", &avoid_rotation, 0.5f, -180.f, 180.f);
         ImGui::DragFloat("Avoid CD", &avoid_cd, 0.01f, 0.01f, 1.f);
         ImGui::DragFloat("Avoid Dist", &avoid_dist, 1.f, 1.f, 256.f);
@@ -147,12 +149,12 @@ void Movement::update(float dt)
             ai::find_path_astar(pos.position, cur_head, mov.desired_position, m_context.scenario->bounds);
         }
 
-        /** Draw paths */
-        if (draw_paths)
+        if (draw_direction)
         {
             gfx::get_renderer().debug().draw_line(pos.position,
                                                   pos.position + glm::vec3(mov.direction, 0.f) * mov.speed,
                                                   {1.f, 0.f, 1.f});
+        }
 
             gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
             for (int i = 0; i < mov.desired_position.size() - 1; ++i)
