@@ -41,10 +41,15 @@ bool find_path_astar(const glm::vec2& start_vec,
     robin_hood::unordered_flat_map<glm::ivec2, int> a_star_cost{};
     auto start_grid = world_to_grid(start_vec, accuracy);
     auto goal_grid  = world_to_grid(goal_vec, accuracy);
-
     auto bonds_grid = world_to_grid(bonds, accuracy);
-    glm::ivec2 alt_goal{goal_grid};
+
+    auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
+        return a.first > b.first;
+    };
+    std::priority_queue<std::pair<int, glm::ivec2>, std::vector<std::pair<int, glm::ivec2>>, decltype(priority_func)> open(
+        priority_func);
     // Cheking for horizontal
+    glm::ivec2 alt_goal{goal_grid};
     if (goal_grid.x < 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
@@ -55,27 +60,30 @@ bool find_path_astar(const glm::vec2& start_vec,
         // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
         alt_goal.x = -(bonds_grid.x * 2 + 1) + goal_grid.x;
     }
+    open.emplace(path_heuristic(start_grid, alt_goal), alt_goal);
+    glm::ivec2 alt_goal2{goal_grid};
     if (goal_grid.y < 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
-        alt_goal.y = (bonds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal.y  = (bonds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal2.y = (bonds_grid.y * 2 + 1) + goal_grid.y;
     }
     else if (goal_grid.y > 0)
     {
         // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
-        alt_goal.y = -(bonds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal.y  = -(bonds_grid.y * 2 + 1) + goal_grid.y;
+        alt_goal2.y = -(bonds_grid.y * 2 + 1) + goal_grid.y;
     }
-    if (path_heuristic(start_grid, alt_goal) < path_heuristic(start_grid, goal_grid))
+    open.emplace(path_heuristic(start_grid, alt_goal), alt_goal);
+    open.emplace(path_heuristic(start_grid, alt_goal2), alt_goal2);
+    open.emplace(path_heuristic(start_grid, goal_grid), goal_grid);
+    goal_grid = open.top().second;
+
+    // Priority_queue does not have a clear function
+    while (!open.empty())
     {
-        goal_grid = alt_goal;
+        open.pop();
     }
-
-    auto priority_func = [](const std::pair<int, glm::ivec2>& a, const std::pair<int, glm::ivec2>& b) {
-        return a.first > b.first;
-    };
-
-    std::priority_queue<std::pair<int, glm::ivec2>, std::vector<std::pair<int, glm::ivec2>>, decltype(priority_func)> open(
-        priority_func);
 
     open.emplace(0.f, start_grid);
     a_star_grid[start_grid] = start_grid;

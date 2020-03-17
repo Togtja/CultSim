@@ -46,6 +46,7 @@ bool out_of_bounds(const glm::vec3 pos, const glm::vec2& bounds)
     auto cpy = pos;
     return fix_out_of_bounds(cpy, bounds);
 }
+
 void Movement::update(float dt)
 {
     CS_AUTOTIMER(Movement System);
