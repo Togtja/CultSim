@@ -14,67 +14,62 @@ void Action::update(float dt)
 
     auto& registry = *m_context.registry;
     auto group     = registry.group<component::Strategy>(entt::exclude<component::LocationRequirement,
-                                                                     component::VisionRequirement,
-                                                                     component::FindRequirement,
-                                                                     component::TagRequirement>);
+                                                                   component::VisionRequirement,
+                                                                   component::FindRequirement,
+                                                                   component::TagRequirement>);
 
     group.each([this, dt](entt::entity e, component::Strategy& strategies) {
         if (!strategies.staged_strategies.empty())
         {
-            for (auto& strategy : strategies.staged_strategies)
-            {
-                if (!strategy.actions.empty())
-                {
-                    auto& action = strategy.actions.back();
-                    if (action.requirements != TAG_None)
-                    {
-                        if (action.requirements & TAG_Tag)
-                        {
-                            m_context.registry->assign<component::TagRequirement>(e, strategy.tags);
-                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Tag);
-                        }
-                        else if (action.requirements & TAG_Location)
-                        {
-                            m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
-                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
-                        }
-                        else if (action.requirements & TAG_Vision)
-                        {
-                            m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
-                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
-                        }
-                        else if (action.requirements & TAG_Find)
-                        {
-                            m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
-                            action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
-                        }
-                    }
-                    else
-                    {
-                        action.time_spent += dt;
-                        if (action.time_spent >= action.time_to_complete)
-                        {
-                            if (m_context.registry->valid(action.target))
-                            {
-                                if (m_context.rng->trigger(0.9))
-                                {
-                                    action.success(e, action.target);
-                                }
+            auto& strategy = strategies.staged_strategies.back();
 
-                                else
-                                {
-                                    action.failure(e, action.target);
-                                }
-                            }
-                            strategy.actions.pop_back();
-                            break;
-                        }
+            if (!strategy.actions.empty())
+            {
+                auto& action = strategy.actions.back();
+                if (action.requirements)
+                {
+                    if (action.requirements & TAG_Tag)
+                    {
+                        m_context.registry->assign<component::TagRequirement>(e, strategy.tags);
+                        action.requirements = static_cast<ETag>(action.requirements & ~TAG_Tag);
+                    }
+                    else if (action.requirements & TAG_Location)
+                    {
+                        m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
+                        action.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
+                    }
+                    else if (action.requirements & TAG_Vision)
+                    {
+                        m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
+                        action.requirements = static_cast<ETag>(action.requirements & ~TAG_Vision);
+                    }
+                    else if (action.requirements & TAG_Find)
+                    {
+                        m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
+                        action.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
                     }
                 }
                 else
                 {
-                    strategies.staged_strategies.erase(strategies.staged_strategies.begin());
+                    action.time_spent += dt;
+                    if (action.time_spent >= action.time_to_complete)
+                    {
+                        if (m_context.rng->trigger(action.success_chance))
+                        {
+                            action.success(e, action.target);
+                        }
+
+                        else
+                        {
+                            action.failure(e, action.target);
+                        }
+                        strategy.actions.pop_back();
+                    }
                 }
+            }
+            else
+            {
+                strategies.staged_strategies.pop_back();
             }
         }
     });
