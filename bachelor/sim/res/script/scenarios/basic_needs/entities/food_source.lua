@@ -8,7 +8,8 @@ entity = {
         texture = "sprites/bush_c.png",
         normal = "sprites/bush_n.png",
         scale = 50,
-        rotation = random:uniform(0, 255)
+        rotation = random:uniform(0, 255),
+        layer = 3 -- number from 1-3 (default is 0)
     },
     TagComponent = {
         tags = ETag.Avoidable
