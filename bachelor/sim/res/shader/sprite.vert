@@ -15,6 +15,7 @@ layout(location = 0) out VertexData
     vec3 color;
     vec2 texcoord;
     uint texture;
+    mat2 light_mat;
 } vs_out;
 
 layout(location = 0) uniform mat4 u_projection;
@@ -28,6 +29,7 @@ void main()
     const float angle = bitfieldExtract(a_texture, 16, 8) / 127.5f * 3.14f + 3.14f;
     const float scale = bitfieldExtract(a_texture, 24, 8);
     const mat2 model_mat = mat2(vec2(cos(angle), sin(angle)), vec2(-sin(angle), cos(angle)));
+    vs_out.light_mat = mat2(vec2(cos(-angle), sin(-angle)), vec2(-sin(-angle), cos(-angle)));
 
     const vec3 scaled_pos = a_position * scale;
 

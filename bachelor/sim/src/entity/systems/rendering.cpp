@@ -69,10 +69,25 @@ void Rendering::update(float dt)
         sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
     });
 
-    /** Submit sprites to renderer */
-    auto pos_sprite_view = registry.view<component::Sprite, component::Position>();
-    pos_sprite_view.each([](const component::Sprite& sprite, const component::Position& pos) {
-        gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
-    });
+    /** Submit sprites to renderer, for each layer */
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
+
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_1"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
+
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_2"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
+
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
 }
 } // namespace cs::system
