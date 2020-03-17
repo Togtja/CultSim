@@ -348,34 +348,21 @@ void ScenarioScene::bind_scenario_lua_functions()
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
         m_registry
-            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father](entt::entity mother, entt::registry& r) {
+            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
                 /** Don't do anything if e became invalid */
-                if (!r.valid(mother))
+                if (!r.valid(e))
                 {
                     return;
                 }
 
-                auto child = r.create();
-                r.stamp(child, r, mother);
+                /** Figure out "type" of mother and spawn a child based on that */
+                const auto& mother_meta = r.get<component::Meta>(e);
 
-                /** Reset action targets */
-                if (auto* action_comp = r.try_get<component::Strategy>(child); action_comp)
-                {
-                    for (auto& strategy : action_comp->strategies)
-                    {
-                        for (auto& action : strategy.actions)
-                        {
-                            if (action.target != entt::null)
-                            {
-                                action.target = child;
-                            }
-                            if (action.target != child)
-                            {
-                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
-                            }
-                        }
-                    }
-                }
+                /** Set position to be close to mother */
+                const auto new_pos = r.get<component::Position>(e).position +
+                                     glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
+
+                auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
 
                 /** Reset all needs to 100.0 */
                 if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
@@ -392,22 +379,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     health_comp->health = 100.f;
                 }
 
-                /** Reset reproduction stats */
-                if (auto* repro_copm = r.try_get<component::Reproduction>(child); repro_copm)
-                {
-                    repro_copm->sex                = static_cast<component::Reproduction::ESex>(m_rng.uniform(0, 1));
-                    repro_copm->number_of_children = 0;
-                }
-
-                /** Set new child position */
-                if (auto* pos_comp = r.try_get<component::Position>(child); pos_comp)
-                {
-                    const auto new_pos = r.get<component::Position>(mother).position +
-                                         glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
-                    pos_comp->position = new_pos;
-                }
-
-                /** Give a child to the parents (dad could've died, so check if he's valid first) */
+                /** Give a child to the parents */
                 if (m_registry.valid(father))
                 {
                     if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
@@ -536,8 +508,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction] =
-        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction>(
+    const auto& [needs, health, strategy, reproduction, timer] =
+        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction, component::Timer>(
             selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
@@ -598,6 +570,12 @@ void ScenarioScene::draw_selected_entity_information_ui()
             }
             ImGui::EndTable();
         }
+    }
+
+    if (timer)
+    {
+        ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
+        ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
     }
 
     ImGui::End();
