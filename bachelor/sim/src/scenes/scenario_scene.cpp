@@ -122,7 +122,7 @@ bool ScenarioScene::update(float dt)
     draw_time_control_ui();
     draw_selected_entity_information_ui();
 
-    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png", "sprites/background_n.png");
+    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
 
     /** Draw background crudely */

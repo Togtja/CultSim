@@ -71,7 +71,7 @@ public:
      * no normal map is required
      * @return An ID to the given texture
      */
-    SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath);
+    SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath = {});
 
 private:
     bool increment_next_texture_id();
