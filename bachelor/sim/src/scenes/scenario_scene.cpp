@@ -342,12 +342,15 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
+    /** Check entity validity */
+    cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
+
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
         m_registry
-            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
+            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father](entt::entity mother, entt::registry& r) {
                 /** Don't do anything if e became invalid */
-                if (!r.valid(e))
+                if (!r.valid(mother))
                 {
                     return;
                 }
@@ -399,15 +402,18 @@ void ScenarioScene::bind_scenario_lua_functions()
                 /** Set new child position */
                 if (auto* pos_comp = r.try_get<component::Position>(child); pos_comp)
                 {
-                    const auto new_pos = r.get<component::Position>(e).position +
+                    const auto new_pos = r.get<component::Position>(mother).position +
                                          glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
                     pos_comp->position = new_pos;
                 }
 
-                /** Give a child to the parents */
-                if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
+                /** Give a child to the parents (dad could've died, so check if he's valid first) */
+                if (m_registry.valid(father))
                 {
-                    ++rc->number_of_children;
+                    if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
+                    {
+                        ++rc->number_of_children;
+                    }
                 }
 
                 if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
