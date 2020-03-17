@@ -18,9 +18,9 @@ void Requirement::update(float dt)
     auto& bounds   = m_context.scenario->bounds;
     auto view_loc  = registry.view<component::LocationRequirement, component::Movement, component::Position>();
     view_loc.each([&registry, &bounds](entt::entity e,
-                                       component::LocationRequirement locationreqs,
+                                       const component::LocationRequirement& locationreqs,
                                        component::Movement& mov,
-                                       component::Position pos) {
+                                       const component::Position& pos) {
         if (close_enough(pos.position, locationreqs.desired_position, 5.f))
         {
             registry.remove<component::LocationRequirement>(e);
@@ -32,7 +32,7 @@ void Requirement::update(float dt)
     });
 
     auto view_vis = registry.view<component::VisionRequirement, component::Vision>();
-    view_vis.each([&registry](entt::entity e, component::VisionRequirement visionreqs, component::Vision vision) {
+    view_vis.each([&registry](entt::entity e, const component::VisionRequirement& visionreqs, const component::Vision& vision) {
         for (auto& entity : vision.seen)
         {
             if ((registry.get<component::Tags>(entity).tags & visionreqs.tags) == visionreqs.tags)
@@ -44,9 +44,9 @@ void Requirement::update(float dt)
 
     auto view_find = registry.view<component::FindRequirement, component::Vision, component::Position, component::Movement>();
     view_find.each([&registry, this](entt::entity e,
-                                     component::FindRequirement findreqs,
-                                     component::Vision vision,
-                                     component::Position pos,
+                                     component::FindRequirement& findreqs,
+                                     const component::Vision& vision,
+                                     const component::Position& pos,
                                      component::Movement& mov) {
         for (auto& entity : vision.seen)
         {
@@ -141,7 +141,7 @@ void Requirement::update(float dt)
     });
 
     auto view_tag = registry.view<component::TagRequirement, component::Tags>();
-    view_tag.each([this](entt::entity e, component::TagRequirement tagreqs, component::Tags& tags) {
+    view_tag.each([this](entt::entity e, const component::TagRequirement& tagreqs, component::Tags& tags) {
         tags.tags = ETag(tags.tags | tagreqs.tags);
         m_context.registry->remove<component::TagRequirement>(e);
     });
