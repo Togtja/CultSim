@@ -156,10 +156,56 @@ void Movement::update(float dt)
                                                   {1.f, 0.f, 1.f});
         }
 
+        /** Draw paths */
+        if (draw_paths)
+        {
             gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
-            for (int i = 0; i < mov.desired_position.size() - 1; ++i)
+            gfx::get_renderer().debug().draw_circle(mov.desired_position.front(), 3, {0.f, 1.f, 0.f});
+
+            for (int i = mov.desired_position.size() - 1; i > 0; --i)
             {
-                gfx::get_renderer().debug().draw_line(mov.desired_position[i], mov.desired_position[i + 1], {0.f, 1.f, 1.f});
+                auto dst        = mov.desired_position[i - 1];
+                auto src        = mov.desired_position[i];
+                auto bonds      = m_context.scenario->bounds; // ai::world_to_grid(m_context.scenario->bounds, 32) * 32;
+                glm::vec3 color = {0.f, 1.f, 1.f};
+                if (out_of_bounds(dst, bonds) && !out_of_bounds(src, bonds))
+                {
+                    color = {0.f, 1.f, 0.f};
+                    glm::vec3 temp{src};
+                    gfx::get_renderer().debug().draw_line(dst, src, color);
+                    if (dst.x < -bonds.x)
+                    {
+                        dst.x  = bonds.x - (-bonds.x - dst.x) + 1;
+                        temp.x = -temp.x;
+                    }
+                    else if (dst.x > bonds.x)
+                    {
+                        dst.x  = (-bonds.x + (dst.x - bonds.x) - 1);
+                        temp.x = -temp.x;
+                    }
+                    if (dst.y < -bonds.y)
+                    {
+                        dst.y  = bonds.y - (-bonds.y - dst.y) + 1;
+                        temp.y = -temp.y;
+                    }
+                    else if (dst.y > bonds.y)
+                    {
+                        dst.y  = (-bonds.y + (dst.y - bonds.y) - 1);
+                        temp.y = -temp.y;
+                    }
+                    src = temp;
+                    dst = src + (src - dst);
+                    gfx::get_renderer().debug().draw_circle(src, 3, {1.f, 1.f, 0.f});
+                    gfx::get_renderer().debug().draw_line(src, dst, color);
+                    gfx::get_renderer().debug().draw_line(src, mov.desired_position.front(), color);
+                    break;
+                }
+                else if (out_of_bounds(src, bonds))
+                {
+                    continue;
+                }
+                gfx::get_renderer().debug().draw_circle(src, 3, {1.f, 1.f, 0.f});
+                gfx::get_renderer().debug().draw_line(dst, src, color);
             }
         }
 
