@@ -18,7 +18,7 @@ void Mitigation::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Need, component::Strategy, component::Tags>();
-    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, component::Tags tags) {
+    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
             auto temp = needs.vital_needs[0];
@@ -78,7 +78,7 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
         // costly count_set_bits function
 
         // Check if the entities tags match the requirements of the strategy
-        if ((strategy.requirements & tags.tags) == strategy.requirements)
+        if ((strategy.prerequisites & tags.tags) == strategy.prerequisites)
         {
             // Check if ANY of the strategies tags matches the needs tags
             if ((strategy.tags & need.tags) != 0)
