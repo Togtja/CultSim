@@ -67,6 +67,12 @@ bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table tabl
         spr.texture.scale = table["scale"].get<uint8_t>();
     }
 
+    /** Get rotation if specified */
+    if (table["rotation"].get_type() == sol::type::number)
+    {
+        spr.texture.bigrees = table["rotation"].get<uint8_t>();
+    }
+
     return true;
 }
 

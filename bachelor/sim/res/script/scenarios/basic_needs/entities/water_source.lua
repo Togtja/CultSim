@@ -6,7 +6,8 @@ entity = {
     SpriteComponent = {
         color = Vec3:new(1.0, 1.0, 1.0),
         texture = "sprites/crate_water_c.png",
-        normal = "sprites/crate_n.png"
+        normal = "sprites/crate_n.png",
+        rotation = random:uniform(0, 255)
     },
     TagComponent = {
         tags = ETag.Avoidable
