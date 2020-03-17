@@ -4,9 +4,9 @@ entity = {
                             random:uniform(-scenario.bounds.y, scenario.bounds.y))
     },
     SpriteComponent = {
-        color = Vec3:new(0.10, 0.20, 0.60),
-        texture = "sprites/circle_c.png",
-        normal = "sprites/circle_n.png"
+        color = Vec3:new(1.0, 1.0, 1.0),
+        texture = "sprites/crate_water_c.png",
+        normal = "sprites/crate_n.png"
     },
     TagComponent = {
         tags = ETag.Avoidable
