@@ -14,6 +14,38 @@
 
 namespace cs::system
 {
+bool fix_out_of_bounds(glm::vec3& pos, const glm::vec2& bounds)
+{
+    /**Handle wrapping */
+    bool wrap = false;
+    if (pos.x < -bounds.x)
+    {
+        pos.x = bounds.x;
+        wrap  = true;
+    }
+    else if (pos.x > bounds.x)
+    {
+        pos.x = -bounds.x;
+        wrap  = true;
+    }
+    if (pos.y < -bounds.y)
+    {
+        pos.y = bounds.y;
+        wrap  = true;
+    }
+    else if (pos.y > bounds.y)
+    {
+        pos.y = -bounds.y;
+        wrap  = true;
+    }
+    return wrap;
+}
+
+bool out_of_bounds(const glm::vec3 pos, const glm::vec2& bounds)
+{
+    auto cpy = pos;
+    return fix_out_of_bounds(cpy, bounds);
+}
 void Movement::update(float dt)
 {
     CS_AUTOTIMER(Movement System);
@@ -107,31 +139,8 @@ void Movement::update(float dt)
 
         pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * dt;
 
-        /**Handle wrapping */
-        bool wrap = false;
-        if (pos.position.x < -m_context.scenario->bounds.x)
-        {
-            pos.position.x = m_context.scenario->bounds.x;
-            wrap           = true;
-        }
-        else if (pos.position.x > m_context.scenario->bounds.x)
-        {
-            pos.position.x = -m_context.scenario->bounds.x;
-            wrap           = true;
-        }
-        if (pos.position.y < -m_context.scenario->bounds.y)
-        {
-            pos.position.y = m_context.scenario->bounds.y;
-            wrap           = true;
-        }
-        else if (pos.position.y > m_context.scenario->bounds.y)
-        {
-            pos.position.y = -m_context.scenario->bounds.y;
-            wrap           = true;
-        }
-
         /** If we wrapped around we recalculate the path */
-        if (wrap)
+        if (fix_out_of_bounds(pos.position, m_context.scenario->bounds))
         {
             cur_head = mov.desired_position.front();
             mov.desired_position.clear();
