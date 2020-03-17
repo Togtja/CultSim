@@ -1,7 +1,7 @@
 entity = {
     PositionComponent = {
-        position = Vec2:new(random:uniform(-scenario.bounds.x, scenario.bounds.x),
-                            random:uniform(-scenario.bounds.y, scenario.bounds.y))
+        position = Vec2:new(random:uniform(-scenario.bounds.x + 20, scenario.bounds.x - 20),
+                            random:uniform(-scenario.bounds.y + 20, scenario.bounds.y - 20))
     },
     SpriteComponent = {
         color = Vec3:new(1.0, 1.0, 1.0),
