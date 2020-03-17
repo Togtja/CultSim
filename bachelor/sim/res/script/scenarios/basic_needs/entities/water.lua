@@ -5,7 +5,8 @@ entity = {
     SpriteComponent = {
         color = Vec3:new(0.10, 0.70, 1.00),
         texture = "sprites/liquid_c.png",
-        normal = "sprites/liquid_n.png"
+        normal = "sprites/liquid_n.png",
+        scale = 6
     },
     TagComponent = {
         tags = ETag.Drink

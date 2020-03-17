@@ -60,6 +60,36 @@ bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table tabl
     }
 
     spr.color = table["color"].get<glm::vec3>();
+
+    /** Get scale if specified */
+    if (table["scale"].get_type() == sol::type::number)
+    {
+        spr.texture.scale = table["scale"].get<uint8_t>();
+    }
+
+    /** Get rotation if specified */
+    if (table["rotation"].get_type() == sol::type::number)
+    {
+        spr.texture.bigrees = table["rotation"].get<uint8_t>();
+    }
+
+    /** Get layer if specified, or assign default layer 0 */
+    if (table["layer"].get_type() == sol::type::number)
+    {
+        const auto layer_name = table["layer"].get<int64_t>();
+        switch (layer_name)
+        {
+            case 1: reg.assign<entt::tag<"layer_1"_hs>>(e); break;
+            case 2: reg.assign<entt::tag<"layer_2"_hs>>(e); break;
+            case 3: reg.assign<entt::tag<"layer_3"_hs>>(e); break;
+            default: reg.assign<entt::tag<"layer_0"_hs>>(e); break;
+        }
+    }
+    else
+    {
+        reg.assign<entt::tag<"layer_0"_hs>>(e);
+    }
+
     return true;
 }
 
