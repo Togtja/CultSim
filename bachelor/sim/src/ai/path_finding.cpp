@@ -89,11 +89,11 @@ bool find_path_astar(const glm::vec2& start_vec,
 
     for (auto&& i : pos_to_wrap_grid(goal_vec, bounds, accuracy))
     {
-        open.emplace(path_heuristic(start_grid, i), i);
+        auto grid_pos = world_to_grid(i, accuracy);
+        open.emplace(path_heuristic(start_grid, grid_pos), grid_pos);
     }
 
     goal_grid = open.top().second;
-
     // Priority_queue does not have a clear function
     while (!open.empty())
     {
