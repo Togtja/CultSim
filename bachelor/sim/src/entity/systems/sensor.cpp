@@ -44,8 +44,8 @@ void Sensor::update(float dt)
 
     /** Construct collision grid */
     registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
-        auto min = ai::world_to_grid(pos.position);
-        m_collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
+        auto min = ai::world_to_grid(pos.position, SIM_GRID_SIZE * 2);
+        m_collision_grid[min.x * SIM_GRID_SIZE * 2 + min.y].emplace_back(e);
     });
 
     registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
@@ -55,18 +55,19 @@ void Sensor::update(float dt)
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0));
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0));
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE * 2);
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE * 2);
+
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                if (m_collision_grid.find(x * SIM_GRID_SIZE + y) == m_collision_grid.end())
+                if (m_collision_grid.find(x * SIM_GRID_SIZE * 2 + y) == m_collision_grid.end())
                 {
                     continue;
                 }
 
-                for (auto e2 : m_collision_grid[x * SIM_GRID_SIZE + y])
+                for (auto e2 : m_collision_grid[x * SIM_GRID_SIZE * 2 + y])
                 {
                     auto& pos2 = registry.get<component::Position>(e2);
                     if (e == e2)
