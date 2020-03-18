@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "debug_renderer.h"
 #include "sprite_renderer.h"
+#include "uniform_buffer.h"
 
 namespace cs::gfx
 {
@@ -15,6 +16,8 @@ private:
 
     SpriteRenderer m_sprite_renderer;
 
+    UniformBuffer<glm::mat4> m_matrix_ubo{};
+
 public:
     friend Renderer& get_renderer();
 
@@ -22,6 +25,13 @@ public:
     Renderer(Renderer&&)      = delete;
     Renderer& operator=(const Renderer&) = delete;
     Renderer& operator=(Renderer&&) = delete;
+
+    /**
+     * Render contents of all renderers to screen and write required uniforms
+     *
+     * @warning Do not call the display methods of the renderers manually, use this instead
+     */
+    void display();
 
     /**
      * Get a handle to the debug renderer

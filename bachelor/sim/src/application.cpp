@@ -80,9 +80,7 @@ void Application::draw()
 {
     m_scene_manager.draw();
 
-    auto& r = gfx::get_renderer();
-    r.sprite().display();
-    r.debug().display();
+    gfx::get_renderer().display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

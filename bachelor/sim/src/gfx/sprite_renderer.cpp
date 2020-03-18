@@ -43,7 +43,6 @@ void SpriteRenderer::display()
     glUseProgram(m_shader);
     glBindVertexArray(m_vao);
 
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
     glUniform3fv(1, 1, glm::value_ptr(light_direction));
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
