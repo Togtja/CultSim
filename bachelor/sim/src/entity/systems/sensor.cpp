@@ -18,10 +18,7 @@ bool Sensor::is_visible(const glm::vec2& pos, const glm::vec2& pos2, float rad)
 {
     float x = pos.x - pos2.x;
     float y = pos.y - pos2.y;
-    if (x * x + y * y <= rad * rad)
-    {
-        return true;
-    }
+    return (x * x + y * y <= rad * rad);
 }
 
 bool Sensor::is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::vec2& bounds)

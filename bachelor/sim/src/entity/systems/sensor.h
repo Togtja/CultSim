@@ -20,7 +20,7 @@ public:
     bool is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::vec2& bounds);
 
     bool is_colliding(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2);
-    bool is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::ivec2& bounds);
+    bool is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::vec2& bounds);
 
     void update(float dt) override;
 
