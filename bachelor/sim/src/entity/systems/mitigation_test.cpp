@@ -127,8 +127,8 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
         REQUIRE(!needs.vital_needs.empty());
         REQUIRE(strategies.strategies.size() == 2);
         REQUIRE(strategies.staged_strategies.size() == 2);
-        REQUIRE(strategies.staged_strategies.back() == strategy);
-        REQUIRE(strategies.staged_strategies.front() == strategy2);
+        REQUIRE(strategies.staged_strategies.front() == strategy);
+        REQUIRE(strategies.staged_strategies.back() == strategy2);
     });
 }
 
@@ -220,7 +220,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
         REQUIRE(needs.vital_needs.size() == 1);
         REQUIRE(strategies.staged_strategies.size() == 1);
-        REQUIRE(strategies.staged_strategies.front() == strategy);
+        REQUIRE(strategies.staged_strategies.back() == strategy);
     });
 
     need_system->update(50.f);
@@ -228,6 +228,6 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
         REQUIRE(needs.vital_needs.size() == 2);
         REQUIRE(strategies.staged_strategies.size() == 1);
-        REQUIRE(strategies.staged_strategies.front() == strategy2);
+        REQUIRE(strategies.staged_strategies.back() == strategy2);
     });
 }
