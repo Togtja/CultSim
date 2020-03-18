@@ -46,4 +46,20 @@ struct SwitchNeedContext
 {
     entt::entity entity{};
 };
+
+struct FinishedRequirement
+{
+    entt::entity entity{};
+
+    cs::ETag requirement{};
+};
+
+struct RequirementFailure
+{
+    entt::entity entity{};
+
+    cs::ETag requirement{};
+
+    std::string error{};
+};
 } // namespace cs::event
