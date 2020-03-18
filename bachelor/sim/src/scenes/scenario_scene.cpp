@@ -7,7 +7,6 @@
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
-#include "entity/systems/sensor.h"
 #include "entity/systems/health.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
@@ -15,6 +14,7 @@
 #include "entity/systems/rendering.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
+#include "entity/systems/sensor.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
@@ -183,10 +183,14 @@ bool ScenarioScene::draw()
                               glm::vec3(0.3f));
         }
     }
-
-    r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-    r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    static bool show_axis = false;
+    ImGui::Checkbox("Show Axis", &show_axis);
+    if (show_axis)
+    {
+        r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+        r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+        r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    }
 
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
 

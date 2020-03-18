@@ -77,6 +77,7 @@ target_compile_options(
         PRIVATE
         $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate -fcoverage-mapping>
         $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:--coverage>
+        $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:MSVC>>:-bigobj>
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS
