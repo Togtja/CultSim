@@ -18,7 +18,11 @@ layout(location = 0) out VertexData
     mat2 light_mat;
 } vs_out;
 
-layout(location = 0) uniform mat4 u_projection;
+/** Uniforms */
+layout(binding = 0, std140) uniform Matrices
+{
+    mat4 u_projection;
+};
 
 void main()
 {
