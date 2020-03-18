@@ -70,23 +70,35 @@ void Rendering::update(float dt)
     });
 
     /** Submit sprites to renderer, for each layer */
+    auto shadow_tex     = gfx::get_renderer().sprite().get_texture("sprites/shadow_c.png");
+    shadow_tex.flag_lit = 0;
+    shadow_tex.scale    = 15;
+
     registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
-        [](const component::Sprite& sprite, const component::Position& pos) {
+        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
+            shadow_tex.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_1"_hs>>().less(
-        [](const component::Sprite& sprite, const component::Position& pos) {
+        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
+            shadow_tex.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_2"_hs>>().less(
-        [](const component::Sprite& sprite, const component::Position& pos) {
+        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
+            shadow_tex.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
-        [](const component::Sprite& sprite, const component::Position& pos) {
+        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
+            shadow_tex.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 }
