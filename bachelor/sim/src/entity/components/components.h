@@ -123,6 +123,12 @@ struct Strategy
 struct LocationRequirement
 {
     glm::vec3 desired_position{};
+
+    float closest_distance{};
+
+    float max_time{};
+
+    float elapsed_time{};
 };
 
 struct VisionRequirement
@@ -134,6 +140,10 @@ struct FindRequirement
 {
     ETag tags{};
     glm::vec3 desired_position{};
+
+    float max_time{};
+
+    float elapsed_time{};
 };
 
 struct TagRequirement
