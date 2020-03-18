@@ -28,6 +28,8 @@ struct Action
     sol::function success{};
     sol::function failure{};
     std::function<void(void)> abort{};
+
+    Action() = default;
 };
 
 inline bool operator==(Action const& lhs, Action const& rhs)
