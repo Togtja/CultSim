@@ -41,10 +41,12 @@ std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bou
     return ret;
 }
 
-glm::ivec2 world_to_grid(const glm::vec2& pos, int grid)
+glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid)
 {
-    return {static_cast<int>(pos.x) / grid, static_cast<int>(pos.y) / grid};
+    return {static_cast<int>(std::floor(pos.x / grid)), static_cast<int>(std::floor(pos.y / grid))};
 }
+
+
 
 int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
 {
