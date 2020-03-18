@@ -41,7 +41,7 @@ bool fix_out_of_bounds(glm::vec3& pos, const glm::vec2& bounds)
     return wrap;
 }
 
-bool out_of_bounds(const glm::vec3 pos, const glm::vec2& bounds)
+bool out_of_bounds(const glm::vec3& pos, const glm::vec2& bounds)
 {
     auto cpy = pos;
     return fix_out_of_bounds(cpy, bounds);
@@ -167,41 +167,37 @@ void Movement::update(float dt)
             {
                 auto dst        = mov.desired_position[i - 1];
                 auto src        = mov.desired_position[i];
-                auto bonds      = m_context.scenario->bounds; // ai::world_to_grid(m_context.scenario->bounds, 32) * 32;
+                auto bounds     = m_context.scenario->bounds; // ai::world_to_grid(m_context.scenario->bounds, 32) * 32;
                 glm::vec3 color = {0.f, 1.f, 1.f};
-                if (out_of_bounds(dst, bonds) && !out_of_bounds(src, bonds))
+                // TODO: Fix issue with multi wrapping, and/or refactor the entire thing
+                if (out_of_bounds(dst, bounds) && !out_of_bounds(src, bounds))
                 {
                     color = {0.f, 1.f, 0.f};
-                    glm::vec3 temp{src};
-                    gfx::get_renderer().debug().draw_line(dst, src, color);
-                    if (dst.x < -bonds.x)
-                    {
-                        dst.x  = bonds.x - (-bonds.x - dst.x) + 1;
-                        temp.x = -temp.x;
-                    }
-                    else if (dst.x > bonds.x)
-                    {
-                        dst.x  = (-bonds.x + (dst.x - bonds.x) - 1);
-                        temp.x = -temp.x;
-                    }
-                    if (dst.y < -bonds.y)
-                    {
-                        dst.y  = bonds.y - (-bonds.y - dst.y) + 1;
-                        temp.y = -temp.y;
-                    }
-                    else if (dst.y > bonds.y)
-                    {
-                        dst.y  = (-bonds.y + (dst.y - bonds.y) - 1);
-                        temp.y = -temp.y;
-                    }
-                    src = temp;
-                    dst = src + (src - dst);
-                    gfx::get_renderer().debug().draw_circle(src, 3, {1.f, 1.f, 0.f});
                     gfx::get_renderer().debug().draw_line(src, dst, color);
-                    gfx::get_renderer().debug().draw_line(src, mov.desired_position.front(), color);
+
+                    gfx::get_renderer().debug().draw_circle(src, 3, {1.f, 0.f, 0.f});
+                    // Draw indication we are leaving map
+                    // gfx::get_renderer().debug().draw_line(src, dst, color);
+                    for (int j = i - 1; j > 2; --j)
+                    {
+                        auto newsrc = ai::world_to_grid_bound(mov.desired_position[j], SIM_GRID_SIZE, bounds) * SIM_GRID_SIZE;
+                        auto newdst = ai::world_to_grid_bound(mov.desired_position[j - 1], SIM_GRID_SIZE, bounds) * SIM_GRID_SIZE;
+
+                        gfx::get_renderer().debug().draw_circle(newsrc, 3, {1.f, 1.f, 0.f});
+
+                        gfx::get_renderer().debug().draw_line(glm::vec3(newdst, 0), glm::vec3(newsrc, 0), {0.f, 0.f, 1.f});
+                    }
+                    auto newdst = ai::world_to_grid_bound(mov.desired_position[2], SIM_GRID_SIZE, bounds) * SIM_GRID_SIZE;
+
+                    auto newsrc = glm::vec3(newdst, 0) - (dst - src);
+                    gfx::get_renderer().debug().draw_circle(newsrc, 3, {1.f, 0.f, 0.f});
+                    gfx::get_renderer().debug().draw_line(newsrc, glm::vec3(newdst, 0), color);
+
+                    gfx::get_renderer().debug().draw_circle(newdst, 3, {1.f, 1.f, 0.f});
+                    gfx::get_renderer().debug().draw_line(glm::vec3(newdst, 0), mov.desired_position.front(), color);
                     break;
                 }
-                else if (out_of_bounds(src, bonds))
+                else if (out_of_bounds(src, bounds))
                 {
                     continue;
                 }
