@@ -12,13 +12,13 @@
 
 namespace cs::ai
 {
-std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bounds, const int grid_size);
+std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& bounds, const int grid_size);
 
 glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid);
 
 glm::ivec2 world_to_grid_bound(const glm::vec2& pos, const int grid, const glm::ivec2& bounds);
 
-int path_heuristic(glm::ivec2 start, glm::ivec2 goal);
+int path_heuristic(const glm::ivec2& start, const glm::ivec2& goal);
 
 void reconstruct_path(const glm::ivec2& start,
                       const glm::ivec2& grid_goal,

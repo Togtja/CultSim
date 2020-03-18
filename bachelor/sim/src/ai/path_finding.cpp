@@ -5,7 +5,7 @@
 
 namespace cs::ai
 {
-std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bounds, const int grid_size)
+std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& bounds, const int grid_size)
 {
     std::vector<glm::vec2> ret;
 
@@ -57,7 +57,7 @@ glm::ivec2 world_to_grid_bound(const glm::vec2& pos, const int grid, const glm::
     return {(((nx % mx) + mx) % mx) - (bounds.x / grid), (((ny % my) + my) % my) - (bounds.y / grid)};
 }
 
-int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
+int path_heuristic(const glm::ivec2& start, const glm::ivec2& goal)
 {
     auto p = start - goal;
     return p.x * p.x + p.y * p.y;
