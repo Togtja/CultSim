@@ -24,7 +24,7 @@ bool Sensor::is_visible(const glm::vec2& pos, const glm::vec2& pos2, float rad)
     }
 }
 
-bool Sensor::is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::ivec2& bounds)
+bool Sensor::is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::vec2& bounds)
 {
     if (is_visible(pos, pos2, rad))
     {
@@ -82,7 +82,7 @@ bool Sensor::is_colliding(const glm::vec2& pos, const glm::vec2& pos2, float siz
     return is_visible(pos, pos2, size + size2);
 }
 
-bool Sensor::is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::ivec2& bounds)
+bool Sensor::is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::vec2& bounds)
 {
     return is_visible_bound(pos, pos2, size + size2, bounds);
 }
