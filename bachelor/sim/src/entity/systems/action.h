@@ -23,19 +23,15 @@ public:
     Action(SystemContext context) : ISystem(context)
     {
         context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(this);
-        context.dispatcher->sink<event::FinishedRequirement>().connect<&Action::finished_Requirement>(this);
     }
 
     ~Action()
     {
         m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(this);
-        m_context.dispatcher->sink<event::FinishedRequirement>().disconnect<&Action::finished_Requirement>(this);
     }
     
     void update(float dt) override;
 
     void abort_strategy(const event::RequirementFailure& event);
-
-    void finished_Requirement(const event::FinishedRequirement& event);
 };
 } // namespace cs::system
