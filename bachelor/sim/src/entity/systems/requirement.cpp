@@ -3,6 +3,7 @@
 #include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/events.h"
 #include "entity/memories/resource_location.h"
 
 #include "glm/glm.hpp"
@@ -14,53 +15,109 @@ void Requirement::update(float dt)
 {
     CS_AUTOTIMER(Requirement System);
 
-    auto& registry = *m_context.registry;
-    auto view_loc  = registry.view<component::LocationRequirement, component::Movement, component::Position>();
-    view_loc.each([&registry](entt::entity e,
-                              component::LocationRequirement locationreqs,
-                              component::Movement& mov,
-                              component::Position pos) {
+    auto& registry   = *m_context.registry;
+    auto& dispatcher = *m_context.dispatcher;
+
+    auto view_loc = registry.view<component::LocationRequirement, component::Movement, component::Position>();
+    view_loc.each([&registry, &dispatcher, dt](entt::entity e,
+                                               component::LocationRequirement locationreqs,
+                                               component::Movement& mov,
+                                               component::Position pos) {
         if (close_enough(pos.position, locationreqs.desired_position, 5.f))
         {
+            dispatcher.enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Location});
             registry.remove<component::LocationRequirement>(e);
         }
         else if (mov.desired_position.empty())
         {
             ai::find_path_astar(pos.position, locationreqs.desired_position, mov.desired_position);
         }
-    });
 
-    auto view_vis = registry.view<component::VisionRequirement, component::Vision>();
-    view_vis.each([&registry](entt::entity e, component::VisionRequirement visionreqs, component::Vision vision) {
-        for (auto& entity : vision.seen)
+        // If we do not get closer to our target for an amount specified by max_time we fail the requirement
+        auto distance = 0.f;
+        for (int i = 1; i < mov.desired_position.size(); i++)
         {
-            if ((registry.get<component::Tags>(entity).tags & visionreqs.tags) == visionreqs.tags)
+            spdlog::get("agent")->warn("We are checking how close we are now");
+            distance += glm::distance(mov.desired_position[i], mov.desired_position[i - 1]);
+        }
+
+        if (distance < locationreqs.closest_distance)
+        {
+            spdlog::get("agent")->warn("We are updating our closest distance");
+            locationreqs.closest_distance = distance;
+            locationreqs.elapsed_time     = 0.f;
+        }
+        else
+        {
+            spdlog::get("agent")->warn("We are adding time to our elapsed time");
+            locationreqs.elapsed_time += dt;
+            if (locationreqs.elapsed_time >= locationreqs.max_time)
             {
-                registry.remove<component::VisionRequirement>(e);
+                spdlog::get("agent")->warn("We are failing our Locationrequirement");
+                dispatcher.enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Location, ""});
+                registry.remove<component::LocationRequirement>(e);
             }
         }
     });
 
-    auto view_find = registry.view<component::FindRequirement, component::Vision, component::Position, component::Movement>();
-    view_find.each([&registry, this](entt::entity e,
-                                     component::FindRequirement findreqs,
-                                     component::Vision vision,
-                                     component::Position pos,
-                                     component::Movement& mov) {
+    auto view_vis = registry.view<component::VisionRequirement, component::Vision>();
+    view_vis.each([&registry, &dispatcher](entt::entity e, component::VisionRequirement visionreqs, component::Vision vision) {
         for (auto& entity : vision.seen)
         {
-            if (registry.valid(entity) && ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags))
+            if ((registry.get<component::Tags>(entity).tags & visionreqs.tags) == visionreqs.tags)
             {
-                auto&& strat = registry.get<component::Strategy>(e);
-                if (strat.staged_strategies.size() != 0)
+                dispatcher.enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Vision});
+                registry.remove<component::VisionRequirement>(e);
+            }
+        }
+
+        // If we are not seeing the entity we are looking for
+        if (registry.try_get<component::VisionRequirement>(e))
+        {
+            dispatcher.enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Vision, ""});
+            registry.remove<component::VisionRequirement>(e);
+        }
+    });
+
+    auto view_find =
+        registry
+            .view<component::FindRequirement, component::Strategy, component::Vision, component::Position, component::Movement>();
+    view_find.each([&registry, dt, this](entt::entity e,
+                                         component::FindRequirement& findreqs,
+                                         component::Strategy& strategies,
+                                         const component::Vision& vision,
+                                         const component::Position& pos,
+                                         component::Movement& mov) {
+        findreqs.elapsed_time += dt;
+        if (findreqs.elapsed_time >= findreqs.max_time)
+        {
+            m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Find, ""});
+            registry.remove<component::FindRequirement>(e);
+        }
+
+        for (auto& entity : vision.seen)
+        {
+            if ((registry.get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
+            {
+                if (strategies.staged_strategies.size() != 0)
                 {
-                    registry.assign<component::LocationRequirement>(e, registry.get<component::Position>(entity).position);
+                    registry.assign<component::LocationRequirement>(e,
+                                                                    registry.get<component::Position>(entity).position,
+                                                                    0.f,
+                                                                    30.f,
+                                                                    0.f);
 
-                    strat.staged_strategies.front().actions.back().target = entity;
+                    strategies.staged_strategies.back().actions.back().target = entity;
+
+                    m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Find});
+                    registry.remove<component::FindRequirement>(e);
+                    mov.desired_position.clear();
                 }
-
-                registry.remove<component::FindRequirement>(e);
-                mov.desired_position.clear();
+                else
+                {
+                    m_context.dispatcher->enqueue<event::RequirementFailure>(
+                        event::RequirementFailure{e, TAG_Find, "The entity's staged requirements list is empty"});
+                }
                 return;
             }
         }
@@ -70,43 +127,25 @@ void Requirement::update(float dt)
             for (auto& memory_container : memories->memory_container)
             {
                 // Find a container matching our tag
-                if (memory_container.memory_tags & findreqs.tags && memory_container.memory_tags & TAG_Location)
+                if ((memory_container.memory_tags & findreqs.tags == findreqs.tags) &&
+                    memory_container.memory_tags & TAG_Location)
                 {
-                    // spdlog::get("agent")->warn("Number of memories: {}", memory_container.memory_storage.size());
-                    int i = 0;
+                    auto& memory = memory_container.memory_storage.front();
 
-                    // Go through each memory in it
-                    for (auto& memory : memory_container.memory_storage)
+                    if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                     {
-                        if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
+                        if (findreqs.desired_position != res->m_location && mov.desired_position.empty())
                         {
-                            if (mov.desired_position.size())
-                            {
-                                //                                spdlog::get("agent")->warn("Target position: {},{},{}",
-                                //                                                           mov.desired_position.back().x,
-                                //                                                           mov.desired_position.back().y,
-                                //                                                           mov.desired_position.back().z);
-                            }
-
-                            if (findreqs.desired_position != res->m_location && mov.desired_position.empty())
-                            {
-                                findreqs.desired_position = res->m_location;
-                                ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
-                            }
-
-                            if (close_enough(pos.position, findreqs.desired_position, 5.f))
-                            {
-                                res->m_number_of_entities = 0.f;
-                                mov.desired_position.clear();
-                                //                                spdlog::get("agent")->warn(
-                                //                                    "Number of Entities in res : {}, Number of Entities in
-                                //                                    memory: {}", res->m_number_of_entities,
-                                //                                    dynamic_cast<memory::ResourceLocation*>(memory.get())->m_number_of_entities);
-                                continue;
-                            }
-                            break;
+                            findreqs.desired_position = res->m_location;
+                            ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
                         }
-                        i++;
+
+                        if (close_enough(pos.position, findreqs.desired_position, 5.f))
+                        {
+                            res->m_number_of_entities = 0.f;
+                            mov.desired_position.clear();
+                        }
+                        break;
                     }
                 }
             }
@@ -119,12 +158,12 @@ void Requirement::update(float dt)
                 findreqs.tags,
                 glm::vec3(m_context.rng->uniform(-m_context.scenario->bounds.x, m_context.scenario->bounds.x),
                           m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
-                          0.f));
+                          0.f),30.f,0.f);
         }
 
         else if (mov.desired_position.empty())
         {
-            //  spdlog::get("agent")->warn("We are searching randomly");
+            // If this is the first run and we have no memories so our desired position is not set
             if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
             {
                 findreqs.desired_position =
@@ -132,6 +171,7 @@ void Requirement::update(float dt)
                               m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
                               0.f);
             }
+
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position);
         }
     });
@@ -140,6 +180,7 @@ void Requirement::update(float dt)
     view_tag.each([this](entt::entity e, component::TagRequirement tagreqs, component::Tags& tags) {
         tags.tags = ETag(tags.tags | tagreqs.tags);
         m_context.registry->remove<component::TagRequirement>(e);
+        m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Tag});
     });
 }
 } // namespace cs::system
