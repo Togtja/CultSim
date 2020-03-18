@@ -14,16 +14,77 @@
 
 namespace cs::system
 {
-bool Sensor::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
+bool Sensor::is_visible(const glm::vec2& pos, const glm::vec2& pos2, float rad)
 {
     float x = pos.x - pos2.x;
     float y = pos.y - pos2.y;
-    return x * x + y * y <= rad * rad;
+    if (x * x + y * y <= rad * rad)
+    {
+        return true;
+    }
 }
 
-bool Sensor::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
+bool Sensor::is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::ivec2& bounds)
+{
+    if (is_visible(pos, pos2, rad))
+    {
+        return true;
+    }
+    // Check for out of bound vision wrapping
+    float x;
+    float y;
+    float rad2 = rad * rad;
+    if (pos.x - rad < -bounds.x)
+    {
+        auto b_pos = pos + glm::vec2(2.f * bounds.x, 0);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.x + rad > bounds.x)
+    {
+        auto b_pos = pos - glm::vec2(2.f * bounds.x, 0);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.y - rad < -bounds.y)
+    {
+        auto b_pos = pos + glm::vec2(0, 2.f * bounds.y);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.y + rad > bounds.y)
+    {
+        auto b_pos = pos - glm::vec2(0, 2.f * bounds.y);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Sensor::is_colliding(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2)
 {
     return is_visible(pos, pos2, size + size2);
+}
+
+bool Sensor::is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::ivec2& bounds)
+{
+    return is_visible_bound(pos, pos2, size + size2, bounds);
 }
 
 void Sensor::update(float dt)
