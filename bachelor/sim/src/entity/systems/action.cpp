@@ -43,7 +43,7 @@ void Action::update(float dt)
                     }
                     if (strategy.requirements & TAG_Location)
                     {
-                        m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f});
+                        m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f}, 0.f, 30.f, 0.f);
                         strategy.requirements = static_cast<ETag>(action.requirements & ~TAG_Location);
                     }
                     if (strategy.requirements & TAG_Vision)
@@ -53,7 +53,7 @@ void Action::update(float dt)
                     }
                     if (strategy.requirements & TAG_Find)
                     {
-                        m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{});
+                        m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{}, 30.f,0.f);
                         strategy.requirements = static_cast<ETag>(action.requirements & ~TAG_Find);
                     }
                 }
@@ -108,15 +108,6 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         strategy.desirability--;
 
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
-    }
-}
-void Action::finished_Requirement(const event::FinishedRequirement& event)
-{
-    auto strategy = m_context.registry->try_get<component::Strategy>(event.entity);
-    if (strategy)
-    {
-        strategy->staged_strategies.back().requirements =
-            ETag(strategy->staged_strategies.back().requirements & ~event.requirement);
     }
 }
 } // namespace cs::system
