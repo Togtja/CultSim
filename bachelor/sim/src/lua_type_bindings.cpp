@@ -72,6 +72,8 @@ void bind_components(sol::state_view lua)
                                      &action::Action::requirements,
                                      "time_to_complete",
                                      &action::Action::time_to_complete,
+                                     "success_chance",
+                                     &action::Action::success_chance,
                                      "success",
                                      &action::Action::success,
                                      "failure",

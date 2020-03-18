@@ -6,6 +6,7 @@ actions.sleep = {
     name = "Sleep",
     requirements = ETag.None,
     time_to_complete = 10.0,
+    success_chance = 0.9,
     success = function(owner, target)
         cultsim.modify_need(owner, ETag.Sleep, 69.0)
     end,
@@ -19,6 +20,7 @@ actions.consume_self = {
     requirements = ETag.None,
     time_to_complete = 7.5,
     -- You manage to eat yourself without too much damage caused
+    success_chance = 0.9,
     success = function(owner, target)
         -- Roll for how much we ate
         local chunk_eaten = random:uniform(15.0, 45.0)
@@ -37,6 +39,7 @@ actions.drink = {
     name = "Drink",
     requirements = ETag.Find,
     time_to_complete = 2.0,
+    success_chance = 0.9,
     success = function(owner, target)
         cultsim.modify_need(owner, ETag.Drink, 85.0)
         cultsim.kill(target)
@@ -50,6 +53,7 @@ actions.eat = {
     name = "Eat",
     requirements = ETag.Find,
     time_to_complete = 5.0,
+    success_chance = 0.9,
     success = function(owner, target)
         cultsim.modify_need(owner, ETag.Food, 60.0)
         cultsim.kill(target)
@@ -63,6 +67,7 @@ actions.reproduce = {
     name = "Reproducing",
     requirements = ETag.Find | ETag.Tag,
     time_to_complete = 5.0,
+    success_chance = 0.9,
     success = function(owner, target)
         local my_reproduction = cultsim.get_component(owner, component.reproduction)
         local their_reproduction = cultsim.get_component(target, component.reproduction)
