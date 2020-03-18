@@ -9,6 +9,8 @@ target_sources(
         cultbench
         PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/functions.h
+        ${CMAKE_CURRENT_LIST_DIR}/functions.cpp
 )
 
 # Set Include Directories
@@ -25,6 +27,7 @@ target_link_libraries(
         PRIVATE
         benchmark
         EnTT::EnTT
+        glm::glm
         # OpenMP::OpenMP_CXX
 )
 
