@@ -14,9 +14,14 @@ struct Strategy
 
     float desirability{};
 
-    ETag prerequisites{};
+    int working_on_action = 0;
+
 
     ETag tags{};
+
+    ETag prerequisites{};
+
+    ETag requirements{};
 
     std::vector<action::Action> actions{};
 };
