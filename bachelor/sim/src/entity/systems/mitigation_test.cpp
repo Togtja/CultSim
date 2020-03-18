@@ -17,11 +17,8 @@ TEST_CASE("Testing that system does not run if pressing needs are empty")
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
-    cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                                 0,
-                                 {},
-                                 cs::TAG_Food,
-                                 std::vector<cs::action::Action>{std::move(action)}};
+    cs::ai::Strategy strategy =
+        {static_cast<std::string>("eat food"), 0, {}, cs::TAG_Food, {}, {}, std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
@@ -64,17 +61,11 @@ TEST_CASE("Test case for mitigation system not adding strategies that do not mat
     cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
-    cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                                 0,
-                                 {},
-                                 cs::TAG_Food,
-                                 std::vector<cs::action::Action>{action}};
+    cs::ai::Strategy strategy =
+        {static_cast<std::string>("eat food"), 0, {}, cs::TAG_Food, {}, {}, std::vector<cs::action::Action>{action}};
 
-    cs::ai::Strategy strategy2 = {static_cast<std::string>("go sleep"),
-                                  0,
-                                  {},
-                                  cs::TAG_Sleep,
-                                  std::vector<cs::action::Action>{action}};
+    cs::ai::Strategy strategy2 =
+        {static_cast<std::string>("go sleep"), 0, {}, cs::TAG_Sleep, {}, {}, std::vector<cs::action::Action>{action}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
@@ -108,17 +99,15 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
         {static_cast<std::string>("hunger & thirst"), 3.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
-    cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                                 0,
-                                 {},
-                                 cs::TAG_Food,
-                                 std::vector<cs::action::Action>{std::move(action)}};
+    cs::ai::Strategy strategy =
+        {static_cast<std::string>("eat food"), 0, {}, cs::TAG_Food, {}, {}, std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink slushy"),
                                   0,
                                   {},
                                   static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink),
-                                  std::vector<cs::action::Action>{std::move(action)}};
+                                  {},
+                                  {}, std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
@@ -153,16 +142,15 @@ TEST_CASE("Test case for strategies being removed if pressing needs becomes empt
         {static_cast<std::string>("hunger & thirst"), 3.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink)};
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
-    cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                                 0,
-                                 {},
-                                 cs::TAG_Food,
-                                 std::vector<cs::action::Action>{std::move(action)}};
+    cs::ai::Strategy strategy =
+        {static_cast<std::string>("eat food"), 0, {}, cs::TAG_Food, {}, {}, std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink slushy"),
                                   0,
                                   {},
                                   static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink),
+                                  {},
+                                  {},
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
@@ -204,16 +192,15 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
 
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
-    cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
-                                 0,
-                                 {},
-                                 cs::TAG_Food,
-                                 std::vector<cs::action::Action>{std::move(action)}};
+    cs::ai::Strategy strategy =
+        {static_cast<std::string>("eat food"), 0, {}, cs::TAG_Food, {}, {}, std::vector<cs::action::Action>{std::move(action)}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink water"),
                                   0,
                                   {},
                                   static_cast<cs::ETag>(cs::TAG_Drink),
+                                  {},
+                                  {},
                                   std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need, need2}), std::vector<cs::ai::Need>({}));
