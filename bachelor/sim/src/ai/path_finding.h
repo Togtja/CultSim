@@ -16,6 +16,8 @@ std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2 pos, const glm::vec2 bou
 
 glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid);
 
+glm::ivec2 world_to_grid_bound(const glm::vec2& pos, const int grid, const glm::ivec2& bounds);
+
 int path_heuristic(glm::ivec2 start, glm::ivec2 goal);
 
 void reconstruct_path(const glm::ivec2& start,

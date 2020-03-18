@@ -1,5 +1,6 @@
 #include "path_finding.h"
 
+#include <cmath>
 #include <spdlog/spdlog.h>
 
 namespace cs::ai
@@ -46,7 +47,15 @@ glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid)
     return {static_cast<int>(std::floor(pos.x / grid)), static_cast<int>(std::floor(pos.y / grid))};
 }
 
+glm::ivec2 world_to_grid_bound(const glm::vec2& pos, const int grid, const glm::ivec2& bounds)
+{
+    int nx = std::floor((pos.x - bounds.x) / grid);
+    int mx = std::floor((2 * bounds.x) / grid);
 
+    int ny = std::floor((pos.y - bounds.y) / grid);
+    int my = std::floor((2 * bounds.y) / grid);
+    return {(((nx % mx) + mx) % mx) - (bounds.x / grid), (((ny % my) + my) % my) - (bounds.y / grid)};
+}
 
 int path_heuristic(glm::ivec2 start, glm::ivec2 goal)
 {
