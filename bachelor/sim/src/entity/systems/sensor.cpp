@@ -105,37 +105,41 @@ void Sensor::update(float dt)
 
     /** Construct collision grid */
     registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
-        auto min = ai::world_to_grid(pos.position, SIM_GRID_SIZE * 2);
-        m_collision_grid[min.x * SIM_GRID_SIZE * 2 + min.y].emplace_back(e);
+        auto min = ai::world_to_grid_bound(pos.position, SIM_GRID_SIZE, m_context.scenario->bounds);
+        m_collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
     });
 
     registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = registry.group<component::Vision, component::Position>();
 
-    std::for_each(std::execution::par, vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
+    std::for_each(vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE * 2);
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE * 2);
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
 
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                if (m_collision_grid.find(x * SIM_GRID_SIZE * 2 + y) == m_collision_grid.end())
+                auto bounded = ai::world_to_grid_bound(glm::vec2(x * SIM_GRID_SIZE, y * SIM_GRID_SIZE),
+                                                       SIM_GRID_SIZE,
+                                                       m_context.scenario->bounds);
+
+                if (m_collision_grid.find(bounded.x * SIM_GRID_SIZE + bounded.y) == m_collision_grid.end())
                 {
                     continue;
                 }
 
-                for (auto e2 : m_collision_grid[x * SIM_GRID_SIZE * 2 + y])
+                for (auto e2 : m_collision_grid[bounded.x * SIM_GRID_SIZE + bounded.y])
                 {
                     auto& pos2 = registry.get<component::Position>(e2);
                     if (e == e2)
                     {
                         continue;
                     }
-                    if (is_visible(pos.position, pos2.position, vis.radius))
+                    if (is_visible_bound(pos.position, pos2.position, vis.radius, m_context.scenario->bounds))
                     {
                         vis.seen.push_back(e2);
                     }
