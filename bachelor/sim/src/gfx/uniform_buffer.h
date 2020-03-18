@@ -87,7 +87,31 @@ public:
      */
     void flush()
     {
+        memcpy(m_mapped_pointer, m_value.data(), size_bytes(m_value));
         glFlushMappedNamedBufferRange(m_handle, 0, size_bytes(m_value));
+    }
+
+    /**
+     * Flush the contents of the uniform buffer to make it available for the GPU
+     *
+     * @param values Set the value before flushing
+     */
+    void flush(const T& value)
+    {
+        m_value[0] = value;
+        flush();
+    }
+
+    /**
+     * Flush the contents of the uniform buffer to make it available for the GPU
+     *
+     * @param values Set the values before flushing
+     */
+    void flush(const std::array<T, Num>& values)
+    {
+        static_assert(Num > 1, "can not use array version on non-array data");
+        m_value = values;
+        flush();
     }
 
     /**
@@ -105,10 +129,11 @@ private:
     {
         glCreateBuffers(1, &m_handle);
         glNamedBufferStorage(m_handle, size_bytes(m_value), m_value.data(), GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT);
-        m_mapped_pointer = glMapNamedBufferRange(m_handle,
-                                                 0,
-                                                 size_bytes(m_value),
-                                                 GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_FLUSH_EXPLICIT_BIT);
+        m_mapped_pointer =
+            static_cast<T*>(glMapNamedBufferRange(m_handle,
+                                                  0,
+                                                  size_bytes(m_value),
+                                                  GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
     }
 
     void deinitialize()
