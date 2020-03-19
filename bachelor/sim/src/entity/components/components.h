@@ -81,7 +81,8 @@ struct Reproduction
 
     ESex sex = Male;
     uint16_t number_of_children{};
-    uint16_t max_children{};
+    
+    float fertility{};
 };
 
 struct Timer
