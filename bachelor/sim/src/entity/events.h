@@ -1,8 +1,11 @@
 #pragma once
 #include "entity/components/tags.h"
+#include "entity/memories/memory.h"
+#include <memory>
 
 #include <entt/fwd.hpp>
 #include <glm/vec3.hpp>
+
 namespace cs::event
 {
 /**
@@ -61,5 +64,12 @@ struct RequirementFailure
     cs::ETag requirement{};
 
     std::string error{};
+};
+
+struct CreatedMemory
+{
+    entt::entity entity{};
+
+    std::shared_ptr<memory::IMemory> memory{};
 };
 } // namespace cs::event
