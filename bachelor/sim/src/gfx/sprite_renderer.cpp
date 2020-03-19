@@ -21,12 +21,10 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     init_shader();
     init_vbo_and_vao();
     init_texture_slots();
+    init_ubos();
 
     /** Initialize Camera */
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
-
-    /** Init UBO */
-    m_material_ubo = std::make_unique<UniformBuffer<Material, 4>>();
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
@@ -36,17 +34,12 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
-    static glm::vec3 light_direction{1.f, 1.f, 1.f};
-    ImGui::DragFloat3("Light Direction", glm::value_ptr(light_direction), 0.01f, -1.f, 1.f, "%.2f");
-    light_direction = glm::normalize(light_direction);
-
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
     glUseProgram(m_shader);
     glBindVertexArray(m_vao);
 
-    glUniform3fv(1, 1, glm::value_ptr(light_direction));
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
     m_nsprites = 0u;
@@ -215,4 +208,14 @@ void SpriteRenderer::init_texture_slots()
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }
+
+void SpriteRenderer::init_ubos()
+{
+    m_material_ubo = std::make_unique<UniformBuffer<Material, 4>>();
+    m_material_ubo->bind(1);
+    m_material_ubo->flush();
+    m_env_ubo.bind(2);
+    m_env_ubo.flush();
+}
+
 } // namespace cs::gfx

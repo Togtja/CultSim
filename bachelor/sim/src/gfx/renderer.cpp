@@ -8,8 +8,8 @@ void Renderer::display()
 {
     m_matrix_ubo.flush(m_camera.get_view_matrix());
     m_matrix_ubo.bind(0u);
-    m_debug_renderer.display();
     m_sprite_renderer.display();
+    m_debug_renderer.display();
 }
 
 DebugRenderer& Renderer::debug()

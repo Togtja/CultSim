@@ -4,6 +4,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace cs::gfx
 {
@@ -49,6 +50,17 @@ struct Material
     float specular = 0.5f;
     float gloss    = 50.f;
     float emissive = 0.f;
+};
+
+/**
+ * Describes a sunlight environment
+ */
+struct Environment
+{
+    glm::vec4 sun_color{1.f, 1.f, 1.f, 1.f};
+    glm::vec4 ambient_color{0.1f, 0.1f, 0.2f, 1.f};
+    glm::vec3 sun_direction{1.f, 1.f, 1.f};
+    float _padding;
 };
 
 /**
