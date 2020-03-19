@@ -96,7 +96,7 @@ void Memory::update(float dt)
 
             
                         // TODO: Remove magic number and put limit of memories remembered into Lua
-                        while (memory_container.memory_storage.size() > m_max_memories || memory_container.memory_storage.back()->m_time_since_creation <  m_max_retention_time)
+                        while (memory_container.memory_storage.size() > m_max_memories || (memory_container.memory_storage.size() > 0 && memory_container.memory_storage.back()->m_time_since_creation <  m_max_retention_time))
                         {
                             memory_container.memory_storage.pop_back();
                         }
