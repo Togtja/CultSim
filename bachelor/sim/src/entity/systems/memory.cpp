@@ -14,7 +14,7 @@ void Memory::update(float dt)
     m_timer += dt;
     auto& registry = m_context.registry;
 
-    if (m_timer / 0.5f > 0.0f && m_timer / 0.5 < 0.1f)
+    if (m_timer > 0.4f && m_timer < 0.6f)
     {
         auto view = registry->view<component::Memory, component::Vision>();
         view.each([dt, registry](entt::entity e, component::Memory& memory, const component::Vision& vision) {
@@ -52,14 +52,20 @@ void Memory::update(float dt)
             }
         });
     }
+
     if (m_timer >= 1)
     {
         m_timer   = 0.f;
         auto view = registry->view<component::Memory>();
 
-        view.each([dt, registry](entt::entity e, component::Memory& memory) {
+        view.each([dt, registry, this](entt::entity e, component::Memory& memory) {
             for (auto& memory_container : memory.memory_container)
             {
+                for (auto& memory : memory_container.memory_storage)
+                {
+                    memory->update(1.f);
+                }
+
                 if (memory_container.memory_storage.size() != 0)
                 {
                     // spdlog::get("agent")->warn("Size of memory storage {}: {}",
@@ -88,30 +94,99 @@ void Memory::update(float dt)
                                 return cost_lhs < cost_rhs;
                             });
 
-                        int i = 0;
-                        for (auto& memory : memory_container.memory_storage)
-                        {
-                            if (auto res = dynamic_cast<memory::ResourceLocation*>(memory.get());
-                                res && res->m_number_of_entities == 0)
-                            {
-                                memory->update(1.f);
-                                //  spdlog::get("agent")->warn("We are deleting a {} Memory. Memories left : {}",
-                                //                             tag_to_string(ETag(memory_container.memory_tags & ~TAG_Location)),
-                                //                             memory_container.memory_storage.size());
-                                memory_container.memory_storage.erase(memory_container.memory_storage.begin() + i);
-                            }
-                            i++;
-                        }
-
+            
                         // TODO: Remove magic number and put limit of memories remembered into Lua
-                        while (memory_container.memory_storage.size() > 10)
+                        while (memory_container.memory_storage.size() > m_max_memories || memory_container.memory_storage.back()->m_time_since_creation <  m_max_retention_time)
                         {
-                            memory_container.memory_storage.erase(memory_container.memory_storage.end() - 1);
+                            memory_container.memory_storage.pop_back();
                         }
                     }
                 }
             }
         });
+    }
+}
+
+void Memory::update_memories(const event::CreatedMemory& event)
+{
+    auto memories  = m_context.registry->try_get<component::Memory>(event.entity);
+    const auto pos = m_context.registry->try_get<component::Position>(event.entity);
+
+    if (memories)
+    {
+        // Adds the new memory / Updates memories where applicable
+        for (auto& memory_container : memories->memory_container)
+        {
+            // Memory creation / Updating
+            if (memory_container.memory_tags & event.memory->m_tags == event.memory->m_tags)
+            {
+                auto duplicate = false;
+                int i          = 0;
+                for (auto& memory : memory_container.memory_storage)
+                {
+                    auto* res       = dynamic_cast<memory::ResourceLocation*>(memory.get());
+                    auto* event_res = dynamic_cast<memory::ResourceLocation*>(event.memory.get());
+                    if (res && close_enough(res->m_location, event_res->m_location, 20.f))
+                    {
+                        res->m_number_of_entities  = event_res->m_number_of_entities;
+                        res->m_time_since_creation = 0.f;
+                        duplicate                  = true;
+                    }
+                }
+                // Create a new memory
+                if (!duplicate)
+                {
+                    memory_container.memory_storage.emplace_back(event.memory->clone());
+                }
+
+                // Re-sort the memories
+                if (event.memory->m_tags & TAG_Location)
+                {
+                    auto pos = m_context.registry->try_get<component::Position>(event.entity);
+                    if (pos && dynamic_cast<memory::ResourceLocation*>(event.memory.get()))
+                    {
+                        std::sort(memory_container.memory_storage.begin(),
+                                  memory_container.memory_storage.end(),
+                                  [pos, this](const std::unique_ptr<memory::IMemory>& lhs,
+                                              const std::unique_ptr<memory::IMemory>& rhs) {
+                                      auto res_lhs = dynamic_cast<memory::ResourceLocation*>(lhs.get());
+                                      auto res_rhs = dynamic_cast<memory::ResourceLocation*>(rhs.get());
+
+                                      float cost_lhs{};
+                                      float cost_rhs{};
+
+                                      cost_lhs = glm::distance(res_lhs->m_location, pos->position);
+                                      cost_rhs = glm::distance(res_rhs->m_location, pos->position);
+
+                                      cost_lhs -= res_lhs->m_number_of_entities * 10.f;
+                                      cost_rhs -= res_rhs->m_number_of_entities * 10.f;
+
+                                      cost_lhs += res_lhs->m_time_since_creation;
+                                      cost_rhs += res_rhs->m_time_since_creation;
+
+                                      //Make sure that memories that have aged past retention_time are moved to the back of the list
+                                      if (res_lhs->m_time_since_creation > m_max_retention_time)
+                                      {
+                                          cost_lhs += 1000.f;
+                                      }
+                                      if (res_rhs->m_time_since_creation > m_max_retention_time) 
+                                      {
+                                          cost_rhs += 1000.f;
+                                      }
+                                      
+                                      return cost_lhs < cost_rhs;
+                                  });
+                    }
+                }
+
+                // Delete the most useless memories
+                while (memory_container.memory_storage.size() >= m_max_memories ||
+                       memory_container.memory_storage.back()->m_time_since_creation < m_max_retention_time)
+                {
+                    memory_container.memory_storage.pop_back();
+                }
+            }
+        }
     }
 }
 } // namespace cs::system
