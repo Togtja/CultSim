@@ -1,10 +1,10 @@
 #pragma once
 
+#include "entity/memories/container.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "random_engine.h"
 #include "strategy.h"
-#include "entity/memories/container.h"
 #include "tags.h"
 
 #include <vector>
@@ -99,7 +99,15 @@ struct Health
 {
     float health{};
     float tickdown_rate{};
+
     ETag need_tags{};
+};
+
+struct Age
+{
+    float current_age{};
+
+    float max_age{};
 };
 
 struct DropItems
