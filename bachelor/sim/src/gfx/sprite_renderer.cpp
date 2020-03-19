@@ -24,6 +24,9 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
 
     /** Initialize Camera */
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
+
+    /** Init UBO */
+    m_material_ubo = std::make_unique<UniformBuffer<Material, 4>>();
 }
 
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
