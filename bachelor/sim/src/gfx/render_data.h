@@ -44,6 +44,16 @@ struct SpriteTextureID
 };
 
 /**
+ * Describes a surface
+ */
+struct Material
+{
+    float diffuse  = 1.f;
+    float specular = 0.5f;
+    float gloss    = 50.f;
+};
+
+/**
  * The vertex layout of a sprite used by the sprite renderer
  */
 struct SpriteVertex

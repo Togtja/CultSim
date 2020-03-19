@@ -64,9 +64,16 @@ bool Window::init(std::string_view name, int width, int height)
     m_context = SDL_GL_CreateContext(m_window);
 
     /** Set window icon (hard coded to  our icon */
-    auto pixels = gfx::load_texture("sprites/logo.png", false);
-    SDL_Surface* surf =
-        SDL_CreateRGBSurfaceFrom(pixels.pixels.data(), 512, 512, 32, 4 * 512, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+    auto pixels       = gfx::load_texture("sprites/logo.png", false);
+    SDL_Surface* surf = SDL_CreateRGBSurfaceFrom(pixels.pixels.data(),
+                                                 pixels.width,
+                                                 pixels.height,
+                                                 32,
+                                                 4 * pixels.width,
+                                                 0x000000FF,
+                                                 0x0000FF00,
+                                                 0x00FF0000,
+                                                 0xFF000000);
     SDL_SetWindowIcon(m_window, surf);
     SDL_FreeSurface(surf);
 

@@ -13,8 +13,8 @@ namespace cs::gfx
 class SpriteRenderer
 {
 private:
-    inline static constexpr int TEXTURE_WIDTH  = 512;
-    inline static constexpr int TEXTURE_HEIGHT = 512;
+    inline static constexpr int TEXTURE_WIDTH  = 64;
+    inline static constexpr int TEXTURE_HEIGHT = 64;
 
     Camera& m_camera;
 
@@ -71,7 +71,7 @@ public:
      * no normal map is required
      * @return An ID to the given texture
      */
-    SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath);
+    SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath = {});
 
 private:
     bool increment_next_texture_id();

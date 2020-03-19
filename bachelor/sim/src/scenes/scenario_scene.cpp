@@ -7,7 +7,6 @@
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
-#include "entity/systems/sensor.h"
 #include "entity/systems/health.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
@@ -15,6 +14,7 @@
 #include "entity/systems/rendering.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
+#include "entity/systems/sensor.h"
 #include "entity/systems/timer.h"
 #include "gfx/renderer.h"
 #include "input/input_handler.h"
@@ -122,15 +122,16 @@ bool ScenarioScene::update(float dt)
     draw_time_control_ui();
     draw_selected_entity_information_ui();
 
-    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png", {});
+    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale       = 100;
+    b_tex.flag_lit    = false;
 
     /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
     {
         for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
         {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.1f, 0.1f, 0.1f), b_tex);
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.15f, 0.0f), b_tex);
         }
     }
 
@@ -182,10 +183,14 @@ bool ScenarioScene::draw()
                               glm::vec3(0.3f));
         }
     }
-
-    r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-    r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-    r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    static bool show_axis = false;
+    ImGui::Checkbox("Show Axis", &show_axis);
+    if (show_axis)
+    {
+        r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
+        r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
+        r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
+    }
 
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
 
