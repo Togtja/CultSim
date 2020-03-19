@@ -49,7 +49,7 @@ public:
     SpriteRenderer& sprite();
     [[nodiscard]] const SpriteRenderer& sprite() const;
 
-    void set_camera_position(glm::vec3 pos);
+    void set_camera_position(const glm::vec3& pos);
 
     void move_camera(glm::vec3 delta);
 
