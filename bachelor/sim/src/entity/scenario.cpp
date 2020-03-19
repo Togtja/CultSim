@@ -1,5 +1,8 @@
 #include "scenario.h"
+#include "constants.h"
 #include "filesystem/filesystem.h"
+
+#include <glm/common.hpp>
 
 #include <spdlog/spdlog.h>
 
@@ -23,7 +26,9 @@ Scenario quick_load_scenario(sol::state_view lua, std::string_view rpath)
 
     /** Get scenario from Lua */
     auto scenario        = lua["scenario"].get<Scenario>();
+    scenario.bounds      = glm::ivec2(glm::ceil(scenario.bounds / static_cast<float>(SIM_GRID_SIZE))) * SIM_GRID_SIZE;
     scenario.script_path = rpath;
+    lua["scenario"]      = scenario;
     return scenario;
 }
 } // namespace cs::lua

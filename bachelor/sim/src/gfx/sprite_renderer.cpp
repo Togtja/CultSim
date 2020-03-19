@@ -192,7 +192,7 @@ void SpriteRenderer::init_texture_slots()
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
         /** TODO: Fix Hard coded texture size and layers */
-        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
+        glTextureStorage3D(tex, 1, GL_RGBA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32);
     }
     glBindTextures(0, num_textures, m_color_texture_handles.data());
 
@@ -208,8 +208,8 @@ void SpriteRenderer::init_texture_slots()
 
         /** TODO: Fix Hard coded texture size and layers */
         const uint8_t color_data[] = {128, 128, 255, 255};
-        glTextureStorage3D(tex, 1, GL_RGBA8, 512, 512, 32);
-        glClearTexSubImage(tex, 0, 0, 0, 0, 512, 512, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
+        glTextureStorage3D(tex, 1, GL_RGBA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32);
+        glClearTexSubImage(tex, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }

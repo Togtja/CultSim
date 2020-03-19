@@ -14,16 +14,74 @@
 
 namespace cs::system
 {
-bool Sensor::is_visible(glm::vec2 pos, glm::vec2 pos2, float rad)
+bool Sensor::is_visible(const glm::vec2& pos, const glm::vec2& pos2, float rad)
 {
     float x = pos.x - pos2.x;
     float y = pos.y - pos2.y;
-    return x * x + y * y <= rad * rad;
+    return (x * x + y * y <= rad * rad);
 }
 
-bool Sensor::is_colliding(glm::vec2 pos, glm::vec2 pos2, float size, float size2)
+bool Sensor::is_visible_bound(const glm::vec2& pos, const glm::vec2& pos2, float rad, const glm::vec2& bounds)
+{
+    if (is_visible(pos, pos2, rad))
+    {
+        return true;
+    }
+    // Check for out of bound vision wrapping
+    float x;
+    float y;
+    float rad2 = rad * rad;
+    if (pos.x - rad < -bounds.x)
+    {
+        auto b_pos = pos + glm::vec2(2.f * bounds.x, 0);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.x + rad > bounds.x)
+    {
+        auto b_pos = pos - glm::vec2(2.f * bounds.x, 0);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.y - rad < -bounds.y)
+    {
+        auto b_pos = pos + glm::vec2(0, 2.f * bounds.y);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    if (pos.y + rad > bounds.y)
+    {
+        auto b_pos = pos - glm::vec2(0, 2.f * bounds.y);
+        x          = b_pos.x - pos2.x;
+        y          = b_pos.y - pos2.y;
+        if (x * x + y * y <= rad2)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Sensor::is_colliding(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2)
 {
     return is_visible(pos, pos2, size + size2);
+}
+
+bool Sensor::is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, float size, float size2, const glm::vec2& bounds)
+{
+    return is_visible_bound(pos, pos2, size + size2, bounds);
 }
 
 void Sensor::update(float dt)
@@ -44,7 +102,7 @@ void Sensor::update(float dt)
 
     /** Construct collision grid */
     registry.view<component::Position>().each([this](entt::entity e, const component::Position& pos) {
-        auto min = ai::world_to_grid(pos.position);
+        auto min = ai::world_to_grid_bound(pos.position, SIM_GRID_SIZE, m_context.scenario->bounds);
         m_collision_grid[min.x * SIM_GRID_SIZE + min.y].emplace_back(e);
     });
 
@@ -55,25 +113,30 @@ void Sensor::update(float dt)
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0));
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0));
+        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
+        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
+
         for (int x = min.x; x <= max.x; x++)
         {
             for (int y = min.y; y <= max.y; y++)
             {
-                if (m_collision_grid.find(x * SIM_GRID_SIZE + y) == m_collision_grid.end())
+                auto bounded = ai::world_to_grid_bound(glm::vec2(x * SIM_GRID_SIZE, y * SIM_GRID_SIZE),
+                                                       SIM_GRID_SIZE,
+                                                       m_context.scenario->bounds);
+
+                if (m_collision_grid.find(bounded.x * SIM_GRID_SIZE + bounded.y) == m_collision_grid.end())
                 {
                     continue;
                 }
 
-                for (auto e2 : m_collision_grid[x * SIM_GRID_SIZE + y])
+                for (auto e2 : m_collision_grid[bounded.x * SIM_GRID_SIZE + bounded.y])
                 {
                     auto& pos2 = registry.get<component::Position>(e2);
                     if (e == e2)
                     {
                         continue;
                     }
-                    if (is_visible(pos.position, pos2.position, vis.radius))
+                    if (is_visible_bound(pos.position, pos2.position, vis.radius, m_context.scenario->bounds))
                     {
                         vis.seen.push_back(e2);
                     }
