@@ -188,7 +188,7 @@ bool ScenarioScene::draw()
     r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
     r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
 
-    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
+    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
 
     m_scenario.draw();
     return false;
@@ -203,7 +203,6 @@ void ScenarioScene::bind_actions_for_scene()
         if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
         }
 
         select_helper.selected_entity = select_helper.hovered_entity;
@@ -211,7 +210,6 @@ void ScenarioScene::bind_actions_for_scene()
         if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
         }
     });
 
@@ -591,7 +589,6 @@ void ScenarioScene::update_entity_hover()
     if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.remove<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
-        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 0;
     }
 
     /** Reset hover status */
@@ -608,7 +605,6 @@ void ScenarioScene::update_entity_hover()
     if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
-        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 1;
     }
 
     ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
