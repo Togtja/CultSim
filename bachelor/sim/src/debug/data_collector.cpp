@@ -16,6 +16,26 @@ void DataCollector::sample()
     }
 }
 
+void DataCollector::set_sampling_rate(float seconds)
+{
+    m_sampling_rate = seconds;
+}
+
+void DataCollector::update(float dt)
+{
+    m_time_since_sample += dt;
+    if (m_time_since_sample > m_sampling_rate)
+    {
+        sample();
+    }
+}
+
+void DataCollector::clear()
+{
+    m_collectors.clear();
+    m_samples.clear();
+}
+
 void DataCollector::save_to_file(std::string_view rpath, bool timestamp)
 {
 }

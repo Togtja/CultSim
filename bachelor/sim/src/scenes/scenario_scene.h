@@ -53,9 +53,6 @@ private:
     /** Time sim has been running */
     float m_simtime = 0.f;
 
-    /** When this value passes the sampling rate we sample data */
-    float m_next_data_sample = 0.f;
-
     /** Current time scale of simulation */
     float m_timescale = 1.f;
 

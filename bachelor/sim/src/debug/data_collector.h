@@ -29,6 +29,12 @@ private:
     /** Samples */
     std::vector<std::vector<float>> m_samples{};
 
+    /** Time since sample */
+    float m_time_since_sample = 0.f;
+
+    /** How often we sample */
+    float m_sampling_rate = 0.f;
+
 public:
     DataCollector() = default;
 
@@ -59,6 +65,23 @@ public:
      * Run data collection commands and sample all data
      */
     void sample();
+
+    /**
+     * Set the sampling rate for the data collector
+     *
+     * @param seconds The number of seconds between each sample
+     */
+    void set_sampling_rate(float seconds);
+
+    /**
+     * Update the data collector, it will sample if required
+     *
+     * @param dt The delta time since last update
+     */
+    void update(float dt);
+
+    /** Clear all data samples and collectors */
+    void clear();
 
     /**
      * Save the collected data to a file

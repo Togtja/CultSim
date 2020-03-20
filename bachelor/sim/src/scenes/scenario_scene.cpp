@@ -62,6 +62,9 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** TODO: Read in data samplers from Lua */
+    m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
+
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
@@ -84,7 +87,7 @@ void ScenarioScene::clean_simulation()
     m_timescale = 1.f;
     m_active_systems.clear();
     m_inactive_systems.clear();
-    m_next_data_sample = 0.f;
+    m_data_collector.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -112,7 +115,6 @@ bool ScenarioScene::update(float dt)
     dt *= m_timescale;
 
     m_simtime += dt;
-    m_next_data_sample += dt;
 
     // TODO : Move to input action response
     update_entity_hover();
@@ -146,6 +148,9 @@ bool ScenarioScene::update(float dt)
     m_scheduler.update(dt);
     m_dispatcher.update();
     m_scenario.update(dt);
+
+    /** Sample data */
+    m_data_collector.update(dt);
 
     /** It's supposed to be two of these here, do not change - not a bug */
     ImGui::End();
