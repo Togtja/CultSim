@@ -15,6 +15,7 @@ void Deletion::update(float dt)
 }
 void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
+    spdlog::get("agent")->critical("We are deleting enity {}", event.entity);
     m_context.registry->assign<component::Delete>(event.entity);
 }
 } // namespace cs::system

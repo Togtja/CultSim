@@ -1,6 +1,6 @@
 #pragma once
-#include "system.h"
 #include "entity/events.h"
+#include "system.h"
 namespace cs::system
 {
 class Memory : public ISystem
@@ -15,7 +15,7 @@ private:
 public:
     Memory(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::CreatedMemory>().connect<&Memory::update_memories>(this);
+        m_context.dispatcher->sink<event::CreatedMemory>().connect<&Memory::update_memories>(this);
     }
 
     ~Memory()

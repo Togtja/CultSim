@@ -10,7 +10,7 @@ class Inventory : public ISystem
 public:
     Inventory(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::DeleteEntity>().connect<&Inventory::drop_items>(this);
+        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Inventory::drop_items>(this);
     }
 
     ~Inventory()

@@ -358,12 +358,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](entt::entity e) {
-        if (m_registry.valid(e))
-        {
-            m_registry.destroy(e);
-        }
-    });
+    cultsim.set_function("kill", [this](entt::entity e) { m_dispatcher.trigger<event::DeleteEntity>(event::DeleteEntity{e}); });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -477,14 +472,15 @@ void ScenarioScene::draw_scenario_information_ui()
     }
 
     /** Plot number of living entities */
-    ImGui::PlotLines("##Alive",
-                     living_entities.data(),
-                     living_entities.size(),
-                     0,
-                     fmt::format("Living Agents: {}", living_entities.empty() ? 0 : static_cast<int>(living_entities.back())).c_str(),
-                     FLT_MAX,
-                     FLT_MAX,
-                     {0, 75});
+    ImGui::PlotLines(
+        "##Alive",
+        living_entities.data(),
+        living_entities.size(),
+        0,
+        fmt::format("Living Agents: {}", living_entities.empty() ? 0 : static_cast<int>(living_entities.back())).c_str(),
+        FLT_MAX,
+        FLT_MAX,
+        {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
