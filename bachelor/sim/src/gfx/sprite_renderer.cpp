@@ -34,6 +34,25 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
+    /** Adjust environment */
+    if (ImGui::TreeNode("Environment"))
+    {
+        /** Ok with multi flush since only one can be dragged / frame */
+        if (ImGui::DragFloat4("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        if (ImGui::DragFloat3("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        if (ImGui::DragFloat4("Ambient Color", glm::value_ptr(m_env_ubo.get().ambient_color), 0.01f, 0.0f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        ImGui::TreePop();
+    }
+
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
@@ -212,9 +231,24 @@ void SpriteRenderer::init_texture_slots()
 void SpriteRenderer::init_ubos()
 {
     m_material_ubo = std::make_unique<UniformBuffer<Material, 4>>();
+
+    /** Set up nospec material */
+    auto& mat1    = m_material_ubo->get(MATERIAL_IDX_NOSPEC);
+    mat1.specular = 0.f;
+
+    /** Set up shiny material */
+    auto& mat2    = m_material_ubo->get(MATERIAL_IDX_SHINY);
+    mat2.gloss    = 80.f;
+    mat2.specular = 1.25f;
+
+    /** Set up matte material */
+    auto& mat3    = m_material_ubo->get(MATERIAL_IDX_MATTE);
+    mat3.gloss    = 10.f;
+    mat3.specular = 0.7f;
+
     m_material_ubo->bind(1);
     m_material_ubo->flush();
-    m_env_ubo.bind(2);
+    m_env_ubo.bind(5);
     m_env_ubo.flush();
 }
 
