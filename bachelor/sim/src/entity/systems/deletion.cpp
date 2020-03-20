@@ -11,10 +11,7 @@ void Deletion::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Delete>();
-    view.each([this, dt](entt::entity e, component::Delete& deletion) {
-        m_context.dispatcher->enqueue<event::RemovedEntity>(event::RemovedEntity{e});
-        m_context.registry->destroy(e);
-    });
+    view.each([this, dt](entt::entity e, component::Delete& deletion) { m_context.registry->destroy(e); });
 }
 void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
