@@ -83,6 +83,29 @@ public:
     }
 
     /**
+     * Get a value at the given index
+     *
+     * \todo MAKE NON INDEXED VERSION
+     * @param idx Index of value
+     * @return Value at given index
+     */
+    const T& get(unsigned idx = 0) const
+    {
+        return m_value[idx];
+    }
+
+    /**
+     * Get a value at the given index
+     *
+     * @param idx Index of value
+     * @return Value at given index
+     */
+    T& get(unsigned idx = 0)
+    {
+        return m_value[idx];
+    }
+
+    /**
      * Flush the contents of the uniform buffer to make it available for the GPU
      */
     void flush()
