@@ -34,23 +34,19 @@ void Requirement::update(float dt)
         auto distance = 0.f;
         for (int i = 1; i < mov.desired_position.size(); i++)
         {
-            spdlog::get("agent")->warn("We are checking how close we are now");
             distance += glm::distance(mov.desired_position[i], mov.desired_position[i - 1]);
         }
 
         if (distance < locationreqs.closest_distance)
         {
-            spdlog::get("agent")->warn("We are updating our closest distance");
             locationreqs.closest_distance = distance;
             locationreqs.elapsed_time     = 0.f;
         }
         else
         {
-            spdlog::get("agent")->warn("We are adding time to our elapsed time");
             locationreqs.elapsed_time += dt;
             if (locationreqs.elapsed_time >= locationreqs.max_time)
             {
-                spdlog::get("agent")->warn("We are failing our Locationrequirement");
                 m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Location, ""});
                 m_context.registry->remove_if_exists<component::LocationRequirement>(e);
             }

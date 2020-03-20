@@ -22,7 +22,9 @@ scenario.systems = {
     "TimerSystem",
     "SensorSystem",
     "MovementSystem",
-    "RenderingSystem"
+    "InventorySystem",
+    "RenderingSystem",
+    "DeletionSystem"
 }
 
 -- Decides how many seconds between each data sample taken in this scenario. IE: (also accuracy / granularity of graphs and output)

@@ -1,20 +1,16 @@
 #pragma once
-#include "system.h"
 #include "entity/events.h"
+#include "system.h"
 namespace cs::system
 {
 class Deletion : public ISystem
 {
 public:
-    Deletion(SystemContext context) : ISystem(context)
-    {
-        context.dispatcher->sink<event::DeleteEntity>().connect<&Deletion::check_and_delete>(this);
-    };
-    
-    ~Deletion()
-    {
-        m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Deletion::check_and_delete>(this);
-    };
+    using ISystem::ISystem;
+
+    void initialize() override;
+
+    void deinitialize() override;
 
     void update(float dt) override;
 

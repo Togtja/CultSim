@@ -69,14 +69,6 @@ void Action::update(float dt)
 
             if (action->time_spent >= action->time_to_complete)
             {
-                // TEMP
-                if (!m_context.registry->valid(action->target))
-                {
-                    spdlog::critical("Failed Target");
-                    return;
-                }
-                // END TEMP
-
                 if (m_context.rng->trigger(action->success_chance))
                 {
                     action->success(e, action->target);
@@ -129,6 +121,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
 }
 void Action::delete_target(const event::DeleteEntity& event)
 {
+    spdlog::critical("We are deleting a target {} and restarting an action", event.entity);
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](component::Strategy& strat) {
         for (auto& strategy : strat.staged_strategies)
@@ -137,7 +130,9 @@ void Action::delete_target(const event::DeleteEntity& event)
             {
                 if (action.target == event.entity)
                 {
+                    // TEMP
                     // TODO: write proper syntax for action.abort
+
                     action.abort();
                     action.time_spent     = 0;
                     action.target         = entt::null;

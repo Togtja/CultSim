@@ -22,7 +22,7 @@ class Reproduction : public ISystem
 public:
     Reproduction(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(this);
+        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(this);
     }
 
     ~Reproduction()

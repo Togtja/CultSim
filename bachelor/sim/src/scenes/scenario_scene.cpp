@@ -1,7 +1,7 @@
 #include "scenario_scene.h"
 #include "common_helpers.h"
-#include "debug/native_collectors.h"
 #include "constants.h"
+#include "debug/native_collectors.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
@@ -77,6 +77,7 @@ void ScenarioScene::initialize_simulation()
         if (type)
         {
             m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
+            m_active_systems.back().type().func("initialize"_hs).invoke(m_active_systems.back());
         }
         else
         {
@@ -90,9 +91,20 @@ void ScenarioScene::clean_simulation()
     m_registry.clear();
     m_simtime   = 0.f;
     m_timescale = 1.f;
-    m_active_systems.clear();
-    m_inactive_systems.clear();
     m_data_collector.clear();
+
+    /** Deinitialize systems and then clear them */
+    for (auto& system : m_active_systems)
+    {
+        system.type().func("deinitialize"_hs).invoke(system);
+    }
+    m_active_systems.clear();
+
+    for (auto& system : m_inactive_systems)
+    {
+        system.type().func("deinitialize"_hs).invoke(system);
+    }
+    m_inactive_systems.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -107,12 +119,15 @@ void ScenarioScene::on_enter()
 
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+    input::get_input().add_context(input::EKeyContext::ScenarioScene);
 }
 
 void ScenarioScene::on_exit()
 {
     input::get_input().remove_context(input::EKeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&ScenarioScene::handle_preference_changed>(this);
+
+    clean_simulation();
 }
 
 bool ScenarioScene::update(float dt)
@@ -248,8 +263,6 @@ void ScenarioScene::bind_actions_for_scene()
         m_context->scene_manager->push<PauseMenuScene>();
     });
 
-    input::get_input().add_context(input::EKeyContext::ScenarioScene);
-
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
         m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
     });
@@ -368,12 +381,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](entt::entity e) {
-        if (m_registry.valid(e))
-        {
-            m_registry.destroy(e);
-        }
-    });
+    cultsim.set_function("kill", [this](entt::entity e) { m_dispatcher.trigger<event::DeleteEntity>(event::DeleteEntity{e}); });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -643,5 +651,4 @@ void ScenarioScene::handle_preference_changed(const Preference& before, const Pr
         m_resolution = std::get<glm::ivec2>(after.value);
     }
 }
-
 } // namespace cs

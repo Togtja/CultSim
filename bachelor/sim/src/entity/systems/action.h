@@ -22,8 +22,8 @@ class Action : public ISystem
 public:
     Action(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(this);
-        context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(this);
+        m_context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(this);
+        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(this);
     }
 
     ~Action()
