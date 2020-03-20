@@ -67,7 +67,11 @@ void reflect_data_types()
 
 void reflect_systems()
 {
-    entt::meta<system::ISystem>().alias("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
+    entt::meta<system::ISystem>()
+        .alias("ISystem"_hs)
+        .func<&system::ISystem::update>("update"_hs)
+        .func<&system::ISystem::initialize>("initialize"_hs)
+        .func<&system::ISystem::deinitialize>("deinitialize"_hs);
     entt::meta<system::Action>().alias("ActionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Sensor>().alias("SensorSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Health>().alias("HealthSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();

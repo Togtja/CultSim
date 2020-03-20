@@ -6,15 +6,11 @@ namespace cs::system
 class Deletion : public ISystem
 {
 public:
-    Deletion(SystemContext context) : ISystem(context)
-    {
-        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Deletion::check_and_delete>(this);
-    };
+    using ISystem::ISystem;
 
-    ~Deletion()
-    {
-        m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Deletion::check_and_delete>(this);
-    };
+    void initialize() override;
+
+    void deinitialize() override;
 
     void update(float dt) override;
 

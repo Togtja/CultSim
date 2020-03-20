@@ -4,6 +4,17 @@
 
 namespace cs::system
 {
+void Deletion::initialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Deletion::check_and_delete>(*this);
+}
+
+void Deletion::deinitialize()
+{
+    spdlog::critical("DISCONNECTING LOL");
+    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Deletion::check_and_delete>(*this);
+}
+
 void Deletion::update(float dt)
 {
     CS_AUTOTIMER(Deletion System);
@@ -11,8 +22,9 @@ void Deletion::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Delete>();
-    view.each([this, dt](entt::entity e, component::Delete& deletion) { m_context.registry->destroy(e); });
+    view.less([this](entt::entity e) { m_context.registry->destroy(e); });
 }
+
 void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
     spdlog::get("agent")->critical("We are deleting enity {}", event.entity);
