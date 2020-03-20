@@ -113,8 +113,11 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     dt *= m_timescale;
-
     m_simtime += dt;
+
+    /** Sample data */
+    m_data_collector.update(dt);
+    m_data_collector.show_ui();
 
     // TODO : Move to input action response
     update_entity_hover();
@@ -148,9 +151,6 @@ bool ScenarioScene::update(float dt)
     m_scheduler.update(dt);
     m_dispatcher.update();
     m_scenario.update(dt);
-
-    /** Sample data */
-    m_data_collector.update(dt);
 
     /** It's supposed to be two of these here, do not change - not a bug */
     ImGui::End();

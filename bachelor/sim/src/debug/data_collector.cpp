@@ -1,5 +1,7 @@
 #include "data_collector.h"
 
+#include <gfx/ImGUI/imgui.h>
+
 namespace cs::debug
 {
 void DataCollector::add_collector(std::unique_ptr<DataCollector::Command> new_collector)
@@ -34,6 +36,18 @@ void DataCollector::clear()
 {
     m_collectors.clear();
     m_samples.clear();
+}
+
+void DataCollector::show_ui()
+{
+    /** TODO : Make it more elaborate */
+    if (ImGui::TreeNode("Data Collection"))
+    {
+        for (unsigned i = 0u; i < m_collectors.size(); ++i)
+        {
+            ImGui::PlotLines(m_collectors[i]->get_name().data(), m_samples[i].data(), m_samples[i].size());
+        }
+    }
 }
 
 void DataCollector::save_to_file(std::string_view rpath, bool timestamp)

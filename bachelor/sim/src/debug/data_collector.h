@@ -84,6 +84,11 @@ public:
     void clear();
 
     /**
+     * Show data collector UI
+     */
+    void show_ui();
+
+    /**
      * Save the collected data to a file
      *
      * @param rpath The relative file path to save it
