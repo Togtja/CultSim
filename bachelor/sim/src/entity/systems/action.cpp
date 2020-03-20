@@ -87,6 +87,11 @@ void Action::update(float dt)
                     {
                         strategy.working_on_action++;
                     }
+                    else
+                    {
+                        strategies.staged_strategies.clear();
+                        return;
+                    }
                     action                = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
                     strategy.requirements = action->requirements;
                 }
@@ -130,12 +135,12 @@ void Action::delete_target(const event::RemovedEntity& event)
         {
             for (auto& action : strategy.actions)
             {
-                if (action.target == event.entity) 
+                if (action.target == event.entity)
                 {
-                    //TODO: write proper syntax for action.abort
+                    // TODO: write proper syntax for action.abort
                     action.abort();
                     action.time_spent     = 0;
-                    action.target = entt::null;
+                    action.target         = entt::null;
                     strategy.requirements = action.requirements;
                 }
             }
