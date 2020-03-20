@@ -361,7 +361,7 @@ void ContextHandler::handle_input(const SDL_Event& event)
                 block = true;
             }
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN && !ImGui::GetIO().WantCaptureMouse)
+        if (event.type == SDL_MOUSEBUTTONDOWN)
         {
             // Translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<EMouse>(event.button.button);

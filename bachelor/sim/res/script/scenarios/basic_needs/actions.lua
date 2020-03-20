@@ -64,6 +64,8 @@ actions.reproduce = {
     requirements = ETag.Find | ETag.Tag,
     time_to_complete = 5.0,
     success = function(owner, target)
+        if not (cultsim.is_valid(owner) and cultsim.is_valid(target)) then return end
+
         local my_reproduction = cultsim.get_component(owner, component.reproduction)
         local their_reproduction = cultsim.get_component(target, component.reproduction)
 
