@@ -24,7 +24,7 @@ void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
     if (m_context.registry->has<component::Delete>(event.entity)) 
     {
-        m_context.dispatcher->enqueue<event::RemovedEntity>(event.entity);
+        m_context.dispatcher->enqueue<event::RemovedEntity>(event::RemovedEntity{event.entity});
         m_context.registry->destroy(event.entity);
     }
 }
