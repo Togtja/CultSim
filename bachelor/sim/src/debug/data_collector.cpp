@@ -1,6 +1,8 @@
 #include "data_collector.h"
+#include "debug/auto_timer.h"
 
 #include <gfx/ImGUI/imgui.h>
+#include <fmt/format.h>
 
 namespace cs::debug
 {
@@ -25,9 +27,12 @@ void DataCollector::set_sampling_rate(float seconds)
 
 void DataCollector::update(float dt)
 {
+    CS_AUTOTIMER(Data Sampling);
+
     m_time_since_sample += dt;
     if (m_time_since_sample > m_sampling_rate)
     {
+        m_time_since_sample = 0.f;
         sample();
     }
 }
@@ -45,8 +50,17 @@ void DataCollector::show_ui()
     {
         for (unsigned i = 0u; i < m_collectors.size(); ++i)
         {
-            ImGui::PlotLines(m_collectors[i]->get_name().data(), m_samples[i].data(), m_samples[i].size());
+            ImGui::PlotLines(fmt::format("##{}", m_collectors[i]->get_name()).c_str(),
+                             m_samples[i].data(),
+                             m_samples[i].size(),
+                             0,
+                             fmt::format("{}: {}", m_collectors[i]->get_name(), m_samples[i].back()).c_str(),
+                             FLT_MAX,
+                             FLT_MAX,
+                             {0, 75});
         }
+
+        ImGui::TreePop();
     }
 }
 
