@@ -61,7 +61,7 @@ void Requirement::update(float dt)
     view_vis.each([this](const entt::entity e, const component::VisionRequirement& visionreqs, const component::Vision& vision) {
         for (auto& entity : vision.seen)
         {
-            if ((m_context.registry->get<component::Tags>(entity).tags & visionreqs.tags) == visionreqs.tags)
+            if (auto tags = m_context.registry->try_get<component::Tags>(entity); tags && ((tags->tags & visionreqs.tags) == visionreqs.tags) && !(tags->tags & TAG_Delete))
             {
                 m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Vision});
                 m_context.registry->remove<component::VisionRequirement>(e);
@@ -96,12 +96,7 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
-            // TODO: Remove when event deletion
-            if (!m_context.registry->valid(entity))
-            {
-                continue;
-            }
-            if ((m_context.registry->get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
+            if (auto tags = m_context.registry->try_get<component::Tags>(entity); tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & TAG_Delete))
             {
                 if (strategies.staged_strategies.size() != 0)
                 {
