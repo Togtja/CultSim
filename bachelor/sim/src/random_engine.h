@@ -4,6 +4,8 @@
 #include <random>
 #include <type_traits>
 
+#include <pcg/pcg_random.hpp>
+
 namespace cs
 {
 /**
@@ -12,12 +14,11 @@ namespace cs
 class RandomEngine
 {
 private:
-    std::random_device m_seeder;
-
-    std::mt19937 m_random_generator;
+    /** Random generator */
+    pcg32 m_random_generator;
 
 public:
-    RandomEngine() : m_random_generator(m_seeder())
+    RandomEngine() : m_random_generator(pcg_extras::seed_seq_from<std::random_device>())
     {
     }
 

@@ -1,5 +1,6 @@
 #include "scenario_scene.h"
 #include "common_helpers.h"
+#include "debug/native_collectors.h"
 #include "constants.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
@@ -62,6 +63,13 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** TODO: Read in data samplers from Lua */
+    m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
+    m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
+    m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
+    m_data_collector.add_collector<debug::CollectorMouse>(true);
+    m_data_collector.add_collector<debug::CollectorMouse>(false);
+
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
@@ -84,7 +92,7 @@ void ScenarioScene::clean_simulation()
     m_timescale = 1.f;
     m_active_systems.clear();
     m_inactive_systems.clear();
-    m_next_data_sample = 0.f;
+    m_data_collector.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -110,9 +118,7 @@ void ScenarioScene::on_exit()
 bool ScenarioScene::update(float dt)
 {
     dt *= m_timescale;
-
     m_simtime += dt;
-    m_next_data_sample += dt;
 
     // TODO : Move to input action response
     update_entity_hover();
@@ -122,6 +128,10 @@ bool ScenarioScene::update(float dt)
     draw_scenario_information_ui();
     draw_time_control_ui();
     draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.update(dt);
+    m_data_collector.show_ui();
 
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
@@ -445,9 +455,6 @@ void ScenarioScene::setup_docking_ui()
 
 void ScenarioScene::draw_scenario_information_ui()
 {
-    // TODO : Get rid of after prototype
-    static std::vector<float> living_entities{};
-
     /** Title and description */
     ImGui::PushFont(g_header_font);
     ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
@@ -468,23 +475,6 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
-
-    /** Entity count graph */
-    if (m_next_data_sample > m_scenario.sampling_rate)
-    {
-        m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Health>());
-    }
-
-    /** Plot number of living entities */
-    ImGui::PlotLines("##Alive",
-                     living_entities.data(),
-                     living_entities.size(),
-                     0,
-                     fmt::format("Living Agents: {}", living_entities.empty() ? 0 : static_cast<int>(living_entities.back())).c_str(),
-                     FLT_MAX,
-                     FLT_MAX,
-                     {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
