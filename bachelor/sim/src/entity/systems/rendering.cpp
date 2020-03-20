@@ -1,5 +1,7 @@
 #include "rendering.h"
+#include "constants.h"
 #include "debug/auto_timer.h"
+#include "gfx/renderer.h"
 #include "entity/components/components.h"
 
 #include <array>
@@ -13,6 +15,13 @@ static constexpr std::array visualization_mode_names{"None", "Vision", "Needs", 
 
 namespace cs::system
 {
+Rendering::Rendering(SystemContext context) : ISystem(context)
+{
+    /** Submit sprites to renderer, for each layer */
+    m_shadow_texture              = gfx::get_renderer().sprite().get_texture("sprites/shadow_c.png");
+    m_shadow_texture.material_idx = MATERIAL_IDX_NOSPEC;
+}
+
 void Rendering::update(float dt)
 {
     CS_AUTOTIMER(Rendering System);
@@ -69,36 +78,31 @@ void Rendering::update(float dt)
         sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
     });
 
-    /** Submit sprites to renderer, for each layer */
-    auto shadow_tex     = gfx::get_renderer().sprite().get_texture("sprites/shadow_c.png");
-    shadow_tex.flag_lit = 0;
-    shadow_tex.scale    = 15;
-
     registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
-        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
-            shadow_tex.scale = sprite.texture.scale + 5;
-            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
+        [this](const component::Sprite& sprite, const component::Position& pos) {
+            m_shadow_texture.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, m_shadow_texture);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_1"_hs>>().less(
-        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
-            shadow_tex.scale = sprite.texture.scale + 5;
-            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
+        [this](const component::Sprite& sprite, const component::Position& pos) {
+            m_shadow_texture.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, m_shadow_texture);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_2"_hs>>().less(
-        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
-            shadow_tex.scale = sprite.texture.scale + 5;
-            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
+        [this](const component::Sprite& sprite, const component::Position& pos) {
+            m_shadow_texture.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, m_shadow_texture);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
     registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
-        [&shadow_tex](const component::Sprite& sprite, const component::Position& pos) {
-            shadow_tex.scale = sprite.texture.scale + 5;
-            gfx::get_renderer().sprite().draw(pos.position, sprite.color, shadow_tex);
+        [this](const component::Sprite& sprite, const component::Position& pos) {
+            m_shadow_texture.scale = sprite.texture.scale + 5;
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, m_shadow_texture);
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
         });
 
