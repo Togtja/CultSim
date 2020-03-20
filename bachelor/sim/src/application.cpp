@@ -69,7 +69,12 @@ void Application::handle_input()
                 m_running = false;
             }
         }
-        input::get_input().handle_input(e);
+        const auto& io = ImGui::GetIO();
+
+        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
+        {
+            input::get_input().handle_input(e);
+        }
     }
 }
 
