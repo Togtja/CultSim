@@ -1,8 +1,10 @@
 #pragma once
 
+#include "uniform_buffer.h"
 #include "render_data.h"
 #include "camera.h"
 
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -46,6 +48,12 @@ private:
     /** Cache of previously loaded textures */
     robin_hood::unordered_map<std::string, SpriteTextureID> m_texture_cache{};
 
+    /** Materials */
+    std::unique_ptr<UniformBuffer<Material, 8>> m_material_ubo{};
+
+    /** Sunlight environment UBO */
+    UniformBuffer<Environment> m_env_ubo{};
+
 public:
     explicit SpriteRenderer(Camera& camera);
 
@@ -81,6 +89,8 @@ private:
     void init_shader();
 
     void init_texture_slots();
+
+    void init_ubos();
 };
 
 } // namespace cs::gfx

@@ -4,6 +4,7 @@
 #include "delta_clock.h"
 #include "entity/reflection.h"
 #include "entity/systems/rendering.h"
+#include "gfx/renderer.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "input/input_handler.h"
@@ -63,9 +64,17 @@ void Application::handle_input()
         ImGui_ImplSDL2_ProcessEvent(&e);
         if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            m_running = false;
+            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            {
+                m_running = false;
+            }
         }
-        input::get_input().handle_input(e);
+        const auto& io = ImGui::GetIO();
+
+        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
+        {
+            input::get_input().handle_input(e);
+        }
     }
 }
 
@@ -80,9 +89,7 @@ void Application::draw()
 {
     m_scene_manager.draw();
 
-    auto& r = gfx::get_renderer();
-    r.sprite().display();
-    r.debug().display();
+    gfx::get_renderer().display();
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -112,26 +119,6 @@ bool Application::init_input()
 
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
-
-    /** Likewise with actions */
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
-    });
 
     /* TODO: Fix to not return true */
 

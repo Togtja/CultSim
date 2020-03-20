@@ -4,6 +4,14 @@
 
 namespace cs::gfx
 {
+void Renderer::display()
+{
+    m_matrix_ubo.flush(m_camera.get_view_matrix());
+    m_matrix_ubo.bind(0u);
+    m_sprite_renderer.display();
+    m_debug_renderer.display();
+}
+
 DebugRenderer& Renderer::debug()
 {
     return m_debug_renderer;
@@ -24,9 +32,9 @@ const SpriteRenderer& Renderer::sprite() const
     return m_sprite_renderer;
 }
 
-void Renderer::set_camera_position(glm::vec3 pos)
+void Renderer::set_camera_position(const glm::vec3& pos)
 {
-    /** Todo */
+    m_camera.set_position(pos);
 }
 
 void Renderer::move_camera(glm::vec3 delta)
