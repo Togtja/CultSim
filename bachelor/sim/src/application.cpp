@@ -64,7 +64,10 @@ void Application::handle_input()
         ImGui_ImplSDL2_ProcessEvent(&e);
         if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            m_running = false;
+            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            {
+                m_running = false;
+            }
         }
         input::get_input().handle_input(e);
     }
