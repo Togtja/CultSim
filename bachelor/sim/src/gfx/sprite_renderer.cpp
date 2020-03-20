@@ -74,10 +74,10 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std:
     }
 
     /** Set the texture ID to have appropriate values */
-    auto texture_id     = m_next_texture_id;
-    texture_id.length   = 0;
-    texture_id.index    = 0;
-    texture_id.flag_lit = 1;
+    auto texture_id         = m_next_texture_id;
+    texture_id.length       = 0;
+    texture_id.index        = 0;
+    texture_id.material_idx = MATERIAL_IDX_DEFAULT;
 
     /** Load color data */
     const auto color_data = load_texture(rpath);
@@ -230,7 +230,7 @@ void SpriteRenderer::init_texture_slots()
 
 void SpriteRenderer::init_ubos()
 {
-    m_material_ubo = std::make_unique<UniformBuffer<Material, 4>>();
+    m_material_ubo = std::make_unique<UniformBuffer<Material, 8>>();
 
     /** Set up nospec material */
     auto& mat1    = m_material_ubo->get(MATERIAL_IDX_NOSPEC);

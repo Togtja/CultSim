@@ -125,7 +125,6 @@ bool ScenarioScene::update(float dt)
 
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
-    b_tex.flag_lit     = false;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
 
     /** Draw background crudely */

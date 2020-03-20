@@ -27,7 +27,7 @@ struct Material
 
 layout(binding = 1, std140) uniform Materials
 {
-    Material[4] materials;
+    Material[8] materials;
 };
 
 /** Sunlight environment */
@@ -63,7 +63,7 @@ void main()
     /* Sample normal / color textures */
     const vec4 diffuse = sample_sprite();
     const vec3 normal = sample_normal().rgb * 2.0 - 1.0;
-    const uint material_id = bitfieldExtract(vs_in.texture, 14, 2);
+    const uint material_id = bitfieldExtract(vs_in.texture, 13, 3);
 
     /* Rotate light to illuminate sprite from correct diraction based on normals */
     const vec3 rotated_light = normalize(vec3(vs_in.light_mat * env.sun_direction.xy, env.sun_direction.z));

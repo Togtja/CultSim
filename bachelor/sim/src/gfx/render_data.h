@@ -25,11 +25,8 @@ struct SpriteTextureID
     /** Current index of the animation */
     uint16_t index : 2;
 
-    /** Should the sprite be affected by lighting */
-    uint16_t flag_lit : 1;
-
     /** Index into material array to use for this sprite */
-    uint16_t material_idx : 2;
+    uint16_t material_idx : 3;
 
     uint8_t bigrees{0};
 
