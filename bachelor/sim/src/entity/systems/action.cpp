@@ -79,6 +79,11 @@ void Action::update(float dt)
                     {
                         strategy.working_on_action++;
                     }
+                    else
+                    {
+                        strategies.staged_strategies.clear();
+                        return;
+                    }
                     action                = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
                     strategy.requirements = action->requirements;
                 }

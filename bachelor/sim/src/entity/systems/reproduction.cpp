@@ -6,7 +6,7 @@ namespace cs::system
 {
 void Reproduction::update(float dt)
 {
-    CS_AUTOTIMER(reproduction System);
+    CS_AUTOTIMER(Reproduction System);
 
     auto view = m_context.registry->view<component::Reproduction>();
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
