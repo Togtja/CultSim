@@ -77,9 +77,4 @@ struct DeleteEntity
 {
     entt::entity entity{};
 };
-
-struct RemovedEntity
-{
-    entt::entity entity{};
-};
 } // namespace cs::event
