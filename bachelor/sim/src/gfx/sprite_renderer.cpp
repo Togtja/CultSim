@@ -38,11 +38,11 @@ void SpriteRenderer::display()
     if (ImGui::TreeNode("Environment"))
     {
         /** Ok with multi flush since only one can be dragged / frame */
-        if (ImGui::DragFloat4("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
+        if (ImGui::DragFloat3("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
         {
             m_env_ubo.flush();
         }
-        if (ImGui::DragFloat3("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
+        if (ImGui::DragFloat4("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
         {
             m_env_ubo.flush();
         }

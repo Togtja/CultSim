@@ -78,7 +78,7 @@ void main()
     s_coef = pow(s_coef, materials[material_id].gloss) * materials[material_id].specular;
 
     const vec3 diffuse_color = diffuse.rgb * vs_in.color;
-    out_color = vec4(diffuse_color * d_coef +
+    out_color = vec4(diffuse_color * env.sun_color.rgb * d_coef +
                      diffuse_color * env.ambient_color.rgb * env.ambient_color.a +
                      s_coef + e_coef,
                      diffuse.a);
