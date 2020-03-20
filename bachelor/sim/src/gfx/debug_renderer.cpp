@@ -43,7 +43,6 @@ void DebugRenderer::display()
     glBindVertexArray(m_vao);
     glBindVertexBuffer(0, m_linevbo, 0, sizeof(PrimitiveVertex));
     glUseProgram(m_shader);
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
     glUniform1f(1, 1.f);
 
     glDrawArrays(GL_LINES, 0, m_nlines);

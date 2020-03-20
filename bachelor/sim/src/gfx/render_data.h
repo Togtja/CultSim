@@ -4,6 +4,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 namespace cs::gfx
 {
@@ -24,14 +25,8 @@ struct SpriteTextureID
     /** Current index of the animation */
     uint16_t index : 2;
 
-    /** Should the sprite be affected by lighting */
-    uint16_t flag_lit : 1;
-
-    /** Unspecified flag */
-    uint16_t flag_hovered : 1;
-
-    /** Unspecified flag */
-    uint16_t flag_selected : 1;
+    /** Index into material array to use for this sprite */
+    uint16_t material_idx : 3;
 
     uint8_t bigrees{0};
 
@@ -44,13 +39,25 @@ struct SpriteTextureID
 };
 
 /**
- * Describes a surface
+ * Describes a surface material
  */
 struct Material
 {
     float diffuse  = 1.f;
     float specular = 0.5f;
     float gloss    = 50.f;
+    float emissive = 0.f;
+};
+
+/**
+ * Describes a sunlight environment
+ */
+struct Environment
+{
+    glm::vec4 sun_color{1.f, 1.f, 1.f, 1.f};
+    glm::vec4 ambient_color{0.1f, 0.1f, 0.2f, 1.f};
+    glm::vec3 sun_direction{1.f, 1.f, 1.f};
+    float _padding;
 };
 
 /**

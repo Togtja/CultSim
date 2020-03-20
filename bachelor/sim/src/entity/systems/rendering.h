@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/renderer.h"
+#include "gfx/render_data.h"
 #include "system.h"
 
 namespace cs::system
@@ -18,8 +18,10 @@ class Rendering : public ISystem
 private:
     EVisualizationMode m_visualization_mode{EVisualizationMode::None};
 
+    gfx::SpriteTextureID m_shadow_texture{};
+
 public:
-    using ISystem::ISystem;
+    Rendering(SystemContext context);
 
     void update(float dt) override;
 };

@@ -22,6 +22,7 @@
 #include "random_engine.h"
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
+#include "constants.h"
 
 #include <algorithm>
 #include <functional>
@@ -122,9 +123,9 @@ bool ScenarioScene::update(float dt)
     draw_time_control_ui();
     draw_selected_entity_information_ui();
 
-    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
-    b_tex.scale       = 100;
-    b_tex.flag_lit    = false;
+    static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
+    b_tex.scale        = 100;
+    b_tex.material_idx = MATERIAL_IDX_NOSPEC;
 
     /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
@@ -192,7 +193,7 @@ bool ScenarioScene::draw()
         r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
     }
 
-    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {0.f, 1.f, 0.f});
+    r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
 
     m_scenario.draw();
     return false;
@@ -207,7 +208,6 @@ void ScenarioScene::bind_actions_for_scene()
         if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.remove<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 0;
         }
 
         select_helper.selected_entity = select_helper.hovered_entity;
@@ -215,7 +215,6 @@ void ScenarioScene::bind_actions_for_scene()
         if (m_registry.valid(select_helper.selected_entity))
         {
             m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
-            m_registry.get<component::Sprite>(select_helper.selected_entity).texture.flag_selected = 1;
         }
     });
 
@@ -250,6 +249,26 @@ void ScenarioScene::bind_actions_for_scene()
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
+
+    /** Camera Controls */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
+    });
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
@@ -346,6 +365,9 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
+    /** Check entity validity */
+    cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
+
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
         m_registry
@@ -356,27 +378,14 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return;
                 }
 
-                auto child = r.create();
-                r.stamp(child, r, mother);
+                /** Figure out "type" of mother and spawn a child based on that */
+                const auto& mother_meta = r.get<component::Meta>(e);
 
-                /** Reset action targets */
-                if (auto* action_comp = r.try_get<component::Strategy>(child); action_comp)
-                {
-                    for (auto& strategy : action_comp->strategies)
-                    {
-                        for (auto& action : strategy.actions)
-                        {
-                            if (action.target != entt::null)
-                            {
-                                action.target = child;
-                            }
-                            if (action.target != child)
-                            {
-                                spdlog::get("agent")->error("child: {}, action.target: {}", child, action.target);
-                            }
-                        }
-                    }
-                }
+                /** Set position to be close to mother */
+                const auto new_pos = r.get<component::Position>(e).position +
+                                     glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
+
+                auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
 
                 /** Reset all needs to 100.0 */
                 if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
@@ -393,25 +402,13 @@ void ScenarioScene::bind_scenario_lua_functions()
                     health_comp->health = 100.f;
                 }
 
-                /** Reset reproduction stats */
-                if (auto* repro_copm = r.try_get<component::Reproduction>(child); repro_copm)
-                {
-                    repro_copm->sex                = static_cast<component::Reproduction::ESex>(m_rng.uniform(0, 1));
-                    repro_copm->number_of_children = 0;
-                }
-
-                /** Set new child position */
-                if (auto* pos_comp = r.try_get<component::Position>(child); pos_comp)
-                {
-                    const auto new_pos = r.get<component::Position>(e).position +
-                                         glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
-                    pos_comp->position = new_pos;
-                }
-
                 /** Give a child to the parents */
-                if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
+                if (m_registry.valid(father))
                 {
-                    ++rc->number_of_children;
+                    if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
+                    {
+                        ++rc->number_of_children;
+                    }
                 }
 
                 if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
@@ -534,8 +531,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction] =
-        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction>(
+    const auto& [needs, health, strategy, reproduction, timer] =
+        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction, component::Timer>(
             selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
@@ -598,6 +595,12 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
+    if (timer)
+    {
+        ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
+        ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
+    }
+
     ImGui::End();
 }
 
@@ -611,7 +614,6 @@ void ScenarioScene::update_entity_hover()
     if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.remove<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
-        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 0;
     }
 
     /** Reset hover status */
@@ -628,7 +630,6 @@ void ScenarioScene::update_entity_hover()
     if (m_registry.valid(selection_helper.hovered_entity))
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
-        hover_view.get<component::Sprite>(selection_helper.hovered_entity).texture.flag_hovered = 1;
     }
 
     ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);

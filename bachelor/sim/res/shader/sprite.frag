@@ -15,8 +15,30 @@ layout(location = 0) out vec4 out_color;
 /** Uniforms */
 layout(binding = 0) uniform sampler2DArray colorTextures[8];
 layout(binding = 8) uniform sampler2DArray normalTextures[8];
-layout(location = 1) uniform vec3 light_dir = vec3(1.f, 1.f, 1.f);
-layout(location = 2) uniform vec3 ambient_col = vec3(0.05f, 0.05f, 0.1f);
+
+/** Available materials */
+struct Material
+{
+    float diffuse;
+    float specular;
+    float gloss;
+    float emissive;
+};
+
+layout(binding = 1, std140) uniform Materials
+{
+    Material[8] materials;
+};
+
+/** Sunlight environment */
+layout(binding = 5, std140) uniform Environment
+{
+    /** Intensities in A */
+    vec4 sun_color;
+    vec4 ambient_color;
+
+    vec3 sun_direction;
+} env;
 
 /**
  * Sample a sprite based on the texture data from the vertex shader
@@ -38,21 +60,26 @@ vec4 sample_normal()
 
 void main()
 {
-    /**  Hover and selection */
-    const vec3 hover_color  = bitfieldExtract(vs_in.texture, 14, 1) * vec3(1.f, 0.5f, 0.f);
-    const vec3 select_color = bitfieldExtract(vs_in.texture, 15, 1) * vec3(0.f, 0.5f, 1.f);
-
+    /* Sample normal / color textures */
     const vec4 diffuse = sample_sprite();
     const vec3 normal = sample_normal().rgb * 2.0 - 1.0;
+    const uint material_id = bitfieldExtract(vs_in.texture, 13, 3);
 
-    const vec3 rotated_light = normalize(vec3(vs_in.light_mat * light_dir.xy, light_dir.z));
+    /* Rotate light to illuminate sprite from correct diraction based on normals */
+    const vec3 rotated_light = normalize(vec3(vs_in.light_mat * env.sun_direction.xy, env.sun_direction.z));
+    const vec3 specular_direction = normalize(vec3(0, 0, 1) + rotated_light);
 
-    float d_coef = max(dot(normal, rotated_light), 0.0);
+    /* Compute emissive component */
+    const vec3 e_coef = materials[material_id].emissive * vs_in.color;
 
-    vec3 specular_direction = normalize(vec3(0, 0, 1) + rotated_light);
+    /* Compute Diffuse / Spec */
+    float d_coef = max(dot(normal, rotated_light), 0.0) * materials[material_id].diffuse * env.sun_color.a;
     float s_coef = max(dot(normal, specular_direction), 0.0);
-    s_coef = pow(s_coef, 10.0) * bitfieldExtract(vs_in.texture, 13, 1);
+    s_coef = pow(s_coef, materials[material_id].gloss) * materials[material_id].specular;
 
-    vec3 modifier_color = hover_color + select_color;
-    out_color = vec4(diffuse.rgb * vs_in.color * d_coef + ambient_col + s_coef * 0.25f + vec3(modifier_color), diffuse.a);
+    const vec3 diffuse_color = diffuse.rgb * vs_in.color;
+    out_color = vec4(diffuse_color * env.sun_color.rgb * d_coef +
+                     diffuse_color * env.ambient_color.rgb * env.ambient_color.a +
+                     s_coef + e_coef,
+                     diffuse.a);
 }

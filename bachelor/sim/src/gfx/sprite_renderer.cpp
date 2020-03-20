@@ -21,6 +21,7 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     init_shader();
     init_vbo_and_vao();
     init_texture_slots();
+    init_ubos();
 
     /** Initialize Camera */
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
@@ -33,9 +34,24 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
-    static glm::vec3 light_direction{1.f, 1.f, 1.f};
-    ImGui::DragFloat3("Light Direction", glm::value_ptr(light_direction), 0.01f, -1.f, 1.f, "%.2f");
-    light_direction = glm::normalize(light_direction);
+    /** Adjust environment */
+    if (ImGui::TreeNode("Environment"))
+    {
+        /** Ok with multi flush since only one can be dragged / frame */
+        if (ImGui::DragFloat3("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        if (ImGui::DragFloat4("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        if (ImGui::DragFloat4("Ambient Color", glm::value_ptr(m_env_ubo.get().ambient_color), 0.01f, 0.0f, 1.f, "%.2f"))
+        {
+            m_env_ubo.flush();
+        }
+        ImGui::TreePop();
+    }
 
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
@@ -43,8 +59,6 @@ void SpriteRenderer::display()
     glUseProgram(m_shader);
     glBindVertexArray(m_vao);
 
-    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(m_camera.get_view_matrix()));
-    glUniform3fv(1, 1, glm::value_ptr(light_direction));
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
 
     m_nsprites = 0u;
@@ -60,10 +74,10 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std:
     }
 
     /** Set the texture ID to have appropriate values */
-    auto texture_id     = m_next_texture_id;
-    texture_id.length   = 0;
-    texture_id.index    = 0;
-    texture_id.flag_lit = 1;
+    auto texture_id         = m_next_texture_id;
+    texture_id.length       = 0;
+    texture_id.index        = 0;
+    texture_id.material_idx = MATERIAL_IDX_DEFAULT;
 
     /** Load color data */
     const auto color_data = load_texture(rpath);
@@ -213,4 +227,29 @@ void SpriteRenderer::init_texture_slots()
     }
     glBindTextures(num_textures, num_textures, m_normal_texture_handles.data());
 }
+
+void SpriteRenderer::init_ubos()
+{
+    m_material_ubo = std::make_unique<UniformBuffer<Material, 8>>();
+
+    /** Set up nospec material */
+    auto& mat1    = m_material_ubo->get(MATERIAL_IDX_NOSPEC);
+    mat1.specular = 0.f;
+
+    /** Set up shiny material */
+    auto& mat2    = m_material_ubo->get(MATERIAL_IDX_SHINY);
+    mat2.gloss    = 80.f;
+    mat2.specular = 1.25f;
+
+    /** Set up matte material */
+    auto& mat3    = m_material_ubo->get(MATERIAL_IDX_MATTE);
+    mat3.gloss    = 10.f;
+    mat3.specular = 0.7f;
+
+    m_material_ubo->bind(1);
+    m_material_ubo->flush();
+    m_env_ubo.bind(5);
+    m_env_ubo.flush();
+}
+
 } // namespace cs::gfx

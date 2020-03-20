@@ -35,6 +35,7 @@ struct Action
 
 inline bool operator==(Action const& lhs, Action const& rhs)
 {
-    return lhs.name == rhs.name;
+    return lhs.name == rhs.name && lhs.requirements == rhs.requirements && lhs.time_to_complete == rhs.time_to_complete &&
+           lhs.target == rhs.target && lhs.time_spent == rhs.time_spent;
 }
 } // namespace cs::action

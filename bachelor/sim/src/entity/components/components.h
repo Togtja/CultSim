@@ -32,7 +32,6 @@ struct Movement
 struct Meta
 {
     std::string name{};
-    std::string description{};
 };
 
 struct Sprite

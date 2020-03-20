@@ -214,6 +214,7 @@ entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity)
 {
     auto out = reg.create();
+    reg.assign<component::Meta>(out, std::string(entity));
 
     lua.script(fs::read_file(entity));
     sol::table entity_info = lua["entity"];
