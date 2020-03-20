@@ -2,7 +2,8 @@
 #include "debug/auto_timer.h"
 
 #include <gfx/ImGUI/imgui.h>
-#include <fmt/format.h>
+
+#include <spdlog/fmt/fmt.h>
 
 namespace cs::debug
 {
