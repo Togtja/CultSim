@@ -1,5 +1,6 @@
 #include "scenario_scene.h"
 #include "common_helpers.h"
+#include "debug/native_collectors.h"
 #include "constants.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
@@ -64,6 +65,7 @@ void ScenarioScene::initialize_simulation()
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
+    m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
 
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
@@ -115,10 +117,6 @@ bool ScenarioScene::update(float dt)
     dt *= m_timescale;
     m_simtime += dt;
 
-    /** Sample data */
-    m_data_collector.update(dt);
-    m_data_collector.show_ui();
-
     // TODO : Move to input action response
     update_entity_hover();
 
@@ -127,6 +125,10 @@ bool ScenarioScene::update(float dt)
     draw_scenario_information_ui();
     draw_time_control_ui();
     draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.update(dt);
+    m_data_collector.show_ui();
 
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;

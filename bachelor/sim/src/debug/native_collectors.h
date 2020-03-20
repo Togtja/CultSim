@@ -6,7 +6,7 @@
 
 namespace cs::debug
 {
-class CollectorLivingEntities : DataCollector::Command
+class CollectorLivingEntities : public DataCollector::Command
 {
 private:
     /** Registry */
