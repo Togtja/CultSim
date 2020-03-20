@@ -58,6 +58,7 @@ target_link_libraries(
     spdlog::spdlog
     glm::glm
     doctest
+    pcg::pcg
     $<$<CXX_COMPILER_ID:GNU>:tbb>
 
     # Link with gcov on GNU for code coverage
