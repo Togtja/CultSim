@@ -112,26 +112,6 @@ bool Application::init_input()
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
 
-    /** Likewise with actions */
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
-        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
-    });
-    inputs.bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
-        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
-    });
-
     /* TODO: Fix to not return true */
 
     return true;

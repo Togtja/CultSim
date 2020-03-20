@@ -246,6 +246,26 @@ void ScenarioScene::bind_actions_for_scene()
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
+
+    /** Camera Controls */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, 1.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveLeft, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(-1.f, 0.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveDown, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(0.f, -1.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveRight, [](float dt) {
+        gfx::get_renderer().move_camera(glm::vec3(1.f, 0.f, 0.f) * dt * 200.f);
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomIn, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, -.05f});
+    });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
+        gfx::get_renderer().move_camera({0.f, 0.f, .05f});
+    });
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
