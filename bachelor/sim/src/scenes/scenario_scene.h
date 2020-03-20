@@ -1,6 +1,7 @@
 #pragma once
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "debug/data_collector.h"
 #include "random_engine.h"
 #include "scene.h"
 
@@ -43,12 +44,16 @@ private:
     /** The scenario we are running */
     lua::Scenario m_scenario;
 
+    /** Create a data collector for this scenario */
+    debug::DataCollector m_data_collector{};
+
     /** Keep track of screen resolution */
     glm::vec2 m_resolution{};
 
     /** Time sim has been running */
     float m_simtime = 0.f;
 
+    /** When this value passes the sampling rate we sample data */
     float m_next_data_sample = 0.f;
 
     /** Current time scale of simulation */
