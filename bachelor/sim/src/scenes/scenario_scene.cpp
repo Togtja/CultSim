@@ -477,12 +477,11 @@ void ScenarioScene::draw_scenario_information_ui()
     }
 
     /** Plot number of living entities */
-    auto alive = m_registry.size<component::Health>();
     ImGui::PlotLines("##Alive",
                      living_entities.data(),
                      living_entities.size(),
                      0,
-                     fmt::format("Living Agents: {}", alive).c_str(),
+                     fmt::format("Living Agents: {}", living_entities.empty() ? 0 : static_cast<int>(living_entities.back())).c_str(),
                      FLT_MAX,
                      FLT_MAX,
                      {0, 75});
