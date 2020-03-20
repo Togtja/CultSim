@@ -23,15 +23,19 @@ public:
     Action(SystemContext context) : ISystem(context)
     {
         context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(this);
+        context.dispatcher->sink<event::RemovedEntity>().connect<&Action::delete_target>(this);
     }
 
     ~Action()
     {
         m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(this);
+        m_context.dispatcher->sink<event::RemovedEntity>().disconnect<&Action::delete_target>(this);
     }
     
     void update(float dt) override;
 
     void abort_strategy(const event::RequirementFailure& event);
+
+    void delete_target(const event::RemovedEntity& event);
 };
 } // namespace cs::system

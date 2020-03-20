@@ -81,6 +81,7 @@ void Action::update(float dt)
                 {
                     action->success(e, action->target);
                     action->time_spent = 0;
+                    action->target     = entt::null;
 
                     if (strategy.working_on_action < strategy.actions.size())
                     {
@@ -94,6 +95,7 @@ void Action::update(float dt)
                 {
                     action->failure(e, action->target);
                     action->time_spent    = 0;
+                    action->target        = entt::null;
                     strategy.requirements = action->requirements;
                 }
             }
@@ -119,5 +121,25 @@ void Action::abort_strategy(const event::RequirementFailure& event)
 
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
     }
+}
+void Action::delete_target(const event::RemovedEntity& event)
+{
+    auto view = m_context.registry->view<component::Strategy>();
+    view.each([this, event](component::Strategy& strat) {
+        for (auto& strategy : strat.staged_strategies)
+        {
+            for (auto& action : strategy.actions)
+            {
+                if (action.target == event.entity) 
+                {
+                    //TODO: write proper syntax for action.abort
+                    action.abort();
+                    action.time_spent     = 0;
+                    action.target = entt::null;
+                    strategy.requirements = action.requirements;
+                }
+            }
+        }
+    });
 }
 } // namespace cs::system
