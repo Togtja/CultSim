@@ -1,5 +1,6 @@
 #include "scenario_scene.h"
 #include "common_helpers.h"
+#include "constants.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
@@ -22,7 +23,6 @@
 #include "random_engine.h"
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
-#include "constants.h"
 
 #include <algorithm>
 #include <functional>
@@ -473,11 +473,18 @@ void ScenarioScene::draw_scenario_information_ui()
     if (m_next_data_sample > m_scenario.sampling_rate)
     {
         m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Need>());
+        living_entities.push_back(m_registry.size<component::Health>());
     }
 
     /** Plot number of living entities */
-    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
+    ImGui::PlotLines("##Alive",
+                     living_entities.data(),
+                     living_entities.size(),
+                     0,
+                     fmt::format("Living Agents: {}", living_entities.empty() ? 0 : static_cast<int>(living_entities.back())).c_str(),
+                     FLT_MAX,
+                     FLT_MAX,
+                     {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()

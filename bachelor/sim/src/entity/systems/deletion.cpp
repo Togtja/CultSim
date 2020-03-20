@@ -17,7 +17,7 @@ void Deletion::update(float dt)
         if (deletion.time_since_marked >= deletion.time_before_timeout)
         {
             m_context.registry->remove<component::Delete>(e);
-            if (auto tags = m_context.registry->try_get<component::Tags>(e); tags) 
+            if (auto tags = m_context.registry->try_get<component::Tags>(e); tags)
             {
                 tags->tags = ETag(tags->tags & ~TAG_Delete);
             }
