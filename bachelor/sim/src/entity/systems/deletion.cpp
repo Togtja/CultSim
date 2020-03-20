@@ -33,7 +33,7 @@ void Deletion::check_and_delete(const event::DeleteEntity& event)
     }
     else
     {
-        spdlog::get("agent")->debug("Failed to delete entity {} : It was not flagged for deletion")
+        spdlog::get("agent")->debug("Failed to delete entity {} : It was not flagged for deletion");
     }
 }
 } // namespace cs::system
