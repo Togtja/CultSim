@@ -11,7 +11,6 @@ void Deletion::initialize()
 
 void Deletion::deinitialize()
 {
-    spdlog::critical("DISCONNECTING LOL");
     m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Deletion::check_and_delete>(*this);
 }
 
