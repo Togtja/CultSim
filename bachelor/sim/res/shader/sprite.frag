@@ -17,16 +17,21 @@ layout(binding = 0) uniform sampler2DArray colorTextures[8];
 layout(binding = 8) uniform sampler2DArray normalTextures[8];
 
 /** Available materials */
-layout(binding = 1, std140) uniform Materials
+struct Material
 {
     float diffuse;
     float specular;
     float gloss;
     float emissive;
-} materials[4];
+};
+
+layout(binding = 1, std140) uniform Materials
+{
+    Material[4] materials;
+};
 
 /** Sunlight environment */
-layout(binding = 2, std140) uniform Environment
+layout(binding = 5, std140) uniform Environment
 {
     /** Intensities in A */
     vec4 sun_color;
@@ -72,5 +77,9 @@ void main()
     float s_coef = max(dot(normal, specular_direction), 0.0);
     s_coef = pow(s_coef, materials[material_id].gloss) * materials[material_id].specular;
 
-    out_color = vec4(diffuse.rgb * vs_in.color * d_coef + env.ambient_color.rgb * env.ambient_color.a + s_coef + e_coef, diffuse.a);
+    const vec3 diffuse_color = diffuse.rgb * vs_in.color;
+    out_color = vec4(diffuse_color * d_coef +
+                     diffuse_color * env.ambient_color.rgb * env.ambient_color.a +
+                     s_coef + e_coef,
+                     diffuse.a);
 }
