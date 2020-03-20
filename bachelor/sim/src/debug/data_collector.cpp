@@ -2,11 +2,17 @@
 
 namespace cs::debug
 {
+void DataCollector::add_collector(std::unique_ptr<DataCollector::Command> new_collector)
+{
+    m_collectors.push_back(std::move(new_collector));
+    m_samples.push_back({});
+}
+
 void DataCollector::sample()
 {
-    for (const auto& sampler : m_collectors)
+    for (unsigned i = 0u; i < m_collectors.size(); ++i)
     {
-        sampler->execute();
+        m_samples[i].push_back(m_collectors[i]->execute());
     }
 }
 
