@@ -18,4 +18,17 @@ public:
     float execute() override;
     std::string_view get_name() override;
 };
+
+class CollectorAverageHealth : public DataCollector::Command
+{
+private:
+    /** Registry */
+    entt::registry* m_registry = nullptr;
+
+public:
+    CollectorAverageHealth(entt::registry& registry);
+
+    float execute() override;
+    std::string_view get_name() override;
+};
 } // namespace cs::debug
