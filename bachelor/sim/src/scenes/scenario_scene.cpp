@@ -445,9 +445,6 @@ void ScenarioScene::setup_docking_ui()
 
 void ScenarioScene::draw_scenario_information_ui()
 {
-    // TODO : Get rid of after prototype
-    static std::vector<float> living_entities{};
-
     /** Title and description */
     ImGui::PushFont(g_header_font);
     ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
@@ -468,24 +465,6 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
-
-    /** Entity count graph */
-    if (m_next_data_sample > m_scenario.sampling_rate)
-    {
-        m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Health>());
-    }
-
-    /** Plot number of living entities */
-    auto alive = m_registry.size<component::Health>();
-    ImGui::PlotLines("##Alive",
-                     living_entities.data(),
-                     living_entities.size(),
-                     0,
-                     fmt::format("Living Agents: {}", alive).c_str(),
-                     FLT_MAX,
-                     FLT_MAX,
-                     {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
