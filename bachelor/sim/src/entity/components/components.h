@@ -80,7 +80,7 @@ struct Reproduction
 
     ESex sex = Male;
     uint16_t number_of_children{};
-    
+
     float fertility{};
 };
 
@@ -179,6 +179,13 @@ struct Memory
     Memory& operator=(Memory&&) = default;
     Memory(const Memory&)       = default;
     Memory& operator=(const Memory&) = default;
+};
+
+struct Delete
+{
+    float time_since_marked{};
+    
+    float time_before_timeout{};
 };
 
 struct AI
