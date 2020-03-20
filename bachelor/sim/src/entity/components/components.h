@@ -82,6 +82,8 @@ struct Reproduction
     uint16_t number_of_children{};
 
     float fertility{};
+
+    int max_children_per_pregnancy{};
 };
 
 struct Timer
@@ -184,8 +186,20 @@ struct Memory
 struct Delete
 {
     float time_since_marked{};
-    
+
     float time_before_timeout{};
+};
+
+struct Pregnancy
+{
+    float time_since_start{};
+    float gestation_period{};
+
+    entt::entity father{};
+
+    int number_of_children{};
+
+    sol::function birth{};
 };
 
 struct AI

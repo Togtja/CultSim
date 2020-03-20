@@ -17,7 +17,7 @@ void Deletion::update(float dt)
         if (deletion.time_since_marked >= deletion.time_before_timeout)
         {
             m_context.registry->remove<component::Delete>(e);
-            if (auto tags = m_context.registry->try_get<component::Tags>(e); tags) 
+            if (auto tags = m_context.registry->try_get<component::Tags>(e); tags)
             {
                 tags->tags = ETag(tags->tags & ~TAG_Delete);
             }
@@ -33,7 +33,7 @@ void Deletion::check_and_delete(const event::DeleteEntity& event)
     }
     else
     {
-        spdlog::get("agent")->debug("Failed to delete entity {} : It was not flagged for deletion")
+        spdlog::get("agent")->debug("Failed to delete entity {} : It was not flagged for deletion");
     }
 }
 } // namespace cs::system
