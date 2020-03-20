@@ -28,8 +28,9 @@ void Health::update(float dt)
         if (health.health <= 0.f)
         {
             m_context.registry->destroy(e);
+            return;
         }
-        
+
         if (auto age = m_context.registry->try_get<component::Age>(e); age)
         {
             age->current_age += dt;
@@ -42,7 +43,6 @@ void Health::update(float dt)
         {
             health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
         }
-
     });
 }
 } // namespace cs::system
