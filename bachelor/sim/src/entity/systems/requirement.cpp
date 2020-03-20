@@ -16,7 +16,7 @@ void Requirement::update(float dt)
     CS_AUTOTIMER(Requirement System);
 
     auto view_loc = m_context.registry->view<component::LocationRequirement, component::Movement, component::Position>();
-    view_loc.each([dt, this](entt::entity e,
+    view_loc.each([dt, this](const entt::entity e,
                              component::LocationRequirement& locationreqs,
                              component::Movement& mov,
                              const component::Position& pos) {
@@ -52,7 +52,7 @@ void Requirement::update(float dt)
             {
                 spdlog::get("agent")->warn("We are failing our Locationrequirement");
                 m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Location, ""});
-                m_context.registry->remove<component::LocationRequirement>(e);
+                m_context.registry->remove_if_exists<component::LocationRequirement>(e);
             }
         }
     });
@@ -96,6 +96,11 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
+            // TODO: Remove when event deletion
+            if (!m_context.registry->valid(entity))
+            {
+                continue;
+            }
             if ((m_context.registry->get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
             {
                 if (strategies.staged_strategies.size() != 0)
@@ -110,7 +115,7 @@ void Requirement::update(float dt)
                     strategies.staged_strategies.back().actions.back().target = entity;
 
                     m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Find});
-                    m_context.registry->remove<component::FindRequirement>(e);
+                    m_context.registry->remove_if_exists<component::FindRequirement>(e);
                     mov.desired_position.clear();
                 }
                 else

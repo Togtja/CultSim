@@ -41,4 +41,8 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/timer.cpp
         ${CMAKE_CURRENT_LIST_DIR}/timer.h
+
+        
+        ${CMAKE_CURRENT_LIST_DIR}/deletion.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/deletion.h
 )
