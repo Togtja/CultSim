@@ -50,7 +50,7 @@ void DataCollector::show_ui()
     {
         for (unsigned i = 0u; i < m_collectors.size(); ++i)
         {
-            ImGui::PlotLines(fmt::format("##{}", m_collectors[i]->get_name()).c_str(),
+            ImGui::PlotLines(fmt::format("##{}_{}", m_collectors[i]->get_name(), i).c_str(),
                              m_samples[i].data(),
                              m_samples[i].size(),
                              0,

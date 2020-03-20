@@ -28,12 +28,37 @@ float CollectorAverageHealth::execute()
     float avg        = 0.f;
     auto health_view = m_registry->view<component::Health>();
     health_view.each([&avg](const component::Health& health) { avg += health.health; });
-    return avg / health_view.size();
+    return avg / (health_view.size() ? health_view.size() : 1u);
 }
 
 std::string_view CollectorAverageHealth::get_name()
 {
     return "Average Health";
+}
+
+CollectorNeed::CollectorNeed(entt::registry& registry, const std::string& need_name) :
+    m_registry(&registry),
+    m_need_name(need_name)
+{
+}
+
+float CollectorNeed::execute()
+{
+    float avg      = 0.f;
+    auto need_view = m_registry->view<component::Need>();
+
+    need_view.each([&avg, this](const component::Need& need) {
+        avg += std::find_if(need.needs.cbegin(), need.needs.cend(), [this](const ai::Need& n) {
+                   return n.name == m_need_name;
+               })->status;
+    });
+
+    return avg / (need_view.size() ? need_view.size() : 1u);
+}
+
+std::string_view CollectorNeed::get_name()
+{
+    return m_need_name;
 }
 
 } // namespace cs::debug
