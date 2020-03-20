@@ -1,6 +1,7 @@
 #include "health.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/events.h"
 
 #include "spdlog/spdlog.h"
 
@@ -27,7 +28,7 @@ void Health::update(float dt)
         // TODO: Better entity removal upon death
         if (health.health <= 0.f)
         {
-            m_context.registry->destroy(e);
+            m_context.dispatcher->trigger<event::DeleteEntity>(event::DeleteEntity{e});
             return;
         }
 

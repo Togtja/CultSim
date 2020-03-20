@@ -127,7 +127,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
     }
 }
-void Action::delete_target(const event::RemovedEntity& event)
+void Action::delete_target(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](component::Strategy& strat) {

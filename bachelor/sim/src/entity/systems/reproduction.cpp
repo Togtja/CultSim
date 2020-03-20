@@ -28,15 +28,13 @@ void Reproduction::update(float dt)
             preg.birth(e, preg.father, preg.number_of_children);
         }
     });
-
 }
 
-void Reproduction::delete_father(const event::RemovedEntity& event)
+void Reproduction::delete_father(const event::DeleteEntity& event)
 {
-
     auto view = m_context.registry->view<component::Pregnancy>();
     view.each([this, event](entt::entity e, component::Pregnancy& preg) {
-        if (preg.father == event.entity) 
+        if (preg.father == event.entity)
         {
             preg.father == entt::null;
         }

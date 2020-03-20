@@ -1,7 +1,7 @@
 #pragma once
 
-#include "system.h"
 #include "entity/events.h"
+#include "system.h"
 
 namespace cs::system
 {
@@ -22,16 +22,16 @@ class Reproduction : public ISystem
 public:
     Reproduction(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::RemovedEntity>().connect<&Reproduction::delete_father>(this);
+        context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(this);
     }
 
     ~Reproduction()
     {
-        m_context.dispatcher->sink<event::RemovedEntity>().disconnect<&Reproduction::delete_father>(this);
+        m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Reproduction::delete_father>(this);
     }
 
     void update(float dt) override;
 
-    void delete_father(const event::RemovedEntity& event);
+    void delete_father(const event::DeleteEntity& event);
 };
 } // namespace cs::system
