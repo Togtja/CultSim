@@ -22,15 +22,10 @@ class Action : public ISystem
 public:
     Action(SystemContext context) : ISystem(context)
     {
-        m_context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(this);
-        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(this);
     }
 
-    ~Action()
-    {
-        m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(this);
-        m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Action::delete_target>(this);
-    }
+    void initialize() override;
+    void deinitialize() override;
 
     void update(float dt) override;
 

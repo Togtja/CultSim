@@ -4,6 +4,15 @@
 
 namespace cs::system
 {
+void Reproduction::initialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(*this);
+}
+
+void Reproduction::deinitialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Reproduction::delete_father>(*this);
+}
 void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(Reproduction System);
@@ -12,7 +21,7 @@ void Reproduction::update(float dt)
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
         if (auto age = m_context.registry->try_get<component::Age>(e); age)
         {
-            std::clamp(repr.fertility = 100.f - (age->current_age - age->max_age), 0.f, 100.f);
+            repr.fertility = std::clamp(100.f - (age->current_age - age->max_age), 0.f, 100.f);
         }
         else
         {

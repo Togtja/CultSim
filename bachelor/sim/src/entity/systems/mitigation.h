@@ -3,6 +3,7 @@
 #include "entity/components/need.h"
 #include "entity/events.h"
 #include "system.h"
+
 #include <vector>
 
 namespace cs::system
@@ -21,13 +22,11 @@ class Mitigation : public ISystem
 public:
     Mitigation(SystemContext context) : ISystem(context)
     {
-        context.dispatcher->sink<event::SwitchNeedContext>().connect<&Mitigation::switch_need_context>(this);
     }
 
-    ~Mitigation() noexcept override
-    {
-        m_context.dispatcher->sink<event::SwitchNeedContext>().disconnect<&Mitigation::switch_need_context>(this);
-    }
+    void initialize() override;
+
+    void deinitialize() override;
 
     void update(float dt) override;
 

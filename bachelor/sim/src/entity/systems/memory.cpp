@@ -7,6 +7,16 @@
 
 namespace cs::system
 {
+void Memory::initialize()
+{
+    m_context.dispatcher->sink<event::CreatedMemory>().connect<&Memory::update_memories>(*this);
+}
+
+void Memory::deinitialize()
+{
+    m_context.dispatcher->sink<event::CreatedMemory>().disconnect<&Memory::update_memories>(*this);
+}
+
 void Memory::update(float dt)
 {
     CS_AUTOTIMER(Memory System);
@@ -94,9 +104,10 @@ void Memory::update(float dt)
                                 return cost_lhs < cost_rhs;
                             });
 
-            
                         // TODO: Remove magic number and put limit of memories remembered into Lua
-                        while (memory_container.memory_storage.size() > m_max_memories || (memory_container.memory_storage.size() > 0 && memory_container.memory_storage.back()->m_time_since_creation <  m_max_retention_time))
+                        while (memory_container.memory_storage.size() > m_max_memories ||
+                               (memory_container.memory_storage.size() > 0 &&
+                                memory_container.memory_storage.back()->m_time_since_creation < m_max_retention_time))
                         {
                             memory_container.memory_storage.pop_back();
                         }
@@ -164,16 +175,18 @@ void Memory::update_memories(const event::CreatedMemory& event)
                                       cost_lhs += res_lhs->m_time_since_creation;
                                       cost_rhs += res_rhs->m_time_since_creation;
 
-                                      //Make sure that memories that have aged past retention_time are moved to the back of the list
+                                      // Make sure that memories that have aged past retention_time are moved to the back of the
+                                      // list
                                       if (res_lhs->m_time_since_creation > m_max_retention_time)
                                       {
                                           cost_lhs += 1000.f;
                                       }
-                                      if (res_rhs->m_time_since_creation > m_max_retention_time) 
+
+                                      if (res_rhs->m_time_since_creation > m_max_retention_time)
                                       {
                                           cost_rhs += 1000.f;
                                       }
-                                      
+
                                       return cost_lhs < cost_rhs;
                                   });
                     }

@@ -22,13 +22,10 @@ class Reproduction : public ISystem
 public:
     Reproduction(SystemContext context) : ISystem(context)
     {
-        m_context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(this);
     }
+    void initialize() override;
 
-    ~Reproduction()
-    {
-        m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Reproduction::delete_father>(this);
-    }
+    void deinitialize() override;
 
     void update(float dt) override;
 

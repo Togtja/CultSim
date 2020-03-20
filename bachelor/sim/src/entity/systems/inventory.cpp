@@ -2,10 +2,20 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
+void Inventory::initialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Inventory::drop_items>(*this);
+}
+
+void Inventory::deinitialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Inventory::drop_items>(*this);
+}
+
 void Inventory::update(float dt)
 {
     CS_AUTOTIMER(Inventory System);

@@ -8,6 +8,18 @@
 
 namespace cs::system
 {
+void Action::initialize()
+{
+    m_context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(*this);
+    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(*this);
+}
+
+void Action::deinitialize()
+{
+    m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(*this);
+    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Action::delete_target>(*this);
+}
+
 void Action::update(float dt)
 {
     CS_AUTOTIMER(Action System);

@@ -4,13 +4,21 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
-
 #include "entt/entt.hpp"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
+void Mitigation::initialize()
+{
+    m_context.dispatcher->sink<event::SwitchNeedContext>().connect<&Mitigation::switch_need_context>(*this);
+}
+
+void Mitigation::deinitialize()
+{
+    m_context.dispatcher->sink<event::SwitchNeedContext>().disconnect<&Mitigation::switch_need_context>(*this);
+}
 void Mitigation::update(float dt)
 {
     CS_AUTOTIMER(Mitigation System);
@@ -103,6 +111,10 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
 
 void Mitigation::switch_need_context(const event::SwitchNeedContext& event)
 {
+    if (!m_context.registry->valid(event.entity))
+    {
+        return;
+    }
     auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
     if (strategies)
     {
