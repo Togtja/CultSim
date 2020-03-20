@@ -185,9 +185,6 @@ struct Memory
 
 struct Delete
 {
-    float time_since_marked{};
-
-    float time_before_timeout{};
 };
 
 struct Pregnancy
