@@ -104,11 +104,7 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
     lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
 
-    lua.new_usertype<component::Reproduction>("ReproductionComponent",
-                                              "sex",
-                                              &component::Reproduction::sex,
-                                              "max_children",
-                                              &component::Reproduction::max_children);
+    lua.new_usertype<component::Reproduction>("ReproductionComponent", "sex", &component::Reproduction::sex);
 
     lua.new_usertype<component::Health>("HealthComponet",
                                         "health",

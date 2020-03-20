@@ -19,14 +19,15 @@ struct Action
     ETag requirements{};
 
     float time_to_complete{};
-    float time_spent = 0.f;
-
     float success_chance = 1.f;
-
-    entt::entity target{};
 
     sol::function success{};
     sol::function failure{};
+
+    float time_spent = 0.f;
+
+    entt::entity target{};
+
     std::function<void(void)> abort{};
 
     Action() = default;

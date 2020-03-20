@@ -130,8 +130,7 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 {
     auto& repl = reg.assign_or_replace<component::Reproduction>(e);
 
-    repl.sex          = table["sex"].get<component::Reproduction::ESex>();
-    repl.max_children = table["max_children"].get<int>();
+    repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
     return true;
 }
@@ -154,10 +153,10 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
         {
             strategy.actions.push_back(action::Action{action_table["name"].get<std::string>(),
                                                       action_table["requirements"].get<ETag>(),
-                                                      action_table["time_to_complete"].get<float>()});
-
-            strategy.actions.back().success = action_table["success"];
-            strategy.actions.back().failure = action_table["failure"];
+                                                      action_table["time_to_complete"].get<float>(),
+                                                      action_table["success_chance"].get<float>(),
+                                                      action_table["success"].get<sol::function>(),
+                                                      action_table["failure"].get<sol::function>()});
         }
 
         strat.strategies.push_back(strategy);
