@@ -31,20 +31,25 @@ void Inventory::update(float dt)
             }
             inventory.tags = tags;
         }
-
-        if (auto pos = registry.try_get<component::Position>(e); pos && registry.try_get<component::Delete>(e))
+    });
+}
+void Inventory::drop_items(const event::DeleteEntity& event)
+{
+    if (auto inventory = m_context.registry->try_get<component::Inventory>(event.entity); inventory)
+    {
+        if (auto pos = m_context.registry->try_get<component::Position>(event.entity); pos)
         {
-            for (entt::entity component : inventory.contents)
+            for (entt::entity component : inventory->contents)
             {
-                if (!registry.has<component::Position>(component))
+                if (!m_context.registry->has<component::Position>(component))
                 {
-                    registry.assign<component::Position>(component,
-                                                         glm::vec3{pos->position.x + m_context.rng->uniform(0.f, 10.f),
-                                                                   pos->position.y + m_context.rng->uniform(0.f, 10.f),
-                                                                   pos->position.z});
+                    m_context.registry->assign<component::Position>(component,
+                                                                    glm::vec3{pos->position.x + m_context.rng->uniform(0.f, 10.f),
+                                                                              pos->position.y + m_context.rng->uniform(0.f, 10.f),
+                                                                              pos->position.z});
                 }
             }
         }
-    });
+    }
 }
 } // namespace cs::system
