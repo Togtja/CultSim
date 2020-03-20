@@ -122,7 +122,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
     }
 }
-void Action::delete_target(const event::RemovedEntity& event)
+void Action::delete_target(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](component::Strategy& strat) {
@@ -130,12 +130,12 @@ void Action::delete_target(const event::RemovedEntity& event)
         {
             for (auto& action : strategy.actions)
             {
-                if (action.target == event.entity) 
+                if (action.target == event.entity)
                 {
-                    //TODO: write proper syntax for action.abort
+                    // TODO: write proper syntax for action.abort
                     action.abort();
                     action.time_spent     = 0;
-                    action.target = entt::null;
+                    action.target         = entt::null;
                     strategy.requirements = action.requirements;
                 }
             }
