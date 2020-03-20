@@ -47,4 +47,18 @@ public:
     float execute() override;
     std::string_view get_name() override;
 };
+
+class CollectorMouse : public DataCollector::Command
+{
+private:
+    bool m_x_axis = false;
+
+    std::string m_name{};
+
+public:
+    CollectorMouse(bool x_axis);
+
+    float execute() override;
+    std::string_view get_name() override;
+};
 } // namespace cs::debug
