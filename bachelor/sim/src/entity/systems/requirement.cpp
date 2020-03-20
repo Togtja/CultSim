@@ -96,6 +96,11 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
+            // TODO: Remove when event deletion
+            if (!m_context.registry->valid(entity))
+            {
+                continue;
+            }
             if ((m_context.registry->get<component::Tags>(entity).tags & findreqs.tags) == findreqs.tags)
             {
                 if (strategies.staged_strategies.size() != 0)
@@ -110,7 +115,7 @@ void Requirement::update(float dt)
                     strategies.staged_strategies.back().actions.back().target = entity;
 
                     m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Find});
-                    m_context.registry->remove<component::FindRequirement>(e);
+                    m_context.registry->remove_if_exists<component::FindRequirement>(e);
                     mov.desired_position.clear();
                 }
                 else
