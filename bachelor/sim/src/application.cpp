@@ -4,6 +4,7 @@
 #include "delta_clock.h"
 #include "entity/reflection.h"
 #include "entity/systems/rendering.h"
+#include "gfx/renderer.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
 #include "input/input_handler.h"

@@ -22,6 +22,7 @@
 #include "random_engine.h"
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
+#include "constants.h"
 
 #include <algorithm>
 #include <functional>
@@ -122,9 +123,10 @@ bool ScenarioScene::update(float dt)
     draw_time_control_ui();
     draw_selected_entity_information_ui();
 
-    static auto b_tex = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
-    b_tex.scale       = 100;
-    b_tex.flag_lit    = false;
+    static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
+    b_tex.scale        = 100;
+    b_tex.flag_lit     = false;
+    b_tex.material_idx = MATERIAL_IDX_NOSPEC;
 
     /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
