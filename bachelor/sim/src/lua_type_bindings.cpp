@@ -45,7 +45,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Reproduce", ETag::TAG_Reproduce},
                         {"Human", ETag::TAG_Human},
                         {"Tag", ETag::TAG_Tag},
-                        {"Gather", ETag::TAG_Gather}});
+                        {"Gather", ETag::TAG_Gather},
+                        {"Reserved", ETag::TAG_Reserved},
+                        {"Delete", ETag::TAG_Delete}});
 }
 
 void bind_components(sol::state_view lua)

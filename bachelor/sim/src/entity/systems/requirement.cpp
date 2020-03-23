@@ -3,7 +3,6 @@
 #include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
-#include "entity/events.h"
 #include "entity/memories/resource_location.h"
 
 #include "glm/glm.hpp"
@@ -11,6 +10,16 @@
 
 namespace cs::system
 {
+void Requirement::initialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Requirement::remove_requirements>(*this);
+}
+
+void Requirement::deinitialize()
+{
+    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Requirement::remove_requirements>(*this);
+}
+
 void Requirement::update(float dt)
 {
     CS_AUTOTIMER(Requirement System);
@@ -61,7 +70,7 @@ void Requirement::update(float dt)
             if (tags && ((tags->tags & visionreqs.tags) == visionreqs.tags) && !(tags->tags & TAG_Delete))
             {
                 m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Vision});
-                m_context.registry->remove<component::VisionRequirement>(e);
+                m_context.registry->remove_if_exists<component::VisionRequirement>(e);
             }
         }
 
@@ -69,7 +78,7 @@ void Requirement::update(float dt)
         if (m_context.registry->try_get<component::VisionRequirement>(e))
         {
             m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Vision, ""});
-            m_context.registry->remove<component::VisionRequirement>(e);
+            m_context.registry->remove_if_exists<component::VisionRequirement>(e);
         }
     });
 
@@ -93,8 +102,12 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
+            if (m_context.registry->valid(entity))
+            {
+                continue;
+            }
             auto tags = m_context.registry->try_get<component::Tags>(entity);
-            if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & TAG_Delete))
+            if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & (TAG_Delete | TAG_Reserved)))
             {
                 if (strategies.staged_strategies.size() != 0)
                 {
@@ -104,6 +117,8 @@ void Requirement::update(float dt)
                         0.f,
                         30.f,
                         0.f);
+
+                    tags->tags = ETag(tags->tags | TAG_Reserved);
 
                     strategies.staged_strategies.back().actions.back().target = entity;
 
@@ -189,5 +204,12 @@ void Requirement::update(float dt)
 ISystem* Requirement::clone()
 {
     return new Requirement(m_context);
+}
+void Requirement::remove_requirements(const event::DeleteEntity& event)
+{
+    m_context.registry->remove_if_exists<component::FindRequirement,
+                                         component::LocationRequirement,
+                                         component::TagRequirement,
+                                         component::VisionRequirement>(event.entity);
 }
 } // namespace cs::system

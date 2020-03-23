@@ -81,6 +81,7 @@ void Action::update(float dt)
 
             if (action->time_spent >= action->time_to_complete)
             {
+                spdlog::get("agent")->warn("We have finished an action");
                 if (m_context.rng->trigger(action->success_chance))
                 {
                     action->success(e, action->target);
@@ -119,6 +120,11 @@ ISystem* Action::clone()
 
 void Action::abort_strategy(const event::RequirementFailure& event)
 {
+    if (!m_context.registry->valid(event.entity))
+    {
+        return;
+    }
+
     auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
     if (event.error != "")
     {
@@ -129,9 +135,9 @@ void Action::abort_strategy(const event::RequirementFailure& event)
     {
         auto& strategy = strategies->staged_strategies.back();
         auto& action   = strategy.actions[strategy.actions.size() - strategy.working_on_action];
-        if (action.abort != nullptr)
+        if (action.abort.valid())
         {
-            action.abort();
+            action.abort(event.entity, action.target);
         }
 
         strategy.desirability -= 1.f;
@@ -152,8 +158,10 @@ void Action::delete_target(const event::DeleteEntity& event)
                 {
                     // TEMP
                     // TODO: write proper syntax for action.abort
-
-                    action.abort();
+                    if (action.abort.valid())
+                    {
+                        action.abort(event.entity, action.target);
+                    }
                     action.time_spent     = 0;
                     action.target         = entt::null;
                     strategy.requirements = action.requirements;

@@ -157,6 +157,11 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
                                                       action_table["success_chance"].get<float>(),
                                                       action_table["success"].get<sol::function>(),
                                                       action_table["failure"].get<sol::function>()});
+
+            if (action_table["abort"].get_type() == sol::type::function)
+            {
+                strategy.actions.back().abort = action_table["abort"].get<sol::function>();
+            }
         }
 
         strat.strategies.push_back(strategy);

@@ -23,12 +23,11 @@ struct Action
 
     sol::function success{};
     sol::function failure{};
+    sol::function abort{};
 
     float time_spent = 0.f;
 
     entt::entity target{};
-
-    std::function<void(void)> abort{};
 };
 
 inline bool operator==(Action const& lhs, Action const& rhs)
