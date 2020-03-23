@@ -91,7 +91,7 @@ public:
     /**
      * Save the collected data to a csv file
      *
-     * @param rpath The relative file path to save it
+     * @param rpath The relative file path to save it <i>without</i> any suffix like .csv
      * @param timestamp Set to true if the file name should be timestamped
      */
     void save_to_file(std::string_view rpath, bool timestamp = true);
