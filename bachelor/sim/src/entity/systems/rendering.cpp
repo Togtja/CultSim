@@ -116,4 +116,9 @@ void Rendering::update(float dt)
         gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {1.f, 1.f, 0.f});
     });
 }
+
+ISystem* Rendering::clone()
+{
+    return new Rendering(m_context);
+}
 } // namespace cs::system

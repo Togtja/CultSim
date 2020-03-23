@@ -222,4 +222,9 @@ void Movement::update(float dt)
         }
     });
 }
+
+ISystem* Movement::clone()
+{
+    return new Movement(m_context);
+}
 } // namespace cs::system

@@ -28,6 +28,8 @@ public:
 
     void update(float dt) override;
 
+    ISystem* clone() override;
+
     /**
      *
      * Go through a list of possible strategies and filters out those that can help in mitigating our pressing needs.

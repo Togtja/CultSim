@@ -45,5 +45,12 @@ public:
     virtual void deinitialize(){};
 
     virtual void update(float dt) = 0;
+
+    /**
+     * Implement in subclasses to create clones of a system
+     *
+     * @return Pointer to a new heap allocated system
+     */
+    virtual ISystem* clone() = 0;
 };
 } // namespace cs::system

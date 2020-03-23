@@ -23,12 +23,16 @@ public:
     using ISystem::ISystem;
 
     void initialize() override;
+
     void deinitialize() override;
 
     void update(float dt) override;
+
+    ISystem* clone() override;
 
     void abort_strategy(const event::RequirementFailure& event);
 
     void delete_target(const event::DeleteEntity& event);
 };
+
 } // namespace cs::system

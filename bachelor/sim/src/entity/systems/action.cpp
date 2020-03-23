@@ -111,6 +111,12 @@ void Action::update(float dt)
         }
     });
 }
+
+ISystem* Action::clone()
+{
+    return new Action(m_context);
+}
+
 void Action::abort_strategy(const event::RequirementFailure& event)
 {
     auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);

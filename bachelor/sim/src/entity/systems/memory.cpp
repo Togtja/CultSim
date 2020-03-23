@@ -118,6 +118,11 @@ void Memory::update(float dt)
     }
 }
 
+ISystem* Memory::clone()
+{
+    return new Memory(m_context);
+}
+
 void Memory::update_memories(const event::CreatedMemory& event)
 {
     auto memories  = m_context.registry->try_get<component::Memory>(event.entity);

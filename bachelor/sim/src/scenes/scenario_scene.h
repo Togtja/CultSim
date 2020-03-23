@@ -36,10 +36,10 @@ private:
     RandomEngine m_rng{};
 
     /** Enabled Systems for this Scenario */
-    std::vector<entt::meta_any> m_active_systems{};
+    std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
 
     /** Disabled Systems for this Scenario */
-    std::vector<entt::meta_any> m_inactive_systems{};
+    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
 
     /** The scenario we are running */
     lua::Scenario m_scenario;

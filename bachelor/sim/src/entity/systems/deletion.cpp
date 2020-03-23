@@ -24,6 +24,11 @@ void Deletion::update(float dt)
     view.less([this](entt::entity e) { m_context.registry->destroy(e); });
 }
 
+ISystem* Deletion::clone()
+{
+    return new Deletion(m_context);
+}
+
 void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
     spdlog::get("agent")->critical("We are deleting enity {}", event.entity);

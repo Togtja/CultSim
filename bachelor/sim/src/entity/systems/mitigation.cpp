@@ -75,6 +75,11 @@ void Mitigation::update(float dt)
     });
 }
 
+ISystem* Mitigation::clone()
+{
+    return new Mitigation(m_context);
+}
+
 bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need& need, const component::Tags& tags)
 {
     ai::Strategy temp{};

@@ -43,6 +43,12 @@ void Inventory::update(float dt)
         }
     });
 }
+
+ISystem* Inventory::clone()
+{
+    return new Inventory(m_context);
+}
+
 void Inventory::drop_items(const event::DeleteEntity& event)
 {
     if (auto inventory = m_context.registry->try_get<component::Inventory>(event.entity); inventory)

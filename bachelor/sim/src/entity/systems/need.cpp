@@ -54,4 +54,9 @@ void Need::update(float dt)
         }
     });
 }
+
+ISystem* Need::clone()
+{
+    return new Need(m_context);
+}
 } // namespace cs::system

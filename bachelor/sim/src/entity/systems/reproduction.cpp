@@ -39,6 +39,11 @@ void Reproduction::update(float dt)
     });
 }
 
+ISystem* Reproduction::clone()
+{
+    return new Reproduction(m_context);
+}
+
 void Reproduction::delete_father(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Pregnancy>();

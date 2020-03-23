@@ -38,4 +38,9 @@ void Timer::update(float dt)
         }
     });
 }
+
+ISystem* Timer::clone()
+{
+    return new Timer(m_context);
+}
 } // namespace cs::system

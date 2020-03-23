@@ -185,4 +185,9 @@ void Requirement::update(float dt)
         m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Tag});
     });
 }
+
+ISystem* Requirement::clone()
+{
+    return new Requirement(m_context);
+}
 } // namespace cs::system

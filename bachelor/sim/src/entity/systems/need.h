@@ -23,5 +23,7 @@ public:
     using ISystem::ISystem;
 
     void update(float dt) override;
+
+    ISystem* clone() override;
 };
 } // namespace cs::system

@@ -76,8 +76,10 @@ void ScenarioScene::initialize_simulation()
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
-            m_active_systems.back().type().func("initialize"_hs).invoke(m_active_systems.back());
+            auto meta                 = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario});
+            system::ISystem& temp_ref = meta.cast<system::ISystem>();
+            m_active_systems.emplace_back(temp_ref.clone());
+            m_active_systems.back()->initialize();
         }
         else
         {
@@ -96,13 +98,13 @@ void ScenarioScene::clean_simulation()
     /** Deinitialize systems and then clear them */
     for (auto& system : m_active_systems)
     {
-        system.type().func("deinitialize"_hs).invoke(system);
+        system->deinitialize();
     }
     m_active_systems.clear();
 
     for (auto& system : m_inactive_systems)
     {
-        system.type().func("deinitialize"_hs).invoke(system);
+        system->initialize();
     }
     m_inactive_systems.clear();
 }
@@ -164,7 +166,7 @@ bool ScenarioScene::update(float dt)
     /** Update systems */
     for (auto&& system : m_active_systems)
     {
-        system.type().func("update"_hs).invoke(system, dt);
+        system->update(dt);
     }
 
     /** Deal with long running tasks, then events */

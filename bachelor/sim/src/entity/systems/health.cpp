@@ -46,4 +46,9 @@ void Health::update(float dt)
         }
     });
 }
+
+ISystem* Health::clone()
+{
+    return new Health(m_context);
+}
 } // namespace cs::system
