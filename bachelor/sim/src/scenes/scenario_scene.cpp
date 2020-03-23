@@ -70,13 +70,16 @@ void ScenarioScene::initialize_simulation()
     m_data_collector.add_collector<debug::CollectorMouse>(true);
     m_data_collector.add_collector<debug::CollectorMouse>(false);
 
+    m_active_systems.reserve(m_scenario.systems.size());
+    m_inactive_systems.reserve(m_scenario.systems.size());
+
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
+            m_active_systems.push_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
             m_active_systems.back().type().func("initialize"_hs).invoke(m_active_systems.back());
         }
         else

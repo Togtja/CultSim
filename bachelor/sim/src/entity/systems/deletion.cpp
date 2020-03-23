@@ -28,5 +28,9 @@ void Deletion::check_and_delete(const event::DeleteEntity& event)
 {
     spdlog::get("agent")->critical("We are deleting enity {}", event.entity);
     m_context.registry->assign<component::Delete>(event.entity);
+    if (auto tags = m_context.registry->try_get<component::Tags>(event.entity); tags) 
+    {
+        tags->tags = ETag(tags->tags | TAG_Delete);
+    }
 }
 } // namespace cs::system

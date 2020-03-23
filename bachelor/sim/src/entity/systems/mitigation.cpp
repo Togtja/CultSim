@@ -111,24 +111,23 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
 
 void Mitigation::switch_need_context(const event::SwitchNeedContext& event)
 {
-    if (!m_context.registry->valid(event.entity))
+    if (m_context.registry->valid(event.entity))
     {
-        return;
+        auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
+        if (strategies)
+        {
+            strategies->staged_strategies.clear();
+        }
+        else
+        {
+            spdlog::get("agent")->debug("tried to clear strategies from an entity that does not have that component. Entity: {}",
+                                        event.entity);
+        }
+        m_context.registry->remove_if_exists<component::LocationRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::VisionRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::FindRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::TagRequirement>(event.entity);
     }
-    auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
-    if (strategies)
-    {
-        strategies->staged_strategies.clear();
-    }
-    else
-    {
-        spdlog::get("agent")->debug("tried to clear strategies from an entity that does not have that component. Entity: {}",
-                                    event.entity);
-    }
-    m_context.registry->remove_if_exists<component::LocationRequirement>(event.entity);
-    m_context.registry->remove_if_exists<component::VisionRequirement>(event.entity);
-    m_context.registry->remove_if_exists<component::FindRequirement>(event.entity);
-    m_context.registry->remove_if_exists<component::TagRequirement>(event.entity);
 }
 
 } // namespace cs::system
