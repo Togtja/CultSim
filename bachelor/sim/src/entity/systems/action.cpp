@@ -58,23 +58,29 @@ void Action::update(float dt)
             if (strategy.requirements & TAG_Tag)
             {
                 m_context.registry->assign<component::TagRequirement>(e, strategy.tags);
-                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Tag);
+                strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Tag);
             }
             if (strategy.requirements & TAG_Location)
             {
                 m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f}, 0.f, 30.f, 0.f);
-                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Location);
+                strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Location);
             }
             if (strategy.requirements & TAG_Find)
             {
                 m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{}, 30.f, 0.f);
-                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Find);
+                strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Find);
             }
             if (strategy.requirements & TAG_Vision)
             {
                 m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
-                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Vision);
+                strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Vision);
             }
+
+            if (strategy.requirements & ~TAG_None)
+            {
+                spdlog::warn("Unhandled requirement {}", tag_to_string(strategy.requirements));
+            }
+            strategy.requirements = TAG_None;
         }
         else
         {
