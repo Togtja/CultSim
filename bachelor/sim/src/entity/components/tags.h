@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include <vector>
+
 namespace cs
 {
 enum ETag : uint64_t
@@ -22,26 +24,32 @@ enum ETag : uint64_t
     TAG_Reserved  = 1 << 14
 };
 
-inline constexpr std::string_view tag_to_string(ETag tag)
+inline std::string tag_to_string(ETag tag)
 {
-    switch (uint64_t(tag))
+    std::string result{};
+    std::vector<std::string> tag_names{"None",
+                                       "Food",
+                                       "Drink",
+                                       "Sleep",
+                                       "Joy",
+                                       "Location",
+                                       "Find",
+                                       "Vision",
+                                       "Avoidable",
+                                       "Reproduce",
+                                       "Human",
+                                       "Tag",
+                                       "Gather",
+                                       "Delete",
+                                       "Reserved"};
+    for (int i = 0; i < tag_names.size(); i++)
     {
-        case 0: return "None";
-        case 1 << 1: return "Food";
-        case 1 << 2: return "Drink";
-        case 1 << 3: return "Sleep";
-        case 1 << 4: return "Joy";
-        case 1 << 5: return "Location";
-        case 1 << 6: return "Find";
-        case 1 << 7: return "Vision";
-        case 1 << 8: return "Avoidable";
-        case 1 << 9: return "Reproduce";
-        case 1 << 10: return "Human";
-        case 1 << 11: return "Tag";
-        case 1 << 12: return "Gather";
-        case 1 << 13: return "Delete";
-        case 1 << 14: return "Reserved";
-        default: return "Error";
+        if (tag & 1 << i)
+        {
+            result += " " + tag_names[i];
+        }
     }
+
+    return result;
 }
 } // namespace cs

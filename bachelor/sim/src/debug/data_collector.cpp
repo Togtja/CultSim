@@ -2,6 +2,7 @@
 #include "debug/auto_timer.h"
 #include "filesystem/filesystem.h"
 
+#include <iomanip>
 #include <algorithm>
 #include <sstream>
 
@@ -92,7 +93,25 @@ void DataCollector::save_to_file(std::string_view rpath, bool timestamp)
         stream << '\n';
     }
 
-    fs::write_file(rpath, stream.str());
+    /** Create path */
+    std::string final_output_path;
+    std::transform(rpath.cbegin(), rpath.cend(), std::back_inserter(final_output_path), [](char c) {
+        return std::isspace(c) ? '_' : std::tolower(c);
+    });
+
+    if (timestamp)
+    {
+        char timebuf[128];
+        const auto now     = std::chrono::system_clock::now();
+        std::time_t time_t = std::chrono::system_clock::to_time_t(now);
+        std::strftime(timebuf, 128, "%d%m%y_%H%M%S", std::localtime(&time_t));
+
+        final_output_path += fmt::format("_{}", timebuf);
+    }
+
+    final_output_path += ".csv";
+
+    fs::write_file(final_output_path, stream.str());
 }
 
 } // namespace cs::debug
