@@ -23,12 +23,12 @@ struct Need
 
 inline bool operator<(Need const& lhs, Need const& rhs)
 {
-    return ((100 / (lhs.status + 0.01)) * lhs.weight < (100 / (rhs.status + 0.01)) * rhs.weight);
+    return ((100 / (lhs.status + 1)) * lhs.weight < (100 / (rhs.status + 1)) * rhs.weight);
 }
 
 inline bool operator>(Need const& lhs, Need const& rhs)
 {
-    return ((100 / (lhs.status + 0.01)) * lhs.weight > (100 / (rhs.status + 0.01)) * rhs.weight);
+    return ((100 / (lhs.status + 1)) * lhs.weight > (100 / (rhs.status + 1)) * rhs.weight);
 }
 
 inline bool operator==(Need const& lhs, Need const& rhs)
