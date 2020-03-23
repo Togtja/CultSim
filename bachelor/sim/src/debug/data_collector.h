@@ -89,7 +89,7 @@ public:
     void show_ui();
 
     /**
-     * Save the collected data to a file
+     * Save the collected data to a csv file
      *
      * @param rpath The relative file path to save it
      * @param timestamp Set to true if the file name should be timestamped
