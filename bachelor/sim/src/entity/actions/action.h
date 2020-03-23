@@ -27,7 +27,7 @@ struct Action
 
     float time_spent = 0.f;
 
-    entt::entity target{};
+    entt::entity target = entt::null;
 };
 
 inline bool operator==(Action const& lhs, Action const& rhs)
