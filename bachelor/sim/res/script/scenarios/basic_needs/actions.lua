@@ -37,7 +37,7 @@ actions.consume_self = {
 
 actions.drink = {
     name = "Drink",
-    requirements = ETag.Find | ETag.View,
+    requirements = ETag.Find | ETag.Vision,
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner, target)
@@ -51,7 +51,7 @@ actions.drink = {
 
 actions.eat = {
     name = "Eat",
-    requirements = ETag.Find | ETag.View,
+    requirements = ETag.Find | ETag.Vision,
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
@@ -65,7 +65,7 @@ actions.eat = {
 
 actions.reproduce = {
     name = "Reproducing",
-    requirements = ETag.Find | ETag.Tag | ETag.View,
+    requirements = ETag.Find | ETag.Tag | ETag.Vision,
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
