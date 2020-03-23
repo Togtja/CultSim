@@ -129,10 +129,12 @@ void Action::abort_strategy(const event::RequirementFailure& event)
     {
         auto& strategy = strategies->staged_strategies.back();
         auto& action   = strategy.actions[strategy.actions.size() - strategy.working_on_action];
+        if (action.abort != nullptr)
+        {
+            action.abort();
+        }
 
-        action.abort();
-
-        strategy.desirability--;
+        strategy.desirability -= 1.f;
 
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
     }
