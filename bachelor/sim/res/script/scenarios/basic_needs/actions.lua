@@ -33,11 +33,12 @@ actions.consume_self = {
     failure = function(owner, target)
         cultsim.apply_basic_damage(owner, 3.0)
     end
+        
 }
 
 actions.drink = {
     name = "Drink",
-    requirements = ETag.Find | ETag.Vision,
+    requirements = ETag.Find,
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner, target)
@@ -46,12 +47,16 @@ actions.drink = {
     end,
     failure = function(owner, target)
         cultsim.modify_need(owner, ETag.Drink, 5.0)
+    end,
+    abort = function(owner, target)
+        local tag_component = cultsim.get_component(component.tag)
+        tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
 
 actions.eat = {
     name = "Eat",
-    requirements = ETag.Find | ETag.Vision,
+    requirements = ETag.Find,
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
@@ -60,12 +65,16 @@ actions.eat = {
     end,
     failure = function(owner, target)
         cultsim.modify_need(owner, ETag.Food, 10.0)
+    end,
+    abort = function(owner, target)
+        local tag_component = cultsim.get_component(component.tag)
+        tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
 
 actions.reproduce = {
     name = "Reproducing",
-    requirements = ETag.Find | ETag.Tag | ETag.Vision,
+    requirements = ETag.Find | ETag.Tag,
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
@@ -82,5 +91,9 @@ actions.reproduce = {
             cultsim.impregnate(target, owner)
         end
     end,
-    failure = function(owner, target) log.info(owner .. " failed to have sex with " .. target) end
+    failure = function(owner, target) log.info(owner .. " failed to have sex with " .. target) end,
+    abort = function(owner, target)
+        local tag_component = cultsim.get_component(component.tag)
+        tag_component.tags = tag_component.tags & ~ETag.Reserved
+    end
 }

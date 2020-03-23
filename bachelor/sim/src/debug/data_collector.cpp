@@ -1,5 +1,9 @@
 #include "data_collector.h"
 #include "debug/auto_timer.h"
+#include "filesystem/filesystem.h"
+
+#include <algorithm>
+#include <sstream>
 
 #include <gfx/ImGUI/imgui.h>
 
@@ -67,6 +71,28 @@ void DataCollector::show_ui()
 
 void DataCollector::save_to_file(std::string_view rpath, bool timestamp)
 {
+    std::ostringstream stream{};
+
+    /** Header row */
+    stream << "Collector,";
+    for (unsigned i = 0u; i < m_samples.front().size(); ++i)
+    {
+        stream << m_sampling_rate * i << ',';
+    }
+    stream << '\n';
+
+    /** Sampler data */
+    for (unsigned i = 0u; i < m_collectors.size(); ++i)
+    {
+        stream << m_collectors[i]->get_name() << ',';
+        for (const auto& sample : m_samples[i])
+        {
+            stream << sample << ',';
+        }
+        stream << '\n';
+    }
+
+    fs::write_file(rpath, stream.str());
 }
 
 } // namespace cs::debug
