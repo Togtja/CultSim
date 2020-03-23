@@ -90,6 +90,8 @@ void ScenarioScene::initialize_simulation()
 
 void ScenarioScene::clean_simulation()
 {
+    m_data_collector.save_to_file(m_scenario.name + "_data.csv");
+
     m_registry.clear();
     m_simtime   = 0.f;
     m_timescale = 1.f;
