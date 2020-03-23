@@ -25,10 +25,14 @@ void Health::update(float dt)
             }
         }
 
-        // TODO: Better entity removal upon death
         if (health.health <= 0.f)
         {
-            m_context.dispatcher->trigger<event::DeleteEntity>(event::DeleteEntity{e});
+            m_context.registry->assign<component::Delete>(e);
+            auto tags = m_context.registry->try_get<component::Tags>(e);
+            if (tags)
+            {
+                tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
+            }
             return;
         }
 

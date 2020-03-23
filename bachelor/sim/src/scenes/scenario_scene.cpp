@@ -385,7 +385,14 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](entt::entity e) { m_dispatcher.trigger<event::DeleteEntity>(event::DeleteEntity{e}); });
+    cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+        m_registry.assign<component::Delete>(e);
+        auto tags = m_registry.try_get<component::Tags>(e);
+        if (tags)
+        {
+            tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
+        }
+    });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
