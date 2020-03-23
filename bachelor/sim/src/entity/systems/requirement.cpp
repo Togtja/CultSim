@@ -102,10 +102,11 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
-            if (m_context.registry->valid(entity))
+            if (!m_context.registry->valid(entity))
             {
                 continue;
             }
+
             auto tags = m_context.registry->try_get<component::Tags>(entity);
             if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & (TAG_Delete | TAG_Reserved)))
             {
@@ -118,9 +119,19 @@ void Requirement::update(float dt)
                         30.f,
                         0.f);
 
-                    tags->tags = ETag(tags->tags | TAG_Reserved);
-
+                    tags->tags                                                = ETag(tags->tags | TAG_Reserved);
+                    auto self_tags                                            = m_context.registry->try_get<component::Tags>(e);
                     strategies.staged_strategies.back().actions.back().target = entity;
+                    if (findreqs.tags & TAG_Reproduce)
+                    {
+                        spdlog::get("agent")->warn(
+                            " entity {} with tags {} and entity: {} with tags {} for strategy with requirements {}",
+                            e,
+                            tag_to_string(self_tags->tags).c_str(),
+                            entity,
+                            tag_to_string(tags->tags).c_str(),
+                            tag_to_string(findreqs.tags).c_str());
+                    }
 
                     m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Find});
                     m_context.registry->remove_if_exists<component::FindRequirement>(e);

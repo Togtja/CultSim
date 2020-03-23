@@ -547,9 +547,13 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer] =
-        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction, component::Timer>(
-            selection_info.selected_entity);
+    const auto& [needs, health, strategy, reproduction, timer, tags] =
+        m_registry.try_get<component::Need,
+                           component::Health,
+                           component::Strategy,
+                           component::Reproduction,
+                           component::Timer,
+                           component::Tags>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -611,6 +615,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
+    if (tags)
+    {
+        ImGui::Text("Tags: %s", tag_to_string(tags->tags).c_str());
+    }
     if (timer)
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);

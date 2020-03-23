@@ -80,7 +80,11 @@ actions.reproduce = {
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
-        if not (cultsim.is_valid(owner) and cultsim.is_valid(target)) then return end
+        log.warn(owner.." succeeded to have sex with " .. target)
+
+        if not (cultsim.is_valid(owner) and cultsim.is_valid(target)) then 
+            return
+        end
 
         local my_reproduction = cultsim.get_component(owner, component.reproduction)
         local their_reproduction = cultsim.get_component(target, component.reproduction)
