@@ -5,8 +5,8 @@
 #include "entity/components/components.h"
 #include "entity/memories/resource_location.h"
 
-#include "glm/glm.hpp"
-#include "spdlog/spdlog.h"
+#include <glm/glm.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {

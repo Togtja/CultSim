@@ -4,18 +4,19 @@
 #include "delta_clock.h"
 #include "entity/reflection.h"
 #include "entity/systems/rendering.h"
-#include "gfx/renderer.h"
 #include "filesystem/filesystem.h"
 #include "gfx/glutil.h"
+#include "gfx/renderer.h"
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
 
+
 #include <functional>
 
-#include "gfx/ImGUI/imgui.h"
-#include "gfx/ImGUI/imgui_impl_opengl3.h"
-#include "gfx/ImGUI/imgui_impl_sdl.h"
+#include <gfx/ImGUI/imgui.h>
+#include <gfx/ImGUI/imgui_impl_opengl3.h>
+#include <gfx/ImGUI/imgui_impl_sdl.h>
 
 /** Header font for ImGui purposes */
 ImFont* g_header_font = nullptr;

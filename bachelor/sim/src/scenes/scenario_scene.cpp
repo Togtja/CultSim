@@ -30,8 +30,8 @@
 #include <memory>
 #include <random>
 
-#include "gfx/ImGUI/imgui.h"
-#include "spdlog/spdlog.h"
+#include <gfx/ImGUI/imgui.h>
+#include <spdlog/spdlog.h>
 
 extern ImFont* g_header_font;
 extern ImFont* g_light_font;
