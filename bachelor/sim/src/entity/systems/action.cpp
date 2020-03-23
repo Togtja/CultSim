@@ -64,15 +64,15 @@ void Action::update(float dt)
                 m_context.registry->assign<component::LocationRequirement>(e, glm::vec3{20.f, 20.f, 0.f}, 0.f, 30.f, 0.f);
                 strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Location);
             }
-            if (strategy.requirements & TAG_Vision)
-            {
-                m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
-                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Vision);
-            }
             if (strategy.requirements & TAG_Find)
             {
                 m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{}, 30.f, 0.f);
                 strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Find);
+            }
+            if (strategy.requirements & TAG_Vision)
+            {
+                m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
+                strategy.requirements = static_cast<ETag>(action->requirements & ~TAG_Vision);
             }
         }
         else

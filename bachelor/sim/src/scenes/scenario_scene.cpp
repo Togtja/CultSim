@@ -70,6 +70,9 @@ void ScenarioScene::initialize_simulation()
     m_data_collector.add_collector<debug::CollectorMouse>(true);
     m_data_collector.add_collector<debug::CollectorMouse>(false);
 
+    m_active_systems.reserve(m_scenario.systems.size());
+    m_inactive_systems.reserve(m_scenario.systems.size());
+
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
