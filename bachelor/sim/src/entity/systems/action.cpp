@@ -37,6 +37,7 @@ void Action::update(float dt)
         }
 
         auto& strategy = strategies.staged_strategies.back();
+
         if (strategy.actions.empty() || strategy.working_on_action > strategy.actions.size())
         {
             strategies.staged_strategies.pop_back();
@@ -81,7 +82,7 @@ void Action::update(float dt)
 
             if (action->time_spent >= action->time_to_complete)
             {
-                spdlog::get("agent")->warn("We have finished an action");
+                spdlog::get("agent")->info("We have finished {}", action->name);
                 if (m_context.rng->trigger(action->success_chance))
                 {
                     action->success(e, action->target);
@@ -148,7 +149,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
 
 void Action::delete_target(const event::DeleteEntity& event)
 {
-    spdlog::critical("We are deleting a target {} and restarting an action", event.entity);
+    spdlog::get("agent")->info("We are deleting a target {} and restarting the action", event.entity);
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {
         for (auto& strategy : strat.staged_strategies)

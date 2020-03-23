@@ -102,10 +102,11 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
-            if (m_context.registry->valid(entity))
+            if (!m_context.registry->valid(entity))
             {
                 continue;
             }
+
             auto tags = m_context.registry->try_get<component::Tags>(entity);
             if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & (TAG_Delete | TAG_Reserved)))
             {

@@ -29,12 +29,12 @@ void Mitigation::update(float dt)
     view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
-            auto temp = needs.vital_needs[0];
+            auto temp = needs.vital_needs.front();
             // Put the most pressing needs to the front
             std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());
 
             // If the most pressing need has changed
-            if (temp != needs.vital_needs[0])
+            if (temp != needs.vital_needs.front())
             {
                 strategies.staged_strategies.clear();
                 m_context.registry->remove_if_exists<component::LocationRequirement>(e);
@@ -45,7 +45,7 @@ void Mitigation::update(float dt)
 
             if (strategies.staged_strategies.empty())
             {
-                if (!(add_strategies(strategies, needs.vital_needs[0], tags)))
+                if (!(add_strategies(strategies, needs.vital_needs.front(), tags)))
                 {
                     spdlog::get("agent")->warn("Unable to add actions to fix need {}", needs.vital_needs[0].name);
                 }
