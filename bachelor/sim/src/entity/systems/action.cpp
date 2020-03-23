@@ -135,7 +135,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
     {
         auto& strategy = strategies->staged_strategies.back();
         auto& action   = strategy.actions[strategy.actions.size() - strategy.working_on_action];
-        if (action.abort.valid())
+        if (action.abort.valid() && m_context.registry->valid(action.target))
         {
             action.abort(event.entity, action.target);
         }
@@ -145,11 +145,12 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         std::sort(strategies->staged_strategies.begin(), strategies->staged_strategies.end());
     }
 }
+
 void Action::delete_target(const event::DeleteEntity& event)
 {
     spdlog::critical("We are deleting a target {} and restarting an action", event.entity);
     auto view = m_context.registry->view<component::Strategy>();
-    view.each([this, event](component::Strategy& strat) {
+    view.each([this, event](entt::entity e, component::Strategy& strat) {
         for (auto& strategy : strat.staged_strategies)
         {
             for (auto& action : strategy.actions)
@@ -158,9 +159,9 @@ void Action::delete_target(const event::DeleteEntity& event)
                 {
                     // TEMP
                     // TODO: write proper syntax for action.abort
-                    if (action.abort.valid())
+                    if (action.abort.valid() && m_context.registry->valid(action.target))
                     {
-                        action.abort(event.entity, action.target);
+                        action.abort(e, action.target);
                     }
                     action.time_spent     = 0;
                     action.target         = entt::null;
