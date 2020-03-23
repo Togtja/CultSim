@@ -20,9 +20,7 @@ namespace cs::system
 class Mitigation : public ISystem
 {
 public:
-    Mitigation(SystemContext context) : ISystem(context)
-    {
-    }
+    using ISystem::ISystem;
 
     void initialize() override;
 

@@ -8,13 +8,11 @@ namespace cs::system
 class Inventory : public ISystem
 {
 public:
+    using ISystem::ISystem;
+    
     void initialize() override;
 
     void deinitialize() override;
-
-    Inventory(SystemContext context) : ISystem(context)
-    {
-    }
 
     void update(float dt) override;
 

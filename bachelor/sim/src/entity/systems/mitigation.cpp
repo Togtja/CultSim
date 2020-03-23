@@ -12,12 +12,12 @@ namespace cs::system
 {
 void Mitigation::initialize()
 {
-    m_context.dispatcher->sink<event::SwitchNeedContext>().connect<&Mitigation::switch_need_context>(*this);
+    m_context.dispatcher->sink<event::SwitchNeedContext>().connect<&Mitigation::switch_need_context>(this);
 }
 
 void Mitigation::deinitialize()
 {
-    m_context.dispatcher->sink<event::SwitchNeedContext>().disconnect<&Mitigation::switch_need_context>(*this);
+    m_context.dispatcher->sink<event::SwitchNeedContext>().disconnect<&Mitigation::switch_need_context>(this);
 }
 void Mitigation::update(float dt)
 {

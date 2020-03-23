@@ -14,9 +14,8 @@ private:
     float m_max_retention_time{};
 
 public:
-    Memory(SystemContext context) : ISystem(context)
-    {
-    }
+    using ISystem::ISystem;
+    
     void initialize() override;
 
     void deinitialize() override;

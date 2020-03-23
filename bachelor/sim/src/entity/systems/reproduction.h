@@ -20,9 +20,8 @@ namespace cs::system
 class Reproduction : public ISystem
 {
 public:
-    Reproduction(SystemContext context) : ISystem(context)
-    {
-    }
+    using ISystem::ISystem;
+    
     void initialize() override;
 
     void deinitialize() override;

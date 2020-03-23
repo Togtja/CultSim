@@ -20,9 +20,7 @@ namespace cs::system
 class Action : public ISystem
 {
 public:
-    Action(SystemContext context) : ISystem(context)
-    {
-    }
+    using ISystem::ISystem;
 
     void initialize() override;
     void deinitialize() override;
