@@ -33,7 +33,7 @@ actions.consume_self = {
     failure = function(owner, target)
         cultsim.apply_basic_damage(owner, 3.0)
     end
-        
+
 }
 
 actions.drink = {
@@ -42,6 +42,7 @@ actions.drink = {
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner, target)
+        log.info("I (" .. owner .. ") drink-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Drink, 85.0)
         cultsim.kill(target)
     end,
@@ -49,7 +50,7 @@ actions.drink = {
         cultsim.modify_need(owner, ETag.Drink, 5.0)
     end,
     abort = function(owner, target)
-        local tag_component = cultsim.get_component(component.tag)
+        local tag_component = cultsim.get_component(owner, component.tag)
         tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
@@ -60,6 +61,7 @@ actions.eat = {
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
+        log.info("I (" .. owner .. ") eat-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Food, 60.0)
         cultsim.kill(target)
     end,
@@ -67,7 +69,7 @@ actions.eat = {
         cultsim.modify_need(owner, ETag.Food, 10.0)
     end,
     abort = function(owner, target)
-        local tag_component = cultsim.get_component(component.tag)
+        local tag_component = cultsim.get_component(owner, component.tag)
         tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
@@ -83,6 +85,9 @@ actions.reproduce = {
         local my_reproduction = cultsim.get_component(owner, component.reproduction)
         local their_reproduction = cultsim.get_component(target, component.reproduction)
 
+        local tag_component = cultsim.get_component(owner, component.tag)
+        tag_component.tags = tag_component.tags & ~ETag.Reserved
+
         -- Increase need
         cultsim.modify_need(owner, ETag.Reproduce, 99.0)
 
@@ -91,9 +96,13 @@ actions.reproduce = {
             cultsim.impregnate(target, owner)
         end
     end,
-    failure = function(owner, target) log.info(owner .. " failed to have sex with " .. target) end,
+    failure = function(owner, target)
+         log.info(owner .. " failed to have sex with " .. target)
+         local tag_component = cultsim.get_component(owner, component.tag)
+         tag_component.tags = tag_component.tags & ~ETag.Reserved
+    end,
     abort = function(owner, target)
-        local tag_component = cultsim.get_component(component.tag)
+        local tag_component = cultsim.get_component(owner, component.tag)
         tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
