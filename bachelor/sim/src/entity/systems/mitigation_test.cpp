@@ -5,8 +5,8 @@
 #include "mitigation.h"
 #include "need.h"
 
-#include "doctest/doctest.h"
-#include "spdlog/spdlog.h"
+#include <doctest/doctest.h>
+#include <spdlog/spdlog.h>
 
 TEST_CASE("Testing that system does not run if pressing needs are empty")
 {
@@ -107,7 +107,8 @@ TEST_CASE("Test case to ensure strategies are ordered correctly")
                                   {},
                                   static_cast<cs::ETag>(cs::TAG_Food | cs::TAG_Drink),
                                   {},
-                                  {}, std::vector<cs::action::Action>{std::move(action)}};
+                                  {},
+                                  std::vector<cs::action::Action>{std::move(action)}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,

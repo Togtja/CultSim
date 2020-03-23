@@ -2,7 +2,8 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/events.h"
-#include "spdlog/spdlog.h"
+
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
