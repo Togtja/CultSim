@@ -115,6 +115,13 @@ void Action::update(float dt)
 
                 else
                 {
+                    if(m_context.registry->valid(action->target)){
+                    if(auto tags = m_context.registry->try_get<component::Tags>(action->target); tags)
+                    {
+                        tags->tags = static_cast<ETag>(tags->tags & ~ETag::TAG_Reserved);
+                    }
+                    }
+
                     action->failure(e, action->target);
                     action->time_spent    = 0;
                     action->target        = entt::null;
@@ -150,6 +157,11 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         if (action.abort.valid() && m_context.registry->valid(action.target))
         {
             action.abort(event.entity, action.target);
+
+            if(auto tags = m_context.registry->try_get<component::Tags>(action.target); tags)
+            {
+                tags->tags = static_cast<ETag>(tags->tags & ~ETag::TAG_Reserved);
+            }
         }
 
         strategy.desirability -= 1.f;
