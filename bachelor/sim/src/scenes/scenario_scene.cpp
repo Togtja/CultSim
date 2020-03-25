@@ -386,6 +386,11 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Destroy entity */
     cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+        if (e == entt::null)
+        {
+            spdlog::get("agent")->critical("Trying to kill a null agent");
+            return;
+        }
         m_registry.assign<component::Delete>(e);
         auto tags = m_registry.try_get<component::Tags>(e);
         if (tags)
