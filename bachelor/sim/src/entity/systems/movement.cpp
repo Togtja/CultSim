@@ -5,7 +5,6 @@
 #include "entity/events.h"
 #include "gfx/renderer.h"
 
-#include <execution>
 #include <random>
 
 #include <gfx/ImGUI/imgui.h>
