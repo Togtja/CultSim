@@ -7,6 +7,7 @@ actions.sleep = {
     requirements = ETag.None,
     time_to_complete = 10.0,
     success_chance = 0.9,
+    targets_self = true,
     success = function(owner, target)
         cultsim.modify_need(owner, ETag.Sleep, 69.0)
     end,
@@ -21,6 +22,7 @@ actions.consume_self = {
     time_to_complete = 7.5,
     -- You manage to eat yourself without too much damage caused
     success_chance = 0.9,
+    targets_self = true,
     success = function(owner, target)
         -- Roll for how much we ate
         local chunk_eaten = random:uniform(15.0, 45.0)
@@ -51,7 +53,6 @@ actions.drink = {
     end,
     abort = function(owner, target)
         local tag_component = cultsim.get_component(owner, component.tag)
-        tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
 
@@ -70,7 +71,6 @@ actions.eat = {
     end,
     abort = function(owner, target)
         local tag_component = cultsim.get_component(owner, component.tag)
-        tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }
 
@@ -90,10 +90,15 @@ actions.reproduce = {
         local their_reproduction = cultsim.get_component(target, component.reproduction)
 
         local tag_component = cultsim.get_component(owner, component.tag)
-        tag_component.tags = tag_component.tags & ~ETag.Reserved
+        local their_tags = cultsim.get_component(target,component.tag)
+        tag_component.tags = tag_component.tags & ~(ETag.Reproduce)
+        their_tags.tags = their_tags.tags & ~(ETag.Reproduce)
 
         -- Increase need
         cultsim.modify_need(owner, ETag.Reproduce, 99.0)
+        cultsim.modify_need(target, ETag.Reproduce,99.0)
+
+
 
         -- If we have different sexes and we're the female, then we're impregnated (currently 100% chance)
         if my_reproduction.sex == ESex.Female and their_reproduction.sex == ESex.Male then
@@ -103,10 +108,8 @@ actions.reproduce = {
     failure = function(owner, target)
          log.info(owner .. " failed to have sex with " .. target)
          local tag_component = cultsim.get_component(owner, component.tag)
-         tag_component.tags = tag_component.tags & ~ETag.Reserved
     end,
     abort = function(owner, target)
         local tag_component = cultsim.get_component(owner, component.tag)
-        tag_component.tags = tag_component.tags & ~ETag.Reserved
     end
 }

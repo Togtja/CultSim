@@ -547,13 +547,14 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
                            component::Timer,
-                           component::Tags>(selection_info.selected_entity);
+                           component::Tags,
+                           component::Memory>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);

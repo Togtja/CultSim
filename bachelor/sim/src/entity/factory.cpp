@@ -162,6 +162,11 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
             {
                 strategy.actions.back().abort = action_table["abort"].get<sol::function>();
             }
+
+            if (action_table["targets_self"].get_type() == sol::type::boolean && action_table["targets_self"].get<bool>())
+            {
+                strategy.actions.back().target = e;
+            }
         }
 
         strat.strategies.push_back(strategy);

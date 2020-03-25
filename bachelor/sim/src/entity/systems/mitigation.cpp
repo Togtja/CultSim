@@ -36,22 +36,6 @@ void Mitigation::update(float dt)
             // If the most pressing need has changed
             if (temp != needs.vital_needs.front())
             {
-                /** Clean up reservations */
-                for(auto& strategy : strategies.staged_strategies)
-                {
-                    for (auto& action : strategy.actions)
-                    {
-                        if(!m_context.registry->valid(action.target))
-                        {
-                            continue;
-                        }
-                        if(auto tags = m_context.registry->try_get<component::Tags>(action.target); tags)
-                        {
-                            tags->tags = static_cast<ETag>(tags->tags & ~ETag::TAG_Reserved);
-                        }
-                    }
-                }
-
                 strategies.staged_strategies.clear();
                 m_context.registry->remove_if_exists<component::LocationRequirement>(e);
                 m_context.registry->remove_if_exists<component::VisionRequirement>(e);
