@@ -29,7 +29,7 @@ float CollectorAverageHealth::execute()
     float avg        = 0.f;
     auto health_view = m_registry->view<component::Health>();
     health_view.each([&avg](const component::Health& health) { avg += health.health; });
-    return avg / (health_view.size() ? health_view.size() : 1u);
+    return avg / (health_view.empty() ? 1u : health_view.size());
 }
 
 std::string_view CollectorAverageHealth::get_name()
