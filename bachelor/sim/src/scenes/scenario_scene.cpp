@@ -625,10 +625,32 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::Text("Tags: %s", tag_to_string(tags->tags).c_str());
     }
+
     if (timer)
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
+    }
+
+    if (memories)
+    {
+        if (!memories->memory_container.empty())
+        {
+            if (ImGui::BeginTable("Entity Memories", 2))
+            {
+                ImGui::TableSetupColumn("Tags");
+                ImGui::TableSetupColumn("Size");
+                ImGui::TableAutoHeaders();
+                for (auto& memory : memories->memory_container)
+                {
+                    ImGui::TableNextCell();
+                    ImGui::Text("%s", tag_to_string(memory.memory_tags).c_str());
+                    ImGui::TableNextCell();
+                    ImGui::Text("%s", memory.memory_storage.size());
+                }
+                ImGui::EndTable();
+            }
+        }
     }
 
     ImGui::End();
