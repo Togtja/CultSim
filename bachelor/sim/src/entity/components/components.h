@@ -176,6 +176,9 @@ struct Inventory
 
 struct Memory
 {
+    int max_memories{};
+    float max_retention_time{};
+
     std::vector<memory::Container> memory_container{};
     Memory(Memory&&) = default;
     Memory& operator=(Memory&&) = default;

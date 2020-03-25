@@ -187,7 +187,9 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
 bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     const std::vector<ETag>& allowed_memories = table["allowed_memories"].get_or<std::vector<ETag>>({});
-    auto& memory_component                    = reg.assign_or_replace<component::Memory>(e);
+
+    auto& memory_component =
+        reg.assign_or_replace<component::Memory>(e, table["max_memories"].get<int>(), table["max_retention_time"].get<float>());
 
     /** Add allowed memories to memory compnent */
     for (auto tag : allowed_memories)

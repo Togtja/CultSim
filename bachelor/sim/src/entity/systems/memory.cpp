@@ -50,8 +50,9 @@ void Memory::update(float dt)
                     if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get());
                         res && close_enough(res->m_location, location, 20.f))
                     {
-                        res->m_number_of_entities = count;
-                        duplicate                 = true;
+                        res->m_number_of_entities  = count;
+                        res->m_time_since_creation = 0.f;
+                        duplicate                  = true;
                     }
                 }
                 if (!duplicate)
@@ -78,36 +79,45 @@ void Memory::update(float dt)
 
                 if (memory_container.memory_storage.size() != 0)
                 {
-                    // spdlog::get("agent")->warn("Size of memory storage {}: {}",
-                    //                           tag_to_string(ETag(memory_container.memory_tags & ~TAG_Location)),
-                    //                           memory_container.memory_storage.size());
-
                     if (dynamic_cast<memory::ResourceLocation*>(memory_container.memory_storage.front().get()))
                     {
                         auto pos = registry->get<component::Position>(e).position;
-                        std::sort(
-                            memory_container.memory_storage.begin(),
-                            memory_container.memory_storage.end(),
-                            [pos](const std::unique_ptr<memory::IMemory>& lhs, const std::unique_ptr<memory::IMemory>& rhs) {
-                                auto res_lhs = dynamic_cast<memory::ResourceLocation*>(lhs.get());
-                                auto res_rhs = dynamic_cast<memory::ResourceLocation*>(rhs.get());
+                        std::sort(memory_container.memory_storage.begin(),
+                                  memory_container.memory_storage.end(),
+                                  [pos, memory](const std::unique_ptr<memory::IMemory>& lhs,
+                                                const std::unique_ptr<memory::IMemory>& rhs) {
+                                      auto res_lhs = dynamic_cast<memory::ResourceLocation*>(lhs.get());
+                                      auto res_rhs = dynamic_cast<memory::ResourceLocation*>(rhs.get());
 
-                                float cost_lhs{};
-                                float cost_rhs{};
+                                      float cost_lhs{};
+                                      float cost_rhs{};
 
-                                cost_lhs = glm::distance(res_lhs->m_location, pos);
-                                cost_rhs = glm::distance(res_rhs->m_location, pos);
+                                      cost_lhs = glm::distance(res_lhs->m_location, pos);
+                                      cost_rhs = glm::distance(res_rhs->m_location, pos);
 
-                                cost_lhs -= res_lhs->m_number_of_entities * 10.f;
-                                cost_rhs -= res_rhs->m_number_of_entities * 10.f;
+                                      cost_lhs -= res_lhs->m_number_of_entities * 10.f;
+                                      cost_rhs -= res_rhs->m_number_of_entities * 10.f;
+                                      cost_lhs += res_lhs->m_time_since_creation;
+                                      cost_rhs += res_rhs->m_time_since_creation;
 
-                                return cost_lhs < cost_rhs;
-                            });
+                                      // Make sure that memories that have aged past retention_time are moved to the back of the
+                                      // list
+                                      if (res_lhs->m_time_since_creation > memory.max_retention_time)
+                                      {
+                                          cost_lhs += 1000.f;
+                                      }
 
-                        // TODO: Remove magic number and put limit of memories remembered into Lua
-                        while (memory_container.memory_storage.size() > m_max_memories ||
+                                      if (res_rhs->m_time_since_creation > memory.max_retention_time)
+                                      {
+                                          cost_rhs += 1000.f;
+                                      }
+
+                                      return cost_lhs < cost_rhs;
+                                  });
+
+                        while (memory_container.memory_storage.size() > memory.max_memories ||
                                (memory_container.memory_storage.size() > 0 &&
-                                memory_container.memory_storage.back()->m_time_since_creation < m_max_retention_time))
+                                memory_container.memory_storage.back()->m_time_since_creation > memory.max_retention_time))
                         {
                             memory_container.memory_storage.pop_back();
                         }
@@ -134,7 +144,7 @@ void Memory::update_memories(const event::CreatedMemory& event)
         for (auto& memory_container : memories->memory_container)
         {
             // Memory creation / Updating
-            if (memory_container.memory_tags & event.memory->m_tags == event.memory->m_tags)
+            if ((memory_container.memory_tags & event.memory->m_tags) == event.memory->m_tags)
             {
                 auto duplicate = false;
                 int i          = 0;
@@ -163,8 +173,8 @@ void Memory::update_memories(const event::CreatedMemory& event)
                     {
                         std::sort(memory_container.memory_storage.begin(),
                                   memory_container.memory_storage.end(),
-                                  [pos, this](const std::unique_ptr<memory::IMemory>& lhs,
-                                              const std::unique_ptr<memory::IMemory>& rhs) {
+                                  [pos, this, memories](const std::unique_ptr<memory::IMemory>& lhs,
+                                                        const std::unique_ptr<memory::IMemory>& rhs) {
                                       auto res_lhs = dynamic_cast<memory::ResourceLocation*>(lhs.get());
                                       auto res_rhs = dynamic_cast<memory::ResourceLocation*>(rhs.get());
 
@@ -182,12 +192,12 @@ void Memory::update_memories(const event::CreatedMemory& event)
 
                                       // Make sure that memories that have aged past retention_time are moved to the back of the
                                       // list
-                                      if (res_lhs->m_time_since_creation > m_max_retention_time)
+                                      if (res_lhs->m_time_since_creation > memories->max_retention_time)
                                       {
                                           cost_lhs += 1000.f;
                                       }
 
-                                      if (res_rhs->m_time_since_creation > m_max_retention_time)
+                                      if (res_rhs->m_time_since_creation > memories->max_retention_time)
                                       {
                                           cost_rhs += 1000.f;
                                       }
@@ -198,8 +208,8 @@ void Memory::update_memories(const event::CreatedMemory& event)
                 }
 
                 // Delete the most useless memories
-                while (memory_container.memory_storage.size() >= m_max_memories ||
-                       memory_container.memory_storage.back()->m_time_since_creation < m_max_retention_time)
+                while (memory_container.memory_storage.size() > memories->max_memories ||
+                       memory_container.memory_storage.back()->m_time_since_creation > memories->max_retention_time)
                 {
                     memory_container.memory_storage.pop_back();
                 }

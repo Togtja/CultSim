@@ -646,7 +646,24 @@ void ScenarioScene::draw_selected_entity_information_ui()
                     ImGui::TableNextCell();
                     ImGui::Text("%s", tag_to_string(memory.memory_tags).c_str());
                     ImGui::TableNextCell();
-                    ImGui::Text("%s", memory.memory_storage.size());
+                    ImGui::Text("%zu", memory.memory_storage.size());
+                    if (memory.memory_tags & ETag::TAG_Location)
+                    {
+                        if (ImGui::BeginTable(tag_to_string(memory.memory_tags).c_str(), 2))
+                        {
+                            ImGui::TableSetupColumn("Age");
+                            ImGui::TableSetupColumn("Entity Count");
+                            ImGui::TableAutoHeaders();
+                            for (auto& mem : memory.memory_storage)
+                            {
+                                ImGui::TableNextCell();
+                                ImGui::Text("%u", mem->m_time_since_creation);
+                                ImGui::TableNextCell();
+                                ImGui::Text("%u", dynamic_cast<memory::ResourceLocation*>(mem.get())->m_number_of_entities);
+                            }
+                            ImGui::EndTable();
+                        }
+                    }
                 }
                 ImGui::EndTable();
             }

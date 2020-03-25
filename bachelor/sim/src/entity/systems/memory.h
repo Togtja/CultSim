@@ -9,10 +9,6 @@ class Memory : public ISystem
 private:
     float m_timer{};
 
-    float m_max_memories{};
-
-    float m_max_retention_time{};
-
 public:
     using ISystem::ISystem;
 

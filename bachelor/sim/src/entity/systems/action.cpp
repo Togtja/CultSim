@@ -92,7 +92,6 @@ void Action::update(float dt)
 
             if (action->time_spent >= action->time_to_complete)
             {
-                spdlog::get("agent")->info("We have finished {}", action->name);
                 if ((!m_context.registry->valid(action->target)) || m_context.registry->has<component::Delete>(action->target))
                 {
                     action->time_spent    = 0;
@@ -166,7 +165,6 @@ void Action::abort_strategy(const event::RequirementFailure& event)
 
 void Action::delete_target(const event::DeleteEntity& event)
 {
-    spdlog::get("agent")->info("We are deleting a target {} and restarting the action", event.entity);
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {
         for (auto& strategy : strat.staged_strategies)
