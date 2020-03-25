@@ -47,10 +47,10 @@ ISystem* Reproduction::clone()
 void Reproduction::delete_father(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Pregnancy>();
-    view.each([this, event](entt::entity e, component::Pregnancy& preg) {
+    view.each([&event](component::Pregnancy& preg) {
         if (preg.father == event.entity)
         {
-            preg.father == entt::null;
+            preg.father = entt::null;
         }
     });
 }

@@ -76,7 +76,7 @@ void ScenarioScene::initialize_simulation()
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            auto meta                 = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario});
+            auto meta = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor});
             system::ISystem& temp_ref = meta.cast<system::ISystem>();
             m_active_systems.emplace_back(temp_ref.clone());
             m_active_systems.back()->initialize();

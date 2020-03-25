@@ -6,11 +6,11 @@
 #include "gfx/renderer.h"
 
 #include <algorithm>
-#include <execution>
 
 #include <gfx/ImGUI/imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
+#include <taskflow/taskflow.hpp>
 
 namespace cs::system
 {
@@ -109,7 +109,8 @@ void Sensor::update(float dt)
     registry.view<component::Vision>().each([](component::Vision& vis) { vis.seen.clear(); });
     auto vis_view = registry.group<component::Vision, component::Position>();
 
-    std::for_each(std::execution::par, vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
+    tf::Taskflow taskflow{};
+    taskflow.parallel_for(vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
         auto&& vis      = vis_view.get<component::Vision>(e);
         const auto& pos = vis_view.get<component::Position>(e);
 
@@ -144,6 +145,8 @@ void Sensor::update(float dt)
             }
         }
     });
+
+    m_context.executor->run(taskflow).get();
 
     /** Debug drawing */
     if (draw_fov)

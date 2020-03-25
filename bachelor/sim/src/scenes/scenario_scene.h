@@ -12,6 +12,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <taskflow/core/executor.hpp>
 
 namespace cs
 {
@@ -31,6 +32,9 @@ private:
 
     /** Event dispatcher used within this scene */
     entt::dispatcher m_dispatcher{};
+
+    /** Executor for multi threaded sub-operations */
+    tf::Executor m_mt_executor{};
 
     /** Random number generator for this scene */
     RandomEngine m_rng{};
