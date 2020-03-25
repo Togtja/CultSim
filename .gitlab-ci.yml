@@ -21,3 +21,5 @@ test:
     - ../cmakebin/bin/cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
     - make
     - ../cmakebin/bin/ctest
+    - cd bachelor/sim
+    - ./cultsim --exit
