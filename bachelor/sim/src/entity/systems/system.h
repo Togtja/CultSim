@@ -4,6 +4,7 @@
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <taskflow/declarations.hpp>
 
 namespace cs::system
 {
@@ -16,6 +17,7 @@ struct SystemContext
     entt::dispatcher* dispatcher{nullptr};
     RandomEngine* rng{nullptr};
     lua::Scenario* scenario{nullptr};
+    tf::Executor* executor{nullptr};
 };
 
 class ISystem

@@ -157,7 +157,7 @@ TEST_CASE("pressing needs are correctly updated")
     need_system->update(50.f);
     view.each([](cs::component::Need& needs) {
         REQUIRE(needs.needs.size() == 4);
-        for (auto need : needs.needs)
+        for (const auto& need : needs.needs)
         {
             REQUIRE(need.status == 50.f);
         }
@@ -166,7 +166,7 @@ TEST_CASE("pressing needs are correctly updated")
 
     need_system->update(-50.f);
     view.each([](cs::component::Need& needs) {
-        for (auto need : needs.needs)
+        for (const auto& need : needs.needs)
         {
             REQUIRE(need.status == 100.f);
         }
