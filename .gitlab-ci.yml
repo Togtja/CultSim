@@ -7,7 +7,7 @@ before_script:
   - apt install -y -qq git make lua5.3 lua5.3-dev libx11-dev libxext-dev clang
   - apt install -y -qq cppcheck libphysfs-dev libtbb-dev wget mesa-common-dev libgl1-mesa-dev
   - wget https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4-Linux-x86_64.sh
-  - chmod +x cmake-3.16.4-Linux-x86_64.sh 
+  - chmod +x cmake-3.16.4-Linux-x86_64.sh
   - mkdir cmakebin
   - ./cmake-3.16.4-Linux-x86_64.sh --skip-license --prefix=cmakebin
 
@@ -20,4 +20,4 @@ test:
     - cd build
     - ../cmakebin/bin/cmake .. -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../
     - make
-    - ctest
+    - ../cmakebin/bin/ctest
