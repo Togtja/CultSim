@@ -50,7 +50,8 @@ TEST_CASE("attempting to use keybinding after unbind")
     f10.key.keysym.scancode = SDL_SCANCODE_F10;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
     // Binding 2 key to make sure that no other key also get unbinding
     // AKA somebody just "cleared" all
     input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_F11, EAction::MoveLeft, [&times1]() { times1++; });
@@ -74,7 +75,8 @@ TEST_CASE("attempting to bind same key to different function")
     e.key.keysym.scancode = SDL_SCANCODE_F19;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
 
     input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_F19, EAction::MoveLeft, [&times1]() { times1++; });
     input.handle_input(e);
@@ -138,7 +140,8 @@ TEST_CASE("attempting to add default context on top of something else")
     e.key.keysym.scancode = SDL_SCANCODE_F13;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
 
     input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_F13, EAction::MoveLeft, [&times1]() { times1++; });
     input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_F13, EAction::MoveLeft, [&times0]() { times0++; });
@@ -164,7 +167,8 @@ TEST_CASE("attempting to add non default context on top of another one")
     e.key.keysym.scancode = SDL_SCANCODE_F13;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
 
     input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_F13, EAction::MoveLeft, [&times1]() { times1++; });
     input.fast_bind_key(EKeyContext::AgentOnHover, SDL_SCANCODE_F13, EAction::MoveLeft, [&times0]() { times0++; });
@@ -237,7 +241,8 @@ TEST_CASE("attempting to remove non default context from stack by context")
     f13.key.keysym.scancode = SDL_SCANCODE_F13;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
 
     input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_F11, EAction::MoveLeft, [&times1]() { times1++; });
     input.fast_bind_key(EKeyContext::AgentOnHover, SDL_SCANCODE_F13, EAction::MoveLeft, [&times0]() { times0++; });
@@ -277,7 +282,8 @@ TEST_CASE("attempting to remove top non default context from stack")
     f13.key.keysym.scancode = SDL_SCANCODE_F13;
 
     auto& input = get_input();
-    int times1 = 0, times0 = 0;
+    int times1  = 0;
+    int times0  = 0;
     input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_F11, EAction::MoveLeft, [&times1]() { times1++; });
     input.fast_bind_key(EKeyContext::AgentOnHover, SDL_SCANCODE_F13, EAction::MoveLeft, [&times0]() { times0++; });
     // Nothing should happend as the context are not on the stack
@@ -340,7 +346,9 @@ TEST_CASE("attempting to go back to default context")
     e.key.keysym.scancode = SDL_SCANCODE_F11;
 
     auto& input = get_input();
-    int times0 = 0, times1 = 0, times2 = 0;
+    int times0  = 0;
+    int times1  = 0;
+    int times2  = 0;
 
     input.fast_bind_key(EKeyContext::DefaultContext, SDL_SCANCODE_F11, EAction::MoveLeft, [&times0]() { times0++; });
     input.fast_bind_key(EKeyContext::Agent, SDL_SCANCODE_F11, EAction::MoveLeft, [&times1]() { times1++; });

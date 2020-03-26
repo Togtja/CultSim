@@ -1,5 +1,7 @@
 #include "scenario_scene.h"
 #include "common_helpers.h"
+#include "constants.h"
+#include "debug/native_collectors.h"
 #include "entity/actions/action.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
@@ -22,15 +24,14 @@
 #include "random_engine.h"
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
-#include "constants.h"
 
 #include <algorithm>
 #include <functional>
 #include <memory>
 #include <random>
 
-#include "gfx/ImGUI/imgui.h"
-#include "spdlog/spdlog.h"
+#include <gfx/ImGUI/imgui.h>
+#include <spdlog/spdlog.h>
 
 extern ImFont* g_header_font;
 extern ImFont* g_light_font;
@@ -62,13 +63,23 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** TODO: Read in data samplers from Lua */
+    m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
+    m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
+    m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
+    m_data_collector.add_collector<debug::CollectorMouse>(true);
+    m_data_collector.add_collector<debug::CollectorMouse>(false);
+
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            m_active_systems.emplace_back(type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario}));
+            auto meta = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor});
+            system::ISystem& temp_ref = meta.cast<system::ISystem>();
+            m_active_systems.emplace_back(temp_ref.clone());
+            m_active_systems.back()->initialize();
         }
         else
         {
@@ -79,12 +90,25 @@ void ScenarioScene::initialize_simulation()
 
 void ScenarioScene::clean_simulation()
 {
+    m_data_collector.save_to_file(m_scenario.name + "_data", true);
+
     m_registry.clear();
     m_simtime   = 0.f;
     m_timescale = 1.f;
+    m_data_collector.clear();
+
+    /** Deinitialize systems and then clear them */
+    for (auto& system : m_active_systems)
+    {
+        system->deinitialize();
+    }
     m_active_systems.clear();
+
+    for (auto& system : m_inactive_systems)
+    {
+        system->initialize();
+    }
     m_inactive_systems.clear();
-    m_next_data_sample = 0.f;
 }
 
 void ScenarioScene::reset_simulation()
@@ -99,20 +123,21 @@ void ScenarioScene::on_enter()
 
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+    input::get_input().add_context(input::EKeyContext::ScenarioScene);
 }
 
 void ScenarioScene::on_exit()
 {
     input::get_input().remove_context(input::EKeyContext::ScenarioScene);
     m_context->preferences->on_preference_changed.disconnect<&ScenarioScene::handle_preference_changed>(this);
+
+    clean_simulation();
 }
 
 bool ScenarioScene::update(float dt)
 {
     dt *= m_timescale;
-
     m_simtime += dt;
-    m_next_data_sample += dt;
 
     // TODO : Move to input action response
     update_entity_hover();
@@ -122,6 +147,10 @@ bool ScenarioScene::update(float dt)
     draw_scenario_information_ui();
     draw_time_control_ui();
     draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.update(dt);
+    m_data_collector.show_ui();
 
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
@@ -139,7 +168,7 @@ bool ScenarioScene::update(float dt)
     /** Update systems */
     for (auto&& system : m_active_systems)
     {
-        system.type().func("update"_hs).invoke(system, dt);
+        system->update(dt);
     }
 
     /** Deal with long running tasks, then events */
@@ -237,8 +266,6 @@ void ScenarioScene::bind_actions_for_scene()
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
-
-    input::get_input().add_context(input::EKeyContext::ScenarioScene);
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
         m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
@@ -358,10 +385,17 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](entt::entity e) {
-        if (m_registry.valid(e))
+    cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+        if (e == entt::null)
         {
-            m_registry.destroy(e);
+            spdlog::get("agent")->critical("Trying to kill a null agent");
+            return;
+        }
+        m_registry.assign<component::Delete>(e);
+        auto tags = m_registry.try_get<component::Tags>(e);
+        if (tags)
+        {
+            tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
         }
     });
 
@@ -445,9 +479,6 @@ void ScenarioScene::setup_docking_ui()
 
 void ScenarioScene::draw_scenario_information_ui()
 {
-    // TODO : Get rid of after prototype
-    static std::vector<float> living_entities{};
-
     /** Title and description */
     ImGui::PushFont(g_header_font);
     ImGui::TextColored({1.f, 0.843, 0.f, 1.f}, "%s", m_scenario.name.c_str());
@@ -468,16 +499,6 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
-
-    /** Entity count graph */
-    if (m_next_data_sample > m_scenario.sampling_rate)
-    {
-        m_next_data_sample = 0.f;
-        living_entities.push_back(m_registry.size<component::Need>());
-    }
-
-    /** Plot number of living entities */
-    ImGui::PlotLines("##Alive", living_entities.data(), living_entities.size(), 0, "Living Agents", FLT_MAX, FLT_MAX, {0, 75});
 }
 
 void ScenarioScene::draw_time_control_ui()
@@ -531,9 +552,14 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer] =
-        m_registry.try_get<component::Need, component::Health, component::Strategy, component::Reproduction, component::Timer>(
-            selection_info.selected_entity);
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories] =
+        m_registry.try_get<component::Need,
+                           component::Health,
+                           component::Strategy,
+                           component::Reproduction,
+                           component::Timer,
+                           component::Tags,
+                           component::Memory>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -595,10 +621,53 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
+    if (tags)
+    {
+        ImGui::Text("Tags: %s", tag_to_string(tags->tags).c_str());
+    }
+
     if (timer)
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
+    }
+
+    if (memories)
+    {
+        if (!memories->memory_container.empty())
+        {
+            if (ImGui::BeginTable("Entity Memories", 2))
+            {
+                ImGui::TableSetupColumn("Tags");
+                ImGui::TableSetupColumn("Size");
+                ImGui::TableAutoHeaders();
+                for (auto& memory : memories->memory_container)
+                {
+                    ImGui::TableNextCell();
+                    ImGui::Text("%s", tag_to_string(memory.memory_tags).c_str());
+                    ImGui::TableNextCell();
+                    ImGui::Text("%zu", memory.memory_storage.size());
+                    if (memory.memory_tags & ETag::TAG_Location)
+                    {
+                        if (ImGui::BeginTable(tag_to_string(memory.memory_tags).c_str(), 2))
+                        {
+                            ImGui::TableSetupColumn("Age");
+                            ImGui::TableSetupColumn("Entity Count");
+                            ImGui::TableAutoHeaders();
+                            for (auto& mem : memory.memory_storage)
+                            {
+                                ImGui::TableNextCell();
+                                ImGui::Text("%u", mem->m_time_since_creation);
+                                ImGui::TableNextCell();
+                                ImGui::Text("%u", dynamic_cast<memory::ResourceLocation*>(mem.get())->m_number_of_entities);
+                            }
+                            ImGui::EndTable();
+                        }
+                    }
+                }
+                ImGui::EndTable();
+            }
+        }
     }
 
     ImGui::End();
@@ -646,5 +715,4 @@ void ScenarioScene::handle_preference_changed(const Preference& before, const Pr
         m_resolution = std::get<glm::ivec2>(after.value);
     }
 }
-
 } // namespace cs

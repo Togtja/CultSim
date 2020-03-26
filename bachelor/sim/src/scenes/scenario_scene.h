@@ -1,6 +1,7 @@
 #pragma once
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
+#include "debug/data_collector.h"
 #include "random_engine.h"
 #include "scene.h"
 
@@ -11,6 +12,7 @@
 #include <entt/meta/factory.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <taskflow/core/executor.hpp>
 
 namespace cs
 {
@@ -31,25 +33,29 @@ private:
     /** Event dispatcher used within this scene */
     entt::dispatcher m_dispatcher{};
 
+    /** Executor for multi threaded sub-operations */
+    tf::Executor m_mt_executor{};
+
     /** Random number generator for this scene */
     RandomEngine m_rng{};
 
     /** Enabled Systems for this Scenario */
-    std::vector<entt::meta_any> m_active_systems{};
+    std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
 
     /** Disabled Systems for this Scenario */
-    std::vector<entt::meta_any> m_inactive_systems{};
+    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
 
     /** The scenario we are running */
     lua::Scenario m_scenario;
+
+    /** Create a data collector for this scenario */
+    debug::DataCollector m_data_collector{};
 
     /** Keep track of screen resolution */
     glm::vec2 m_resolution{};
 
     /** Time sim has been running */
     float m_simtime = 0.f;
-
-    float m_next_data_sample = 0.f;
 
     /** Current time scale of simulation */
     float m_timescale = 1.f;

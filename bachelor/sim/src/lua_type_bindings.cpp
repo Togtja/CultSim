@@ -45,7 +45,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Reproduce", ETag::TAG_Reproduce},
                         {"Human", ETag::TAG_Human},
                         {"Tag", ETag::TAG_Tag},
-                        {"Gather", ETag::TAG_Gather}});
+                        {"Gather", ETag::TAG_Gather},
+                        {"Reserved", ETag::TAG_Reserved},
+                        {"Delete", ETag::TAG_Delete}});
 }
 
 void bind_components(sol::state_view lua)
@@ -72,6 +74,8 @@ void bind_components(sol::state_view lua)
                                      &action::Action::requirements,
                                      "time_to_complete",
                                      &action::Action::time_to_complete,
+                                     "success_chance",
+                                     &action::Action::success_chance,
                                      "success",
                                      &action::Action::success,
                                      "failure",
@@ -102,11 +106,7 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
     lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
 
-    lua.new_usertype<component::Reproduction>("ReproductionComponent",
-                                              "sex",
-                                              &component::Reproduction::sex,
-                                              "max_children",
-                                              &component::Reproduction::max_children);
+    lua.new_usertype<component::Reproduction>("ReproductionComponent", "sex", &component::Reproduction::sex);
 
     lua.new_usertype<component::Health>("HealthComponet",
                                         "health",

@@ -1,8 +1,9 @@
 #include "reflection.h"
 #include "entity/components/components.h"
 #include "entity/systems/action.h"
-#include "entity/systems/sensor.h"
+#include "entity/systems/deletion.h"
 #include "entity/systems/health.h"
+#include "entity/systems/inventory.h"
 #include "entity/systems/memory.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
@@ -10,6 +11,7 @@
 #include "entity/systems/rendering.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
+#include "entity/systems/sensor.h"
 #include "entity/systems/timer.h"
 
 #include <entt/core/hashed_string.hpp>
@@ -65,7 +67,11 @@ void reflect_data_types()
 
 void reflect_systems()
 {
-    entt::meta<system::ISystem>().alias("ISystem"_hs).func<&system::ISystem::update>("update"_hs);
+    entt::meta<system::ISystem>()
+        .alias("ISystem"_hs)
+        .func<&system::ISystem::update>("update"_hs)
+        .func<&system::ISystem::initialize>("initialize"_hs)
+        .func<&system::ISystem::deinitialize>("deinitialize"_hs);
     entt::meta<system::Action>().alias("ActionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Sensor>().alias("SensorSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Health>().alias("HealthSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
@@ -77,6 +83,8 @@ void reflect_systems()
     entt::meta<system::Requirement>().alias("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Timer>().alias("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Memory>().alias("MemorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Deletion>().alias("DeletionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Inventory>().alias("InventorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta

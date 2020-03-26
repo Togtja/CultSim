@@ -5,7 +5,6 @@
 #include "entity/events.h"
 #include "gfx/renderer.h"
 
-#include <execution>
 #include <random>
 
 #include <gfx/ImGUI/imgui.h>
@@ -221,5 +220,10 @@ void Movement::update(float dt)
             }
         }
     });
+}
+
+ISystem* Movement::clone()
+{
+    return new Movement(m_context);
 }
 } // namespace cs::system

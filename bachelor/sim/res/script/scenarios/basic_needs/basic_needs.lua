@@ -12,17 +12,19 @@ scenario.bounds = Vec2:new(500.0, 500.0)
 
 -- Declare all systems that should be active initially
 scenario.systems = {
+    "SensorSystem",
     "NeedSystem",
-    "HealthSystem",
     "ReproductionSystem",
     "MitigationSystem",
     "ActionSystem",
     "RequirementSystem",
     "MemorySystem",
     "TimerSystem",
-    "SensorSystem",
     "MovementSystem",
-    "RenderingSystem"
+    "InventorySystem",
+    "RenderingSystem",
+    "HealthSystem",
+    "DeletionSystem"
 }
 
 -- Decides how many seconds between each data sample taken in this scenario. IE: (also accuracy / granularity of graphs and output)

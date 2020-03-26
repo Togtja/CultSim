@@ -8,7 +8,7 @@ namespace cs::fs
 {
 bool init(std::string_view project_name)
 {
-    if (!PHYSFS_init(project_name.data()))
+    if (PHYSFS_init(project_name.data()) == 0)
     {
         spdlog::get("filesystem")->error("failed to initialize PhysFS, {}", get_errorstring());
         return false;
@@ -98,7 +98,8 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
         PHYSFS_close(file);
         return write_bytes;
     }
-    else if (write_bytes == -1)
+
+    if (write_bytes == -1)
     {
         spdlog::get("filesystem")->error("the file: '{}' failed to write with error: {}", rpath, get_errorstring());
     }

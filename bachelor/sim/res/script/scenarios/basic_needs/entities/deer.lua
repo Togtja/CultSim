@@ -36,6 +36,8 @@ entity = {
         vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
     },
     MemoryComponent = {
-        allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location }
+        max_memories = 10,
+        max_retention_time = 1000.0,
+        allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location },
     }
 }
