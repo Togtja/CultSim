@@ -96,6 +96,8 @@ public:
 private:
     void bind_actions_for_scene();
 
+    void bind_available_lua_events();
+
     void bind_scenario_lua_functions();
 
     void setup_docking_ui();

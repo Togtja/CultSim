@@ -18,6 +18,13 @@ struct ArrivedAtDestination
     glm::vec3 position{};
 };
 
+/**
+ * Event for when a scenario has finished loading
+ */
+struct ScenarioLoaded
+{
+};
+
 struct SensedEntity
 {
     entt::entity entity{};

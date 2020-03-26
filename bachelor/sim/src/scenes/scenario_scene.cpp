@@ -52,6 +52,7 @@ void ScenarioScene::initialize_simulation()
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
     bind_actions_for_scene();
+    bind_available_lua_events();
     bind_scenario_lua_functions();
     m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
@@ -87,13 +88,8 @@ void ScenarioScene::initialize_simulation()
         }
     }
 
-    /** Clean up event handlers and binders */
-    for (auto& handler : m_lua_event_handlers)
-    {
-        handler.connection.release();
-    }
-    m_lua_event_handlers.clear();
-    m_lua_ebinder.clear();
+    /** Notify the scenario is loaded */
+    m_dispatcher.enqueue<event::ScenarioLoaded>();
 }
 
 void ScenarioScene::clean_simulation()
@@ -117,6 +113,14 @@ void ScenarioScene::clean_simulation()
         system->initialize();
     }
     m_inactive_systems.clear();
+
+    /** Clean up event handlers and binders */
+    for (auto& handler : m_lua_event_handlers)
+    {
+        handler.connection.release();
+    }
+    m_lua_event_handlers.clear();
+    m_lua_ebinder.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -304,6 +308,12 @@ void ScenarioScene::bind_actions_for_scene()
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::ZoomOut, [] {
         gfx::get_renderer().move_camera({0.f, 0.f, .05f});
     });
+}
+
+void ScenarioScene::bind_available_lua_events()
+{
+    m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
+                     {"ScenarioLoaded", &lua_binder<event::ScenarioLoaded>}};
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
