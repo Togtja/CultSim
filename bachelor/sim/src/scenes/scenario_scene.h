@@ -55,7 +55,7 @@ private:
     std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
 
     /** Storage of bound lua events */
-    std::vector<LuaEventHandle> m_lua_event_handlers{};
+    std::vector<std::unique_ptr<LuaEventHandle>> m_lua_event_handlers{};
 
     /** Storage of possible events for lua to subscribe to */
     LuaEventMap m_lua_ebinder{};

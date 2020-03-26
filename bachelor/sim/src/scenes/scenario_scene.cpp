@@ -117,7 +117,7 @@ void ScenarioScene::clean_simulation()
     /** Clean up event handlers and binders */
     for (auto& handler : m_lua_event_handlers)
     {
-        handler.connection.release();
+        handler->connection.release();
     }
     m_lua_event_handlers.clear();
     m_lua_ebinder.clear();
@@ -415,8 +415,10 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /* Function to allow lua to connect to events */
     cultsim.set_function("connect", [this](const std::string& event_name, sol::function func) {
-        auto connection = m_lua_ebinder.at(event_name)(m_dispatcher, func);
-        m_lua_event_handlers.push_back(LuaEventHandle{func, connection});
+        auto handle        = std::make_unique<LuaEventHandle>();
+        handle->func       = func;
+        handle->connection = m_lua_ebinder.at(event_name)(m_dispatcher, handle->func);
+        m_lua_event_handlers.emplace_back(std::move(handle));
     });
 
     /** Spawn entity functions */
