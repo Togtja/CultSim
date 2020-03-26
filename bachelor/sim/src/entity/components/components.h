@@ -105,6 +105,11 @@ struct Health
     ETag need_tags{};
 };
 
+struct Attack
+{
+    float damage{};
+};
+
 struct Age
 {
     float current_age{};
