@@ -52,9 +52,16 @@ bool MainMenuScene::update(float dt)
     /** Shows the popup to select scenario (TODO: Lua-fi) */
     if (ImGui::BeginPopupModal("Select##Scenario", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
     {
-        if (ImGui::Button("Basic Needs", {150, 50}))
+        auto&& scenarios = fs::list_directory("script/scenarios/");
+        for (auto&& scenario : scenarios)
         {
-            m_context->scene_manager->push<ScenarioScene>("script/scenarios/basic_needs");
+            if (fs::is_directory("script/scenarios/" + scenario))
+            {
+                if (ImGui::Button(scenario.c_str(), {150, 50}))
+                {
+                    m_context->scene_manager->push<ScenarioScene>(fmt::format("script/scenarios/{}", scenario));
+                }
+            }
         }
         if (ImGui::Button("Cancel", {150, 25}))
         {
