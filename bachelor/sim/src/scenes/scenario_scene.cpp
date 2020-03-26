@@ -608,10 +608,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (!strategy->staged_strategies.empty())
         {
-            ImGui::Text("Currently: %s", strategy->staged_strategies.front().name.c_str());
-            if (!strategy->staged_strategies.front().actions.empty())
+            ImGui::Text("Currently: %s", strategy->staged_strategies.back().name.c_str());
+            if (!strategy->staged_strategies.back().actions.empty())
             {
-                const auto& action = strategy->staged_strategies.front().actions.front();
+                const auto& action = strategy->staged_strategies.back().actions.back();
                 if (action.time_spent > 0.f)
                 {
                     ImGui::Indent();

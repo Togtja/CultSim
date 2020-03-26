@@ -29,7 +29,7 @@ entity = {
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file
-        strategies = { strategies.find_food, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate }
+        strategies = { strategies.find_food, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate, strategies.forage_for_food}
     },
     HealthComponent = {
         health = 100.0,
