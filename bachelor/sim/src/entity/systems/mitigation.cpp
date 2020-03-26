@@ -109,6 +109,15 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
     if (!strategies.staged_strategies.empty())
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
+        int i = 0;
+        for (auto strategy : strategies.staged_strategies)
+        {
+            if (need.tags == ETag(TAG_Food | TAG_Gather))
+            {
+                i++;
+                spdlog::get("agent")->warn("Strategy number : {}, name : {}", i, strategy.name);
+            }
+        }
         return true;
     }
     return false;

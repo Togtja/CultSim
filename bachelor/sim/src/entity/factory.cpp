@@ -156,9 +156,9 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
     for (const auto& strategy_table : available_strategies)
     {
         ai::Strategy strategy{};
-        strategy.name = strategy_table["name"].get<std::string>();
-        strategy.tags = strategy_table["tags"].get<ETag>();
-
+        strategy.name        = strategy_table["name"].get<std::string>();
+        strategy.tags        = strategy_table["tags"].get<ETag>();
+        strategy.target_tags = strategy_table["target_tags"].get<ETag>();
         /** Get the actions for this strategy */
         const auto& actions = strategy_table["actions"].get_or<std::vector<sol::table>>({});
         for (const auto& action_table : actions)

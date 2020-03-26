@@ -37,7 +37,10 @@ void Action::update(float dt)
         }
 
         auto& strategy = strategies.staged_strategies.back();
-
+        if (strategy.tags & TAG_Food)
+        {
+            spdlog::get("agent")->warn("working on strategy : {}", strategy.name);
+        }
         if (strategy.actions.empty() || strategy.working_on_action > strategy.actions.size())
         {
             strategies.staged_strategies.pop_back();
@@ -50,14 +53,17 @@ void Action::update(float dt)
             strategy.working_on_action++;
             strategy.requirements = strategy.actions.back().requirements;
         }
-
+        if (strategy.tags & TAG_Food)
+        {
+            spdlog::get("agent")->warn("strategy requirements : {}", tag_to_string(strategy.requirements));
+        }
         auto* action = &strategy.actions[strategy.actions.size() - strategy.working_on_action];
 
         if (strategy.requirements)
         {
             if (strategy.requirements & TAG_Tag)
             {
-                m_context.registry->assign<component::TagRequirement>(e, strategy.tags);
+                m_context.registry->assign<component::TagRequirement>(e, strategy.target_tags);
                 strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Tag);
             }
             if (strategy.requirements & TAG_Location)
@@ -67,12 +73,12 @@ void Action::update(float dt)
             }
             if (strategy.requirements & TAG_Find)
             {
-                m_context.registry->assign<component::FindRequirement>(e, strategy.tags, glm::vec3{}, 30.f, 0.f);
+                m_context.registry->assign<component::FindRequirement>(e, strategy.target_tags, glm::vec3{}, 30.f, 0.f);
                 strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Find);
             }
             if (strategy.requirements & TAG_Vision)
             {
-                m_context.registry->assign<component::VisionRequirement>(e, strategy.tags);
+                m_context.registry->assign<component::VisionRequirement>(e, strategy.target_tags);
                 strategy.requirements = static_cast<ETag>(strategy.requirements & ~TAG_Vision);
             }
             if (strategy.requirements & ~TAG_None)
