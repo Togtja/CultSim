@@ -36,18 +36,7 @@ void Health::update(float dt)
             return;
         }
 
-        if (auto age = m_context.registry->try_get<component::Age>(e); age)
-        {
-            age->current_age += dt;
-
-            auto age_above_max = age->current_age - age->max_age;
-            health.health =
-                std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f - (age->max_age - age->current_age));
-        }
-        else
-        {
-            health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
-        }
+        health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
     });
 }
 

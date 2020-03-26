@@ -83,11 +83,6 @@ void Action::update(float dt)
         }
         else
         {
-            /* spdlog::get("agent")->error("We are doing action with tags {} between {} and {} ",
-                                         tag_to_string(strategy.tags).c_str(),
-                                         e,
-                                         action->target);
-            */
             action->time_spent += dt;
 
             if (action->time_spent >= action->time_to_complete)
