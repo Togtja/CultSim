@@ -1,7 +1,7 @@
 -- This file defines all needs available to agents. Not all agents will be using all needs
 -- Likewise, not all needs are used in every scenario
 
-required_needs = {
+needs = {
     hunger = {
         name = "Hunger",
         weight = 3.0,
@@ -33,10 +33,7 @@ required_needs = {
         decay_rate = 0.05,
         vitality = 0.0,
         tags = ETag.Reproduce
-    }
-}
-
-leisure_needs ={
+    },
     stockpile = {
         name = "Stockpile Food",
         weight = 0.0,

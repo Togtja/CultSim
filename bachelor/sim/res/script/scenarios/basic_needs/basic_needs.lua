@@ -36,9 +36,9 @@ scenario.init = function()
     for i=1,100 do
         local deer = cultsim.spawn("deer")
 
-        -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
+        -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
         local need_comp = cultsim.get_component(deer, component.need)
-        for i, need in ipairs(need_comp.needs) do
+        for i, need in ipairs(need_comp.required_needs) do
             need.status = random:normal(75.0, 25.0)
         end
     end

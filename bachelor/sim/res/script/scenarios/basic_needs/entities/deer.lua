@@ -20,7 +20,8 @@ entity = {
     },
     NeedComponent = {
         -- Corresponds to entires in the needs.lua file
-        needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce }
+        required_needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce },
+        leisure_needs = { needs.stockpile }
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
@@ -36,7 +37,7 @@ entity = {
         vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
     },
     InventoryComponent = {
-    max_size = 5
+        max_size = 5
     },
     MemoryComponent = {
         max_memories = 10,
