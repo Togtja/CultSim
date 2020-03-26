@@ -84,9 +84,32 @@ actions.gather_food = {
         cultsim.add_to_inventory(owner,target)
         cultsim.remove_component(target, component.position)
     end,
-    failute = function(owner, target)
+    failure = function(owner, target)
+    log.info("I (" .. owner .. ") failed to pick up " .. target .. ".")
     end,
     abort = function(owner, target)
+    end
+}
+
+actions.eat_from_inventory = {
+    name = "Eat from inventory",
+    requirements = ETag.Inventory,
+    time_to_complete = 5.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+        local inventory_component = cultsim.get_component(owner, component.inventory)
+        for i, content in ipairs(inventory_component.contents) do
+            if(cultsim.get_component(content, component.tags).tags & ETag.Food) then
+                log.info("I (" .. owner .. ") ate ".. target .." from my backpack.")
+                cultsim.modify_need(owner, ETag.Food, 60.0)
+                cultsim.kill(target)
+                break
+            end
+        end
+    end,
+    failure = function(owner,target)
+    end,
+    abort = function(owner,target)
     end
 }
 

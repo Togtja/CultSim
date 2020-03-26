@@ -2,23 +2,23 @@
 
 strategies.consume_self = {
     name = "Consume Self",
-    tags = ETag.Food,
+    tags = ETag.Food, ETag.Consume,
     target_tags = ETag.Food,
     actions = { actions.consume_self }
 }
 
 strategies.find_water = {
     name = "Looking for Water",
-    tags = ETag.Drink,
-    target_tags = ETag.Drink
+    tags = ETag.Drink, ETag.Consume,
+    target_tags = ETag.Drink,
     actions = { actions.drink }
 }
 
 strategies.find_food = {
     name = "Looking for Food",
-    tags = ETag.Food,
-    target_tags = ETag.Food
-    actions = { actions.eat }
+    tags = ETag.Food, ETag.Consume,
+    target_tags = ETag.Food,
+    actions = { actions.eat_from_inventory, actions.eat }
 }
 
 strategies.sleep_on_ground = {

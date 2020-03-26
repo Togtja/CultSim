@@ -47,7 +47,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Tag", ETag::TAG_Tag},
                         {"Gather", ETag::TAG_Gather},
                         {"Reserved", ETag::TAG_Reserved},
-                        {"Delete", ETag::TAG_Delete}});
+                        {"Delete", ETag::TAG_Delete},
+                        {"Inventory", ETag::TAG_Inventory},
+                        {"Consume", ETag::TAG_Consume}});
 }
 
 void bind_components(sol::state_view lua)
@@ -91,7 +93,13 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
 
-    lua.new_usertype<component::Inventory>("InventoryComponent", "max_size", &component::Inventory::max_size);
+    lua.new_usertype<component::Inventory>("InventoryComponent",
+                                           "max_size",
+                                           &component::Inventory::max_size,
+                                           "tags",
+                                           &component::Inventory::tags,
+                                           "contents",
+                                           &component::Inventory::contents);
 
     /**
      * Ignoring avoidance_cd and avoid_count since those can be changed using the UI and ignoring desired_position as that is
