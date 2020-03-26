@@ -4,13 +4,21 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
-
 #include "entt/entt.hpp"
 
-#include "spdlog/spdlog.h"
+#include <spdlog/spdlog.h>
 
 namespace cs::system
 {
+void Mitigation::initialize()
+{
+    m_context.dispatcher->sink<event::SwitchNeedContext>().connect<&Mitigation::switch_need_context>(this);
+}
+
+void Mitigation::deinitialize()
+{
+    m_context.dispatcher->sink<event::SwitchNeedContext>().disconnect<&Mitigation::switch_need_context>(this);
+}
 void Mitigation::update(float dt)
 {
     CS_AUTOTIMER(Mitigation System);
@@ -18,16 +26,15 @@ void Mitigation::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Need, component::Strategy, component::Tags>();
-    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, component::Tags tags) {
+    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
-            for (auto need : needs.vital_needs) {}
-            auto temp = needs.vital_needs;
+            auto temp = needs.vital_needs.front();
             // Put the most pressing needs to the front
             std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());
 
             // If the most pressing need has changed
-            if (!(temp[0] == needs.vital_needs[0]))
+            if (temp != needs.vital_needs.front())
             {
                 strategies.staged_strategies.clear();
                 m_context.registry->remove_if_exists<component::LocationRequirement>(e);
@@ -38,7 +45,7 @@ void Mitigation::update(float dt)
 
             if (strategies.staged_strategies.empty())
             {
-                if (!(add_strategies(strategies, needs.vital_needs[0], tags)))
+                if (!(add_strategies(strategies, needs.vital_needs.front(), tags)))
                 {
                     spdlog::get("agent")->warn("Unable to add actions to fix need {}", needs.vital_needs[0].name);
                 }
@@ -46,25 +53,31 @@ void Mitigation::update(float dt)
         }
         else if (!needs.leisure_needs.empty())
         {
-            if (!strategies.staged_strategies.empty())
+            if (strategies.staged_strategies.empty())
             {
-                for (auto need : needs.leisure_needs)
+                RandomEngine rng{};
+                if (!(add_strategies(strategies,
+                                     needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
+                                     tags)))
                 {
-                    RandomEngine rng{};
-                    if (!(add_strategies(strategies,
-                                         needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
-                                         tags)))
-                    {
-                        spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
-                    }
+                    spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
                 }
             }
         }
-        else
+        else if (!strategies.staged_strategies.empty())
         {
             strategies.staged_strategies.clear();
+            m_context.registry->remove_if_exists<component::LocationRequirement>(e);
+            m_context.registry->remove_if_exists<component::VisionRequirement>(e);
+            m_context.registry->remove_if_exists<component::FindRequirement>(e);
+            m_context.registry->remove_if_exists<component::TagRequirement>(e);
         }
     });
+}
+
+ISystem* Mitigation::clone()
+{
+    return new Mitigation(m_context);
 }
 
 bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need& need, const component::Tags& tags)
@@ -78,7 +91,7 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
         // costly count_set_bits function
 
         // Check if the entities tags match the requirements of the strategy
-        if ((strategy.requirements & tags.tags) == strategy.requirements)
+        if ((strategy.prerequisites & tags.tags) == strategy.prerequisites)
         {
             // Check if ANY of the strategies tags matches the needs tags
             if ((strategy.tags & need.tags) != 0)
@@ -95,9 +108,31 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
 
     if (!strategies.staged_strategies.empty())
     {
-        std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end(), std::greater<ai::Strategy>());
+        std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
         return true;
     }
     return false;
 }
+
+void Mitigation::switch_need_context(const event::SwitchNeedContext& event)
+{
+    if (m_context.registry->valid(event.entity))
+    {
+        auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
+        if (strategies)
+        {
+            strategies->staged_strategies.clear();
+        }
+        else
+        {
+            spdlog::get("agent")->debug("tried to clear strategies from an entity that does not have that component. Entity: {}",
+                                        event.entity);
+        }
+        m_context.registry->remove_if_exists<component::LocationRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::VisionRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::FindRequirement>(event.entity);
+        m_context.registry->remove_if_exists<component::TagRequirement>(event.entity);
+    }
+}
+
 } // namespace cs::system

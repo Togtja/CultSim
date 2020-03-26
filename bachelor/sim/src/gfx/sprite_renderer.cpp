@@ -69,7 +69,7 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std:
     /** If we alreadly loaded this texture, then give it back */
     if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
-        spdlog::get("graphics")->debug("used cached texture for {}", rpath);
+        spdlog::get("graphics")->trace("used cached texture for {}", rpath);
         return itr->second;
     }
 
@@ -96,7 +96,7 @@ SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std:
     /** Load normal map if provided */
     if (!nrpath.empty())
     {
-        spdlog::get("graphics")->debug("loading normal map {}", nrpath);
+        spdlog::get("graphics")->trace("loading normal map {}", nrpath);
         const auto normal_data = load_texture(nrpath);
         glTextureSubImage3D(m_normal_texture_handles[texture_id.bind_slot],
                             0,

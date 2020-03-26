@@ -24,6 +24,8 @@ public:
 
     void update(float dt) override;
 
+    ISystem* clone() override;
+
 private:
     bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold);
 };

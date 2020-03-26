@@ -19,13 +19,15 @@ struct Action
     ETag requirements{};
 
     float time_to_complete{};
-    float time_spent = 0.f;
-
-    entt::entity target{};
+    float success_chance = 1.f;
 
     sol::function success{};
     sol::function failure{};
-    std::function<void(void)> abort{};
+    sol::function abort{};
+
+    float time_spent = 0.f;
+
+    entt::entity target = entt::null;
 };
 
 inline bool operator==(Action const& lhs, Action const& rhs)

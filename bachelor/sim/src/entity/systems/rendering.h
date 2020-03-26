@@ -24,5 +24,7 @@ public:
     Rendering(SystemContext context);
 
     void update(float dt) override;
+
+    ISystem* clone() override;
 };
 } // namespace cs::system

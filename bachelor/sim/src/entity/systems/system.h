@@ -1,9 +1,10 @@
 #pragma once
-#include "random_engine.h"
 #include "entity/scenario.h"
+#include "random_engine.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <taskflow/declarations.hpp>
 
 namespace cs::system
 {
@@ -16,6 +17,7 @@ struct SystemContext
     entt::dispatcher* dispatcher{nullptr};
     RandomEngine* rng{nullptr};
     lua::Scenario* scenario{nullptr};
+    tf::Executor* executor{nullptr};
 };
 
 class ISystem
@@ -27,7 +29,30 @@ public:
     ISystem(SystemContext context) : m_context(context)
     {
     }
+    virtual ~ISystem() noexcept = default;
+
+    /**
+     * Override if you need to do any system initialization
+     *
+     * @warning Do <b>NOT</b> override or implement constructors for this
+     */
+    virtual void initialize(){};
+
+    /**
+     * Override if you need to do any system deinitialization
+     *
+     * @note You usually want to implement this if you implemented initialize
+     * @warning Do <b>NOT</b> override or implement destructors for this
+     */
+    virtual void deinitialize(){};
 
     virtual void update(float dt) = 0;
+
+    /**
+     * Implement in subclasses to create clones of a system
+     *
+     * @return Pointer to a new heap allocated system
+     */
+    virtual ISystem* clone() = 0;
 };
 } // namespace cs::system

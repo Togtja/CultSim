@@ -1,10 +1,10 @@
 #pragma once
 
+#include "entity/memories/container.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "random_engine.h"
 #include "strategy.h"
-#include "entity/memories/container.h"
 #include "tags.h"
 
 #include <vector>
@@ -80,7 +80,10 @@ struct Reproduction
 
     ESex sex = Male;
     uint16_t number_of_children{};
-    uint16_t max_children{};
+
+    float fertility{};
+
+    int max_children_per_pregnancy{};
 };
 
 struct Timer
@@ -98,7 +101,15 @@ struct Health
 {
     float health{};
     float tickdown_rate{};
+
     ETag need_tags{};
+};
+
+struct Age
+{
+    float current_age{};
+
+    float max_age{};
 };
 
 struct DropItems
@@ -122,6 +133,12 @@ struct Strategy
 struct LocationRequirement
 {
     glm::vec3 desired_position{};
+
+    float closest_distance{};
+
+    float max_time{};
+
+    float elapsed_time{};
 };
 
 struct VisionRequirement
@@ -133,6 +150,10 @@ struct FindRequirement
 {
     ETag tags{};
     glm::vec3 desired_position{};
+
+    float max_time{};
+
+    float elapsed_time{};
 };
 
 struct TagRequirement
@@ -155,11 +176,30 @@ struct Inventory
 
 struct Memory
 {
+    int max_memories{};
+    float max_retention_time{};
+
     std::vector<memory::Container> memory_container{};
     Memory(Memory&&) = default;
     Memory& operator=(Memory&&) = default;
     Memory(const Memory&)       = default;
     Memory& operator=(const Memory&) = default;
+};
+
+struct Delete
+{
+};
+
+struct Pregnancy
+{
+    float time_since_start{};
+    float gestation_period{};
+
+    entt::entity father{};
+
+    int number_of_children{};
+
+    sol::function birth{};
 };
 
 struct AI

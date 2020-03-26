@@ -8,4 +8,10 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/locale_editor.h
         ${CMAKE_CURRENT_LIST_DIR}/locale_editor.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/native_collectors.h
+        ${CMAKE_CURRENT_LIST_DIR}/native_collectors.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/data_collector.h
+        ${CMAKE_CURRENT_LIST_DIR}/data_collector.cpp
 )

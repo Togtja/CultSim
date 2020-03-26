@@ -56,9 +56,10 @@ target_link_libraries(
     sol2::sol2
     EnTT::EnTT
     spdlog::spdlog
+    taskflow::taskflow
     glm::glm
     doctest
-    $<$<CXX_COMPILER_ID:GNU>:tbb>
+    pcg::pcg
 
     # Link with gcov on GNU for code coverage
     $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:gcov>

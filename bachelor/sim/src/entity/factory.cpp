@@ -130,8 +130,7 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 {
     auto& repl = reg.assign_or_replace<component::Reproduction>(e);
 
-    repl.sex          = table["sex"].get<component::Reproduction::ESex>();
-    repl.max_children = table["max_children"].get<int>();
+    repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
     return true;
 }
@@ -154,10 +153,20 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
         {
             strategy.actions.push_back(action::Action{action_table["name"].get<std::string>(),
                                                       action_table["requirements"].get<ETag>(),
-                                                      action_table["time_to_complete"].get<float>()});
+                                                      action_table["time_to_complete"].get<float>(),
+                                                      action_table["success_chance"].get<float>(),
+                                                      action_table["success"].get<sol::function>(),
+                                                      action_table["failure"].get<sol::function>()});
 
-            strategy.actions.back().success = action_table["success"];
-            strategy.actions.back().failure = action_table["failure"];
+            if (action_table["abort"].get_type() == sol::type::function)
+            {
+                strategy.actions.back().abort = action_table["abort"].get<sol::function>();
+            }
+
+            if (action_table["targets_self"].get_type() == sol::type::boolean && action_table["targets_self"].get<bool>())
+            {
+                strategy.actions.back().target = e;
+            }
         }
 
         strat.strategies.push_back(strategy);
@@ -178,7 +187,9 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
 bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     const std::vector<ETag>& allowed_memories = table["allowed_memories"].get_or<std::vector<ETag>>({});
-    auto& memory_component                    = reg.assign_or_replace<component::Memory>(e);
+
+    auto& memory_component =
+        reg.assign_or_replace<component::Memory>(e, table["max_memories"].get<int>(), table["max_retention_time"].get<float>());
 
     /** Add allowed memories to memory compnent */
     for (auto tag : allowed_memories)

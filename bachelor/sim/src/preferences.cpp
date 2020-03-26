@@ -9,15 +9,15 @@
 namespace cs
 {
 PreferenceManager::PreferenceManager(Window& window, sol::state_view lua_state) :
-    m_window(window),
     m_locale(lua_state),
+    m_window(window),
     m_lua(lua_state)
 {
 }
 
 PreferenceManager::PreferenceManager(Window& window, sol::state_view lua_state, std::string_view from_file) :
-    m_window(window),
     m_locale(lua_state),
+    m_window(window),
     m_lua(lua_state)
 {
 }
