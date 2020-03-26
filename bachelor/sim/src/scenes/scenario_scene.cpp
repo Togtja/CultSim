@@ -52,6 +52,7 @@ void ScenarioScene::initialize_simulation()
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
     bind_actions_for_scene();
+    bind_available_lua_events();
     bind_scenario_lua_functions();
     m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
@@ -86,6 +87,9 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Notify the scenario is loaded */
+    m_dispatcher.enqueue<event::ScenarioLoaded>();
 }
 
 void ScenarioScene::clean_simulation()
@@ -109,6 +113,14 @@ void ScenarioScene::clean_simulation()
         system->initialize();
     }
     m_inactive_systems.clear();
+
+    /** Clean up event handlers and binders */
+    for (auto& handler : m_lua_event_handlers)
+    {
+        handler->connection.release();
+    }
+    m_lua_event_handlers.clear();
+    m_lua_ebinder.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -298,6 +310,12 @@ void ScenarioScene::bind_actions_for_scene()
     });
 }
 
+void ScenarioScene::bind_available_lua_events()
+{
+    m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
+                     {"ScenarioLoaded", &lua_binder<event::ScenarioLoaded>}};
+}
+
 void ScenarioScene::bind_scenario_lua_functions()
 {
     /** Helpful to make following code shorter and more readable, copying is fine here, it's just a pointer */
@@ -393,6 +411,14 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             health->health -= damage;
         }
+    });
+
+    /* Function to allow lua to connect to events */
+    cultsim.set_function("connect", [this](const std::string& event_name, sol::function func) {
+        auto handle        = std::make_unique<LuaEventHandle>();
+        handle->func       = func;
+        handle->connection = m_lua_ebinder.at(event_name)(m_dispatcher, handle->func);
+        m_lua_event_handlers.emplace_back(std::move(handle));
     });
 
     /** Spawn entity functions */

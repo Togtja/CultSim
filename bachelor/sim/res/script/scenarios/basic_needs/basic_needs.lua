@@ -32,6 +32,8 @@ scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
 scenario.init = function()
+    cultsim.connect("ScenarioLoaded", function(event) log.info("Scenario loaded.") end)
+
     -- Spawn 100 Deer
     for i=1,100 do
         local deer = cultsim.spawn("deer")
