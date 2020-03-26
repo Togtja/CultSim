@@ -53,7 +53,12 @@ void DataCollector::show_ui()
 {
     /** TODO: Make it more elaborate */
     static int data_offset = 100;
-    ImGui::SliderInt("Data (display) size", &data_offset, 10, 1000);
+    ImGui::DragInt("Data (display) size", &data_offset, 1.f, 10, 1000);
+    if (data_offset < 10)
+    {
+        data_offset = 10;
+    }
+
     if (ImGui::TreeNode("Data Collection"))
     {
         for (unsigned i = 0u; i < m_collectors.size(); ++i)
