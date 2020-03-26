@@ -24,6 +24,7 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
 bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table table);
 } // namespace detail
 
 /**

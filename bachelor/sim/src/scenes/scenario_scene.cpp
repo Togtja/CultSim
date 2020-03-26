@@ -350,7 +350,22 @@ void ScenarioScene::bind_scenario_lua_functions()
             default: return sol::nil; break;
         }
     });
-
+    cultsim.set_function("remove_component", [this](sol::this_state s, entt::entity e, uint32_t id) {
+        switch (id)
+        {
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
+            case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
+            case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
+            case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
+            case entt::type_info<component::Tags>::id(): m_registry.remove_if_exists<component::Tags>(e); break;
+            case entt::type_info<component::Need>::id(): m_registry.remove_if_exists<component::Need>(e); break;
+            case entt::type_info<component::Reproduction>::id(): m_registry.remove_if_exists<component::Reproduction>(e); break;
+            case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
+            case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
+            case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            default: break;
+        }
+    });
     /** Helper action to modify an entity need */
     cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
@@ -362,6 +377,13 @@ void ScenarioScene::bind_scenario_lua_functions()
                     need.status += delta;
                 }
             }
+        }
+    });
+
+    cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+        if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
+        {
+            inventory->contents.push_back(target);
         }
     });
 

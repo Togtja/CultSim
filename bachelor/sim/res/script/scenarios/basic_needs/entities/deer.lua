@@ -35,6 +35,9 @@ entity = {
         tickdown_rate = 1.0,
         vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
     },
+    InventoryComponent = {
+    max_size = 5
+    },
     MemoryComponent = {
         max_memories = 10,
         max_retention_time = 1000.0,

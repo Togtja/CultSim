@@ -74,6 +74,22 @@ actions.eat = {
     end
 }
 
+actions.gather_food = {
+    name = "Forage",
+    requirements = ETag.Find,
+    time_to_complete = 2.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+        log.info("I (" .. owner .. ") picked up " .. target .. ".")
+        cultsim.add_to_inventory(owner,target)
+        cultsim.remove_component(target, component.position)
+    end,
+    failute = function(owner, target)
+    end,
+    abort = function(owner, target)
+    end
+}
+
 actions.reproduce = {
     name = "Reproducing",
     requirements = ETag.Find | ETag.Tag,

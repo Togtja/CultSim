@@ -91,6 +91,8 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
 
+    lua.new_usertype<component::Inventory>("InventoryComponent", "max_size", &component::Inventory::max_size);
+
     /**
      * Ignoring avoidance_cd and avoid_count since those can be changed using the UI and ignoring desired_position as that is
      * a part of the pathfinding algorithm
@@ -116,7 +118,11 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Tags>("TagComponent", "tags", &component::Tags::tags);
 
-    lua.new_usertype<component::Need>("NeedComponent", "needs", &component::Need::needs);
+    lua.new_usertype<component::Need>("NeedComponent",
+                                      "required_needs",
+                                      &component::Need::needs,
+                                      "leisure_needs",
+                                      &component::Need::leisure_needs);
 
     lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
 

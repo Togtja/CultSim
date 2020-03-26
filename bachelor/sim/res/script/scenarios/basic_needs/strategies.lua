@@ -29,3 +29,9 @@ strategies.find_mate = {
     tags = ETag.Reproduce,
     actions = { actions.reproduce }
 }
+
+strategies.forage_for_food = {
+    name = "Foraging for Food",
+    tags = ETag.Food | ETag.Gather,
+    actions = {actions.gather_food}
+}
