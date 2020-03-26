@@ -86,6 +86,14 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Clean up event handlers and binders */
+    for (auto& handler : m_lua_event_handlers)
+    {
+        handler.connection.release();
+    }
+    m_lua_event_handlers.clear();
+    m_lua_ebinder.clear();
 }
 
 void ScenarioScene::clean_simulation()
@@ -393,6 +401,12 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             health->health -= damage;
         }
+    });
+
+    /* Function to allow lua to connect to events */
+    cultsim.set_function("connect", [this](const std::string& event_name, sol::function func) {
+        auto connection = m_lua_ebinder.at(event_name)(m_dispatcher, func);
+        m_lua_event_handlers.push_back(LuaEventHandle{func, connection});
     });
 
     /** Spawn entity functions */
