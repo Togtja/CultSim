@@ -315,6 +315,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["strategy"]     = entt::type_info<component::Strategy>::id();
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
+    component["attack"]       = entt::type_info<component::Attack>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -347,7 +348,13 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Memory>::id():
                 return sol::make_object(s, &m_registry.get<component::Memory>(e));
                 break;
-            default: return sol::nil; break;
+            case entt::type_info<component::Attack>::id():
+                return sol::make_object(s, &m_registry.get<component::Attack>(e));
+                break;
+            default:
+                spdlog::critical("Can not find the componet you are looking for");
+                return sol::nil;
+                break;
         }
     });
 

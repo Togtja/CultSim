@@ -9,6 +9,6 @@ entity = {
         scale = 6
     },
     TagComponent = {
-        tags = ETag.Food
+        tags = ETag.Food | ETag.Veggie
     }
 }

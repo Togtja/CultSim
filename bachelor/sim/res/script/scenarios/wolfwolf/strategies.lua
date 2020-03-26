@@ -12,9 +12,9 @@ strategies.find_water = {
     actions = { actions.drink }
 }
 
-strategies.find_food = {
-    name = "Looking for Food",
-    tags = ETag.Food,
+strategies.find_veggie = {
+    name = "Looking for plant/based food",
+    tags = ETag.Food | ETag.Veggie,
     actions = { actions.eat }
 }
 
@@ -29,3 +29,16 @@ strategies.find_mate = {
     tags = ETag.Reproduce,
     actions = { actions.reproduce }
 }
+
+strategies.attack = {
+    name = "Looking to beat someone up",
+    tags = ETag.Creature,
+    actions = { actions.attack }
+}
+
+strategies.hunt = {
+    name = "Hunting for some food",
+    tags = ETag.Creature | ETag.Food | ETag.Meat | ETag.Herbivore,
+    actions = { actions.hunt }
+}
+

@@ -21,6 +21,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"ReproductionComponent", spawn_reproduction_component},
                           {"StrategyComponent", spawn_strategy_component},
                           {"HealthComponent", spawn_health_component},
+                          {"AttackComponent", spawn_attack_component},
                           {"MemoryComponent", spawn_memory_component},
                           {"TimerComponent", spawn_timer_component}};
 
@@ -181,6 +182,12 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
                                              table["health"].get<float>(),
                                              table["tickdown_rate"].get<float>(),
                                              table["vital_needs"].get<ETag>());
+    return true;
+}
+
+bool spawn_attack_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign_or_replace<component::Attack>(e, table["damage"].get<float>());
     return true;
 }
 
