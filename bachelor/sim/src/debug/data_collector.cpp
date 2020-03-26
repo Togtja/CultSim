@@ -2,12 +2,12 @@
 #include "debug/auto_timer.h"
 #include "filesystem/filesystem.h"
 
-#include <iomanip>
 #include <algorithm>
+#include <iomanip>
 #include <sstream>
 
 #include <gfx/ImGUI/imgui.h>
-
+#include <gfx/ImGUI/imgui_plot.h>
 #include <spdlog/fmt/fmt.h>
 
 namespace cs::debug
@@ -51,19 +51,40 @@ void DataCollector::clear()
 
 void DataCollector::show_ui()
 {
-    /** TODO : Make it more elaborate */
+    /** TODO: Make it more elaborate */
+    static int data_offset = 100;
+    ImGui::SliderInt("Data (display) size", &data_offset, 10, 1000);
     if (ImGui::TreeNode("Data Collection"))
     {
         for (unsigned i = 0u; i < m_collectors.size(); ++i)
         {
-            ImGui::PlotLines(fmt::format("##{}_{}", m_collectors[i]->get_name(), i).c_str(),
-                             m_samples[i].data(),
-                             m_samples[i].size(),
-                             0,
-                             fmt::format("{}: {}", m_collectors[i]->get_name(), m_samples[i].back()).c_str(),
-                             FLT_MAX,
-                             FLT_MAX,
-                             {0, 75});
+            ImGui::PlotConfig conf;
+            int offset = 0;
+            int count  = m_samples[i].size();
+
+            // Set offset based on slider
+            if (m_samples[i].size() >= data_offset)
+            {
+                offset = m_samples[i].size() - data_offset;
+                count  = data_offset;
+            }
+            conf.values.offset = offset;
+            conf.values.ys     = m_samples[i].data();
+            conf.values.count  = count;
+
+            conf.scale.min = *std::min_element(m_samples[i].begin(), m_samples[i].end());
+            conf.scale.max = *std::max_element(m_samples[i].begin(), m_samples[i].end());
+
+            auto overlay_cstr = fmt::format("{}: {}", m_collectors[i]->get_name(), m_samples[i].back());
+            conf.overlay_text = overlay_cstr.c_str();
+
+            conf.tooltip.show   = true;
+            auto tooltip_cstr   = fmt::format("data point: %g\n{}: %8.4g", m_collectors[i]->get_name());
+            conf.tooltip.format = tooltip_cstr.c_str();
+
+            conf.frame_size     = ImVec2(300, 75);
+            conf.line_thickness = 2.f;
+            ImGui::Plot(fmt::format("##{}_{}", m_collectors[i]->get_name(), i).c_str(), conf);
         }
 
         ImGui::TreePop();
