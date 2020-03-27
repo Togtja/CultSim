@@ -1,8 +1,8 @@
 #include "rendering.h"
 #include "constants.h"
 #include "debug/auto_timer.h"
-#include "gfx/renderer.h"
 #include "entity/components/components.h"
+#include "gfx/renderer.h"
 
 #include <array>
 #include <numeric>
@@ -32,7 +32,7 @@ void Rendering::update(float dt)
     auto& registry = *m_context.registry;
 
     /** Select visualization mode */
-    if (ImGui::TreeNode("Visualization Mode"))
+    /**if (ImGui::TreeNode("Visualization Mode"))
     {
         ImGui::ListBoxHeader("##VisualizationListBox");
         for (int i = 0; i < visualization_mode_names.size(); ++i)
@@ -44,7 +44,7 @@ void Rendering::update(float dt)
         }
         ImGui::ListBoxFooter();
         ImGui::TreePop();
-    }
+    }*/
 
     /** Visualize if needed */
     if (m_visualization_mode == EVisualizationMode::Vision)
