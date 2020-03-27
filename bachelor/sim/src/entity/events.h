@@ -84,4 +84,13 @@ struct DeleteEntity
 {
     entt::entity entity{};
 };
+
+struct PickedUpEntity
+{
+    entt::entity owner{};
+
+    entt::entity target{};
+
+    ETag tags{};
+};
 } // namespace cs::event
