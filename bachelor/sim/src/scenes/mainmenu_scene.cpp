@@ -34,7 +34,7 @@ bool MainMenuScene::update(float dt)
         ImGui::OpenPopup("Select##Scenario");
     }
 
-    if (ImGui::Button("Preferences", {150, 50}))
+    if (ImGui::Button("Key Bindings", {150, 50}))
     {
         m_context->scene_manager->push<PreferenceScene>();
     }
