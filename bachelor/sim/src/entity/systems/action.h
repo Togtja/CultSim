@@ -33,6 +33,7 @@ public:
     void abort_strategy(const event::RequirementFailure& event);
 
     void delete_target(const event::DeleteEntity& event);
+    void Action::picked_up_entity(const event::PickedUpEntity& event);
 };
 
 } // namespace cs::system

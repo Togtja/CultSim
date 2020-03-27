@@ -16,9 +16,9 @@ strategies.find_water = {
 
 strategies.find_food = {
     name = "Looking for Food",
-    tags = ETag.Food, ETag.Consume,
+    tags = ETag.Food | ETag.Consume,
     target_tags = ETag.Food,
-    actions = { actions.eat_from_inventory, actions.eat }
+    actions = { actions.eat, actions.eat_from_inventory }
 }
 
 strategies.sleep_on_ground = {

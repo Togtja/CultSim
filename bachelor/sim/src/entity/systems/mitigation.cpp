@@ -96,6 +96,11 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
             // Check if ANY of the strategies tags matches the needs tags
             if ((strategy.tags & need.tags) != 0)
             {
+                spdlog::get("agent")->warn("We are placing strategy {}, with tags {}, for need {} with tags {}",
+                                           strategy.name,
+                                           tag_to_string(strategy.tags),
+                                           need.name,
+                                           tag_to_string(need.tags));
                 auto matching_tags = count_set_bits(strategy.tags & need.tags);
                 temp               = strategy;
                 temp.desirability += matching_tags;
