@@ -158,6 +158,7 @@ bool ScenarioScene::update(float dt)
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
     draw_time_control_ui();
+    draw_notifications(dt);
     draw_selected_entity_information_ui();
 
     /** Sample data */
@@ -188,7 +189,8 @@ bool ScenarioScene::update(float dt)
     m_dispatcher.update();
     m_scenario.update(dt);
 
-    /** It's supposed to be two of these here, do not change - not a bug */
+    /** It's supposed to be three of these here, do not change - not a bug */
+
     ImGui::End();
     ImGui::End();
 
@@ -421,6 +423,11 @@ void ScenarioScene::bind_scenario_lua_functions()
         m_lua_event_handlers.emplace_back(std::move(handle));
     });
 
+    /** Send notification */
+    cultsim.set_function("notify", [this](std::string title, std::string information, float duration = 4.f) {
+        m_notifications.push_back({std::move(title), std::move(information), -duration});
+    });
+
     /** Spawn entity functions */
     cultsim.set_function("spawn", [this](const std::string& entity_name) {
         const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
@@ -547,6 +554,38 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
+}
+
+void ScenarioScene::draw_notifications(float dt)
+{
+    ImGui::SetNextWindowPos({m_resolution.x - 50.f, 50.f}, ImGuiCond_Always, {1, 0});
+    ImGui::SetNextWindowSize({260.f, 250.f});
+    ImGui::Begin("Notifications",
+                 nullptr,
+                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground |
+                     ImGuiWindowFlags_NoInputs);
+
+    /** Draw all notifications */
+    for (auto itr = m_notifications.begin(); itr != m_notifications.end(); ++itr)
+    {
+        auto& notification = *itr;
+        notification.time_shown += dt;
+
+        /** Show current */
+        ImGui::PushID(&notification);
+        ImGui::BeginChild("Notification", {250, 0}, true, ImGuiWindowFlags_NoTitleBar);
+        ImGui::Text("%s", notification.title.c_str());
+        ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s", notification.information.c_str());
+        ImGui::EndChild();
+        ImGui::PopID();
+    }
+
+    ImGui::End();
+
+    /** Get rid of old notifications */
+    m_notifications.erase(
+        std::remove_if(m_notifications.begin(), m_notifications.end(), [](const Notification& n) { return n.time_shown > 0.f; }),
+        m_notifications.end());
 }
 
 void ScenarioScene::draw_time_control_ui()

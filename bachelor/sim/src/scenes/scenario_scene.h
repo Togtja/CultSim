@@ -3,6 +3,7 @@
 #include "entity/systems/system.h"
 #include "debug/data_collector.h"
 #include "random_engine.h"
+#include "common_helpers.h"
 #include "scene.h"
 
 #include <string_view>
@@ -57,6 +58,9 @@ private:
     /** Storage of bound lua events */
     std::vector<std::unique_ptr<LuaEventHandle>> m_lua_event_handlers{};
 
+    /** Notifications */
+    std::vector<Notification> m_notifications{};
+
     /** Storage of possible events for lua to subscribe to */
     LuaEventMap m_lua_ebinder{};
 
@@ -103,6 +107,8 @@ private:
     void setup_docking_ui();
 
     void draw_scenario_information_ui();
+
+    void draw_notifications(float dt);
 
     void draw_time_control_ui();
 
