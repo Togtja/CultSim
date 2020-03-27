@@ -80,9 +80,16 @@ actions.gather_food = {
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner,target)
-        log.info("I (" .. owner .. ") picked up " .. target .. ".")
-        cultsim.add_to_inventory(owner,target)
-        cultsim.remove_component(target, component.position)
+    if(cultsim.get_component(target,component.tag).tags & ETag.Inventory)then
+            
+        log.info("I (" .. owner .. ") cannot pick up " .. target .. " because it has allready been picked up.")
+        return
+        end
+        
+    log.info("I (" .. owner .. ") picked up " .. target .. ".")
+    cultsim.add_to_inventory(owner,target)
+    cultsim.remove_component(target, component.position)
+
     end,
     failure = function(owner, target)
     log.info("I (" .. owner .. ") failed to pick up " .. target .. ".")

@@ -403,6 +403,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             auto tags = m_registry.try_get<component::Tags>(target);
             m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
+            tags->tags = ETag(tags->tags | TAG_Inventory);
             inventory->contents.push_back(target);
         }
     });
