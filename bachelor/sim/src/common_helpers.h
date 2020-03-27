@@ -22,6 +22,13 @@ struct ApplicationContext
     PreferenceManager* preferences{nullptr};
 };
 
+struct Notification
+{
+    std::string title{};
+    std::string information{};
+    float time_shown{};
+};
+
 /**
  * Helper struct for entity selection
  *

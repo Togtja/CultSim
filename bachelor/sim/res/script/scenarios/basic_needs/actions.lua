@@ -44,7 +44,6 @@ actions.drink = {
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner, target)
-        log.info("I (" .. owner .. ") drink-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Drink, 85.0)
         cultsim.kill(target)
     end,
@@ -62,7 +61,6 @@ actions.eat = {
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
-        log.info("I (" .. owner .. ") eat-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Food, 60.0)
         cultsim.kill(target)
     end,
