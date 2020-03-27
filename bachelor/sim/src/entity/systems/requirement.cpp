@@ -108,7 +108,7 @@ void Requirement::update(float dt)
             }
 
             auto tags = m_context.registry->try_get<component::Tags>(entity);
-            if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & TAG_Delete ))
+            if (tags && ((tags->tags & findreqs.tags) == findreqs.tags) && !(tags->tags & TAG_Delete))
             {
                 if (strategies.staged_strategies.size() != 0)
                 {
@@ -197,6 +197,26 @@ void Requirement::update(float dt)
         tags.tags = ETag(tags.tags | tagreqs.tags);
         m_context.registry->remove<component::TagRequirement>(e);
         m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Tag});
+    });
+
+    auto view_inventory = m_context.registry->view<component::InventoryRequirement, component::Inventory, component::Strategy>();
+    view_inventory.each([this](const entt::entity e,
+                               const component::InventoryRequirement& invreqs,
+                               const component::Inventory& inv,
+                               component::Strategy& strat) {
+        for (auto content : inv.contents)
+        {
+            if (auto tags = m_context.registry->try_get<component::Tags>(content);
+                tags && ((tags->tags & invreqs.tags) == invreqs.tags))
+            {
+                strat.staged_strategies.back().actions.back().target = content;
+                m_context.registry->remove<component::InventoryRequirement>(e);
+                m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Inventory});
+                return;
+            }
+            m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Inventory});
+            m_context.registry->remove<component::InventoryRequirement>(e);
+        }
     });
 }
 

@@ -403,7 +403,25 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
+            auto tags = m_registry.try_get<component::Tags>(target);
+            m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
             inventory->contents.push_back(target);
+        }
+    });
+
+    cultsim.set_function("remove_from_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+        if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
+        {
+            int i = 0;
+            for (auto& content : inventory->contents)
+            {
+                if (content == target)
+                {
+                    spdlog::get("agent")->critical("I {} am deleting {} from my inventory");
+                    inventory->contents.erase(inventory->contents.begin() + i);
+                }
+                i++;
+            }
         }
     });
 
@@ -673,10 +691,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (!strategy->staged_strategies.empty())
         {
-            ImGui::Text("Currently: %s", strategy->staged_strategies.front().name.c_str());
-            if (!strategy->staged_strategies.front().actions.empty())
+            ImGui::Text("Currently: %s", strategy->staged_strategies.back().name.c_str());
+            if (!strategy->staged_strategies.back().actions.empty())
             {
-                const auto& action = strategy->staged_strategies.front().actions.front();
+                const auto& action = strategy->staged_strategies.back().actions.back();
                 if (action.time_spent > 0.f)
                 {
                     ImGui::Indent();

@@ -96,6 +96,11 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
             // Check if ANY of the strategies tags matches the needs tags
             if ((strategy.tags & need.tags) != 0)
             {
+                spdlog::get("agent")->warn("We are placing strategy {}, with tags {}, for need {} with tags {}",
+                                           strategy.name,
+                                           tag_to_string(strategy.tags),
+                                           need.name,
+                                           tag_to_string(need.tags));
                 auto matching_tags = count_set_bits(strategy.tags & need.tags);
                 temp               = strategy;
                 temp.desirability += matching_tags;
@@ -109,6 +114,15 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
     if (!strategies.staged_strategies.empty())
     {
         std::sort(strategies.staged_strategies.begin(), strategies.staged_strategies.end());
+        int i = 0;
+        for (auto strategy : strategies.staged_strategies)
+        {
+            if (need.tags == ETag(TAG_Food | TAG_Gather))
+            {
+                i++;
+                spdlog::get("agent")->warn("Strategy number : {}, name : {}", i, strategy.name);
+            }
+        }
         return true;
     }
     return false;

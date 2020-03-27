@@ -21,7 +21,9 @@ enum ETag : uint64_t
     TAG_Tag       = 1 << 11,
     TAG_Gather    = 1 << 12,
     TAG_Delete    = 1 << 13,
-    TAG_Reserved  = 1 << 14
+    TAG_Reserved  = 1 << 14,
+    TAG_Inventory = 1 << 15,
+    TAG_Consume   = 1 << 16
 };
 
 inline std::string tag_to_string(ETag tag)
@@ -41,7 +43,9 @@ inline std::string tag_to_string(ETag tag)
                                        "Tag",
                                        "Gather",
                                        "Delete",
-                                       "Reserved"};
+                                       "Reserved",
+                                       "Inventory",
+                                       "Consume"};
     for (int i = 0; i < tag_names.size(); i++)
     {
         if (tag & 1 << i)
