@@ -68,6 +68,7 @@ void Application::handle_input()
             if (auto* p = dynamic_cast<PauseMenuScene*>(m_scene_manager.get_active_scene()); p)
             {
                 m_scene_manager.pop();
+                continue;
             }
 
             m_scene_manager.push<PauseMenuScene>();
