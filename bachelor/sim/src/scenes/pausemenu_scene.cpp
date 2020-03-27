@@ -1,5 +1,6 @@
 #include "pausemenu_scene.h"
 #include "mainmenu_scene.h"
+#include "preference_scene.h"
 #include "scene_manager.h"
 
 #include <common_helpers.h>
@@ -18,6 +19,7 @@ void PauseMenuScene::on_exit()
 
 bool PauseMenuScene::update(float dt)
 {
+    ImGui::OpenPopup("Paused##Menu");
     if (ImGui::BeginPopupModal("Paused##Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
     {
         ImGui::Text("You have paused.");
@@ -34,6 +36,10 @@ bool PauseMenuScene::update(float dt)
             m_context->scene_manager->push<MainMenuScene>();
         }
 
+        if (ImGui::Button("Key Bindings", {150, 25}))
+        {
+            m_context->scene_manager->push<PreferenceScene>();
+        }
         if (ImGui::Button("Exit", {150, 25}))
         {
             m_context->scene_manager->clear();
