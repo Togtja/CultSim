@@ -102,7 +102,7 @@ void Requirement::update(float dt)
 
         for (auto& entity : vision.seen)
         {
-            if (!m_context.registry->valid(entity))
+            if (!m_context.registry->valid(entity) || !m_context.registry->has<component::Position>(entity))
             {
                 continue;
             }
