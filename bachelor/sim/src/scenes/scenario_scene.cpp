@@ -100,6 +100,7 @@ void ScenarioScene::clean_simulation()
     m_simtime   = 0.f;
     m_timescale = 1.f;
     m_data_collector.clear();
+    m_notifications.clear();
 
     /** Deinitialize systems and then clear them */
     for (auto& system : m_active_systems)
@@ -576,26 +577,30 @@ void ScenarioScene::draw_scenario_information_ui()
 
 void ScenarioScene::draw_notifications(float dt)
 {
+    if (m_notifications.empty())
+    {
+        return;
+    }
+
+    /** Set up notification window area */
     ImGui::SetNextWindowPos({m_resolution.x - 50.f, 50.f}, ImGuiCond_Always, {1, 0});
-    ImGui::SetNextWindowSize({260.f, 250.f});
-    ImGui::Begin("Notifications",
-                 nullptr,
-                 ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground |
-                     ImGuiWindowFlags_NoInputs);
+    ImGui::SetNextWindowSize({260.f, m_notifications.size() * 60.f});
+    ImGui::SetNextWindowBgAlpha(0.6f);
+    ImGui::Begin("Notifications", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs);
 
     /** Draw all notifications */
-    for (auto itr = m_notifications.begin(); itr != m_notifications.end(); ++itr)
+    for (auto itr = m_notifications.rbegin(); itr != m_notifications.rend(); ++itr)
     {
         auto& notification = *itr;
         notification.time_shown += dt;
 
         /** Show current */
-        ImGui::PushID(&notification);
-        ImGui::BeginChild("Notification", {250, 0}, true, ImGuiWindowFlags_NoTitleBar);
-        ImGui::Text("%s", notification.title.c_str());
-        ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s", notification.information.c_str());
+        if (ImGui::BeginChild("Notification", {250, 0}, true, ImGuiWindowFlags_NoTitleBar))
+        {
+            ImGui::Text("%s", notification.title.c_str());
+            ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s", notification.information.c_str());
+        }
         ImGui::EndChild();
-        ImGui::PopID();
     }
 
     ImGui::End();
