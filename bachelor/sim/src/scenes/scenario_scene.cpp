@@ -411,52 +411,45 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
-        m_registry
-            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
-                /** Don't do anything if e became invalid */
-                if (!r.valid(e))
-                {
-                    return;
-                }
+        /** Figure out "type" of mother and spawn a child based on that */
 
-                /** Figure out "type" of mother and spawn a child based on that */
-                const auto& mother_meta = r.get<component::Meta>(e);
+        auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
 
-                /** Set position to be close to mother */
-                const auto new_pos = r.get<component::Position>(e).position +
-                                     glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
-
-                auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
-
-                /** Reset all needs to 100.0 */
-                if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
-                {
-                    for (auto& need : need_comp->needs)
-                    {
-                        need.status = 100.f;
-                    }
-                }
-
-                /** Reset health */
-                if (auto* health_comp = r.try_get<component::Health>(child); health_comp)
-                {
-                    health_comp->health = 100.f;
-                }
-
-                /** Give a child to the parents */
-                if (m_registry.valid(father))
-                {
-                    if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
-                    {
-                        ++rc->number_of_children;
-                    }
-                }
-
-                if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
-                {
-                    ++rc->number_of_children;
-                }
-            });
+        /** Give a Pregnancy component to the mother */
+        auto* rc_m = m_registry.try_get<component::Reproduction>(mother);
+        auto* rc_f = m_registry.try_get<component::Reproduction>(father);
+        if (rc_m && rc_f)
+        {
+            if (!m_rng.trigger(rc_m->fertility) || !m_rng.trigger(rc_f->fertility))
+            {
+                // N0 pregnancy
+                return;
+            }
+            if (auto* again = m_registry.try_get<component::Pregnancy>(mother); again)
+            {
+                // Can't get pregnant twice
+                return;
+            }
+            cs::component::Pregnancy* preg;
+            if (rc_f->incubator == component::Reproduction::ESex::Female)
+            {
+                preg                        = &m_registry.assign<component::Pregnancy>(mother);
+                preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->deviation);
+            }
+            else
+            {
+                preg                        = &m_registry.assign<component::Pregnancy>(father);
+                preg->children_in_pregnancy = m_rng.normal(rc_m->mean_children_pp, rc_m->deviation);
+            }
+            if (preg->children_in_pregnancy <= 0)
+            {
+                preg->children_in_pregnancy = 1;
+            }
+            if (m_registry.valid(father))
+            {
+                preg->father = father;
+            }
+        }
     });
 }
 

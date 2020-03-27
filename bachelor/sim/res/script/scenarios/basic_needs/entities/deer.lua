@@ -24,7 +24,7 @@ entity = {
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
-        max_children = 10
+        mcpp = 20
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file

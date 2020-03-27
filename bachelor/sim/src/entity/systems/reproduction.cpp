@@ -1,6 +1,7 @@
 #include "reproduction.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/factory.h"
 
 namespace cs::system
 {
@@ -19,9 +20,23 @@ void Reproduction::update(float dt)
 
     auto view = m_context.registry->view<component::Reproduction>();
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
-        if (auto age = m_context.registry->try_get<component::Age>(e); age)
+        if (auto age = m_context.registry->try_get<component::Age>(e); age && repr.has_fertility)
         {
-            repr.fertility = std::clamp(100.f - (age->current_age - age->max_age), 0.f, 100.f);
+            // Can not reproduce after end of fertility
+            if (age->current_age > repr.end_fertility || age->current_age < repr.start_fertility)
+            {
+                repr.fertility = 0;
+                return;
+            }
+            auto age_fertile = age->current_age - repr.peak_fertility;
+            if (age_fertile < 0)
+            {
+                repr.fertility = (1 + (age_fertile / repr.end_fertility));
+            }
+            else
+            {
+                repr.fertility = (1 - (age_fertile / repr.end_fertility));
+            }
         }
         else
         {
@@ -34,7 +49,7 @@ void Reproduction::update(float dt)
         preg.time_since_start += dt;
         if (preg.time_since_start >= preg.gestation_period)
         {
-            preg.birth(e, preg.father, preg.number_of_children);
+            spawn_entity(m_context.registry, m_context.);
         }
     });
 }

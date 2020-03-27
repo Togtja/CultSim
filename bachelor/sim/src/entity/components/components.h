@@ -70,22 +70,6 @@ struct Hearing
     float radius{};
 };
 
-struct Reproduction
-{
-    enum ESex
-    {
-        Male   = true,
-        Female = false
-    };
-
-    ESex sex = Male;
-    uint16_t number_of_children{};
-
-    float fertility{};
-
-    int max_children_per_pregnancy{};
-};
-
 struct Timer
 {
     using OnCompleteFunction = std::function<void(entt::entity, entt::registry&)>;
@@ -195,6 +179,33 @@ struct Delete
 {
 };
 
+struct Reproduction
+{
+    enum ESex
+    {
+        Male   = true,
+        Female = false
+    };
+
+    ESex sex = Male;
+    uint16_t number_of_children{};
+
+    bool lays_eggs = false;
+    ESex incubator = Female;
+
+    // Needs age component to work
+    float start_fertility{};
+    float peak_fertility{};
+    float end_fertility{};
+
+    // General Pregnancy stat
+    float mean_children_pp = 1.0001f;
+    float deviation{};
+
+    float fertility    = -1.f;
+    bool has_fertility = false;
+};
+
 struct Pregnancy
 {
     float time_since_start{};
@@ -202,9 +213,7 @@ struct Pregnancy
 
     entt::entity father{};
 
-    int number_of_children{};
-
-    sol::function birth{};
+    uint16_t children_in_pregnancy{};
 };
 
 struct AI

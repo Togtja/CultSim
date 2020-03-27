@@ -139,6 +139,10 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 
     repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
+    repl.fertility = table["fertility"].get<float>();
+
+    repl.max_children_per_pregnancy = table["mcpp"].get<int>();
+
     return true;
 }
 
