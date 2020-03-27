@@ -81,8 +81,6 @@ actions.gather_food = {
     success_chance = 0.9,
     success = function(owner,target)
     if(cultsim.get_component(target,component.tag).tags & ETag.Inventory)then
-            
-        log.info("I (" .. owner .. ") cannot pick up " .. target .. " because it has allready been picked up.")
         return
         end
         

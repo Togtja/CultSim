@@ -405,6 +405,7 @@ void ScenarioScene::bind_scenario_lua_functions()
             m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
             tags->tags = ETag(tags->tags | TAG_Inventory);
             inventory->contents.push_back(target);
+            spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
         }
     });
 
@@ -416,7 +417,6 @@ void ScenarioScene::bind_scenario_lua_functions()
             {
                 if (content == target)
                 {
-                    spdlog::get("agent")->critical("I {} am deleting {} from my inventory");
                     inventory->contents.erase(inventory->contents.begin() + i);
                 }
                 i++;
