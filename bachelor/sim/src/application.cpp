@@ -10,7 +10,7 @@
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
-
+#include "scenes/pausemenu_scene.h"
 
 #include <functional>
 
@@ -65,20 +65,21 @@ void Application::handle_input()
         ImGui_ImplSDL2_ProcessEvent(&e);
         if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
         {
-            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            if (auto* p = dynamic_cast<PauseMenuScene*>(m_scene_manager.get_active_scene()); p)
             {
-                m_running = false;
+                m_scene_manager.pop();
             }
-        }
-        const auto& io = ImGui::GetIO();
 
-        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
-        {
-            input::get_input().handle_input(e);
+            m_scene_manager.push<PauseMenuScene>();
+            const auto& io = ImGui::GetIO();
+
+            if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
+            {
+                input::get_input().handle_input(e);
+            }
         }
     }
 }
-
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
