@@ -64,6 +64,7 @@ enum class EAction
     SpeedUp,
     SpeedDown,
     Pause,
+    Quit,
 
     Count
 };
@@ -91,6 +92,7 @@ inline std::string action_to_string(const EAction action)
         case EAction::SpeedUp: return "SpeedUp";
         case EAction::SpeedDown: return "SpeedDown";
         case EAction::Pause: return "Pause";
+        case EAction::Quit: return "Quit";
     }
     return "Action not added to to_string";
 }

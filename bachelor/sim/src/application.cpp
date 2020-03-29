@@ -120,8 +120,9 @@ bool Application::init_input()
 
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
-
-    /* TODO: Fix to not return true */
+    inputs.fast_bind_key(input::EKeyContext::DefaultContext, SDL_SCANCODE_ESCAPE, input::EAction::Quit, [this] {
+        m_running = false;
+    });
 
     return true;
 }
