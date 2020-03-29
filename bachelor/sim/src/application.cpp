@@ -63,21 +63,19 @@ void Application::handle_input()
     while (SDL_PollEvent(&e))
     {
         ImGui_ImplSDL2_ProcessEvent(&e);
-        if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+
+        if (e.type == SDL_QUIT)
         {
-            if (auto* p = dynamic_cast<PauseMenuScene*>(m_scene_manager.get_active_scene()); p)
+            if (m_window.confirm_dialog("Quit?", "Do you really want to quit?"))
             {
-                m_scene_manager.pop();
-                continue;
+                m_running = false;
             }
+        }
 
-            m_scene_manager.push<PauseMenuScene>();
-            const auto& io = ImGui::GetIO();
-
-            if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
-            {
-                input::get_input().handle_input(e);
-            }
+        const auto& io = ImGui::GetIO();
+        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
+        {
+            input::get_input().handle_input(e);
         }
     }
 }
@@ -288,6 +286,7 @@ bool Application::init_imgui()
 
 void Application::deinit()
 {
+    m_scene_manager.clear();
     input::get_input().save_binding_to_file();
     deinit_preferences();
     deinit_imgui();
