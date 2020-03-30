@@ -414,8 +414,6 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
         /** Figure out "type" of mother and spawn a child based on that */
 
-        auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
-
         /** Give a Pregnancy component to the mother */
         auto* rc_m = m_registry.try_get<component::Reproduction>(mother);
         auto* rc_f = m_registry.try_get<component::Reproduction>(father);
@@ -434,13 +432,29 @@ void ScenarioScene::bind_scenario_lua_functions()
             cs::component::Pregnancy* preg;
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
-                preg                        = &m_registry.assign<component::Pregnancy>(mother);
-                preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->deviation);
+                preg = &m_registry.assign<component::Pregnancy>(mother);
+                if (rc_m->deviation > 0)
+                {
+                    preg->children_in_pregnancy = m_rng.normal(rc_m->mean_children_pp, rc_m->deviation);
+                }
+                else
+                {
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
+                }
+                preg->other_parent = father;
             }
             else
             {
-                preg                        = &m_registry.assign<component::Pregnancy>(father);
-                preg->children_in_pregnancy = m_rng.normal(rc_m->mean_children_pp, rc_m->deviation);
+                preg = &m_registry.assign<component::Pregnancy>(father);
+                if (rc_f->deviation > 0)
+                {
+                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->deviation);
+                }
+                else
+                {
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
+                }
+                preg->other_parent = mother;
             }
             if (preg->children_in_pregnancy <= 0)
             {
