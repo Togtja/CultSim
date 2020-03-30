@@ -129,6 +129,8 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Attack>("AttackComponent", "damage", &component::Attack::damage);
 
+    lua.new_usertype<component::Age>("AgeComponent", "max_age", &component::Age::max_age);
+
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
 }
