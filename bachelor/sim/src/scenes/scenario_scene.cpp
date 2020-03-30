@@ -88,6 +88,10 @@ void ScenarioScene::initialize_simulation()
         }
     }
 
+    /** Enforce the use of a rendering system */
+    m_draw_systems.emplace_back(
+        new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
 }
@@ -109,11 +113,11 @@ void ScenarioScene::clean_simulation()
     }
     m_active_systems.clear();
 
-    for (auto& system : m_inactive_systems)
+    for (auto& system : m_draw_systems)
     {
         system->initialize();
     }
-    m_inactive_systems.clear();
+    m_draw_systems.clear();
 
     /** Clean up event handlers and binders */
     for (auto& handler : m_lua_event_handlers)
@@ -149,23 +153,6 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    dt *= m_timescale;
-    m_simtime += dt;
-
-    // TODO : Move to input action response
-    update_entity_hover();
-
-    setup_docking_ui();
-    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
-    draw_scenario_information_ui();
-    draw_time_control_ui();
-    draw_notifications(dt);
-    draw_selected_entity_information_ui();
-
-    /** Sample data */
-    m_data_collector.update(dt);
-    m_data_collector.show_ui();
-
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
@@ -179,16 +166,34 @@ bool ScenarioScene::update(float dt)
         }
     }
 
-    /** Update systems */
-    for (auto&& system : m_active_systems)
-    {
-        system->update(dt);
-    }
+    // TODO : Move to input action response
+    update_entity_hover();
 
-    /** Deal with long running tasks, then events */
-    m_scheduler.update(dt);
-    m_dispatcher.update();
-    m_scenario.update(dt);
+    setup_docking_ui();
+    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
+    draw_scenario_information_ui();
+    draw_time_control_ui();
+    draw_notifications(dt);
+    draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.show_ui();
+
+    for (int i = 0; i < m_timescale; ++i)
+    {
+        m_data_collector.update(dt);
+
+        /** Update systems */
+        for (auto&& system : m_active_systems)
+        {
+            system->update(dt);
+        }
+
+        /** Deal with long running tasks, then events */
+        m_scheduler.update(dt);
+        m_dispatcher.update();
+        m_scenario.update(dt);
+    }
 
     /** It's supposed to be three of these here, do not change - not a bug */
 
@@ -205,6 +210,12 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
+    for (const auto& system : m_draw_systems)
+    {
+        /** Pass 0, since draw systems don't need time */
+        system->update(0.f);
+    }
+
     auto& r_debug = gfx::get_renderer().debug();
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
     m_scenario.draw();
@@ -599,7 +610,7 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 1.f;
     }
     ImGui::SameLine();
-    if (ImGui::Button("2.5x", {36, 24}))
+    if (ImGui::Button("2x", {36, 24}))
     {
         m_timescale = 2.5f;
     }
