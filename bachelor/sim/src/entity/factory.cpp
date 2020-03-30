@@ -152,6 +152,10 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
     }
     else if (table["fertility"].get_type() == sol::type::boolean && table["fertility"].get<bool>())
     {
+        if (!table["start_fertility"].valid() || !table["peak_fertility"].valid() || !table["end_fertility"].valid())
+        {
+            spdlog::get("lua")->critical("fertility is true, so you need to set start, peak and end fertility");
+        }
         repl.has_fertility   = true;
         repl.start_fertility = table["start_fertility"].get<float>();
         repl.peak_fertility  = table["peak_fertility"].get<float>();
