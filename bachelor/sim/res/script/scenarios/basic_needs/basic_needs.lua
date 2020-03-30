@@ -22,7 +22,6 @@ scenario.systems = {
     "TimerSystem",
     "MovementSystem",
     "InventorySystem",
-    "RenderingSystem",
     "HealthSystem",
     "DeletionSystem"
 }

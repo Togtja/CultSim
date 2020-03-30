@@ -27,6 +27,11 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
 }
 
+void SpriteRenderer::clear()
+{
+    m_nsprites = 0u;
+}
+
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
     m_instance_data[m_nsprites++] = {pos, color, tex};
@@ -41,8 +46,6 @@ void SpriteRenderer::display()
     glBindVertexArray(m_vao);
 
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
-
-    m_nsprites = 0u;
 }
 
 SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std::string& nrpath)
