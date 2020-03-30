@@ -114,7 +114,8 @@ struct Age
 {
     float current_age{};
 
-    float max_age{};
+    float average_life_expectancy{};
+
 };
 
 struct DropItems
