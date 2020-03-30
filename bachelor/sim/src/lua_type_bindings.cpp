@@ -44,13 +44,19 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable},
                         {"Reproduce", ETag::TAG_Reproduce},
-                        {"Human", ETag::TAG_Human},
+                        {"Creature", ETag::TAG_Creature},
                         {"Tag", ETag::TAG_Tag},
                         {"Gather", ETag::TAG_Gather},
                         {"Reserved", ETag::TAG_Reserved},
                         {"Delete", ETag::TAG_Delete},
+                        {"Carnivore", ETag::TAG_Carnivore},
+                        {"Herbivore", ETag::TAG_Herbivore},
+                        {"Omnivore", ETag::TAG_Omnivore},
+                        {"Meat", ETag::TAG_Meat},
+                        {"Veggie", ETag::TAG_Veggie},
                         {"Inventory", ETag::TAG_Inventory},
                         {"Consume", ETag::TAG_Consume}});
+                       });
 }
 
 void bind_components(sol::state_view lua)
@@ -68,7 +74,9 @@ void bind_components(sol::state_view lua)
                                "vitality",
                                &ai::Need::vitality,
                                "tags",
-                               &ai::Need::tags);
+                               &ai::Need::tags,
+                               "weight_func",
+                               &ai::Need::weight_func);
 
     lua.new_usertype<action::Action>("Action",
                                      "name",
@@ -136,6 +144,8 @@ void bind_components(sol::state_view lua)
                                       &component::Need::leisure_needs);
 
     lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
+
+    lua.new_usertype<component::Attack>("AttackComponent", "damage", &component::Attack::damage);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);

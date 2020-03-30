@@ -21,6 +21,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"ReproductionComponent", spawn_reproduction_component},
                           {"StrategyComponent", spawn_strategy_component},
                           {"HealthComponent", spawn_health_component},
+                          {"AttackComponent", spawn_attack_component},
                           {"MemoryComponent", spawn_memory_component},
                           {"TimerComponent", spawn_timer_component},
                           {"InventoryComponent", spawn_inventory_component}};
@@ -118,12 +119,18 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 
     for (const auto& need_table : required_needs)
     {
-        need.needs.push_back(ai::Need{need_table["name"].get<std::string>(),
-                                      need_table["weight"].get<float>(),
-                                      need_table["status"].get<float>(),
-                                      need_table["decay_rate"].get<float>(),
-                                      need_table["vitality"].get<float>(),
-                                      need_table["tags"].get<ETag>()});
+        auto need_struct = ai::Need{need_table["name"].get<std::string>(),
+                                    need_table["weight"].get<float>(),
+                                    need_table["status"].get<float>(),
+                                    need_table["decay_rate"].get<float>(),
+                                    need_table["vitality"].get<float>(),
+                                    need_table["tags"].get<ETag>()};
+
+        if (need_table["weight_func"].get_type() == sol::type::function)
+        {
+            need_struct.weight_func = need_table["weight_func"].get<sol::function>();
+        }
+        need.needs.push_back(need_struct);
     }
 
     for (const auto& need_table : leisure_needs)
@@ -193,6 +200,12 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
                                              table["health"].get<float>(),
                                              table["tickdown_rate"].get<float>(),
                                              table["vital_needs"].get<ETag>());
+    return true;
+}
+
+bool spawn_attack_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign_or_replace<component::Attack>(e, table["damage"].get<float>());
     return true;
 }
 

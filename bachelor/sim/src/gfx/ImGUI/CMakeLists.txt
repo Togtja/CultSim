@@ -24,4 +24,7 @@ target_sources(
     ${CMAKE_CURRENT_LIST_DIR}/imstb_rectpack.h
     ${CMAKE_CURRENT_LIST_DIR}/imstb_textedit.h
     ${CMAKE_CURRENT_LIST_DIR}/imstb_truetype.h
+
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_plot.h
+    ${CMAKE_CURRENT_LIST_DIR}/imgui_plot.cpp
 )

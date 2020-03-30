@@ -2,13 +2,21 @@
 -- Likewise, not all needs are used in every scenario
 
 needs = {
-    hunger = {
-        name = "Hunger",
+    hunger_herb = {
+        name = "Hunger for Plant",
         weight = 3.0,
         status = random:uniform(50.0, 100.0),
         decay_rate = 0.5,
         vitality = 0.5,
-        tags = ETag.Food
+        tags = ETag.Food | ETag.Veggie
+    },
+    hunger_carn = {
+        name = "Hunger for Meat",
+        weight = 3.0,
+        status = random:uniform(50.0, 100.0),
+        decay_rate = 0.2,
+        vitality = 0.5,
+        tags = ETag.Food | ETag.Meat
     },
     thirst = {
         name = "Thirst",
