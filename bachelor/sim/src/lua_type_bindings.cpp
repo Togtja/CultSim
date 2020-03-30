@@ -97,6 +97,8 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Inventory>("InventoryComponent",
                                            "max_size",
                                            &component::Inventory::max_size,
+                                           "size",
+                                           &component::Inventory::size,
                                            "tags",
                                            &component::Inventory::tags,
                                            "contents",

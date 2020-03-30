@@ -78,10 +78,12 @@ actions.gather_food = {
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner,target)
-    if(cultsim.get_component(target,component.tag).tags & ETag.Inventory)then
+    
+    if cultsim.get_component(target, component.tag).tags & ETag.Inventory ~= 0  then
+      log.info("I (" .. target .. ") with tags " ..cultsim.get_component(target, component.tag).tags .." could not be picked up.")
         return
-        end
-        
+        end   
+
     log.info("I (" .. owner .. ") picked up " .. target .. ".")
     cultsim.add_to_inventory(owner,target)
     cultsim.remove_component(target, component.position)

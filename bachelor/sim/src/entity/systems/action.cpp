@@ -57,7 +57,6 @@ void Action::update(float dt)
 
         if (strategy.requirements)
         {
-            spdlog::get("agent")->warn("We have requirements: {}", tag_to_string(strategy.requirements));
             if (strategy.requirements & TAG_Tag)
             {
                 m_context.registry->assign<component::TagRequirement>(e, strategy.target_tags);
@@ -97,6 +96,7 @@ void Action::update(float dt)
             {
                 if ((!m_context.registry->valid(action->target)) || m_context.registry->has<component::Delete>(action->target))
                 {
+                    spdlog::get("agent")->warn("Failed to run action due to either invalid entity or deletion component");
                     action->time_spent    = 0;
                     action->target        = entt::null;
                     strategy.requirements = action->requirements;
@@ -104,12 +104,18 @@ void Action::update(float dt)
                 }
                 if (m_context.rng->trigger(action->success_chance))
                 {
+                    spdlog::get("agent")->warn("We succeeded with an action");
                     action->success(e, action->target);
                     action->time_spent = 0;
                     action->target     = entt::null;
 
+                    spdlog::get("agent")->warn("Currently on working action {}, max {}",
+                                               strategy.working_on_action,
+                                               strategy.actions.size());
+
                     if (strategy.working_on_action < strategy.actions.size())
                     {
+                        spdlog::get("agent")->warn("Upping working action by 1, max {}", strategy.actions.size());
                         strategy.working_on_action++;
                     }
                     else
@@ -117,7 +123,8 @@ void Action::update(float dt)
                         strategies.staged_strategies.clear();
                         return;
                     }
-                    action                = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
+                    action = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
+                    spdlog::get("agent")->warn("Current action : {}", action->name);
                     strategy.requirements = action->requirements;
                 }
 
