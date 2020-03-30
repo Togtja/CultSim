@@ -171,7 +171,11 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
     {
         repl.incubator = table["incubator"].get<component::Reproduction::ESex>();
     }
-
+    if (table["average_gestation"].get_type() == sol::type::number)
+    {
+        repl.average_gestation_period = table["average_gestation"].get<float>();
+        repl.gestation_deviation      = table["gestation_deviation"].get<float>();
+    }
     return true;
 } // namespace detail
 

@@ -441,6 +441,14 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->children_in_pregnancy = rc_f->mean_children_pp;
                 }
+                if (rc_m->gestation_deviation > 0)
+                {
+                    preg->gestation_period = std::round(m_rng.normal(rc_m->average_gestation_period, rc_m->gestation_deviation));
+                }
+                else
+                {
+                    preg->gestation_period = rc_m->average_gestation_period;
+                }
                 preg->other_parent = father;
             }
             else
@@ -453,6 +461,14 @@ void ScenarioScene::bind_scenario_lua_functions()
                 else
                 {
                     preg->children_in_pregnancy = rc_f->mean_children_pp;
+                }
+                if (rc_f->gestation_deviation > 0)
+                {
+                    preg->gestation_period = m_rng.normal(rc_f->average_gestation_period, rc_f->gestation_deviation);
+                }
+                else
+                {
+                    preg->gestation_period = rc_f->average_gestation_period;
                 }
                 preg->other_parent = mother;
             }

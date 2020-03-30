@@ -202,8 +202,9 @@ struct Reproduction
     int mean_children_pp = 1;
     float children_deviation{};
 
-    float fertility    = -1.f;
-    bool has_fertility = false;
+
+    float average_gestation_period{};
+    float gestation_deviation{};
 };
 
 struct Pregnancy
