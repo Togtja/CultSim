@@ -193,6 +193,8 @@ struct Reproduction
     bool lays_eggs = false;
     ESex incubator = Female;
 
+    // If true then users says they has specified start/peak/end fertility
+    bool has_fertility = false;
     // Needs age component to work
     float start_fertility{};
     float peak_fertility{};
@@ -202,6 +204,8 @@ struct Reproduction
     int mean_children_pp = 1;
     float children_deviation{};
 
+    // Static fertility
+    float fertility = 1.f;
 
     float average_gestation_period{};
     float gestation_deviation{};

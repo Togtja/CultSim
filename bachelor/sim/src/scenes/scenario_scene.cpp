@@ -472,7 +472,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 }
                 preg->other_parent = mother;
             }
-            if (preg->children_in_pregnancy <= 0)
+            if (preg->children_in_pregnancy < 1)
             {
                 preg->children_in_pregnancy = 1;
             }
