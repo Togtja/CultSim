@@ -27,6 +27,11 @@ public:
     Renderer& operator=(Renderer&&) = delete;
 
     /**
+     * Clear the contents of all renderers
+     */
+    void clear();
+
+    /**
      * Render contents of all renderers to screen and write required uniforms
      *
      * @warning Do not call the display methods of the renderers manually, use this instead
