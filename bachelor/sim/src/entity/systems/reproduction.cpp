@@ -55,7 +55,13 @@ void Reproduction::update(float dt)
             {
                 const auto new_pos = m_context.registry->get<component::Position>(e).position +
                                      glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
-                spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, new_pos);
+                auto child = spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, new_pos);
+                // Set age to be 0
+                auto age = m_context.registry->try_get<component::Age>(child);
+                if (age)
+                {
+                    age->current_age = 0;
+                }
             }
             repr.number_of_children += preg.children_in_pregnancy;
             if (m_context.registry->valid(preg.other_parent))
