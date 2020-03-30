@@ -37,13 +37,7 @@ void Application::run(const std::vector<char*>& args)
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
     constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
-    auto time_since_tick    = DeltaClock::TimeUnit{0.f};
-
-    /** Do one ImGui 'tick' up front in order to prevent imgui crash on first render iteration */
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame(m_window.get());
-    ImGui::NewFrame();
-    ImGui::Render();
+    auto time_since_tick    = timestep;
 
     /** Main Loop */
     do
@@ -104,6 +98,7 @@ void Application::draw()
 {
     m_scene_manager.draw();
 
+    gfx::get_renderer().clear();
     gfx::get_renderer().display();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
