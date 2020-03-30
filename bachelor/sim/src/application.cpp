@@ -11,7 +11,6 @@
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
 
-
 #include <functional>
 
 #include <gfx/ImGUI/imgui.h>
@@ -130,6 +129,7 @@ bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
     m_lua.open_libraries(sol::lib::base, sol::lib::math);
+    m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
     m_lua.set_function("writeFile", fs::write_file);

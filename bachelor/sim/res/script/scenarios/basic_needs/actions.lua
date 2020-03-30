@@ -44,7 +44,6 @@ actions.drink = {
     time_to_complete = 2.0,
     success_chance = 0.9,
     success = function(owner, target)
-        log.info("I (" .. owner .. ") drink-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Drink, 85.0)
         cultsim.kill(target)
     end,
@@ -62,7 +61,6 @@ actions.eat = {
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
-        log.info("I (" .. owner .. ") eat-killed " .. target .. "!")
         cultsim.modify_need(owner, ETag.Food, 60.0)
         cultsim.kill(target)
     end,
@@ -71,6 +69,47 @@ actions.eat = {
     end,
     abort = function(owner, target)
         local tag_component = cultsim.get_component(owner, component.tag)
+    end
+}
+
+actions.gather_food = {
+    name = "Forage",
+    requirements = ETag.Find,
+    time_to_complete = 2.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+    
+    if cultsim.get_component(target, component.tag).tags & ETag.Inventory ~= 0  then
+      log.info("I (" .. target .. ") with tags " ..cultsim.get_component(target, component.tag).tags .." could not be picked up.")
+        return
+        end   
+
+    log.info("I (" .. owner .. ") picked up " .. target .. ".")
+    cultsim.add_to_inventory(owner,target)
+    cultsim.remove_component(target, component.position)
+
+    end,
+    failure = function(owner, target)
+    log.info("I (" .. owner .. ") failed to pick up " .. target .. ".")
+    end,
+    abort = function(owner, target)
+    end
+}
+
+actions.eat_from_inventory = {
+    name = "Eat from inventory",
+    requirements = ETag.Inventory,
+    time_to_complete = 5.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+        log.info("I (" .. owner .. ") ate ".. target .." from my backpack.")
+        cultsim.modify_need(owner, ETag.Food, 60.0)
+        cultsim.remove_from_inventory(owner,target)
+        cultsim.kill(target)
+    end,
+    failure = function(owner,target)
+    end,
+    abort = function(owner,target)
     end
 }
 

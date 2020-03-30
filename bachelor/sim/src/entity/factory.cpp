@@ -23,7 +23,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"HealthComponent", spawn_health_component},
                           {"AttackComponent", spawn_attack_component},
                           {"MemoryComponent", spawn_memory_component},
-                          {"TimerComponent", spawn_timer_component}};
+                          {"TimerComponent", spawn_timer_component},
+                          {"InventoryComponent", spawn_inventory_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -113,7 +114,9 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& need = reg.assign_or_replace<component::Need>(e);
 
-    const auto& required_needs = table["needs"].get_or<std::vector<sol::table>>({});
+    const auto& required_needs = table["required_needs"].get_or<std::vector<sol::table>>({});
+    const auto& leisure_needs  = table["leisure_needs"].get_or<std::vector<sol::table>>({});
+
     for (const auto& need_table : required_needs)
     {
         auto need_struct = ai::Need{need_table["name"].get<std::string>(),
@@ -130,6 +133,15 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
         need.needs.push_back(need_struct);
     }
 
+    for (const auto& need_table : leisure_needs)
+    {
+        need.leisure_needs.push_back(ai::Need{need_table["name"].get<std::string>(),
+                                              need_table["weight"].get<float>(),
+                                              need_table["status"].get<float>(),
+                                              need_table["decay_rate"].get<float>(),
+                                              need_table["vitality"].get<float>(),
+                                              need_table["tags"].get<ETag>()});
+    }
     return true;
 }
 
@@ -151,9 +163,9 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
     for (const auto& strategy_table : available_strategies)
     {
         ai::Strategy strategy{};
-        strategy.name = strategy_table["name"].get<std::string>();
-        strategy.tags = strategy_table["tags"].get<ETag>();
-
+        strategy.name        = strategy_table["name"].get<std::string>();
+        strategy.tags        = strategy_table["tags"].get<ETag>();
+        strategy.target_tags = strategy_table["target_tags"].get<ETag>();
         /** Get the actions for this strategy */
         const auto& actions = strategy_table["actions"].get_or<std::vector<sol::table>>({});
         for (const auto& action_table : actions)
@@ -218,6 +230,13 @@ bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table
     auto& timer_component           = reg.assign_or_replace<component::Timer>(e, table["time_to_complete"].get<float>());
     timer_component.number_of_loops = table["number_of_loops"].get<int>();
     timer_component.on_complete     = table["on_complete"].get<sol::function>();
+    return true;
+}
+
+bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& inventory_component    = reg.assign_or_replace<component::Inventory>(e);
+    inventory_component.max_size = table["max_size"].get<uint16_t>();
     return true;
 }
 

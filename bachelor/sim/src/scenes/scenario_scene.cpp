@@ -52,6 +52,7 @@ void ScenarioScene::initialize_simulation()
     /** Run all initialization functions from Lua and required once for this scenario */
     m_context->lua_state["random"] = &m_rng;
     bind_actions_for_scene();
+    bind_available_lua_events();
     bind_scenario_lua_functions();
     m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
@@ -86,6 +87,9 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Notify the scenario is loaded */
+    m_dispatcher.enqueue<event::ScenarioLoaded>();
 }
 
 void ScenarioScene::clean_simulation()
@@ -96,6 +100,7 @@ void ScenarioScene::clean_simulation()
     m_simtime   = 0.f;
     m_timescale = 1.f;
     m_data_collector.clear();
+    m_notifications.clear();
 
     /** Deinitialize systems and then clear them */
     for (auto& system : m_active_systems)
@@ -109,6 +114,14 @@ void ScenarioScene::clean_simulation()
         system->initialize();
     }
     m_inactive_systems.clear();
+
+    /** Clean up event handlers and binders */
+    for (auto& handler : m_lua_event_handlers)
+    {
+        handler->connection.release();
+    }
+    m_lua_event_handlers.clear();
+    m_lua_ebinder.clear();
 }
 
 void ScenarioScene::reset_simulation()
@@ -146,6 +159,7 @@ bool ScenarioScene::update(float dt)
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
     draw_time_control_ui();
+    draw_notifications(dt);
     draw_selected_entity_information_ui();
 
     /** Sample data */
@@ -176,7 +190,8 @@ bool ScenarioScene::update(float dt)
     m_dispatcher.update();
     m_scenario.update(dt);
 
-    /** It's supposed to be two of these here, do not change - not a bug */
+    /** It's supposed to be three of these here, do not change - not a bug */
+
     ImGui::End();
     ImGui::End();
 
@@ -298,6 +313,12 @@ void ScenarioScene::bind_actions_for_scene()
     });
 }
 
+void ScenarioScene::bind_available_lua_events()
+{
+    m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
+                     {"ScenarioLoaded", &lua_binder<event::ScenarioLoaded>}};
+}
+
 void ScenarioScene::bind_scenario_lua_functions()
 {
     /** Helpful to make following code shorter and more readable, copying is fine here, it's just a pointer */
@@ -357,7 +378,22 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
         }
     });
-
+    cultsim.set_function("remove_component", [this](sol::this_state s, entt::entity e, uint32_t id) {
+        switch (id)
+        {
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
+            case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
+            case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
+            case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
+            case entt::type_info<component::Tags>::id(): m_registry.remove_if_exists<component::Tags>(e); break;
+            case entt::type_info<component::Need>::id(): m_registry.remove_if_exists<component::Need>(e); break;
+            case entt::type_info<component::Reproduction>::id(): m_registry.remove_if_exists<component::Reproduction>(e); break;
+            case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
+            case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
+            case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            default: break;
+        }
+    });
     /** Helper action to modify an entity need */
     cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
@@ -372,12 +408,54 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
+    cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+        if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
+        {
+            if (inventory->size < inventory->max_size)
+            {
+                auto tags = m_registry.try_get<component::Tags>(target);
+                m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
+                tags->tags = ETag(tags->tags | TAG_Inventory);
+                inventory->contents.push_back(target);
+                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+            }
+        }
+    });
+
+    cultsim.set_function("remove_from_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+        if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
+        {
+            int i = 0;
+            for (auto& content : inventory->contents)
+            {
+                if (content == target)
+                {
+                    inventory->contents.erase(inventory->contents.begin() + i);
+                }
+                i++;
+            }
+        }
+    });
+
     /** Apply Damage */
     cultsim.set_function("apply_basic_damage", [this](sol::this_state s, entt::entity e, float damage) {
         if (auto* health = m_registry.try_get<component::Health>(e); health)
         {
             health->health -= damage;
         }
+    });
+
+    /* Function to allow lua to connect to events */
+    cultsim.set_function("connect", [this](const std::string& event_name, sol::function func) {
+        auto handle        = std::make_unique<LuaEventHandle>();
+        handle->func       = func;
+        handle->connection = m_lua_ebinder.at(event_name)(m_dispatcher, handle->func);
+        m_lua_event_handlers.emplace_back(std::move(handle));
+    });
+
+    /** Send notification */
+    cultsim.set_function("notify", [this](std::string title, std::string information, float duration = 4.f) {
+        m_notifications.push_back({std::move(title), std::move(information), -duration});
     });
 
     /** Spawn entity functions */
@@ -508,6 +586,42 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Separator();
 }
 
+void ScenarioScene::draw_notifications(float dt)
+{
+    if (m_notifications.empty())
+    {
+        return;
+    }
+
+    /** Set up notification window area */
+    ImGui::SetNextWindowPos({m_resolution.x - 50.f, 50.f}, ImGuiCond_Always, {1, 0});
+    ImGui::SetNextWindowSize({260.f, m_notifications.size() * 60.f});
+    ImGui::SetNextWindowBgAlpha(0.6f);
+    ImGui::Begin("Notifications", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs);
+
+    /** Draw all notifications */
+    for (auto itr = m_notifications.rbegin(); itr != m_notifications.rend(); ++itr)
+    {
+        auto& notification = *itr;
+        notification.time_shown += dt;
+
+        /** Show current */
+        if (ImGui::BeginChild("Notification", {250, 0}, true, ImGuiWindowFlags_NoTitleBar))
+        {
+            ImGui::Text("%s", notification.title.c_str());
+            ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.f}, "%s", notification.information.c_str());
+        }
+        ImGui::EndChild();
+    }
+
+    ImGui::End();
+
+    /** Get rid of old notifications */
+    m_notifications.erase(
+        std::remove_if(m_notifications.begin(), m_notifications.end(), [](const Notification& n) { return n.time_shown > 0.f; }),
+        m_notifications.end());
+}
+
 void ScenarioScene::draw_time_control_ui()
 {
     ImGui::SetNextWindowPos({m_resolution.x / 2.f, 0.f}, 0, {0.5f, 0.f});
@@ -593,10 +707,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (!strategy->staged_strategies.empty())
         {
-            ImGui::Text("Currently: %s", strategy->staged_strategies.front().name.c_str());
-            if (!strategy->staged_strategies.front().actions.empty())
+            ImGui::Text("Currently: %s", strategy->staged_strategies.back().name.c_str());
+            if (!strategy->staged_strategies.back().actions.empty())
             {
-                const auto& action = strategy->staged_strategies.front().actions.front();
+                const auto& action = strategy->staged_strategies.back().actions.back();
                 if (action.time_spent > 0.f)
                 {
                     ImGui::Indent();
