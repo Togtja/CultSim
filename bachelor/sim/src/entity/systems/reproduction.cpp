@@ -63,9 +63,9 @@ void Reproduction::delete_father(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Pregnancy>();
     view.each([&event](component::Pregnancy& preg) {
-        if (preg.father == event.entity)
+        if (preg.other_parent == event.entity)
         {
-            preg.father = entt::null;
+            preg.other_parent = entt::null;
         }
     });
 }

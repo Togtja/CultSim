@@ -211,7 +211,7 @@ struct Pregnancy
     float time_since_start{};
     float gestation_period{};
 
-    entt::entity father{};
+    entt::entity other_parent{};
 
     uint16_t children_in_pregnancy{};
 };

@@ -446,10 +446,6 @@ void ScenarioScene::bind_scenario_lua_functions()
             {
                 preg->children_in_pregnancy = 1;
             }
-            if (m_registry.valid(father))
-            {
-                preg->father = father;
-            }
         }
     });
 }
