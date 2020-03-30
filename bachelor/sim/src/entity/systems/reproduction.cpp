@@ -21,7 +21,9 @@ void Reproduction::update(float dt)
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
         if (auto age = m_context.registry->try_get<component::Age>(e); age)
         {
-            repr.fertility = std::clamp(100.f - (age->current_age - age->max_age), 0.f, 100.f);
+            float age_difference   = age->current_age / (age->max_age + 0.01f);
+            float fertility_reduction = std::clamp(0 + 100 * age_difference, 0.f, 100.f);
+            repr.fertility = std::clamp(100.f -fertility_reduction, 0.f, 100.f);
         }
         else
         {
