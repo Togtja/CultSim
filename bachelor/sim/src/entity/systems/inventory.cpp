@@ -6,24 +6,17 @@
 
 namespace cs::system
 {
-void Inventory::initialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Inventory::drop_items>(*this);
-}
-
-void Inventory::deinitialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Inventory::drop_items>(*this);
-}
-
 void Inventory::update(float dt)
 {
     CS_AUTOTIMER(Inventory System);
 
     auto& registry = *m_context.registry;
-    auto view      = registry.view<component::Inventory>();
+    auto view      = registry.view<component::Inventory, component::Tags, component::Position>();
 
-    view.each([this, dt, &registry](entt::entity e, component::Inventory& inventory) {
+    view.each([this, dt, &registry](entt::entity e,
+                                    component::Inventory& inventory,
+                                    const component::Tags& tags,
+                                    const component::Position& pos) {
         if (inventory.size != inventory.contents.size())
         {
             inventory.size = inventory.contents.size();
@@ -33,6 +26,7 @@ void Inventory::update(float dt)
                 if (auto component_tags = registry.try_get<component::Tags>(component); component_tags)
                 {
                     tags = ETag(tags | component_tags->tags);
+                    tags = ETag(tags & ~TAG_Inventory);
                 }
                 else
                 {
@@ -40,6 +34,22 @@ void Inventory::update(float dt)
                 }
             }
             inventory.tags = tags;
+        }
+        if (tags.tags & TAG_Delete)
+        {
+            for (entt::entity component : inventory.contents)
+            {
+                glm::vec3 new_pos{pos.position.x + m_context.rng->uniform(-10.f, 10.f),
+                                  pos.position.y + m_context.rng->uniform(-10.f, 10.f),
+                                  pos.position.z};
+                m_context.registry->assign_or_replace<component::Position>(component, new_pos);
+
+                if (auto tags = m_context.registry->try_get<component::Tags>(component); tags)
+                {
+                    tags->tags = ETag(tags->tags & ~TAG_Inventory);
+                }
+            }
+            inventory.contents.clear();
         }
     });
 }
@@ -49,23 +59,4 @@ ISystem* Inventory::clone()
     return new Inventory(m_context);
 }
 
-void Inventory::drop_items(const event::DeleteEntity& event)
-{
-    if (auto inventory = m_context.registry->try_get<component::Inventory>(event.entity); inventory)
-    {
-        if (auto pos = m_context.registry->try_get<component::Position>(event.entity); pos)
-        {
-            for (entt::entity component : inventory->contents)
-            {
-                if (!m_context.registry->has<component::Position>(component))
-                {
-                    m_context.registry->assign<component::Position>(component,
-                                                                    glm::vec3{pos->position.x + m_context.rng->uniform(0.f, 10.f),
-                                                                              pos->position.y + m_context.rng->uniform(0.f, 10.f),
-                                                                              pos->position.z});
-                }
-            }
-        }
-    }
-}
 } // namespace cs::system

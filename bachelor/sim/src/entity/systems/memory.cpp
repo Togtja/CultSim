@@ -100,8 +100,8 @@ void Memory::update(float dt)
                                       cost_lhs += res_lhs->m_time_since_creation;
                                       cost_rhs += res_rhs->m_time_since_creation;
 
-                                      // Make sure that memories that have aged past retention_time are moved to the back of the
-                                      // list
+                                      /** Make sure that memories that have aged past retention_time are moved to the back of the
+                                       list */
                                       if (res_lhs->m_time_since_creation > memory.max_retention_time)
                                       {
                                           cost_lhs += 1000.f;
@@ -110,6 +110,17 @@ void Memory::update(float dt)
                                       if (res_rhs->m_time_since_creation > memory.max_retention_time)
                                       {
                                           cost_rhs += 1000.f;
+                                      }
+
+                                      /**Make sure entities that have no entities are rated a lot lower than others */
+                                      if (res_lhs->m_number_of_entities == 0)
+                                      {
+                                          cost_lhs += 1000.f;
+                                      }
+
+                                      if (res_rhs->m_number_of_entities == 0)
+                                      {
+                                          cost_rhs += 100.f;
                                       }
 
                                       return cost_lhs < cost_rhs;

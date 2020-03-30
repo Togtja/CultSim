@@ -18,6 +18,13 @@ struct ArrivedAtDestination
     glm::vec3 position{};
 };
 
+/**
+ * Event for when a scenario has finished loading
+ */
+struct ScenarioLoaded
+{
+};
+
 struct SensedEntity
 {
     entt::entity entity{};
@@ -76,5 +83,14 @@ struct CreatedMemory
 struct DeleteEntity
 {
     entt::entity entity{};
+};
+
+struct PickedUpEntity
+{
+    entt::entity owner{};
+
+    entt::entity target{};
+
+    ETag tags{};
 };
 } // namespace cs::event
