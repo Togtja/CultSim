@@ -49,13 +49,13 @@ void Reproduction::update(float dt)
         preg.time_since_start += dt;
         if (preg.time_since_start >= preg.gestation_period)
         {
-            const auto& parent_meta = m_context.registry->get<component::Meta>(e);
+            const auto parent_name = m_context.registry->get<component::Meta>(e).name;
 
             for (int i = 0; i < preg.children_in_pregnancy; i++)
             {
                 const auto new_pos = m_context.registry->get<component::Position>(e).position +
                                      glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
-                spawn_entity(*m_context.registry, *m_context.lua_state, parent_meta.name, new_pos);
+                spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, new_pos);
             }
             repr.number_of_children += preg.children_in_pregnancy;
             if (m_context.registry->valid(preg.other_parent))
