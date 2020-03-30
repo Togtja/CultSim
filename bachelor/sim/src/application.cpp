@@ -96,9 +96,10 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    gfx::get_renderer().clear();
+
     m_scene_manager.draw();
 
-    gfx::get_renderer().clear();
     gfx::get_renderer().display();
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
