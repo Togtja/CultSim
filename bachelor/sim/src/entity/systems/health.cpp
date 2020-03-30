@@ -24,7 +24,6 @@ void Health::update(float dt)
                 }
             }
         }
-
         if (health.health <= 0.f)
         {
             m_context.registry->assign<component::Delete>(e);
@@ -36,7 +35,19 @@ void Health::update(float dt)
             return;
         }
 
-        health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
+        if (auto age = m_context.registry->try_get<component::Age>(e); age)
+        {
+            age->current_age += dt;
+            /** +0.01 just to avoid crashes for max_age == 0*/
+            float age_difference   = age->current_age / age->max_age + 0.01;
+            float health_reduction = std::clamp(0 + 100 * age_difference, 0.f, 100.f);
+
+            health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100 - health_reduction);
+        }
+        else
+        {
+            health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
+        }
     });
 }
 
