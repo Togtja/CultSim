@@ -31,16 +31,16 @@ void Reproduction::update(float dt)
             auto age_fertile = age->current_age - repr.peak_fertility;
             if (age_fertile < 0)
             {
-                repr.fertility = (1 + (age_fertile / repr.end_fertility));
+                repr.fertility = (1.f + (age_fertile / repr.end_fertility));
             }
             else
             {
-                repr.fertility = (1 - (age_fertile / repr.end_fertility));
+                repr.fertility = (1.f - (age_fertile / repr.end_fertility));
             }
         }
-        else
+        if (repr.fertility < 0)
         {
-            repr.fertility = 100.f - (repr.number_of_children * 10.f);
+            repr.fertility = 0;
         }
     });
 
