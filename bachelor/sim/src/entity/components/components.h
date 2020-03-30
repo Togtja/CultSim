@@ -191,6 +191,8 @@ struct Reproduction
     uint16_t number_of_children{};
 
     bool lays_eggs = false;
+    std::string egg_type;
+
     ESex incubator = Female;
 
     // If true then users says they has specified start/peak/end fertility
@@ -216,7 +218,8 @@ struct Pregnancy
     float time_since_start{};
     float gestation_period{};
 
-    entt::entity other_parent{};
+    // Index 0 is incubator, index 1 is the other parent (In Humans: Index 0 is Mom, index 2 is Dad)
+    entt::entity parents[2] = {entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
 };

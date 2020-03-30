@@ -449,7 +449,8 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_m->average_gestation_period;
                 }
-                preg->other_parent = father;
+                preg->parents[0] = mother;
+                preg->parents[1] = father;
             }
             else
             {
@@ -470,7 +471,9 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_f->average_gestation_period;
                 }
-                preg->other_parent = mother;
+                // Here the incubator is the dad
+                preg->parents[1] = mother;
+                preg->parents[0] = father;
             }
             if (preg->children_in_pregnancy < 1)
             {

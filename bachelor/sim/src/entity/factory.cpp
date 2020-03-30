@@ -165,6 +165,10 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
     if (table["lays_eggs"].get_type() == sol::type::boolean)
     {
         repl.lays_eggs = table["lays_eggs"].get<bool>();
+        if (repl.lays_eggs && table["egg_type"].valid())
+        {
+            repl.egg_type = table["egg_type"].get<std::string>();
+        }
     }
 
     if (table["incubator"].valid())
