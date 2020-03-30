@@ -56,7 +56,6 @@ void bind_dataonly(sol::state_view lua)
                         {"Veggie", ETag::TAG_Veggie},
                         {"Inventory", ETag::TAG_Inventory},
                         {"Consume", ETag::TAG_Consume}});
-                       });
 }
 
 void bind_components(sol::state_view lua)

@@ -34,29 +34,11 @@ enum ETag : uint64_t
 inline std::string tag_to_string(ETag tag)
 {
     std::string result{};
-<<<<<<< bachelor/sim/src/entity/components/tags.h
-    std::vector<std::string> tag_names{"None",
-                                       "Food",
-                                       "Drink",
-                                       "Sleep",
-                                       "Joy",
-                                       "Location",
-                                       "Find",
-                                       "Vision",
-                                       "Avoidable",
-                                       "Reproduce",
-                                       "Human",
-                                       "Tag",
-                                       "Gather",
-                                       "Delete",
-                                       "Reserved",
-                                       "Inventory",
-                                       "Consume"};
-=======
-    std::vector<std::string> tag_names{"None",     "Food",      "Drink",     "Sleep",    "Joy",  "Location", "Find",
-                                       "Vision",   "Avoidable", "Reproduce", "Creature", "Tag",  "Gather",   "Delete",
-                                       "Reserved", "Carnivore", "Herbivore", "Omnivore", "Meat", "Veggie"};
->>>>>>> bachelor/sim/src/entity/components/tags.h
+    std::vector<std::string> tag_names{"None",   "Food",   "Drink",     "Sleep",     "Joy",       "Location",
+                                       "Find",   "Vision", "Avoidable", "Reproduce", "Creature",  "Tag",
+                                       "Gather", "Delete", "Reserved",  "Carnivore", "Herbivore", "Omnivore",
+                                       "Meat",   "Veggie", "Inventory", "Consume"};
+
     for (int i = 0; i < tag_names.size(); i++)
     {
         if (tag & 1 << i)
