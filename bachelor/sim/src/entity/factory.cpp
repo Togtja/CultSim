@@ -225,7 +225,7 @@ bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table
 bool spawn_age_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& age_component = reg.assign_or_replace<component::Age>(e);
-    age_component.max_age = table["max_age"].get<float>();
+    age_component.average_life_expectancy = table["life_expectancy"].get<float>();
     return true;
 }
 

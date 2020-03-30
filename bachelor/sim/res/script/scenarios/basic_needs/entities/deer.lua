@@ -42,6 +42,6 @@ entity = {
     },
     AgeComponent = 
     {
-        max_age = 3000.0
+        life_expectancy = 3000.0
     }
 }
