@@ -205,40 +205,8 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    ImGui::Separator();
-    ImGui::Text("GRID");
-    static bool show_grid = false;
-    static int grid_span  = 25;
-    static int grid_size  = 32;
-    ImGui::Checkbox("Show Grid", &show_grid);
-    ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
-    ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
-
     auto& r_debug = gfx::get_renderer().debug();
-    if (show_grid)
-    {
-        for (int i = -grid_span; i <= grid_span; i++)
-        {
-            r_debug.draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(0.3f));
-
-            r_debug.draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
-                              glm::vec3(i * grid_size, grid_size * grid_span, 0),
-                              glm::vec3(0.3f));
-        }
-    }
-    static bool show_axis = false;
-    ImGui::Checkbox("Show Axis", &show_axis);
-    if (show_axis)
-    {
-        r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-        r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-        r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
-    }
-
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
-
     m_scenario.draw();
     return false;
 }

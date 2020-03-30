@@ -34,25 +34,6 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
-    /** Adjust environment */
-    if (ImGui::TreeNode("Environment"))
-    {
-        /** Ok with multi flush since only one can be dragged / frame */
-        if (ImGui::DragFloat3("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        if (ImGui::DragFloat4("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        if (ImGui::DragFloat4("Ambient Color", glm::value_ptr(m_env_ubo.get().ambient_color), 0.01f, 0.0f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        ImGui::TreePop();
-    }
-
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
