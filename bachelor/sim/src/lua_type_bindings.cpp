@@ -70,7 +70,9 @@ void bind_components(sol::state_view lua)
                                "vitality",
                                &ai::Need::vitality,
                                "tags",
-                               &ai::Need::tags);
+                               &ai::Need::tags,
+                               "weight_func",
+                               &ai::Need::weight_func);
 
     lua.new_usertype<action::Action>("Action",
                                      "name",
