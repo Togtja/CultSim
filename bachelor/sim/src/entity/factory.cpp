@@ -140,9 +140,9 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
     repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
     repl.mean_children_pp = table["mean_offspring"].get<int>();
-    if (table["deviation"].get_type() == sol::type::number)
+    if (table["offspring_deviation"].get_type() == sol::type::number)
     {
-        repl.deviation = table["deviation"].get<float>();
+        repl.children_deviation = table["offspring_deviation"].get<float>();
     }
 
     if (table["fertility"].get_type() == sol::type::number)

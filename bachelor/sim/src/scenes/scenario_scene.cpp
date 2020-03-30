@@ -433,9 +433,9 @@ void ScenarioScene::bind_scenario_lua_functions()
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
                 preg = &m_registry.assign<component::Pregnancy>(mother);
-                if (rc_m->deviation > 0)
+                if (rc_m->children_deviation > 0)
                 {
-                    preg->children_in_pregnancy = m_rng.normal(rc_m->mean_children_pp, rc_m->deviation);
+                    preg->children_in_pregnancy = std::round(m_rng.normal(rc_m->mean_children_pp, rc_m->children_deviation));
                 }
                 else
                 {
@@ -446,9 +446,9 @@ void ScenarioScene::bind_scenario_lua_functions()
             else
             {
                 preg = &m_registry.assign<component::Pregnancy>(father);
-                if (rc_f->deviation > 0)
+                if (rc_f->children_deviation > 0)
                 {
-                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->deviation);
+                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->children_deviation);
                 }
                 else
                 {

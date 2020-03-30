@@ -25,8 +25,7 @@ entity = {
     ReproductionComponent = {
         sex = random:randint(0, 1),
         mean_offspring = 20,
-        deviation = 5,
-        fertility = true;
+        offspring_deviation = 5,
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file

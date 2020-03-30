@@ -200,7 +200,7 @@ struct Reproduction
 
     // General Pregnancy stat
     int mean_children_pp = 1;
-    float deviation{};
+    float children_deviation{};
 
     float fertility    = -1.f;
     bool has_fertility = false;
