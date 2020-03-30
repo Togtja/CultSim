@@ -404,11 +404,14 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
-            auto tags = m_registry.try_get<component::Tags>(target);
-            m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
-            tags->tags = ETag(tags->tags | TAG_Inventory);
-            inventory->contents.push_back(target);
-            spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+            if (inventory->size < inventory->max_size)
+            {
+                auto tags = m_registry.try_get<component::Tags>(target);
+                m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
+                tags->tags = ETag(tags->tags | TAG_Inventory);
+                inventory->contents.push_back(target);
+                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+            }
         }
     });
 

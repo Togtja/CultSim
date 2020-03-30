@@ -56,6 +56,8 @@ void Mitigation::update(float dt)
             if (strategies.staged_strategies.empty())
             {
                 RandomEngine rng{};
+                auto result = rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)));
+
                 if (!(add_strategies(strategies,
                                      needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
                                      tags)))
@@ -132,6 +134,11 @@ void Mitigation::switch_need_context(const event::SwitchNeedContext& event)
         m_context.registry->remove_if_exists<component::VisionRequirement>(event.entity);
         m_context.registry->remove_if_exists<component::FindRequirement>(event.entity);
         m_context.registry->remove_if_exists<component::TagRequirement>(event.entity);
+
+        if (auto mov = m_context.registry->try_get<component::Movement>(event.entity); mov)
+        {
+            mov->desired_position.clear();
+        }
     }
 }
 

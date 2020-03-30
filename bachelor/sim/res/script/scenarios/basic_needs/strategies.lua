@@ -18,7 +18,14 @@ strategies.find_food = {
     name = "Looking for Food",
     tags = ETag.Food | ETag.Consume,
     target_tags = ETag.Food,
-    actions = { actions.eat, actions.eat_from_inventory }
+    actions = { actions.eat}
+}
+
+strategies.consume_from_backpack = {
+    name = "Checking backpack for food",
+    tags = ETag.Food |ETag.Consume,
+    target_tags = ETag.Food,
+    actions = {actions.eat_from_inventory}
 }
 
 strategies.sleep_on_ground = {
