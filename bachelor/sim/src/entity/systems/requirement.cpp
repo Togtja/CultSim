@@ -204,19 +204,27 @@ void Requirement::update(float dt)
                                const component::InventoryRequirement& invreqs,
                                const component::Inventory& inv,
                                component::Strategy& strat) {
+        spdlog::get("agent")->warn("We ({}) are looking for an item with tags ({}) in our inventory with tags ({}) and size {}",
+                                   e,
+                                   tag_to_string(invreqs.tags),
+                                   tag_to_string(inv.tags),
+                                   inv.contents.size());
         for (auto content : inv.contents)
         {
             if (auto tags = m_context.registry->try_get<component::Tags>(content);
                 tags && ((tags->tags & invreqs.tags) == invreqs.tags))
             {
+                spdlog::get("agent")->warn("We ({}) have confirmed we have an item with tags ({}) in our inventory ",
+                                           e,
+                                           tag_to_string(invreqs.tags));
                 strat.staged_strategies.back().actions.back().target = content;
                 m_context.registry->remove<component::InventoryRequirement>(e);
                 m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Inventory});
                 return;
             }
-            m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Inventory});
-            m_context.registry->remove<component::InventoryRequirement>(e);
         }
+        m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Inventory});
+        m_context.registry->remove<component::InventoryRequirement>(e);
     });
 }
 

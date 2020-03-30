@@ -26,6 +26,7 @@ void Inventory::update(float dt)
                 if (auto component_tags = registry.try_get<component::Tags>(component); component_tags)
                 {
                     tags = ETag(tags | component_tags->tags);
+                    tags = ETag(tags & ~TAG_Inventory);
                 }
                 else
                 {
@@ -42,6 +43,11 @@ void Inventory::update(float dt)
                                   pos.position.y + m_context.rng->uniform(-10.f, 10.f),
                                   pos.position.z};
                 m_context.registry->assign_or_replace<component::Position>(component, new_pos);
+
+                if (auto tags = m_context.registry->try_get<component::Tags>(component); tags)
+                {
+                    tags->tags = ETag(tags->tags & ~TAG_Inventory);
+                }
             }
             inventory.contents.clear();
         }

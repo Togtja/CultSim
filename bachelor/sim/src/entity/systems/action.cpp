@@ -57,6 +57,7 @@ void Action::update(float dt)
 
         if (strategy.requirements)
         {
+            spdlog::get("agent")->warn("We have requirements: {}", tag_to_string(strategy.requirements));
             if (strategy.requirements & TAG_Tag)
             {
                 m_context.registry->assign<component::TagRequirement>(e, strategy.target_tags);
