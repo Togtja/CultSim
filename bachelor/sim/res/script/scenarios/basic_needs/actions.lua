@@ -91,6 +91,8 @@ actions.reproduce = {
 
         local tag_component = cultsim.get_component(owner, component.tag)
         local their_tags = cultsim.get_component(target,component.tag)
+
+        -- They no longer want to reproduduce
         tag_component.tags = tag_component.tags & ~(ETag.Reproduce)
         their_tags.tags = their_tags.tags & ~(ETag.Reproduce)
 
@@ -100,9 +102,9 @@ actions.reproduce = {
 
 
 
-        -- If we have different sexes and we're the female, then we're impregnated (currently 100% chance)
+        -- If we have different sexes (no need to add the reverse (I Male, They Female) as this will be run on both parters)
         if my_reproduction.sex == ESex.Female and their_reproduction.sex == ESex.Male then
-            cultsim.impregnate(target, owner)
+            cultsim.impregnate(target, owner) -- impregnate takes in (father, mother)
         end
     end,
     failure = function(owner, target)
