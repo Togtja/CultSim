@@ -139,12 +139,37 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 
     repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
-    repl.fertility = table["fertility"].get<float>();
+    repl.mean_children_pp = table["mean_offspring"].get<int>();
+    if (table["deviation"].get_type() == sol::type::number)
+    {
+        repl.deviation = table["deviation"].get<float>();
+    }
 
-    repl.max_children_per_pregnancy = table["mcpp"].get<int>();
+    if (table["fertility"].get_type() == sol::type::number)
+    {
+        repl.fertility     = table["fertility"].get<float>();
+        repl.has_fertility = false;
+    }
+    else if (table["fertility"].get_type() == sol::type::boolean && table["fertility"].get<bool>())
+    {
+        repl.has_fertility   = true;
+        repl.start_fertility = table["start_fertility"].get<float>();
+        repl.peak_fertility  = table["peak_fertility"].get<float>();
+        repl.end_fertility   = table["end_fertility"].get<float>();
+    }
+
+    if (table["lays_eggs"].get_type() == sol::type::boolean)
+    {
+        repl.lays_eggs = table["lays_eggs"].get<bool>();
+    }
+
+    if (table["incubator"].valid())
+    {
+        repl.incubator = table["incubator"].get<component::Reproduction::ESex>();
+    }
 
     return true;
-}
+} // namespace detail
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {
