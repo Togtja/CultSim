@@ -57,6 +57,7 @@ target_link_libraries(
     EnTT::EnTT
     spdlog::spdlog
     taskflow::taskflow
+    ultralight::ultralight
     glm::glm
     doctest
     pcg::pcg
