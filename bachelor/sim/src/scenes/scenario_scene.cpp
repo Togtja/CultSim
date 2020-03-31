@@ -88,6 +88,10 @@ void ScenarioScene::initialize_simulation()
         }
     }
 
+    /** Enforce the use of a rendering system */
+    m_draw_systems.emplace_back(
+        new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
 }
@@ -109,11 +113,11 @@ void ScenarioScene::clean_simulation()
     }
     m_active_systems.clear();
 
-    for (auto& system : m_inactive_systems)
+    for (auto& system : m_draw_systems)
     {
         system->initialize();
     }
-    m_inactive_systems.clear();
+    m_draw_systems.clear();
 
     /** Clean up event handlers and binders */
     for (auto& handler : m_lua_event_handlers)
@@ -149,23 +153,6 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    dt *= m_timescale;
-    m_simtime += dt;
-
-    // TODO : Move to input action response
-    update_entity_hover();
-
-    setup_docking_ui();
-    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
-    draw_scenario_information_ui();
-    draw_time_control_ui();
-    draw_notifications(dt);
-    draw_selected_entity_information_ui();
-
-    /** Sample data */
-    m_data_collector.update(dt);
-    m_data_collector.show_ui();
-
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
@@ -179,16 +166,34 @@ bool ScenarioScene::update(float dt)
         }
     }
 
-    /** Update systems */
-    for (auto&& system : m_active_systems)
-    {
-        system->update(dt);
-    }
+    // TODO : Move to input action response
+    update_entity_hover();
 
-    /** Deal with long running tasks, then events */
-    m_scheduler.update(dt);
-    m_dispatcher.update();
-    m_scenario.update(dt);
+    setup_docking_ui();
+    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
+    draw_scenario_information_ui();
+    draw_time_control_ui();
+    draw_notifications(dt);
+    draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.show_ui();
+
+    for (int i = 0; i < m_timescale; ++i)
+    {
+        m_data_collector.update(dt);
+
+        /** Update systems */
+        for (auto&& system : m_active_systems)
+        {
+            system->update(dt);
+        }
+
+        /** Deal with long running tasks, then events */
+        m_scheduler.update(dt);
+        m_dispatcher.update();
+        m_scenario.update(dt);
+    }
 
     /** It's supposed to be three of these here, do not change - not a bug */
 
@@ -205,40 +210,14 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    ImGui::Separator();
-    ImGui::Text("GRID");
-    static bool show_grid = false;
-    static int grid_span  = 25;
-    static int grid_size  = 32;
-    ImGui::Checkbox("Show Grid", &show_grid);
-    ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
-    ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
+    for (const auto& system : m_draw_systems)
+    {
+        /** Pass 0, since draw systems don't need time */
+        system->update(0.f);
+    }
 
     auto& r_debug = gfx::get_renderer().debug();
-    if (show_grid)
-    {
-        for (int i = -grid_span; i <= grid_span; i++)
-        {
-            r_debug.draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(0.3f));
-
-            r_debug.draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
-                              glm::vec3(i * grid_size, grid_size * grid_span, 0),
-                              glm::vec3(0.3f));
-        }
-    }
-    static bool show_axis = false;
-    ImGui::Checkbox("Show Axis", &show_axis);
-    if (show_axis)
-    {
-        r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-        r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-        r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
-    }
-
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
-
     m_scenario.draw();
     return false;
 }
@@ -283,11 +262,11 @@ void ScenarioScene::bind_actions_for_scene()
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
-        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale *= 2, 1, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
-        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale /= 2, 1, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
@@ -378,7 +357,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
         }
     });
-    cultsim.set_function("remove_component", [this](sol::this_state s, entt::entity e, uint32_t id) {
+    cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
             case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
@@ -395,7 +374,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
     /** Helper action to modify an entity need */
-    cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
+    cultsim.set_function("modify_need", [this](entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
         {
             for (auto& need : needs->needs)
@@ -408,7 +387,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("add_to_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
             if (inventory->size < inventory->max_size)
@@ -422,7 +401,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("remove_from_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("remove_from_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
             int i = 0;
@@ -438,7 +417,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Apply Damage */
-    cultsim.set_function("apply_basic_damage", [this](sol::this_state s, entt::entity e, float damage) {
+    cultsim.set_function("apply_basic_damage", [this](entt::entity e, float damage) {
         if (auto* health = m_registry.try_get<component::Health>(e); health)
         {
             health->health -= damage;
@@ -470,10 +449,10 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+    cultsim.set_function("kill", [this](entt::entity e) {
         if (e == entt::null)
         {
-            spdlog::get("agent")->critical("Trying to kill a null agent");
+            spdlog::get("agent")->critical("trying to kill a null agent");
             return;
         }
         m_registry.assign<component::Delete>(e);
@@ -580,7 +559,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%2.1fx)", m_simtime, m_timescale);
+    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -630,37 +609,37 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0.f;
+        m_timescale = 0;
     }
     ImGui::SameLine();
     if (ImGui::Button("1x", {36, 24}))
     {
-        m_timescale = 1.f;
+        m_timescale = 1;
     }
     ImGui::SameLine();
-    if (ImGui::Button("2.5x", {36, 24}))
+    if (ImGui::Button("2x", {36, 24}))
     {
-        m_timescale = 2.5f;
+        m_timescale = 2;
     }
     ImGui::SameLine();
     if (ImGui::Button("5x", {36, 24}))
     {
-        m_timescale = 5.f;
+        m_timescale = 5;
     }
     ImGui::SameLine();
     if (ImGui::Button("10x", {36, 24}))
     {
-        m_timescale = 10.f;
+        m_timescale = 10;
     }
     ImGui::SameLine();
-    if (ImGui::Button("25x", {36, 24}))
+    if (ImGui::Button("20x", {36, 24}))
     {
-        m_timescale = 25.f;
+        m_timescale = 20;
     }
     ImGui::SameLine();
-    if (ImGui::Button("100x", {36, 24}))
+    if (ImGui::Button("50x", {36, 24}))
     {
-        m_timescale = 100.f;
+        m_timescale = 50;
     }
     ImGui::End();
 }

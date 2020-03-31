@@ -52,8 +52,8 @@ private:
     /** Enabled Systems for this Scenario */
     std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
 
-    /** Disabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
+    /** Systems that must run in the draw phase for this Scenario */
+    std::vector<std::unique_ptr<system::ISystem>> m_draw_systems{};
 
     /** Storage of bound lua events */
     std::vector<std::unique_ptr<LuaEventHandle>> m_lua_event_handlers{};
@@ -77,7 +77,7 @@ private:
     float m_simtime = 0.f;
 
     /** Current time scale of simulation */
-    float m_timescale = 1.f;
+    int m_timescale = 1;
 
 public:
     explicit ScenarioScene(std::string_view scenario);

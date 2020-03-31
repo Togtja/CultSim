@@ -40,6 +40,8 @@ private:
 public:
     explicit DebugRenderer(Camera& camera);
 
+    void clear();
+
     /**
      * Draw a debug line
      *
