@@ -20,7 +20,8 @@ entity = {
     },
     NeedComponent = {
         -- Corresponds to entires in the needs.lua file
-        needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce }
+        required_needs = { needs.hunger, needs.thirst, needs.sleep},
+        leisure_needs = { needs.stockpile, needs.reproduce }
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
@@ -31,12 +32,15 @@ entity = {
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file
-        strategies = { strategies.find_food, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate }
+        strategies = { strategies.find_food, strategies.consume_from_backpack, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate, strategies.forage_for_food}
     },
     HealthComponent = {
         health = 100.0,
         tickdown_rate = 1.0,
         vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
+    },
+    InventoryComponent = {
+        max_size = 5
     },
     MemoryComponent = {
         max_memories = 10,
