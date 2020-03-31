@@ -8,6 +8,17 @@ target_sources(
     ultralight
 
     INTERFACE
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JavaScript.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSBase.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSContextRef.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSObjectRef.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSObjectRefPrivate.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSRetainPtr.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSStringRef.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSTypedArray.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/JSValueRef.h
+    ${CMAKE_CURRENT_LIST_DIR}/JavaScriptCore/WebKitAvailability.h
+
     ${CMAKE_CURRENT_LIST_DIR}/Ultralight/platform/Config.h
     ${CMAKE_CURRENT_LIST_DIR}/Ultralight/platform/FileSystem.h
     ${CMAKE_CURRENT_LIST_DIR}/Ultralight/platform/FontLoader.h
