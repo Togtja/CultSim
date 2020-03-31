@@ -40,7 +40,7 @@ void Health::update(float dt)
     });
 
     auto age_view = m_context.registry->view<component::Age>();
-    view.each([this, dt](entt::entity e, component::Age& age) {
+    age_view.each([this, dt](entt::entity e, component::Age& age) {
         m_timer += dt;
         age.current_age += dt;
 
