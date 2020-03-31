@@ -262,11 +262,11 @@ void ScenarioScene::bind_actions_for_scene()
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
-        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale *= 2, 0, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
-        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale /= 2, 0, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
@@ -552,7 +552,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%2.1fx)", m_simtime, m_timescale);
+    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
