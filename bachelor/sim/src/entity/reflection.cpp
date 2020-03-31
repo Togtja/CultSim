@@ -78,7 +78,6 @@ void reflect_systems()
     entt::meta<system::Mitigation>().alias("MitigationSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Movement>().alias("MovementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Need>().alias("NeedSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
-    entt::meta<system::Rendering>().alias("RenderingSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Reproduction>().alias("ReproductionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Requirement>().alias("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Timer>().alias("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();

@@ -27,6 +27,11 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
 }
 
+void SpriteRenderer::clear()
+{
+    m_nsprites = 0u;
+}
+
 void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 {
     m_instance_data[m_nsprites++] = {pos, color, tex};
@@ -34,25 +39,6 @@ void SpriteRenderer::draw(glm::vec3 pos, glm::vec3 color, SpriteTextureID tex)
 
 void SpriteRenderer::display()
 {
-    /** Adjust environment */
-    if (ImGui::TreeNode("Environment"))
-    {
-        /** Ok with multi flush since only one can be dragged / frame */
-        if (ImGui::DragFloat3("Sun Direction", glm::value_ptr(m_env_ubo.get().sun_direction), 0.01f, -1.f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        if (ImGui::DragFloat4("Sun Color", glm::value_ptr(m_env_ubo.get().sun_color), 0.01f, 0.0f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        if (ImGui::DragFloat4("Ambient Color", glm::value_ptr(m_env_ubo.get().ambient_color), 0.01f, 0.0f, 1.f, "%.2f"))
-        {
-            m_env_ubo.flush();
-        }
-        ImGui::TreePop();
-    }
-
     glFlushMappedNamedBufferRange(m_ivbo, 0, sizeof(SpriteInstanceVertex) * m_nsprites);
     glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
 
@@ -60,8 +46,6 @@ void SpriteRenderer::display()
     glBindVertexArray(m_vao);
 
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, nullptr, m_nsprites);
-
-    m_nsprites = 0u;
 }
 
 SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std::string& nrpath)
