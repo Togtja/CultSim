@@ -19,6 +19,16 @@ namespace cs::system
  */
 class Reproduction : public ISystem
 {
+    struct Child
+    {
+        std::string type{};
+        glm::vec3 position{};
+        bool is_egg = false;
+
+        std::string parent_type{};
+        entt::entity parents[2] = {entt::null, entt::null};
+    };
+
 public:
     using ISystem::ISystem;
 
