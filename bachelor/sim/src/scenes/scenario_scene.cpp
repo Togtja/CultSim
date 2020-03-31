@@ -582,14 +582,15 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
                            component::Timer,
                            component::Tags,
-                           component::Memory>(selection_info.selected_entity);
+                           component::Memory,
+                           component::Pregnancy>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -607,9 +608,28 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (reproduction)
     {
-        ImGui::Text("I am a %s, and I have %d children.",
-                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
-                    reproduction->number_of_children);
+        if (preg && preg->is_egg)
+        {
+            ImGui::Text("I am a hatching egg");
+        }
+        else
+        {
+            ImGui::Text("I am a %s, and I have %d children.",
+                        (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                        reproduction->number_of_children);
+        }
+    }
+
+    if (preg)
+    {
+        if (preg->is_egg)
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Hatching");
+        }
+        else
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Pregnancy");
+        }
     }
 
     if (strategy)
