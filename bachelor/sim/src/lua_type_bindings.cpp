@@ -3,6 +3,7 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
+#include "preferences.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
@@ -216,6 +217,26 @@ void bind_utils(sol::state_view lua)
                                    &RandomEngine::trigger,
                                    "roll",
                                    &RandomEngine::roll);
+
+    lua.new_usertype<Preference>("Preference",
+                                 sol::no_constructor,
+                                 "name",
+                                 sol::readonly(&Preference::name),
+                                 "description",
+                                 sol::readonly(&Preference::description),
+                                 "value",
+                                 &Preference::value);
+
+    lua.new_usertype<PreferenceManager>("PreferenceManager",
+                                        sol::no_constructor,
+                                        "get_resolution",
+                                        &PreferenceManager::get_resolution,
+                                        "set_resolution",
+                                        &PreferenceManager::set_resolution,
+                                        "get_fullscreen",
+                                        &PreferenceManager::get_fullscreen,
+                                        "set_fullscreen",
+                                        &PreferenceManager::set_fullscreen);
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
