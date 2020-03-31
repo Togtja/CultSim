@@ -77,7 +77,7 @@ private:
     float m_simtime = 0.f;
 
     /** Current time scale of simulation */
-    float m_timescale = 1.f;
+    int m_timescale = 1;
 
 public:
     explicit ScenarioScene(std::string_view scenario);

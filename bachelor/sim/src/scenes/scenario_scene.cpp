@@ -350,7 +350,7 @@ void ScenarioScene::bind_scenario_lua_functions()
             default: return sol::nil; break;
         }
     });
-    cultsim.set_function("remove_component", [this](sol::this_state s, entt::entity e, uint32_t id) {
+    cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
             case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
@@ -367,7 +367,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
     /** Helper action to modify an entity need */
-    cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
+    cultsim.set_function("modify_need", [this](entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
         {
             for (auto& need : needs->needs)
@@ -380,7 +380,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("add_to_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
             if (inventory->size < inventory->max_size)
@@ -394,7 +394,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("remove_from_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("remove_from_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
             int i = 0;
@@ -410,7 +410,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Apply Damage */
-    cultsim.set_function("apply_basic_damage", [this](sol::this_state s, entt::entity e, float damage) {
+    cultsim.set_function("apply_basic_damage", [this](entt::entity e, float damage) {
         if (auto* health = m_registry.try_get<component::Health>(e); health)
         {
             health->health -= damage;
@@ -442,10 +442,10 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+    cultsim.set_function("kill", [this](entt::entity e) {
         if (e == entt::null)
         {
-            spdlog::get("agent")->critical("Trying to kill a null agent");
+            spdlog::get("agent")->critical("trying to kill a null agent");
             return;
         }
         m_registry.assign<component::Delete>(e);
@@ -602,37 +602,37 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0.f;
+        m_timescale = 0;
     }
     ImGui::SameLine();
     if (ImGui::Button("1x", {36, 24}))
     {
-        m_timescale = 1.f;
+        m_timescale = 1;
     }
     ImGui::SameLine();
     if (ImGui::Button("2x", {36, 24}))
     {
-        m_timescale = 2.5f;
+        m_timescale = 2;
     }
     ImGui::SameLine();
     if (ImGui::Button("5x", {36, 24}))
     {
-        m_timescale = 5.f;
+        m_timescale = 5;
     }
     ImGui::SameLine();
     if (ImGui::Button("10x", {36, 24}))
     {
-        m_timescale = 10.f;
+        m_timescale = 10;
     }
     ImGui::SameLine();
-    if (ImGui::Button("25x", {36, 24}))
+    if (ImGui::Button("20x", {36, 24}))
     {
-        m_timescale = 25.f;
+        m_timescale = 20;
     }
     ImGui::SameLine();
-    if (ImGui::Button("100x", {36, 24}))
+    if (ImGui::Button("50x", {36, 24}))
     {
-        m_timescale = 100.f;
+        m_timescale = 50;
     }
     ImGui::End();
 }
