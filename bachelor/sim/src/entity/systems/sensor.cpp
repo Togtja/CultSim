@@ -92,7 +92,7 @@ void Sensor::update(float dt)
 
     if (ImGui::TreeNode("Sensor Info"))
     {
-        ImGui::Checkbox("Draw FoV", &draw_fov);
+        ImGui::Checkbox("Draw Field of View", &draw_fov);
         ImGui::Checkbox("Draw Vision Lines", &draw_seen);
         ImGui::TreePop();
     }

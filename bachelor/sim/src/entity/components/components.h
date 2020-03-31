@@ -167,6 +167,13 @@ struct TagRequirement
     ETag tags{};
 };
 
+struct InventoryRequirement
+{
+    int number_of_matching{};
+
+    ETag tags{};
+};
+
 struct Tags
 {
     ETag tags{};

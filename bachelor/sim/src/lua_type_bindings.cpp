@@ -3,11 +3,13 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
+#include "preferences.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
 #include "random_engine.h"
 
+#include <spdlog/spdlog.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
 
@@ -52,7 +54,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Herbivore", ETag::TAG_Herbivore},
                         {"Omnivore", ETag::TAG_Omnivore},
                         {"Meat", ETag::TAG_Meat},
-                        {"Veggie", ETag::TAG_Veggie}});
+                        {"Veggie", ETag::TAG_Veggie},
+                        {"Inventory", ETag::TAG_Inventory},
+                        {"Consume", ETag::TAG_Consume}});
 }
 
 void bind_components(sol::state_view lua)
@@ -98,6 +102,16 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Position>("PositionComponent", "position", &component::Position::position);
     lua.new_usertype<component::Sprite>("SpriteComponent", "color", &component::Sprite::color); // ignoring texture for now
 
+    lua.new_usertype<component::Inventory>("InventoryComponent",
+                                           "max_size",
+                                           &component::Inventory::max_size,
+                                           "size",
+                                           &component::Inventory::size,
+                                           "tags",
+                                           &component::Inventory::tags,
+                                           "contents",
+                                           &component::Inventory::contents);
+
     /**
      * Ignoring avoidance_cd and avoid_count since those can be changed using the UI and ignoring desired_position as that is
      * a part of the pathfinding algorithm
@@ -123,7 +137,11 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Tags>("TagComponent", "tags", &component::Tags::tags);
 
-    lua.new_usertype<component::Need>("NeedComponent", "needs", &component::Need::needs);
+    lua.new_usertype<component::Need>("NeedComponent",
+                                      "required_needs",
+                                      &component::Need::needs,
+                                      "leisure_needs",
+                                      &component::Need::leisure_needs);
 
     lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
 
@@ -210,6 +228,43 @@ void bind_utils(sol::state_view lua)
                                    &RandomEngine::trigger,
                                    "roll",
                                    &RandomEngine::roll);
+
+    lua.new_usertype<Preference>("Preference",
+                                 sol::no_constructor,
+                                 "name",
+                                 sol::readonly(&Preference::name),
+                                 "description",
+                                 sol::readonly(&Preference::description),
+                                 "value",
+                                 &Preference::value);
+
+    lua.new_usertype<PreferenceManager>("PreferenceManager",
+                                        sol::no_constructor,
+                                        "get_resolution",
+                                        &PreferenceManager::get_resolution,
+                                        "set_resolution",
+                                        &PreferenceManager::set_resolution,
+                                        "get_fullscreen",
+                                        &PreferenceManager::get_fullscreen,
+                                        "set_fullscreen",
+                                        &PreferenceManager::set_fullscreen);
+}
+
+int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
+{
+    auto logger = spdlog::get("lua");
+    if (maybe_exception)
+    {
+        const auto& ex = *maybe_exception;
+        logger->critical("Lua exception thrown: [[[{}]]]", ex.what());
+    }
+    else
+    {
+        logger->critical("Lua error thrown: [[[{}]]]", std::string_view(description.data(), description.size()));
+        std::cout << std::endl;
+    }
+
+    return sol::stack::push(L, description);
 }
 
 } // namespace cs::lua

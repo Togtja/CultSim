@@ -19,4 +19,12 @@ float DeltaClock::restart()
     m_last_reset   = now;
     return dt;
 }
+
+DeltaClock::TimeUnit DeltaClock::restart_time_unit()
+{
+    auto now      = std::chrono::steady_clock::now();
+    const auto dt = std::chrono::duration<float>(now - m_last_reset);
+    m_last_reset  = now;
+    return dt;
+}
 } // namespace cs
