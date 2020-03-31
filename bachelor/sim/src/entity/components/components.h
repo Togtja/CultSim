@@ -222,6 +222,8 @@ struct Pregnancy
     entt::entity parents[2] = {entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
+
+    bool is_egg = false;
 };
 
 struct AI

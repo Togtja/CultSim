@@ -57,8 +57,6 @@ void Reproduction::update(float dt)
                                      glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
                 if (repr.lays_eggs)
                 {
-                    auto magic_bug_fix = preg;
-
                     auto egg           = spawn_entity(*m_context.registry, *m_context.lua_state, repr.egg_type, new_pos);
                     auto& egg_time     = m_context.registry->get<component::Reproduction>(egg);
                     auto& egg_hatching = m_context.registry->assign_or_replace<component::Pregnancy>(egg);
@@ -68,6 +66,8 @@ void Reproduction::update(float dt)
                     egg_hatching.children_in_pregnancy = 1;
                     egg_hatching.parents[0]            = e;
                     egg_hatching.parents[1]            = preg.parents[0];
+                    egg_hatching.is_egg                = true;
+
                     if (egg_time.gestation_deviation > 0)
                     {
                         egg_hatching.gestation_period =
@@ -82,7 +82,16 @@ void Reproduction::update(float dt)
                 }
                 else
                 {
-                    auto child = spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, new_pos);
+                    entt::entity child = entt::null;
+                    if (preg.is_egg)
+                    {
+                        auto egg_pos = m_context.registry->get<component::Position>(e).position;
+                        child        = spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, egg_pos);
+                    }
+                    else
+                    {
+                        child = spawn_entity(*m_context.registry, *m_context.lua_state, parent_name, new_pos);
+                    }
                     // Set age to be 0
                     auto age = m_context.registry->try_get<component::Age>(child);
                     if (age)
@@ -96,6 +105,10 @@ void Reproduction::update(float dt)
             {
                 auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents[1]);
                 f_preg.number_of_children += preg.children_in_pregnancy;
+            }
+            if (preg.is_egg)
+            {
+                m_context.registry->assign_or_replace<component::Delete>(e);
             }
             m_context.registry->remove<component::Pregnancy>(e);
         }
