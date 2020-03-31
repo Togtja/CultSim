@@ -43,12 +43,13 @@ void Reproduction::update(float dt)
             repr.fertility = 0;
         }
     });
-
+    // Children that will be spawned
     std::vector<Child> children;
 
     auto preg_view = m_context.registry->group<>(entt::get<component::Reproduction, component::Pregnancy>);
     preg_view.each([this, dt, &preg_view, &children](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
         preg.time_since_start += dt;
+
         if (preg.time_since_start >= preg.gestation_period)
         {
             const auto parent_name = m_context.registry->get<component::Meta>(e).name;
