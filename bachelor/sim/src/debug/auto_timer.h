@@ -57,7 +57,7 @@ public:
         }
         else
         {
-            itr->time_ms = (itr->time_ms + timed.count()) / 2.f;
+            itr->time_ms += timed.count();
         }
     }
 
