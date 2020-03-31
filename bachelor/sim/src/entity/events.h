@@ -80,6 +80,13 @@ struct CreatedMemory
     std::shared_ptr<memory::IMemory> memory{};
 };
 
+struct EntitySpawned
+{
+    std::string_view name{};
+    entt::entity entity{};
+    glm::vec2 position{};
+};
+
 struct DeleteEntity
 {
     entt::entity entity{};
