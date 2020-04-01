@@ -225,8 +225,8 @@ struct Pregnancy
     float time_since_start{};
     float gestation_period{};
 
-    // Index 0 is incubator, index 1 is the other parent (In Humans: Index 0 is Mom, index 1 is Dad)
-    entt::entity parents[2] = {entt::null, entt::null};
+    // First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad)
+    std::pair<entt::entity, entt::entity> parents = {entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
 

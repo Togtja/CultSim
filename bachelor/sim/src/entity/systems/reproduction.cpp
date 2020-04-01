@@ -46,7 +46,7 @@ void Reproduction::update(float dt)
     // Children that will be spawned
     std::vector<Child> children;
 
-    auto preg_view = m_context.registry->group<>(entt::get<component::Reproduction, component::Pregnancy>);
+    auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
     preg_view.each([this, dt, &preg_view, &children](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
         preg.time_since_start += dt;
 
@@ -60,7 +60,8 @@ void Reproduction::update(float dt)
                                      glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
                 if (repr.lays_eggs)
                 {
-                    children.push_back(Child{repr.egg_type, new_pos, true, parent_name, {preg.parents[0], preg.parents[1]}});
+                    children.push_back(
+                        Child{repr.egg_type, new_pos, true, parent_name, {preg.parents.first, preg.parents.second}});
                 }
                 else
                 {
@@ -76,9 +77,9 @@ void Reproduction::update(float dt)
                 }
             }
             repr.number_of_children += preg.children_in_pregnancy;
-            if (!preg.is_egg && m_context.registry->valid(preg.parents[1]))
+            if (!preg.is_egg && m_context.registry->valid(preg.parents.second))
             {
-                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents[1]);
+                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.second);
                 f_preg.number_of_children += preg.children_in_pregnancy;
             }
             if (preg.is_egg)
@@ -91,7 +92,7 @@ void Reproduction::update(float dt)
 
     for (auto&& child : children)
     {
-        auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
+        auto child_e = spawn_entity(*m_context.registry, m_context.lua_state, child.type, child.position);
 
         if (!child.is_egg)
         {
@@ -108,8 +109,8 @@ void Reproduction::update(float dt)
         egg_time.lays_eggs = false;
 
         egg_hatching.children_in_pregnancy = 1;
-        egg_hatching.parents[0]            = child.parents[0];
-        egg_hatching.parents[1]            = child.parents[1];
+        egg_hatching.parents.first         = child.parents.first;
+        egg_hatching.parents.second        = child.parents.second;
         egg_hatching.is_egg                = true;
 
         if (egg_time.gestation_deviation > 0)
@@ -135,9 +136,9 @@ void Reproduction::delete_father(const event::DeleteEntity& event)
 {
     auto view = m_context.registry->view<component::Pregnancy>();
     view.each([&event](component::Pregnancy& preg) {
-        if (preg.parents[1] == event.entity)
+        if (preg.parents.first == event.entity)
         {
-            preg.parents[1] = entt::null;
+            preg.parents.second = entt::null;
         }
     });
 }

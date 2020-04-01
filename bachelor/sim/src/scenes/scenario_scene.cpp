@@ -78,7 +78,7 @@ void ScenarioScene::initialize_simulation()
         if (type)
         {
             auto meta = type.construct(
-                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
+                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, m_context->lua_state});
             system::ISystem& temp_ref = meta.cast<system::ISystem>();
             m_active_systems.emplace_back(temp_ref.clone());
             m_active_systems.back()->initialize();
@@ -506,8 +506,8 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_m->average_gestation_period;
                 }
-                preg->parents[0] = mother;
-                preg->parents[1] = father;
+                preg->parents.first  = mother;
+                preg->parents.second = father;
             }
             else
             {
@@ -529,8 +529,8 @@ void ScenarioScene::bind_scenario_lua_functions()
                     preg->gestation_period = rc_f->average_gestation_period;
                 }
                 // Here the incubator is the dad
-                preg->parents[1] = mother;
-                preg->parents[0] = father;
+                preg->parents.second = mother;
+                preg->parents.first  = father;
             }
             if (preg->children_in_pregnancy < 1)
             {

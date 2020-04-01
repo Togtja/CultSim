@@ -26,7 +26,7 @@ class Reproduction : public ISystem
         bool is_egg = false;
 
         std::string parent_type{};
-        entt::entity parents[2] = {entt::null, entt::null};
+        std::pair<entt::entity, entt::entity> parents = {entt::null, entt::null};
     };
 
 public:
