@@ -25,8 +25,8 @@ entity = {
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
-        mean_offspring = 20,
-        offspring_deviation = 5,
+        mean_offspring = 2,
+        offspring_deviation = 1,
         average_gestation = 90,
         gestation_deviation = 5
     },
