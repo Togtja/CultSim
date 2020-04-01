@@ -365,7 +365,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
-            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e);             
             case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
             case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
             case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
@@ -375,9 +375,28 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
     });
+    cultsim.set_function("add_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
+        switch (id)
+        {
+            case entt::type_info<component::Position>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Position>(e)); break;
+            case entt::type_info<component::Movement>::id():return sol::make_object(s, m_registry.assign_or_replace<component::Movement>(e)); break;
+            case entt::type_info<component::Sprite>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Sprite>(e)); break;
+            case entt::type_info<component::Vision>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Vision>(e)); break;
+            case entt::type_info<component::Tags>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Tags>(e)); break;
+            case entt::type_info<component::Need>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Need>(e)); break;
+            case entt::type_info<component::Reproduction>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Reproduction>(e)); break;
+            case entt::type_info<component::Strategy>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Strategy>(e)); break;
+            case entt::type_info<component::Health>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Health>(e)); break;
+            case entt::type_info<component::Memory>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Memory>(e)); break;
+            case entt::type_info<component::Inventory>::id(): return sol::make_object(s,m_registry.assign_or_replace<component::Inventory>(e)); break;
+            default: break;
+        }
+    });
+
     /** Helper action to modify an entity need */
     cultsim.set_function("modify_need", [this](entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
