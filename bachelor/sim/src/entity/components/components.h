@@ -99,7 +99,6 @@ struct Age
     float current_age{};
 
     float average_life_expectancy{};
-
 };
 
 struct DropItems
@@ -226,7 +225,7 @@ struct Pregnancy
     float time_since_start{};
     float gestation_period{};
 
-    // Index 0 is incubator, index 1 is the other parent (In Humans: Index 0 is Mom, index 2 is Dad)
+    // Index 0 is incubator, index 1 is the other parent (In Humans: Index 0 is Mom, index 1 is Dad)
     entt::entity parents[2] = {entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
