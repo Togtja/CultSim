@@ -104,18 +104,18 @@ void Action::update(float dt)
                 }
                 if (m_context.rng->trigger(action->success_chance))
                 {
-                    spdlog::get("agent")->warn("We succeeded with an action");
+                    spdlog::get("agent")->debug("We succeeded with an action");
                     action->success(e, action->target);
                     action->time_spent = 0;
                     action->target     = entt::null;
 
-                    spdlog::get("agent")->warn("Currently on working action {}, max {}",
-                                               strategy.working_on_action,
-                                               strategy.actions.size());
+                    spdlog::get("agent")->debug("Currently on working action {}, max {}",
+                                                strategy.working_on_action,
+                                                strategy.actions.size());
 
                     if (strategy.working_on_action < strategy.actions.size())
                     {
-                        spdlog::get("agent")->warn("Upping working action by 1, max {}", strategy.actions.size());
+                        spdlog::get("agent")->debug("Upping working action by 1, max {}", strategy.actions.size());
                         strategy.working_on_action++;
                     }
                     else
@@ -124,7 +124,7 @@ void Action::update(float dt)
                         return;
                     }
                     action = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
-                    spdlog::get("agent")->warn("Current action : {}", action->name);
+                    spdlog::get("agent")->debug("Current action : {}", action->name);
                     strategy.requirements = action->requirements;
                 }
 

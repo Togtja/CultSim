@@ -397,7 +397,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
                 tags->tags = ETag(tags->tags | TAG_Inventory);
                 inventory->contents.push_back(target);
-                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+                spdlog::get("agent")->debug("Size of Inventory {}", inventory->contents.size());
             }
         }
     });
