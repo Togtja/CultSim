@@ -10,6 +10,7 @@
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
+#include "scenes/pausemenu_scene.h"
 
 #include <functional>
 
@@ -36,6 +37,8 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
+    constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
+    auto time_since_tick    = timestep;
 
     /** Main Loop */
     do
@@ -43,12 +46,19 @@ void Application::run(const std::vector<char*>& args)
         CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(m_window.get());
-        ImGui::NewFrame();
+        time_since_tick += dt_clock.restart_time_unit();
+        while (time_since_tick >= timestep)
+        {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame(m_window.get());
+            ImGui::NewFrame();
 
-        update(dt_clock.restart());
-        AutoTimer::show_debug_ui();
+            update(timestep.count());
+            time_since_tick -= timestep;
+            AutoTimer::show_debug_ui();
+
+            ImGui::Render();
+        }
 
         draw();
     } while (m_running && !m_scene_manager.empty());
@@ -62,22 +72,22 @@ void Application::handle_input()
     while (SDL_PollEvent(&e))
     {
         ImGui_ImplSDL2_ProcessEvent(&e);
-        if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+
+        if (e.type == SDL_QUIT)
         {
-            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            if (m_window.confirm_dialog("Quit?", "Do you really want to quit?"))
             {
                 m_running = false;
             }
         }
-        const auto& io = ImGui::GetIO();
 
+        const auto& io = ImGui::GetIO();
         if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
         {
             input::get_input().handle_input(e);
         }
     }
 }
-
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
@@ -88,11 +98,12 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    gfx::get_renderer().clear();
+
     m_scene_manager.draw();
 
     gfx::get_renderer().display();
 
-    ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     m_window.display();
@@ -120,8 +131,9 @@ bool Application::init_input()
 
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
-
-    /* TODO: Fix to not return true */
+    inputs.fast_bind_key(input::EKeyContext::DefaultContext, SDL_SCANCODE_ESCAPE, input::EAction::Quit, [this] {
+        m_running = false;
+    });
 
     return true;
 }
@@ -133,13 +145,13 @@ bool Application::init_lua()
     m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
-    m_lua.set_function("writeFile", fs::write_file);
-    m_lua.set_function("readFile", fs::read_file);
-    m_lua.set_function("makeDirectory", fs::mkdir);
-    m_lua.set_function("moveFile", fs::move_file);
-    m_lua.set_function("fileExists", fs::exists);
-    m_lua.set_function("deleteFile", fs::delete_file);
-    m_lua.set_function("copyFile", fs::copy_file);
+    m_lua.set_function("write_file", fs::write_file);
+    m_lua.set_function("read_file", fs::read_file);
+    m_lua.set_function("make_directory", fs::mkdir);
+    m_lua.set_function("move_file", fs::move_file);
+    m_lua.set_function("file_exists", fs::exists);
+    m_lua.set_function("delete_file", fs::delete_file);
+    m_lua.set_function("copy_file", fs::copy_file);
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");
@@ -287,6 +299,7 @@ bool Application::init_imgui()
 
 void Application::deinit()
 {
+    m_scene_manager.clear();
     input::get_input().save_binding_to_file();
     deinit_preferences();
     deinit_imgui();

@@ -3,6 +3,7 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
+#include "preferences.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
@@ -44,11 +45,16 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable},
                         {"Reproduce", ETag::TAG_Reproduce},
-                        {"Human", ETag::TAG_Human},
+                        {"Creature", ETag::TAG_Creature},
                         {"Tag", ETag::TAG_Tag},
                         {"Gather", ETag::TAG_Gather},
                         {"Reserved", ETag::TAG_Reserved},
                         {"Delete", ETag::TAG_Delete},
+                        {"Carnivore", ETag::TAG_Carnivore},
+                        {"Herbivore", ETag::TAG_Herbivore},
+                        {"Omnivore", ETag::TAG_Omnivore},
+                        {"Meat", ETag::TAG_Meat},
+                        {"Veggie", ETag::TAG_Veggie},
                         {"Inventory", ETag::TAG_Inventory},
                         {"Consume", ETag::TAG_Consume}});
 }
@@ -68,7 +74,9 @@ void bind_components(sol::state_view lua)
                                "vitality",
                                &ai::Need::vitality,
                                "tags",
-                               &ai::Need::tags);
+                               &ai::Need::tags,
+                               "weight_func",
+                               &ai::Need::weight_func);
 
     lua.new_usertype<action::Action>("Action",
                                      "name",
@@ -97,6 +105,8 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<component::Inventory>("InventoryComponent",
                                            "max_size",
                                            &component::Inventory::max_size,
+                                           "size",
+                                           &component::Inventory::size,
                                            "tags",
                                            &component::Inventory::tags,
                                            "contents",
@@ -134,6 +144,10 @@ void bind_components(sol::state_view lua)
                                       &component::Need::leisure_needs);
 
     lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
+
+    lua.new_usertype<component::Attack>("AttackComponent", "damage", &component::Attack::damage);
+
+    lua.new_usertype<component::Age>("AgeComponent", "life_expectancy", &component::Age::average_life_expectancy);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
@@ -184,7 +198,8 @@ void bind_input(sol::state_view lua)
                                   {"FollowEntity", input::EAction::FollowEntity},
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
-                                  {"Pause", input::EAction::Pause}});
+                                  {"Pause", input::EAction::Pause},
+                                  {"Quit", input::EAction::Quit}});
 
     lua.new_enum<input::EMouse>("EMouse",
                                 {{"BtnLeft", input::EMouse::BtnLeft},
@@ -214,6 +229,26 @@ void bind_utils(sol::state_view lua)
                                    &RandomEngine::trigger,
                                    "roll",
                                    &RandomEngine::roll);
+
+    lua.new_usertype<Preference>("Preference",
+                                 sol::no_constructor,
+                                 "name",
+                                 sol::readonly(&Preference::name),
+                                 "description",
+                                 sol::readonly(&Preference::description),
+                                 "value",
+                                 &Preference::value);
+
+    lua.new_usertype<PreferenceManager>("PreferenceManager",
+                                        sol::no_constructor,
+                                        "get_resolution",
+                                        &PreferenceManager::get_resolution,
+                                        "set_resolution",
+                                        &PreferenceManager::set_resolution,
+                                        "get_fullscreen",
+                                        &PreferenceManager::get_fullscreen,
+                                        "set_fullscreen",
+                                        &PreferenceManager::set_fullscreen);
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)

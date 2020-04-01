@@ -70,22 +70,6 @@ struct Hearing
     float radius{};
 };
 
-struct Reproduction
-{
-    enum ESex
-    {
-        Male   = true,
-        Female = false
-    };
-
-    ESex sex = Male;
-    uint16_t number_of_children{};
-
-    float fertility{};
-
-    int max_children_per_pregnancy{};
-};
-
 struct Timer
 {
     using OnCompleteFunction = std::function<void(entt::entity, entt::registry&)>;
@@ -105,11 +89,16 @@ struct Health
     ETag need_tags{};
 };
 
+struct Attack
+{
+    float damage{};
+};
+
 struct Age
 {
     float current_age{};
 
-    float max_age{};
+    float average_life_expectancy{};
 };
 
 struct DropItems
@@ -197,16 +186,51 @@ struct Delete
 {
 };
 
+struct Reproduction
+{
+    enum ESex
+    {
+        Male   = true,
+        Female = false
+    };
+
+    ESex sex = Male;
+    uint16_t number_of_children{};
+
+    bool lays_eggs = false;
+    std::string egg_type;
+
+    ESex incubator = Female;
+
+    // If true then users says they has specified start/peak/end fertility
+    bool has_fertility = false;
+    // Needs age component to work
+    float start_fertility{};
+    float peak_fertility{};
+    float end_fertility{};
+
+    // General Pregnancy stat
+    int mean_children_pp = 1;
+    float children_deviation{};
+
+    // Static fertility
+    float fertility = 1.f;
+
+    float average_gestation_period{};
+    float gestation_deviation{};
+};
+
 struct Pregnancy
 {
     float time_since_start{};
     float gestation_period{};
 
-    entt::entity father{};
+    // First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad)
+    std::pair<entt::entity, entt::entity> parents = {entt::null, entt::null};
 
-    int number_of_children{};
+    uint16_t children_in_pregnancy{};
 
-    sol::function birth{};
+    bool is_egg = false;
 };
 
 struct AI

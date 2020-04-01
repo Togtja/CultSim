@@ -77,7 +77,8 @@ void ScenarioScene::initialize_simulation()
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            auto meta = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor});
+            auto meta = type.construct(
+                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
             system::ISystem& temp_ref = meta.cast<system::ISystem>();
             m_active_systems.emplace_back(temp_ref.clone());
             m_active_systems.back()->initialize();
@@ -87,6 +88,10 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Enforce the use of a rendering system */
+    m_draw_systems.emplace_back(
+        new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
 
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
@@ -109,11 +114,11 @@ void ScenarioScene::clean_simulation()
     }
     m_active_systems.clear();
 
-    for (auto& system : m_inactive_systems)
+    for (auto& system : m_draw_systems)
     {
         system->initialize();
     }
-    m_inactive_systems.clear();
+    m_draw_systems.clear();
 
     /** Clean up event handlers and binders */
     for (auto& handler : m_lua_event_handlers)
@@ -149,23 +154,6 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    dt *= m_timescale;
-    m_simtime += dt;
-
-    // TODO : Move to input action response
-    update_entity_hover();
-
-    setup_docking_ui();
-    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
-    draw_scenario_information_ui();
-    draw_time_control_ui();
-    draw_notifications(dt);
-    draw_selected_entity_information_ui();
-
-    /** Sample data */
-    m_data_collector.update(dt);
-    m_data_collector.show_ui();
-
     static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
     b_tex.scale        = 100;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
@@ -179,16 +167,34 @@ bool ScenarioScene::update(float dt)
         }
     }
 
-    /** Update systems */
-    for (auto&& system : m_active_systems)
-    {
-        system->update(dt);
-    }
+    // TODO : Move to input action response
+    update_entity_hover();
 
-    /** Deal with long running tasks, then events */
-    m_scheduler.update(dt);
-    m_dispatcher.update();
-    m_scenario.update(dt);
+    setup_docking_ui();
+    ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
+    draw_scenario_information_ui();
+    draw_time_control_ui();
+    draw_notifications(dt);
+    draw_selected_entity_information_ui();
+
+    /** Sample data */
+    m_data_collector.show_ui();
+
+    for (int i = 0; i < m_timescale; ++i)
+    {
+        m_data_collector.update(dt);
+
+        /** Update systems */
+        for (auto&& system : m_active_systems)
+        {
+            system->update(dt);
+        }
+
+        /** Deal with long running tasks, then events */
+        m_scheduler.update(dt);
+        m_dispatcher.update();
+        m_scenario.update(dt);
+    }
 
     /** It's supposed to be three of these here, do not change - not a bug */
 
@@ -205,40 +211,14 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
-    ImGui::Separator();
-    ImGui::Text("GRID");
-    static bool show_grid = false;
-    static int grid_span  = 25;
-    static int grid_size  = 32;
-    ImGui::Checkbox("Show Grid", &show_grid);
-    ImGui::DragInt("Grid Span", &grid_span, 1.f, 0, 50);
-    ImGui::DragInt("Grid Size", &grid_size, 1.f, 0, 256);
+    for (const auto& system : m_draw_systems)
+    {
+        /** Pass 0, since draw systems don't need time */
+        system->update(0.f);
+    }
 
     auto& r_debug = gfx::get_renderer().debug();
-    if (show_grid)
-    {
-        for (int i = -grid_span; i <= grid_span; i++)
-        {
-            r_debug.draw_line(glm::vec3(-grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(grid_size * grid_span, i * grid_size, 0),
-                              glm::vec3(0.3f));
-
-            r_debug.draw_line(glm::vec3(i * grid_size, -grid_size * grid_span, 0),
-                              glm::vec3(i * grid_size, grid_size * grid_span, 0),
-                              glm::vec3(0.3f));
-        }
-    }
-    static bool show_axis = false;
-    ImGui::Checkbox("Show Axis", &show_axis);
-    if (show_axis)
-    {
-        r_debug.draw_line({-100.f, 0.f, 0.f}, {100.f, 0.f, 0.f}, {1.f, 0.f, 0.f});
-        r_debug.draw_line({0.f, -100.f, 0.f}, {0.f, 100.f, 0.f}, {0.f, 1.f, 0.f});
-        r_debug.draw_line({0.f, 0.f, -100.f}, {0.f, 0.f, 100.f}, {0.f, 0.f, 1.f});
-    }
-
     r_debug.draw_rect({0.f, 0.f, 0.f}, m_scenario.bounds * 2.f, {1.f, 1.f, 1.f});
-
     m_scenario.draw();
     return false;
 }
@@ -283,11 +263,11 @@ void ScenarioScene::bind_actions_for_scene()
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
-        m_timescale = std::clamp(m_timescale *= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale *= 2, 1, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedDown, [this]() {
-        m_timescale = std::clamp(m_timescale /= 2, 0.05f, 100.f);
+        m_timescale = std::clamp(m_timescale /= 2, 1, 100);
     });
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
@@ -336,6 +316,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["strategy"]     = entt::type_info<component::Strategy>::id();
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
+    component["attack"]       = entt::type_info<component::Attack>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -368,10 +349,16 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Memory>::id():
                 return sol::make_object(s, &m_registry.get<component::Memory>(e));
                 break;
-            default: return sol::nil; break;
+            case entt::type_info<component::Attack>::id():
+                return sol::make_object(s, &m_registry.get<component::Attack>(e));
+                break;
+            default:
+                spdlog::critical("Can not find the componet you are looking for");
+                return sol::nil;
+                break;
         }
     });
-    cultsim.set_function("remove_component", [this](sol::this_state s, entt::entity e, uint32_t id) {
+    cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
             case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
@@ -388,7 +375,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
     /** Helper action to modify an entity need */
-    cultsim.set_function("modify_need", [this](sol::this_state s, entt::entity e, ETag need_tags, float delta) {
+    cultsim.set_function("modify_need", [this](entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
         {
             for (auto& need : needs->needs)
@@ -401,18 +388,21 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("add_to_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("add_to_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
-            auto tags = m_registry.try_get<component::Tags>(target);
-            m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
-            tags->tags = ETag(tags->tags | TAG_Inventory);
-            inventory->contents.push_back(target);
-            spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+            if (inventory->size < inventory->max_size)
+            {
+                auto tags = m_registry.try_get<component::Tags>(target);
+                m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
+                tags->tags = ETag(tags->tags | TAG_Inventory);
+                inventory->contents.push_back(target);
+                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
+            }
         }
     });
 
-    cultsim.set_function("remove_from_inventory", [this](sol::this_state s, entt::entity owner, entt::entity target) {
+    cultsim.set_function("remove_from_inventory", [this](entt::entity owner, entt::entity target) {
         if (auto inventory = m_registry.try_get<component::Inventory>(owner); inventory)
         {
             int i = 0;
@@ -428,7 +418,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Apply Damage */
-    cultsim.set_function("apply_basic_damage", [this](sol::this_state s, entt::entity e, float damage) {
+    cultsim.set_function("apply_basic_damage", [this](entt::entity e, float damage) {
         if (auto* health = m_registry.try_get<component::Health>(e); health)
         {
             health->health -= damage;
@@ -460,10 +450,10 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Destroy entity */
-    cultsim.set_function("kill", [this](sol::this_state s, entt::entity e) {
+    cultsim.set_function("kill", [this](entt::entity e) {
         if (e == entt::null)
         {
-            spdlog::get("agent")->critical("Trying to kill a null agent");
+            spdlog::get("agent")->critical("trying to kill a null agent");
             return;
         }
         m_registry.assign<component::Delete>(e);
@@ -479,52 +469,74 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
-        m_registry
-            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
-                /** Don't do anything if e became invalid */
-                if (!r.valid(e))
+        /** Figure out "type" of mother and spawn a child based on that */
+
+        /** Give a Pregnancy component to the mother */
+        auto* rc_m = m_registry.try_get<component::Reproduction>(mother);
+        auto* rc_f = m_registry.try_get<component::Reproduction>(father);
+        if (rc_m && rc_f)
+        {
+            if (!m_rng.trigger(rc_m->fertility) || !m_rng.trigger(rc_f->fertility))
+            {
+                // N0 pregnancy
+                return;
+            }
+            if (auto* again = m_registry.try_get<component::Pregnancy>(mother); again)
+            {
+                // Can't get pregnant twice
+                return;
+            }
+            cs::component::Pregnancy* preg;
+            if (rc_f->incubator == component::Reproduction::ESex::Female)
+            {
+                preg = &m_registry.assign<component::Pregnancy>(mother);
+                if (rc_m->children_deviation > 0)
                 {
-                    return;
+                    preg->children_in_pregnancy = std::round(m_rng.normal(rc_m->mean_children_pp, rc_m->children_deviation));
                 }
-
-                /** Figure out "type" of mother and spawn a child based on that */
-                const auto& mother_meta = r.get<component::Meta>(e);
-
-                /** Set position to be close to mother */
-                const auto new_pos = r.get<component::Position>(e).position +
-                                     glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
-
-                auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
-
-                /** Reset all needs to 100.0 */
-                if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
+                else
                 {
-                    for (auto& need : need_comp->needs)
-                    {
-                        need.status = 100.f;
-                    }
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
                 }
-
-                /** Reset health */
-                if (auto* health_comp = r.try_get<component::Health>(child); health_comp)
+                if (rc_m->gestation_deviation > 0)
                 {
-                    health_comp->health = 100.f;
+                    preg->gestation_period = std::round(m_rng.normal(rc_m->average_gestation_period, rc_m->gestation_deviation));
                 }
-
-                /** Give a child to the parents */
-                if (m_registry.valid(father))
+                else
                 {
-                    if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
-                    {
-                        ++rc->number_of_children;
-                    }
+                    preg->gestation_period = rc_m->average_gestation_period;
                 }
-
-                if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
+                preg->parents.first  = mother;
+                preg->parents.second = father;
+            }
+            else
+            {
+                preg = &m_registry.assign<component::Pregnancy>(father);
+                if (rc_f->children_deviation > 0)
                 {
-                    ++rc->number_of_children;
+                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->children_deviation);
                 }
-            });
+                else
+                {
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
+                }
+                if (rc_f->gestation_deviation > 0)
+                {
+                    preg->gestation_period = m_rng.normal(rc_f->average_gestation_period, rc_f->gestation_deviation);
+                }
+                else
+                {
+                    preg->gestation_period = rc_f->average_gestation_period;
+                }
+                // Here the incubator is the dad
+                preg->parents.second = mother;
+                preg->parents.first  = father;
+            }
+            if (preg->children_in_pregnancy < 1)
+            {
+                preg->children_in_pregnancy = 1;
+            }
+        }
     });
 }
 
@@ -570,7 +582,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%2.1fx)", m_simtime, m_timescale);
+    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -620,37 +632,37 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0.f;
+        m_timescale = 0;
     }
     ImGui::SameLine();
     if (ImGui::Button("1x", {36, 24}))
     {
-        m_timescale = 1.f;
+        m_timescale = 1;
     }
     ImGui::SameLine();
-    if (ImGui::Button("2.5x", {36, 24}))
+    if (ImGui::Button("2x", {36, 24}))
     {
-        m_timescale = 2.5f;
+        m_timescale = 2;
     }
     ImGui::SameLine();
     if (ImGui::Button("5x", {36, 24}))
     {
-        m_timescale = 5.f;
+        m_timescale = 5;
     }
     ImGui::SameLine();
     if (ImGui::Button("10x", {36, 24}))
     {
-        m_timescale = 10.f;
+        m_timescale = 10;
     }
     ImGui::SameLine();
-    if (ImGui::Button("25x", {36, 24}))
+    if (ImGui::Button("20x", {36, 24}))
     {
-        m_timescale = 25.f;
+        m_timescale = 20;
     }
     ImGui::SameLine();
-    if (ImGui::Button("100x", {36, 24}))
+    if (ImGui::Button("50x", {36, 24}))
     {
-        m_timescale = 100.f;
+        m_timescale = 50;
     }
     ImGui::End();
 }
@@ -663,14 +675,15 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
                            component::Timer,
                            component::Tags,
-                           component::Memory>(selection_info.selected_entity);
+                           component::Memory,
+                           component::Pregnancy>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -688,9 +701,28 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (reproduction)
     {
-        ImGui::Text("I am a %s, and I have %d children.",
-                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
-                    reproduction->number_of_children);
+        if (preg && preg->is_egg)
+        {
+            ImGui::Text("I am a hatching egg");
+        }
+        else
+        {
+            ImGui::Text("I am a %s, and I have %d children.",
+                        (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                        reproduction->number_of_children);
+        }
+    }
+
+    if (preg)
+    {
+        if (preg->is_egg)
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Hatching");
+        }
+        else
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Pregnancy");
+        }
     }
 
     if (strategy)
@@ -711,6 +743,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
                     ImGui::Unindent();
                 }
             }
+        }
+        else
+        {
+            ImGui::Text("Currently: Doing nothing");
         }
     }
 

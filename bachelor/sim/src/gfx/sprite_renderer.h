@@ -58,6 +58,11 @@ public:
     explicit SpriteRenderer(Camera& camera);
 
     /**
+     * Clear all cached sprites to allow for re-submission
+     */
+    void clear();
+
+    /**
      * Add a new sprite to the draw list using the given position color and texture
      *
      * @param pos The position to draw the sprite at in world coordinates

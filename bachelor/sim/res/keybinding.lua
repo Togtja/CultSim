@@ -10,6 +10,7 @@ action_key_bindings = {
         ["d"] = EAction.MoveRight,
         ["f"] = EAction.FollowEntity,
         ["p"] = EAction.PauseMenu,
+        ["Escape"] = EAction.PauseMenu,
         ["."] = EAction.SpeedUp,
         [","] = EAction.SpeedDown,
         ["Space"] = EAction.Pause

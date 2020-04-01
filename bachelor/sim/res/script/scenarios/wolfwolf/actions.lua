@@ -72,6 +72,43 @@ actions.eat = {
     end
 }
 
+actions.hunt = {
+    name = "Hunt",
+    requirements = ETag.Find,
+    time_to_complete = 1,
+    success_chance = 0.5,
+    success = function(owner, target)
+            local damage = cultsim.get_component(owner, component.attack)
+            cultsim.apply_basic_damage(target, damage.damage)
+
+            local health = cultsim.get_component(target, component.health)
+            if health.health <= 0 then
+                cultsim.modify_need(owner, ETag.Food, 100)
+            end
+    end,
+    failure = function(owner, target)
+    end,
+    abort = function(owner, target)
+    end
+}
+
+actions.attack = {
+    name = "Attack",
+    requirements = ETag.Find,
+    time_to_complete = 1,
+    success_chance = 0.5,
+    success = function(owner, target)
+            --Deals less damage as you are just fustrated
+            local damage = cultsim.get_component(owner, component.attack)
+            cultsim.apply_basic_damage(target, damage.damage/2)
+    end,
+    failure = function(owner, target)
+            -- TODO: Lower fustration a bit
+    end,
+    abort = function(owner, target)
+    end
+}
+
 actions.reproduce = {
     name = "Reproducing",
     requirements = ETag.Find | ETag.Tag,

@@ -16,11 +16,11 @@ entity = {
         fov = 0 -- 0 means no FOV
     },
     TagComponent = {
-        tags = ETag.Avoidable
+        tags = ETag.Avoidable | ETag.Creature | ETag.Food | ETag.Meat | ETag.Herbivore
     },
     NeedComponent = {
         -- Corresponds to entires in the needs.lua file
-        needs = { needs.hunger, needs.thirst, needs.sleep, needs.reproduce }
+        needs = { needs.hunger_herb, needs.thirst, needs.sleep, needs.reproduce }
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
@@ -28,7 +28,7 @@ entity = {
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file
-        strategies = { strategies.find_food, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate }
+        strategies = { strategies.find_veggie, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate }
     },
     HealthComponent = {
         health = 100.0,

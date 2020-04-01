@@ -2,10 +2,10 @@
 scenario = Scenario:new()
 
 -- Give the scenario a name
-scenario.name = "Basic Needs"
+scenario.name = "Basic Needs Eggs"
 
 -- Describe the scenario with a sensible amount of text
-scenario.description = "Observe as your agents walk around in a forest looking for food and water to survive. How many can be sustained?"
+scenario.description = "The animals are laying eggs!"
 
 -- The bounds of the level on the X and Y in both directions based on the center 200,200 means the total world is 400,400 with 200 units on both sides of 0,0
 scenario.bounds = Vec2:new(500.0, 500.0)
@@ -32,12 +32,12 @@ scenario.sampling_rate = 1.0;
 -- This function is called before starting the simulation, once
 scenario.init = function()
     cultsim.connect("ScenarioLoaded", function(event) log.info("Scenario loaded.") end)
-
+    
     -- Spawn 100 Deer
     for i=1,100 do
         local deer = cultsim.spawn("deer")
 
-        -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
+        -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
         local need_comp = cultsim.get_component(deer, component.need)
         for i, need in ipairs(need_comp.required_needs) do
             need.status = random:normal(75.0, 25.0)
