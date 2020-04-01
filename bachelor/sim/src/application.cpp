@@ -37,24 +37,30 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
-    constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
-    auto time_since_tick    = timestep;
+    constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
+    auto time_since_tick               = timestep;
+    std::array<float, 144> average_fps = {};
+    int next_fps                       = 0;
 
     /** Main Loop */
     do
     {
-        CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        auto frame_time = dt_clock.restart_time_unit();
+        auto frame_time                 = dt_clock.restart_time_unit();
+        average_fps[(++next_fps) % 144] = frame_time.count();
         time_since_tick += frame_time;
         while (time_since_tick >= timestep)
         {
+            CS_AUTOTIMER(Update Time);
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
 
-            ImGui::Text("Frame Time / FPS: %.3f / %.3f", frame_time.count(), 1.f / frame_time.count());
+            /** Average FPS */
+            float average = std::accumulate(average_fps.cbegin(), average_fps.cend(), 0.f) / average_fps.size();
+            ImGui::Text("FPS: %.3fms / %.3f", average * 1000.f, 1.f / average);
 
             update(timestep.count());
             time_since_tick -= timestep;
