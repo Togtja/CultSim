@@ -17,8 +17,7 @@ TEST_CASE("testing the needs system initialization")
 
     entt::dispatcher dispatcher{};
 
-    auto need_system = new cs::system::Need({&test_registry, &dispatcher, &rng});
-    auto view        = test_registry.view<cs::component::Need>();
+    auto view = test_registry.view<cs::component::Need>();
     REQUIRE(view.size() == 1);
     view.each([](cs::component::Need& needs) {
         // Check that need has been added

@@ -139,7 +139,7 @@ void Requirement::update(float dt)
             for (auto& memory_container : memories->memory_container)
             {
                 // Find a container matching our tag
-                if ((memory_container.memory_tags & findreqs.tags == findreqs.tags) &&
+                if (((memory_container.memory_tags & findreqs.tags) == findreqs.tags) &&
                     memory_container.memory_tags & TAG_Location)
                 {
                     auto& memory = memory_container.memory_storage.front();

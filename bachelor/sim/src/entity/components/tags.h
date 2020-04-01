@@ -39,7 +39,7 @@ inline std::string tag_to_string(ETag tag)
                                        "Gather", "Delete", "Reserved",  "Carnivore", "Herbivore", "Omnivore",
                                        "Meat",   "Veggie", "Inventory", "Consume"};
 
-    for (int i = 0; i < tag_names.size(); i++)
+    for (unsigned i = 0u; i < tag_names.size(); i++)
     {
         if (tag & 1 << i)
         {

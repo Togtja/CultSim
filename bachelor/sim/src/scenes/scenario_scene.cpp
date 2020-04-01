@@ -253,7 +253,7 @@ void ScenarioScene::bind_actions_for_scene()
 
         // TODO: Steal UE4 FInterpretTo
         auto pos =
-            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 1.f * dt);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -468,7 +468,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
 
     /** Impregnate */
-    cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
+    cultsim.set_function("impregnate", [this](entt::entity father, entt::entity mother) {
         /** Figure out "type" of mother and spawn a child based on that */
 
         /** Give a Pregnancy component to the mother */
@@ -690,7 +690,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::Begin("Agent Information");
 
     auto text = fmt::format("Ola Normann nr {}", static_cast<int64_t>(selection_info.selected_entity));
-    ImGui::Text(text.c_str());
+    ImGui::Text("%s", text.c_str());
 
     if (health)
     {
@@ -804,7 +804,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                             for (auto& mem : memory.memory_storage)
                             {
                                 ImGui::TableNextCell();
-                                ImGui::Text("%u", mem->m_time_since_creation);
+                                ImGui::Text("%f", mem->m_time_since_creation);
                                 ImGui::TableNextCell();
                                 ImGui::Text("%u", dynamic_cast<memory::ResourceLocation*>(mem.get())->m_number_of_entities);
                             }
