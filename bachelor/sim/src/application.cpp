@@ -206,6 +206,7 @@ bool Application::init_gl()
     glClearColor(0.02f, 0.02f, 0.02f, 0.0f);
 
     glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 #ifndef NDEBUG
@@ -302,7 +303,7 @@ bool Application::init_imgui()
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init("#version 450 core");
+    ImGui_ImplOpenGL3_Init();
 
     return true;
 }
