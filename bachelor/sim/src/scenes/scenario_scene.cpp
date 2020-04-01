@@ -78,7 +78,7 @@ void ScenarioScene::initialize_simulation()
         if (type)
         {
             auto meta = type.construct(
-                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, m_context->lua_state});
+                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
             system::ISystem& temp_ref = meta.cast<system::ISystem>();
             m_active_systems.emplace_back(temp_ref.clone());
             m_active_systems.back()->initialize();

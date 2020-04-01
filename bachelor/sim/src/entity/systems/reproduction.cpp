@@ -92,7 +92,7 @@ void Reproduction::update(float dt)
 
     for (auto&& child : children)
     {
-        auto child_e = spawn_entity(*m_context.registry, m_context.lua_state, child.type, child.position);
+        auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
 
         if (!child.is_egg)
         {
