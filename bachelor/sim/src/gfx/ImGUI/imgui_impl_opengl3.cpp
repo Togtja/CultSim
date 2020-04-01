@@ -12,7 +12,7 @@
 #include <glad/glad.h>
 
 // OpenGL Data
-static GLuint g_FontTexture              = 0;
+static GLuint g_FontTexture              = 0, g_VaoHandle{};
 static GLuint g_ShaderHandle             = 0;
 static constexpr int g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0; // Uniforms location
 static constexpr int g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 1,
@@ -69,30 +69,11 @@ static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, GLuint ver
     glBindSampler(0, 0); // We use combined texture/sampler state. Applications using GL 3.3 may set that otherwise.
 #endif
 
-    (void)vertex_array_object;
-#ifndef IMGUI_IMPL_OPENGL_ES2
     glBindVertexArray(vertex_array_object);
-#endif
 
     // Bind vertex/index buffers and setup attributes for ImDrawVert
     glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
-    glEnableVertexAttribArray(g_AttribLocationVtxPos);
-    glEnableVertexAttribArray(g_AttribLocationVtxUV);
-    glEnableVertexAttribArray(g_AttribLocationVtxColor);
-    glVertexAttribPointer(g_AttribLocationVtxPos,
-                          2,
-                          GL_FLOAT,
-                          GL_FALSE,
-                          sizeof(ImDrawVert),
-                          (GLvoid*)IM_OFFSETOF(ImDrawVert, pos));
-    glVertexAttribPointer(g_AttribLocationVtxUV, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)IM_OFFSETOF(ImDrawVert, uv));
-    glVertexAttribPointer(g_AttribLocationVtxColor,
-                          4,
-                          GL_UNSIGNED_BYTE,
-                          GL_TRUE,
-                          sizeof(ImDrawVert),
-                          (GLvoid*)IM_OFFSETOF(ImDrawVert, col));
 }
 
 // OpenGL3 Render function.
@@ -123,15 +104,7 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
         clip_origin_lower_left = false;
 #endif
 
-    // Setup desired GL state
-    // Recreate the VAO every time (this is to easily allow multiple GL contexts to be rendered to. VAO are not shared among GL
-    // contexts) The renderer would actually work without any VAO bound, but then our VertexAttrib calls would overwrite the
-    // default one currently bound.
-    GLuint vertex_array_object = 0;
-#ifndef IMGUI_IMPL_OPENGL_ES2
-    glGenVertexArrays(1, &vertex_array_object);
-#endif
-    ImGui_ImplOpenGL3_SetupRenderState(draw_data, vertex_array_object);
+    ImGui_ImplOpenGL3_SetupRenderState(draw_data, g_VaoHandle);
 
     // Will project scissor/clipping rectangles into framebuffer space
     ImVec2 clip_off   = draw_data->DisplayPos;       // (0,0) unless using multi-viewports
@@ -161,7 +134,7 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                 // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset
                 // render state.)
                 if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    ImGui_ImplOpenGL3_SetupRenderState(draw_data, vertex_array_object);
+                    ImGui_ImplOpenGL3_SetupRenderState(draw_data, g_VaoHandle);
                 else
                     pcmd->UserCallback(cmd_list, pcmd);
             }
@@ -189,7 +162,7 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
                                   (int)clip_rect.w); // Support for GL 4.5 rarely used glClipControl(GL_UPPER_LEFT)
 
                     // Bind texture, Draw
-                    glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+                    glBindTextureUnit(0u, (GLuint)(intptr_t)pcmd->TextureId);
                     glDrawElementsBaseVertex(GL_TRIANGLES,
                                              (GLsizei)pcmd->ElemCount,
                                              sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
@@ -199,11 +172,6 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
             }
         }
     }
-
-    // Destroy the temporary VAO
-#ifndef IMGUI_IMPL_OPENGL_ES2
-    glDeleteVertexArrays(1, &vertex_array_object);
-#endif
 
     if (last_enable_scissor_test)
         glEnable(GL_SCISSOR_TEST);
@@ -234,7 +202,7 @@ bool ImGui_ImplOpenGL45_CreateFontsTexture()
     return true;
 }
 
-void ImGui_ImplOpenGL3_DestroyFontsTexture()
+void ImGui_ImplOpenGL45_DestroyFontsTexture()
 {
     if (g_FontTexture)
     {
@@ -283,6 +251,27 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
     glGenBuffers(1, &g_VboHandle);
     glGenBuffers(1, &g_ElementsHandle);
 
+    // Create buffers
+    glCreateBuffers(1, &g_VboHandle);
+    glCreateBuffers(1, &g_ElementsHandle);
+
+    // Create VAO
+    glCreateVertexArrays(1, &g_VaoHandle);
+    glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, 0u, sizeof(ImDrawVert));
+    glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
+
+    glVertexArrayAttribBinding(g_VaoHandle, g_AttribLocationVtxPos, 0);
+    glVertexArrayAttribBinding(g_VaoHandle, g_AttribLocationVtxUV, 0);
+    glVertexArrayAttribBinding(g_VaoHandle, g_AttribLocationVtxColor, 0);
+
+    glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationVtxPos, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, pos));
+    glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationVtxUV, 2, GL_FLOAT, GL_FALSE, IM_OFFSETOF(ImDrawVert, uv));
+    glVertexArrayAttribFormat(g_VaoHandle, g_AttribLocationVtxColor, 4, GL_UNSIGNED_BYTE, GL_TRUE, IM_OFFSETOF(ImDrawVert, col));
+
+    glEnableVertexArrayAttrib(g_VaoHandle, 0);
+    glEnableVertexArrayAttrib(g_VaoHandle, 1);
+    glEnableVertexArrayAttrib(g_VaoHandle, 2);
+
     ImGui_ImplOpenGL45_CreateFontsTexture();
     return true;
 }
@@ -304,6 +293,10 @@ void ImGui_ImplOpenGL3_DestroyDeviceObjects()
         glDeleteProgram(g_ShaderHandle);
         g_ShaderHandle = 0;
     }
+    if (g_VaoHandle)
+    {
+        glDeleteVertexArrays(1, &g_VaoHandle);
+    }
 
-    ImGui_ImplOpenGL3_DestroyFontsTexture();
+    ImGui_ImplOpenGL45_DestroyFontsTexture();
 }
