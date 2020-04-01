@@ -115,6 +115,7 @@ actions.take_food_from_inventory = {
     end,
     failure = function(owner,target)
         local inventory = cultsim.get_component(target, component.inventory)
+        local my_pos = cultsim.get_component(target, component.position)
 
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Food then
@@ -148,7 +149,7 @@ actions.take_water_from_inventory = {
     end,
     failure = function(owner,target)
         local inventory = cultsim.get_component(target, component.inventory)
-
+        local my_pos = cultsim.get_component(target, component.position)
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Drink then
                 cultsim.remove_from_inventory(target,content)
