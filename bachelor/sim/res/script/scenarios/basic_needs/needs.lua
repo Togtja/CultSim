@@ -34,12 +34,20 @@ needs = {
         vitality = 0.0,
         tags = ETag.Reproduce
     },
-    stockpile = {
+    stockpile_food = {
         name = "Stockpile Food",
         weight = 0.0,
         status = 0.0,
         decay_rate = 0.0,
         vitality = 0.0,
         tags = ETag.Food | ETag.Gather
+	},
+    stockpile_water = {
+        name = "Stockpile Water",
+        weight = 0.0,
+        status = 0.0,
+        decay_rate = 0.0,
+        vitality = 0.0,
+        tags = ETag.Drink | ETag.Gather
 	}
 }
