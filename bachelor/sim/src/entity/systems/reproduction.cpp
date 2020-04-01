@@ -21,13 +21,14 @@ void Reproduction::update(float dt)
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
         if (auto age = m_context.registry->try_get<component::Age>(e); age)
         {
-            repr.fertility = std::clamp(100.f - (age->current_age - age->max_age), 0.f, 100.f);
+            repr.fertility = std::clamp(100.f - (age->current_age - age->average_life_expectancy), 0.f, 100.f);
         }
         else
         {
             repr.fertility = 100.f - (repr.number_of_children * 10.f);
         }
     });
+
 
     auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
     preg_view.each([this, dt](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
