@@ -701,6 +701,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 }
             }
         }
+        else
+        {
+            ImGui::Text("Currently: Doing nothing");
+        }
     }
 
     if (needs)

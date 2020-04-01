@@ -10,6 +10,7 @@
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
+#include "scenes/pausemenu_scene.h"
 
 #include <functional>
 
@@ -71,22 +72,22 @@ void Application::handle_input()
     while (SDL_PollEvent(&e))
     {
         ImGui_ImplSDL2_ProcessEvent(&e);
-        if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+
+        if (e.type == SDL_QUIT)
         {
-            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            if (m_window.confirm_dialog("Quit?", "Do you really want to quit?"))
             {
                 m_running = false;
             }
         }
-        const auto& io = ImGui::GetIO();
 
+        const auto& io = ImGui::GetIO();
         if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
         {
             input::get_input().handle_input(e);
         }
     }
 }
-
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
@@ -129,8 +130,9 @@ bool Application::init_input()
 
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
-
-    /* TODO: Fix to not return true */
+    inputs.fast_bind_key(input::EKeyContext::DefaultContext, SDL_SCANCODE_ESCAPE, input::EAction::Quit, [this] {
+        m_running = false;
+    });
 
     return true;
 }
@@ -296,6 +298,7 @@ bool Application::init_imgui()
 
 void Application::deinit()
 {
+    m_scene_manager.clear();
     input::get_input().save_binding_to_file();
     deinit_preferences();
     deinit_imgui();
