@@ -303,7 +303,7 @@ bool Application::init_imgui()
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init();
+    ImGui_ImplOpenGL45_Init();
 
     return true;
 }

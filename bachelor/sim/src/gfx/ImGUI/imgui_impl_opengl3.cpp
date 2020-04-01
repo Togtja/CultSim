@@ -135,15 +135,13 @@ static constexpr int          g_AttribLocationTex = 0, g_AttribLocationProjMtx =
 static constexpr int          g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 1, g_AttribLocationVtxColor = 2; // Vertex attributes location
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
 
-// Functions
-bool    ImGui_ImplOpenGL3_Init()
+bool    ImGui_ImplOpenGL45_Init()
 {
-    // Setup back-end capabilities flags
     ImGuiIO& io = ImGui::GetIO();
     io.BackendRendererName = "imgui_impl_opengl4.5";
 
 #if IMGUI_IMPL_OPENGL_MAY_HAVE_VTX_OFFSET
-    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
+    io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;
 #endif
 
     return true;
@@ -157,7 +155,9 @@ void    ImGui_ImplOpenGL3_Shutdown()
 void    ImGui_ImplOpenGL3_NewFrame()
 {
     if (!g_ShaderHandle)
+    {
         ImGui_ImplOpenGL3_CreateDeviceObjects();
+    }
 }
 
 static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, GLuint vertex_array_object)
@@ -303,31 +303,21 @@ void    ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 
-bool ImGui_ImplOpenGL3_CreateFontsTexture()
+bool ImGui_ImplOpenGL45_CreateFontsTexture()
 {
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
     int width, height;
-    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   // Load as RGBA 32-bit (75% of the memory is wasted, but default font is so small) because it is more likely to be compatible with user's existing shaders. If your ImTextureId represent a higher-level concept than just a GL texture id, consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
+    io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
     // Upload texture to graphics system
-    GLint last_texture;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-    glGenTextures(1, &g_FontTexture);
-    glBindTexture(GL_TEXTURE_2D, g_FontTexture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#ifdef GL_UNPACK_ROW_LENGTH
+    glCreateTextures(GL_TEXTURE_2D, 1, &g_FontTexture);
+    glTextureParameteri(g_FontTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(g_FontTexture, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-#endif
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-    // Store our identifier
-    io.Fonts->TexID = (ImTextureID)(intptr_t)g_FontTexture;
-
-    // Restore state
-    glBindTexture(GL_TEXTURE_2D, last_texture);
+    glTextureStorage2D(g_FontTexture, 1, GL_RGBA8, width, height);
+    glTextureSubImage2D(g_FontTexture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     return true;
 }
@@ -345,15 +335,6 @@ void ImGui_ImplOpenGL3_DestroyFontsTexture()
 
 bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
 {
-    // Backup GL state
-    GLint last_texture, last_array_buffer;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &last_array_buffer);
-#ifndef IMGUI_IMPL_OPENGL_ES2
-    GLint last_vertex_array;
-    glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &last_vertex_array);
-#endif
-
     const GLchar* vertex_shader_source =
         "#version 450 core\n"
         "layout(location = 0) in vec2 Position;\n"
@@ -393,15 +374,7 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
     glGenBuffers(1, &g_VboHandle);
     glGenBuffers(1, &g_ElementsHandle);
 
-    ImGui_ImplOpenGL3_CreateFontsTexture();
-
-    // Restore modified GL state
-    glBindTexture(GL_TEXTURE_2D, last_texture);
-    glBindBuffer(GL_ARRAY_BUFFER, last_array_buffer);
-#ifndef IMGUI_IMPL_OPENGL_ES2
-    glBindVertexArray(last_vertex_array);
-#endif
-
+    ImGui_ImplOpenGL45_CreateFontsTexture();
     return true;
 }
 
