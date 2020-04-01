@@ -199,6 +199,9 @@ bool ImGui_ImplOpenGL45_CreateFontsTexture()
     glTextureStorage2D(g_FontTexture, 1, GL_RGBA8, width, height);
     glTextureSubImage2D(g_FontTexture, 0, 0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
+    // Store our identifier
+    io.Fonts->TexID = (ImTextureID)(intptr_t)g_FontTexture;
+
     return true;
 }
 
