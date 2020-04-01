@@ -183,6 +183,7 @@ bool ScenarioScene::update(float dt)
     for (int i = 0; i < m_timescale; ++i)
     {
         m_data_collector.update(dt);
+        m_simtime += dt;
 
         /** Update systems */
         for (auto&& system : m_active_systems)

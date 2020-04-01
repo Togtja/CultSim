@@ -97,6 +97,7 @@ void Application::handle_input()
         }
     }
 }
+
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
