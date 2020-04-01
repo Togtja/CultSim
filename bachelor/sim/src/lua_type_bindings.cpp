@@ -198,7 +198,8 @@ void bind_input(sol::state_view lua)
                                   {"FollowEntity", input::EAction::FollowEntity},
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
-                                  {"Pause", input::EAction::Pause}});
+                                  {"Pause", input::EAction::Pause},
+                                  {"Quit", input::EAction::Quit}});
 
     lua.new_enum<input::EMouse>("EMouse",
                                 {{"BtnLeft", input::EMouse::BtnLeft},

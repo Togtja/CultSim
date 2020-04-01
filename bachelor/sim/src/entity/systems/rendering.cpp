@@ -1,8 +1,8 @@
 #include "rendering.h"
 #include "constants.h"
 #include "debug/auto_timer.h"
-#include "gfx/renderer.h"
 #include "entity/components/components.h"
+#include "gfx/renderer.h"
 
 #include <array>
 #include <numeric>
