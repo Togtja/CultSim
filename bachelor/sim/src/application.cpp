@@ -46,12 +46,15 @@ void Application::run(const std::vector<char*>& args)
         CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        time_since_tick += dt_clock.restart_time_unit();
+        auto frame_time = dt_clock.restart_time_unit();
+        time_since_tick += frame_time;
         while (time_since_tick >= timestep)
         {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
+
+            ImGui::Text("Frame Time / FPS: %.3f / %.3f", frame_time.count(), 1.f / frame_time.count());
 
             update(timestep.count());
             time_since_tick -= timestep;
