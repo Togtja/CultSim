@@ -153,8 +153,49 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 
     repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
+    repl.mean_children_pp = table["mean_offspring"].get<int>();
+    if (table["offspring_deviation"].get_type() == sol::type::number)
+    {
+        repl.children_deviation = table["offspring_deviation"].get<float>();
+    }
+
+    if (table["fertility"].get_type() == sol::type::number)
+    {
+        repl.fertility     = table["fertility"].get<float>();
+        repl.has_fertility = false;
+    }
+    else if (table["fertility"].get_type() == sol::type::boolean && table["fertility"].get<bool>())
+    {
+        if (!table["start_fertility"].valid() || !table["peak_fertility"].valid() || !table["end_fertility"].valid())
+        {
+            spdlog::get("lua")->critical("fertility is true, so you need to set start, peak and end fertility");
+        }
+        repl.has_fertility   = true;
+        repl.start_fertility = table["start_fertility"].get<float>();
+        repl.peak_fertility  = table["peak_fertility"].get<float>();
+        repl.end_fertility   = table["end_fertility"].get<float>();
+    }
+
+    if (table["lays_eggs"].get_type() == sol::type::boolean)
+    {
+        repl.lays_eggs = table["lays_eggs"].get<bool>();
+        if (repl.lays_eggs && table["egg_type"].valid())
+        {
+            repl.egg_type = table["egg_type"].get<std::string>();
+        }
+    }
+
+    if (table["incubator"].valid())
+    {
+        repl.incubator = table["incubator"].get<component::Reproduction::ESex>();
+    }
+    if (table["average_gestation"].get_type() == sol::type::number)
+    {
+        repl.average_gestation_period = table["average_gestation"].get<float>();
+        repl.gestation_deviation      = table["gestation_deviation"].get<float>();
+    }
     return true;
-}
+} // namespace detail
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {

@@ -7,10 +7,9 @@ entity = {
         speed = 80.0
     },
     SpriteComponent = {
-        color = Vec3:new(1.0, 1.0, 1.0),
-        texture = "sprites/deer_c.png",
-        normal = "sprites/deer_n.png",
-        scale = 20
+        color = Vec3:new(1.0, 0.50, 0.60),
+        texture = "sprites/agent_c.png",
+        normal = "sprites/agent_n.png"
     },
     VisionComponent = {
         radius = 40.0,
@@ -28,8 +27,10 @@ entity = {
         sex = random:randint(0, 1),
         mean_offspring = 2,
         offspring_deviation = 1,
-        average_gestation = 90,
-        gestation_deviation = 5
+        average_gestation = 9,
+        gestation_deviation = 5,
+        lays_eggs = true,
+        egg_type = "script/scenarios/basic_needs_eggs/entities/deer_egg.lua"
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file
@@ -47,9 +48,5 @@ entity = {
         max_memories = 10,
         max_retention_time = 1000.0,
         allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location },
-    },
-    AgeComponent = 
-    {
-        life_expectancy = 3000.0
     }
 }
