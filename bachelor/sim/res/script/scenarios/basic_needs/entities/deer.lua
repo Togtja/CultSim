@@ -7,9 +7,10 @@ entity = {
         speed = 80.0
     },
     SpriteComponent = {
-        color = Vec3:new(1.0, 0.50, 0.60),
-        texture = "sprites/agent_c.png",
-        normal = "sprites/agent_n.png"
+        color = Vec3:new(1.0, 1.0, 1.0),
+        texture = "sprites/deer_c.png",
+        normal = "sprites/deer_n.png",
+        scale = 20
     },
     VisionComponent = {
         radius = 40.0,
