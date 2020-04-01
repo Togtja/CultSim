@@ -114,7 +114,8 @@ struct Age
 {
     float current_age{};
 
-    float max_age{};
+    float average_life_expectancy{};
+
 };
 
 struct DropItems
@@ -163,6 +164,13 @@ struct FindRequirement
 
 struct TagRequirement
 {
+    ETag tags{};
+};
+
+struct InventoryRequirement
+{
+    int number_of_matching{};
+
     ETag tags{};
 };
 

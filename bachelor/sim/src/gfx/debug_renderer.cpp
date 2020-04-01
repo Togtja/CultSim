@@ -16,6 +16,13 @@ DebugRenderer::DebugRenderer(Camera& camera) : m_camera(camera)
     init();
 }
 
+void DebugRenderer::clear()
+{
+    m_nlines   = 0u;
+    m_ncircles = 0u;
+    m_nrects   = 0u;
+}
+
 void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
 {
     m_line_data[m_nlines++] = {{from.x, from.y, from.z}, {color.r, color.g, color.b}};
@@ -57,10 +64,6 @@ void DebugRenderer::display()
     glBindVertexBuffer(0, m_rectvbo, 5 * sizeof(uint32_t), sizeof(PrimitiveVertex));
     glBindVertexBuffer(1, m_rectvbo, m_rect_buffer_offset, sizeof(DebugInstanceVertex));
     glDrawElementsInstanced(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, nullptr, m_nrects);
-
-    m_nlines   = 0u;
-    m_ncircles = 0u;
-    m_nrects   = 0u;
 }
 
 void DebugRenderer::init()

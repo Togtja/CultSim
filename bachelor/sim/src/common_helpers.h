@@ -22,6 +22,13 @@ struct ApplicationContext
     PreferenceManager* preferences{nullptr};
 };
 
+struct Notification
+{
+    std::string title{};
+    std::string information{};
+    float time_shown{};
+};
+
 /**
  * Helper struct for entity selection
  *
@@ -49,4 +56,10 @@ inline bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
     glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
     return boolvec.x && boolvec.y;
 }
+
+inline float sigmoid(const float x)
+{
+    return exp(x) / (exp(x) + 1.f);
+}
+
 } // namespace cs

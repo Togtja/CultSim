@@ -37,6 +37,8 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
+    constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
+    auto time_since_tick    = timestep;
 
     /** Main Loop */
     do
@@ -44,12 +46,19 @@ void Application::run(const std::vector<char*>& args)
         CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(m_window.get());
-        ImGui::NewFrame();
+        time_since_tick += dt_clock.restart_time_unit();
+        while (time_since_tick >= timestep)
+        {
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame(m_window.get());
+            ImGui::NewFrame();
 
-        update(dt_clock.restart());
-        AutoTimer::show_debug_ui();
+            update(timestep.count());
+            time_since_tick -= timestep;
+            AutoTimer::show_debug_ui();
+
+            ImGui::Render();
+        }
 
         draw();
     } while (m_running && !m_scene_manager.empty());
@@ -88,11 +97,12 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    gfx::get_renderer().clear();
+
     m_scene_manager.draw();
 
     gfx::get_renderer().display();
 
-    ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     m_window.display();
@@ -131,15 +141,16 @@ bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
     m_lua.open_libraries(sol::lib::base, sol::lib::math);
+    m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
-    m_lua.set_function("writeFile", fs::write_file);
-    m_lua.set_function("readFile", fs::read_file);
-    m_lua.set_function("makeDirectory", fs::mkdir);
-    m_lua.set_function("moveFile", fs::move_file);
-    m_lua.set_function("fileExists", fs::exists);
-    m_lua.set_function("deleteFile", fs::delete_file);
-    m_lua.set_function("copyFile", fs::copy_file);
+    m_lua.set_function("write_file", fs::write_file);
+    m_lua.set_function("read_file", fs::read_file);
+    m_lua.set_function("make_directory", fs::mkdir);
+    m_lua.set_function("move_file", fs::move_file);
+    m_lua.set_function("file_exists", fs::exists);
+    m_lua.set_function("delete_file", fs::delete_file);
+    m_lua.set_function("copy_file", fs::copy_file);
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");

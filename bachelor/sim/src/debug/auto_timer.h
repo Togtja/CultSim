@@ -4,6 +4,7 @@
 
 #include <robin_hood.h>
 #include <spdlog/spdlog.h>
+#include <robin_hood.h>
 
 namespace cs
 {
@@ -47,7 +48,17 @@ public:
     ~AutoTimer() noexcept
     {
         TimeUnit timed = std::chrono::steady_clock::now() - m_start_time;
-        s_results.push_back({m_name, timed.count()});
+
+        auto itr = std::find_if(s_results.begin(), s_results.end(), [this](const auto& r) { return r.name == m_name; });
+
+        if (itr == s_results.end())
+        {
+            s_results.push_back({m_name, timed.count()});
+        }
+        else
+        {
+            itr->time_ms += timed.count();
+        }
     }
 
     /**

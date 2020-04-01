@@ -5,19 +5,9 @@
 
 namespace cs::system
 {
-enum class EVisualizationMode : int
-{
-    None,
-    Vision,
-    Needs,
-    Health
-};
-
 class Rendering : public ISystem
 {
 private:
-    EVisualizationMode m_visualization_mode{EVisualizationMode::None};
-
     gfx::SpriteTextureID m_shadow_texture{};
 
 public:
