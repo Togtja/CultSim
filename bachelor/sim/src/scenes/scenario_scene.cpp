@@ -77,7 +77,8 @@ void ScenarioScene::initialize_simulation()
         auto type = entt::resolve(entt::hashed_string(system.c_str()));
         if (type)
         {
-            auto meta = type.construct(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor});
+            auto meta = type.construct(
+                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
             system::ISystem& temp_ref = meta.cast<system::ISystem>();
             m_active_systems.emplace_back(temp_ref.clone());
             m_active_systems.back()->initialize();
@@ -468,52 +469,74 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Impregnate */
     cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
-        m_registry
-            .assign_or_replace<component::Timer>(mother, 20.f, 0.f, 1, [this, father, mother](entt::entity e, entt::registry& r) {
-                /** Don't do anything if e became invalid */
-                if (!r.valid(e))
+        /** Figure out "type" of mother and spawn a child based on that */
+
+        /** Give a Pregnancy component to the mother */
+        auto* rc_m = m_registry.try_get<component::Reproduction>(mother);
+        auto* rc_f = m_registry.try_get<component::Reproduction>(father);
+        if (rc_m && rc_f)
+        {
+            if (!m_rng.trigger(rc_m->fertility) || !m_rng.trigger(rc_f->fertility))
+            {
+                // N0 pregnancy
+                return;
+            }
+            if (auto* again = m_registry.try_get<component::Pregnancy>(mother); again)
+            {
+                // Can't get pregnant twice
+                return;
+            }
+            cs::component::Pregnancy* preg;
+            if (rc_f->incubator == component::Reproduction::ESex::Female)
+            {
+                preg = &m_registry.assign<component::Pregnancy>(mother);
+                if (rc_m->children_deviation > 0)
                 {
-                    return;
+                    preg->children_in_pregnancy = std::round(m_rng.normal(rc_m->mean_children_pp, rc_m->children_deviation));
                 }
-
-                /** Figure out "type" of mother and spawn a child based on that */
-                const auto& mother_meta = r.get<component::Meta>(e);
-
-                /** Set position to be close to mother */
-                const auto new_pos = r.get<component::Position>(e).position +
-                                     glm::vec3(m_rng.uniform(-10.f, 10.f), m_rng.uniform(-10.f, 10.f), 0.f);
-
-                auto child = spawn_entity(m_registry, m_context->lua_state, mother_meta.name, new_pos);
-
-                /** Reset all needs to 100.0 */
-                if (auto* need_comp = r.try_get<component::Need>(child); need_comp)
+                else
                 {
-                    for (auto& need : need_comp->needs)
-                    {
-                        need.status = 100.f;
-                    }
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
                 }
-
-                /** Reset health */
-                if (auto* health_comp = r.try_get<component::Health>(child); health_comp)
+                if (rc_m->gestation_deviation > 0)
                 {
-                    health_comp->health = 100.f;
+                    preg->gestation_period = std::round(m_rng.normal(rc_m->average_gestation_period, rc_m->gestation_deviation));
                 }
-
-                /** Give a child to the parents */
-                if (m_registry.valid(father))
+                else
                 {
-                    if (auto* rc = m_registry.try_get<component::Reproduction>(father); rc)
-                    {
-                        ++rc->number_of_children;
-                    }
+                    preg->gestation_period = rc_m->average_gestation_period;
                 }
-
-                if (auto* rc = m_registry.try_get<component::Reproduction>(mother); rc)
+                preg->parents.first  = mother;
+                preg->parents.second = father;
+            }
+            else
+            {
+                preg = &m_registry.assign<component::Pregnancy>(father);
+                if (rc_f->children_deviation > 0)
                 {
-                    ++rc->number_of_children;
+                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->children_deviation);
                 }
-            });
+                else
+                {
+                    preg->children_in_pregnancy = rc_f->mean_children_pp;
+                }
+                if (rc_f->gestation_deviation > 0)
+                {
+                    preg->gestation_period = m_rng.normal(rc_f->average_gestation_period, rc_f->gestation_deviation);
+                }
+                else
+                {
+                    preg->gestation_period = rc_f->average_gestation_period;
+                }
+                // Here the incubator is the dad
+                preg->parents.second = mother;
+                preg->parents.first  = father;
+            }
+            if (preg->children_in_pregnancy < 1)
+            {
+                preg->children_in_pregnancy = 1;
+            }
+        }
     });
 }
 
@@ -652,14 +675,15 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
                            component::Timer,
                            component::Tags,
-                           component::Memory>(selection_info.selected_entity);
+                           component::Memory,
+                           component::Pregnancy>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -677,9 +701,28 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (reproduction)
     {
-        ImGui::Text("I am a %s, and I have %d children.",
-                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
-                    reproduction->number_of_children);
+        if (preg && preg->is_egg)
+        {
+            ImGui::Text("I am a hatching egg");
+        }
+        else
+        {
+            ImGui::Text("I am a %s, and I have %d children.",
+                        (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                        reproduction->number_of_children);
+        }
+    }
+
+    if (preg)
+    {
+        if (preg->is_egg)
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Hatching");
+        }
+        else
+        {
+            ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Pregnancy");
+        }
     }
 
     if (strategy)
