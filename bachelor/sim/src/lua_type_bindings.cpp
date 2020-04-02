@@ -3,15 +3,15 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
-#include "preferences.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
+#include "preferences.h"
 #include "random_engine.h"
 
-#include <spdlog/spdlog.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::lua
 {
@@ -75,6 +75,10 @@ void bind_components(sol::state_view lua)
                                &ai::Need::vitality,
                                "tags",
                                &ai::Need::tags,
+                               "weight_multi",
+                               &ai::Need::weight_multi,
+                               "decay_multi",
+                               &ai::Need::decay_multi,
                                "weight_func",
                                &ai::Need::weight_func);
 

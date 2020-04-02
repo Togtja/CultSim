@@ -23,8 +23,12 @@ struct Need
     ETag tags{};
 
     std::variant<sol::function, std::function<float(const Need&)>> weight_func = [](const ai::Need& local) {
-        return (100 / (local.status + 1)) * local.weight;
+        return (100 / (local.status + 1)) * local.weight * local.weight_multi;
     };
+
+    // Is only used with personalities
+    float weight_multi = 1.f;
+    float decay_multi  = 1.f;
 };
 
 inline bool operator<(Need const& lhs, Need const& rhs)
