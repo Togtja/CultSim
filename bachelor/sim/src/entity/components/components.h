@@ -233,6 +233,24 @@ struct Pregnancy
     bool is_egg = false;
 };
 
+namespace detail
+{
+// Defines a single personality
+struct Personality
+{
+    std::string name;
+    std::string desc;
+
+    sol::function affect;
+    sol::function remove_affect;
+};
+} // namespace detail
+
+// An Agents personalities
+struct Personalities
+{
+    std::vector<detail::Personality> personalities;
+};
 struct AI
 {
 };
