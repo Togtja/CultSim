@@ -208,6 +208,7 @@ bool Application::init_gl()
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 #ifndef NDEBUG
     gfx::create_debug_callback();

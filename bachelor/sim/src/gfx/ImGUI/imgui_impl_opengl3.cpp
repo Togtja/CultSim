@@ -10,14 +10,17 @@
 #include <cstdint>
 
 #include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // OpenGL Data
 static GLuint g_FontTexture              = 0, g_VaoHandle{};
 static GLuint g_ShaderHandle             = 0;
-static constexpr int g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0; // Uniforms location
-static constexpr int g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 1,
-                     g_AttribLocationVtxColor = 2; // Vertex attributes location
+static constexpr int g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
+static constexpr int g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 1, g_AttribLocationVtxColor = 2;
 static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
+static constexpr std::size_t g_vbo_byte_size = 1024 * 1024;
+static constexpr std::size_t g_ebo_byte_size = 1024 * 1024;
 
 bool ImGui_ImplOpenGL45_Init()
 {
@@ -35,45 +38,10 @@ void ImGui_ImplOpenGL3_Shutdown()
 
 void ImGui_ImplOpenGL3_NewFrame()
 {
-    if (!g_ShaderHandle)
+    if (g_ShaderHandle == 0u)
     {
         ImGui_ImplOpenGL3_CreateDeviceObjects();
     }
-}
-
-static void ImGui_ImplOpenGL3_SetupRenderState(ImDrawData* draw_data, GLuint vertex_array_object)
-{
-    // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
-    glEnable(GL_SCISSOR_TEST);
-#ifdef GL_POLYGON_MODE
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-#endif
-
-    // Setup viewport, orthographic projection matrix
-    // Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom
-    // right). DisplayPos is (0,0) for single viewport apps.
-    float L                            = draw_data->DisplayPos.x;
-    float R                            = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
-    float T                            = draw_data->DisplayPos.y;
-    float B                            = draw_data->DisplayPos.y + draw_data->DisplaySize.y;
-    const float ortho_projection[4][4] = {
-        {2.0f / (R - L), 0.0f, 0.0f, 0.0f},
-        {0.0f, 2.0f / (T - B), 0.0f, 0.0f},
-        {0.0f, 0.0f, -1.0f, 0.0f},
-        {(R + L) / (L - R), (T + B) / (B - T), 0.0f, 1.0f},
-    };
-    glUseProgram(g_ShaderHandle);
-    glUniform1i(g_AttribLocationTex, 0);
-    glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, &ortho_projection[0][0]);
-#ifdef GL_SAMPLER_BINDING
-    glBindSampler(0, 0); // We use combined texture/sampler state. Applications using GL 3.3 may set that otherwise.
-#endif
-
-    glBindVertexArray(vertex_array_object);
-
-    // Bind vertex/index buffers and setup attributes for ImDrawVert
-    glBindBuffer(GL_ARRAY_BUFFER, g_VboHandle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ElementsHandle);
 }
 
 // OpenGL3 Render function.
@@ -86,25 +54,26 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     int fb_width  = (int)(draw_data->DisplaySize.x * draw_data->FramebufferScale.x);
     int fb_height = (int)(draw_data->DisplaySize.y * draw_data->FramebufferScale.y);
     if (fb_width <= 0 || fb_height <= 0)
+    {
         return;
+    }
 
-        // Backup GL state
-#ifdef GL_POLYGON_MODE
-    GLint last_polygon_mode[2];
-    glGetIntegerv(GL_POLYGON_MODE, last_polygon_mode);
-#endif
+    // Backup GL state
     GLint last_scissor_box[4];
     glGetIntegerv(GL_SCISSOR_BOX, last_scissor_box);
-    GLboolean last_enable_scissor_test = glIsEnabled(GL_SCISSOR_TEST);
-    bool clip_origin_lower_left        = true;
-#if defined(GL_CLIP_ORIGIN) && !defined(__APPLE__)
-    GLenum last_clip_origin = 0;
-    glGetIntegerv(GL_CLIP_ORIGIN, (GLint*)&last_clip_origin); // Support for GL 4.5's glClipControl(GL_UPPER_LEFT)
-    if (last_clip_origin == GL_UPPER_LEFT)
-        clip_origin_lower_left = false;
-#endif
 
-    ImGui_ImplOpenGL3_SetupRenderState(draw_data, g_VaoHandle);
+    // Setup render state: alpha-blending enabled, no face culling, no depth testing, scissor enabled, polygon fill
+    glEnable(GL_SCISSOR_TEST);
+
+    /** Projection matrix */
+    const glm::mat4 proj = glm::ortho(draw_data->DisplayPos.x,
+                                      draw_data->DisplayPos.x + draw_data->DisplaySize.x,
+                                      draw_data->DisplayPos.y + draw_data->DisplaySize.y,
+                                      draw_data->DisplayPos.y);
+
+    glUseProgram(g_ShaderHandle);
+    glUniformMatrix4fv(g_AttribLocationProjMtx, 1, GL_FALSE, glm::value_ptr(proj));
+    glBindVertexArray(g_VaoHandle);
 
     // Will project scissor/clipping rectangles into framebuffer space
     ImVec2 clip_off   = draw_data->DisplayPos;       // (0,0) unless using multi-viewports
@@ -115,71 +84,48 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
     {
         const ImDrawList* cmd_list = draw_data->CmdLists[n];
 
-        // Upload vertex/index buffers
-        glBufferData(GL_ARRAY_BUFFER,
-                     (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
-                     (const GLvoid*)cmd_list->VtxBuffer.Data,
-                     GL_STREAM_DRAW);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
-                     (const GLvoid*)cmd_list->IdxBuffer.Data,
-                     GL_STREAM_DRAW);
+        /** Upload vertex/index buffers */
+        glNamedBufferSubData(g_VboHandle,
+                             0u,
+                             (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
+                             (const GLvoid*)cmd_list->VtxBuffer.Data);
+
+        glNamedBufferSubData(g_ElementsHandle,
+                             0u,
+                             (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
+                             (const GLvoid*)cmd_list->IdxBuffer.Data);
 
         for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
         {
+            /** We are not processing the user callbacks in this implementation */
             const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-            if (pcmd->UserCallback != NULL)
-            {
-                // User callback, registered via ImDrawList::AddCallback()
-                // (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset
-                // render state.)
-                if (pcmd->UserCallback == ImDrawCallback_ResetRenderState)
-                    ImGui_ImplOpenGL3_SetupRenderState(draw_data, g_VaoHandle);
-                else
-                    pcmd->UserCallback(cmd_list, pcmd);
-            }
-            else
-            {
-                // Project scissor/clipping rectangles into framebuffer space
-                ImVec4 clip_rect;
-                clip_rect.x = (pcmd->ClipRect.x - clip_off.x) * clip_scale.x;
-                clip_rect.y = (pcmd->ClipRect.y - clip_off.y) * clip_scale.y;
-                clip_rect.z = (pcmd->ClipRect.z - clip_off.x) * clip_scale.x;
-                clip_rect.w = (pcmd->ClipRect.w - clip_off.y) * clip_scale.y;
 
-                if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
-                {
-                    // Apply scissor/clipping rectangle
-                    if (clip_origin_lower_left)
-                        glScissor((int)clip_rect.x,
-                                  (int)(fb_height - clip_rect.w),
-                                  (int)(clip_rect.z - clip_rect.x),
-                                  (int)(clip_rect.w - clip_rect.y));
-                    else
-                        glScissor((int)clip_rect.x,
-                                  (int)clip_rect.y,
-                                  (int)clip_rect.z,
-                                  (int)clip_rect.w); // Support for GL 4.5 rarely used glClipControl(GL_UPPER_LEFT)
+            // Project scissor/clipping rectangles into framebuffer space
+            ImVec4 clip_rect;
+            clip_rect.x = (pcmd->ClipRect.x - clip_off.x) * clip_scale.x;
+            clip_rect.y = (pcmd->ClipRect.y - clip_off.y) * clip_scale.y;
+            clip_rect.z = (pcmd->ClipRect.z - clip_off.x) * clip_scale.x;
+            clip_rect.w = (pcmd->ClipRect.w - clip_off.y) * clip_scale.y;
 
-                    // Bind texture, Draw
-                    glBindTextureUnit(0u, (GLuint)(intptr_t)pcmd->TextureId);
-                    glDrawElementsBaseVertex(GL_TRIANGLES,
-                                             (GLsizei)pcmd->ElemCount,
-                                             sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
-                                             (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)),
-                                             (GLint)pcmd->VtxOffset);
-                }
+            if (clip_rect.x < fb_width && clip_rect.y < fb_height && clip_rect.z >= 0.0f && clip_rect.w >= 0.0f)
+            {
+                glScissor((int)clip_rect.x,
+                          (int)(fb_height - clip_rect.w),
+                          (int)(clip_rect.z - clip_rect.x),
+                          (int)(clip_rect.w - clip_rect.y));
+
+                // Bind texture, Draw
+                glBindTextureUnit(g_AttribLocationTex, (GLuint)(intptr_t)pcmd->TextureId);
+                glDrawElementsBaseVertex(GL_TRIANGLES,
+                                         (GLsizei)pcmd->ElemCount,
+                                         sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT,
+                                         (void*)(intptr_t)(pcmd->IdxOffset * sizeof(ImDrawIdx)),
+                                         (GLint)pcmd->VtxOffset);
             }
         }
     }
 
-    if (last_enable_scissor_test)
-        glEnable(GL_SCISSOR_TEST);
-    else
-        glDisable(GL_SCISSOR_TEST);
-#ifdef GL_POLYGON_MODE
-    glPolygonMode(GL_FRONT_AND_BACK, (GLenum)last_polygon_mode[0]);
-#endif
+    glDisable(GL_SCISSOR_TEST);
     glScissor(last_scissor_box[0], last_scissor_box[1], (GLsizei)last_scissor_box[2], (GLsizei)last_scissor_box[3]);
 }
 
@@ -188,7 +134,8 @@ bool ImGui_ImplOpenGL45_CreateFontsTexture()
     // Build texture atlas
     ImGuiIO& io = ImGui::GetIO();
     unsigned char* pixels;
-    int width, height;
+    int width;
+    int height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
     // Upload texture to graphics system
@@ -207,11 +154,11 @@ bool ImGui_ImplOpenGL45_CreateFontsTexture()
 
 void ImGui_ImplOpenGL45_DestroyFontsTexture()
 {
-    if (g_FontTexture)
+    if (g_FontTexture != 0u)
     {
         ImGuiIO& io = ImGui::GetIO();
         glDeleteTextures(1, &g_FontTexture);
-        io.Fonts->TexID = 0;
+        io.Fonts->TexID = nullptr;
         g_FontTexture   = 0;
     }
 }
@@ -251,12 +198,11 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
     glDeleteShader(f_shader);
 
     // Create buffers
-    glGenBuffers(1, &g_VboHandle);
-    glGenBuffers(1, &g_ElementsHandle);
-
-    // Create buffers
     glCreateBuffers(1, &g_VboHandle);
     glCreateBuffers(1, &g_ElementsHandle);
+
+    glNamedBufferStorage(g_VboHandle, g_vbo_byte_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(g_ElementsHandle, g_ebo_byte_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
     // Create VAO
     glCreateVertexArrays(1, &g_VaoHandle);
@@ -281,22 +227,22 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
 
 void ImGui_ImplOpenGL3_DestroyDeviceObjects()
 {
-    if (g_VboHandle)
+    if (g_VboHandle != 0u)
     {
         glDeleteBuffers(1, &g_VboHandle);
         g_VboHandle = 0;
     }
-    if (g_ElementsHandle)
+    if (g_ElementsHandle != 0u)
     {
         glDeleteBuffers(1, &g_ElementsHandle);
         g_ElementsHandle = 0;
     }
-    if (g_ShaderHandle)
+    if (g_ShaderHandle != 0u)
     {
         glDeleteProgram(g_ShaderHandle);
         g_ShaderHandle = 0;
     }
-    if (g_VaoHandle)
+    if (g_VaoHandle != 0u)
     {
         glDeleteVertexArrays(1, &g_VaoHandle);
     }
