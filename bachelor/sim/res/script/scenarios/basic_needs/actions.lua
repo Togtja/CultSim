@@ -104,6 +104,9 @@ actions.take_food_from_inventory = {
     success = function(owner,target)
     
         local inventory = cultsim.get_component(target, component.inventory)
+        if inventory == nil then
+        return
+        end
 
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Food then
@@ -117,11 +120,17 @@ actions.take_food_from_inventory = {
         local inventory = cultsim.get_component(target, component.inventory)
         local my_pos = cultsim.get_component(target, component.position)
 
+        if inventory == nil then
+        return
+        end
+
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Food then
                 cultsim.remove_from_inventory(target,content)
-                cultsim.spawn_at(target,Vec2:new(random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0),
-                                              random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)))
+                local pos = cultsim.add_component(content, component.position)
+                random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0)
+                random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)
+
                 return
             end
         end
@@ -138,6 +147,9 @@ actions.take_water_from_inventory = {
     success = function(owner,target)
     
         local inventory = cultsim.get_component(target, component.inventory)
+         if inventory == nil then
+        return
+        end
 
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Drink then
@@ -150,11 +162,17 @@ actions.take_water_from_inventory = {
     failure = function(owner,target)
         local inventory = cultsim.get_component(target, component.inventory)
         local my_pos = cultsim.get_component(target, component.position)
+         if inventory == nil then
+        return
+        end
+
         for i,content in ipairs(inventory.contents) do
             if cultsim.get_component(content, component.tag).tags & ETag.Drink then
                 cultsim.remove_from_inventory(target,content)
-                cultsim.spawn_at(target,Vec2:new(random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0),
-                                              random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)))
+                local pos = cultsim.add_component(content, component.position)
+                random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0)
+                random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)
+
                 return
             end
         end
