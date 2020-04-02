@@ -6,6 +6,7 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/effect.h"
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
@@ -63,6 +64,9 @@ void ScenarioScene::initialize_simulation()
 
     /** Call lua init function for this scenario */
     m_scenario.init();
+
+    auto per_view = m_registry.view<component::Personalities>();
+    per_view.each([](entt::entity e, const component::Personalities& per) { effect::affect_personality(e, per); });
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
@@ -407,6 +411,13 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Personalities>::id():
+                if (auto per = m_registry.try_get<component::Personalities>(e); per)
+                {
+                    effect::unaffect_personality(e, *per);
+                };
+                m_registry.remove_if_exists<component::Personalities>(e);
+                break;
             default: break;
         }
     });
