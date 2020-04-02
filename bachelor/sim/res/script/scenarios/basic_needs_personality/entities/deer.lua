@@ -56,7 +56,7 @@ entity = {
     PersonalityComponent = {
         -- Other parts of lua code may add and remove a personality(ies)
         -- However this is what all the "Deers" would start with
-        personalities = {personalities.slow_digestion}
+        personalities = {personalities.slow_digestion, personalities.fast}
 
     }
 }

@@ -22,6 +22,28 @@ personalities = { -- Also traits
             local the_need = cultsim.get_need(need_c, "Hunger")
             the_need.decay_multi = the_need.decay_multi + 0.2
          end
-    }
-   
+    },
+   fast = {
+        name = "Fast Runner",
+        desc = "People with this trait runs 20%% faster",
+
+        affect = function(self)
+            local move_c = cultsim.get_component(self, component.movement)
+            if move_c == nil then
+                log.warn("I(" .. self .. ") am invalid")
+                return
+            end
+            move_c.speed_multi = move_c.speed_multi + 0.2
+        end,
+
+        unaffect = function(self)
+            local move_c = cultsim.get_component(self, component.movement)
+            if move_c == nil then
+                log.warn("I(" .. self .. ") am invalid")
+                return
+            end
+            move_c.speed_multi = move_c.speed_multi - 0.2
+        end
+
+   }
 }
