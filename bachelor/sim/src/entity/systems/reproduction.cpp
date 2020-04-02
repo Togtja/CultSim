@@ -1,6 +1,7 @@
 #include "reproduction.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/effect.h"
 #include "entity/factory.h"
 
 namespace cs::system

@@ -139,7 +139,7 @@ void Movement::update(float dt)
             mov.direction = temp;
         }
 
-        pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * dt;
+        pos.position += glm::vec3(mov.direction, 0.f) * mov.speed * mov.speed_multi * dt;
 
         /** If we wrapped around we recalculate the path */
         if (fix_out_of_bounds(pos.position, m_context.scenario->bounds))

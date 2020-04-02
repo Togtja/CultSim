@@ -27,6 +27,8 @@ struct Movement
     float speed        = 1.f;
     float avoidance_cd = 0.f;
     int avoid_count{};
+
+    float speed_multi = 1.f;
 };
 
 struct Meta
