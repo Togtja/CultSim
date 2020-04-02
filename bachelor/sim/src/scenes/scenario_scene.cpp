@@ -358,6 +358,33 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
         }
     });
+
+    cultsim.set_function("get_strategy",
+                         [](sol::this_state s, sol::object& strat_lua, std::string_view strat_name) -> sol::object {
+                             auto& strat = strat_lua.as<component::Strategy>();
+                             for (auto&& i : strat.strategies)
+                             {
+                                 if (i.name == strat_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
+    cultsim.set_function("get_need",
+                         [](sol::this_state s, const sol::object& need_lua, std::string_view need_name) -> sol::object {
+                             const auto& need = need_lua.as<component::Need>();
+                             for (const auto& i : need.needs)
+                             {
+                                 if (i.name == need_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
