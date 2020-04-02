@@ -51,5 +51,12 @@ entity = {
     AgeComponent = 
     {
         life_expectancy = 3000.0
+    },
+
+    PersonalityComponent = {
+        -- Other parts of lua code may add and remove a personality(ies)
+        -- However this is what all the "Deers" would start with
+        personalities = {personalities.slow_digestion}
+
     }
 }

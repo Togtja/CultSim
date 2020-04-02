@@ -2,7 +2,7 @@
 scenario = Scenario:new()
 
 -- Give the scenario a name
-scenario.name = "Basic Needs"
+scenario.name = "Basic Needs Personalities"
 
 -- Describe the scenario with a sensible amount of text
 scenario.description = "Observe as your agents walk around in a forest looking for food and water to survive. How many can be sustained?"
