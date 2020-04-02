@@ -3,15 +3,15 @@
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
-#include "preferences.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
+#include "preferences.h"
 #include "random_engine.h"
 
-#include <spdlog/spdlog.h>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::lua
 {
@@ -56,7 +56,9 @@ void bind_dataonly(sol::state_view lua)
                         {"Meat", ETag::TAG_Meat},
                         {"Veggie", ETag::TAG_Veggie},
                         {"Inventory", ETag::TAG_Inventory},
-                        {"Consume", ETag::TAG_Consume}});
+                        {"Consume", ETag::TAG_Consume},
+                        {"Crime", ETag::TAG_Crime},
+                        {"Hostile", ETag::TAG_Hostile}});
 }
 
 void bind_components(sol::state_view lua)

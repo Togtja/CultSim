@@ -15,8 +15,19 @@ void Inventory::update(float dt)
 
     view.each([this, dt, &registry](entt::entity e,
                                     component::Inventory& inventory,
-                                    const component::Tags& tags,
+                                    component::Tags& tags,
                                     const component::Position& pos) {
+
+        /**Make sure that entities can see that other entities have an inventory with items in it */
+        if (inventory.size != 0 && !(tags.tags & TAG_Inventory))
+        {
+            tags.tags = ETag(tags.tags | TAG_Inventory);
+        }
+        if (inventory.size == 0 && (tags.tags & TAG_Inventory)) 
+        {
+            tags.tags = ETag(tags.tags & ~TAG_Inventory);
+        }
+
         if (inventory.size != inventory.contents.size())
         {
             inventory.size = inventory.contents.size();

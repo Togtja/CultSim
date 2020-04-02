@@ -317,6 +317,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
+    component["inventory"]    = entt::type_info<component::Inventory>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -324,36 +325,139 @@ void ScenarioScene::bind_scenario_lua_functions()
         switch (id)
         {
             case entt::type_info<component::Position>::id():
-                return sol::make_object(s, &m_registry.get<component::Position>(e));
+                if (m_registry.try_get<component::Position>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Position>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Movement>::id():
-                return sol::make_object(s, &m_registry.get<component::Movement>(e));
+                if (m_registry.try_get<component::Movement>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Movement>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Sprite>::id():
-                return sol::make_object(s, &m_registry.get<component::Sprite>(e));
+                if (m_registry.try_get<component::Sprite>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Sprite>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Vision>::id():
-                return sol::make_object(s, &m_registry.get<component::Vision>(e));
+                if (m_registry.try_get<component::Vision>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Vision>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
-            case entt::type_info<component::Tags>::id(): return sol::make_object(s, &m_registry.get<component::Tags>(e)); break;
-            case entt::type_info<component::Need>::id(): return sol::make_object(s, &m_registry.get<component::Need>(e)); break;
+            case entt::type_info<component::Tags>::id():
+                if (m_registry.try_get<component::Tags>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Tags>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Need>::id():
+                if (m_registry.try_get<component::Need>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Need>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             case entt::type_info<component::Reproduction>::id():
-                return sol::make_object(s, &m_registry.get<component::Reproduction>(e));
+                if (m_registry.try_get<component::Reproduction>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Reproduction>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Strategy>::id():
-                return sol::make_object(s, &m_registry.get<component::Strategy>(e));
+                if (m_registry.try_get<component::Strategy>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Strategy>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Health>::id():
-                return sol::make_object(s, &m_registry.get<component::Health>(e));
+                if (m_registry.try_get<component::Health>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Health>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Memory>::id():
-                return sol::make_object(s, &m_registry.get<component::Memory>(e));
+                if (m_registry.try_get<component::Memory>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Memory>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             case entt::type_info<component::Attack>::id():
-                return sol::make_object(s, &m_registry.get<component::Attack>(e));
+                if (m_registry.try_get<component::Attack>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Attack>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Inventory>::id():
+                if (m_registry.try_get<component::Inventory>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Inventory>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
                 break;
             default:
-                spdlog::critical("Can not find the componet you are looking for");
+                spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
                 break;
         }
@@ -361,7 +465,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
-            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e);
             case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
             case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
             case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
@@ -371,9 +475,50 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
     });
+    cultsim.set_function("add_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
+        switch (id)
+        {
+            case entt::type_info<component::Position>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Position>(e));
+                break;
+            case entt::type_info<component::Movement>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Movement>(e));
+                break;
+            case entt::type_info<component::Sprite>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Sprite>(e));
+                break;
+            case entt::type_info<component::Vision>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Vision>(e));
+                break;
+            case entt::type_info<component::Tags>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Tags>(e));
+                break;
+            case entt::type_info<component::Need>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Need>(e));
+                break;
+            case entt::type_info<component::Reproduction>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Reproduction>(e));
+                break;
+            case entt::type_info<component::Strategy>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Strategy>(e));
+                break;
+            case entt::type_info<component::Health>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Health>(e));
+                break;
+            case entt::type_info<component::Memory>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
+                break;
+            case entt::type_info<component::Inventory>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
+                break;
+            default: break;
+        }
+    });
+
     /** Helper action to modify an entity need */
     cultsim.set_function("modify_need", [this](entt::entity e, ETag need_tags, float delta) {
         if (auto* needs = m_registry.try_get<component::Need>(e); needs)
@@ -397,7 +542,6 @@ void ScenarioScene::bind_scenario_lua_functions()
                 m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
                 tags->tags = ETag(tags->tags | TAG_Inventory);
                 inventory->contents.push_back(target);
-                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
             }
         }
     });
