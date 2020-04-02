@@ -1,33 +1,24 @@
-peronality.cannibal = {
-    name = "Cannibal", -- Personality trait
-    desc = "Increases the chances to attack the same species, and eat them", -- A description of what it does (Shows up as tool tip)
-
-    affected_area = {
-        -- Increases the chances of you attacking
-        attack = { -- name, just used for cpp
-            type = Action, -- Attacking is an action
-            what = "Kill Species", -- What Action/Need
-            weight_multi = 1.2, -- By How much it changes the weigthing of wanting to to that Action/Strategy
-        }
-        -- Heavely increasing your want to consume meat from the same species
-        consume_species = {
-            type = Action, 
-            what = "Consume Other",
-            weight_multi = 1.5,
-        }
-        -- Increases the change of wanting to eat yourself in emergencies
-        consume_self = {
-            type = Action,
-            what = "Consume Self",
-            weight_multi = 1.2
-        }
-
-        fast_digestion = {
-            type = Need,
-            what = "Food",
-            weight_multi = 1.1,
-            decay_multi = 1.2
-        }
-    }
+personalities = { -- Also traits
+    slow_digestion = {
+        name = "slow digestion", -- Personality trait
+        desc = "People with this get hungry at lot slower than other people", -- A description of what it does (Shows up as tool tip)
+        
+        affect = function(self)
+            local need_c = get_component(self, component.need)
+            local the_need = get_need(need_c, "Hunger")
+            -- TEST REMOVES IT COMPLETLY
+            if(the_need == nil) then
+                log.warn("I(" .. self .. ") can not find the Hunger Component")
+                return
+            end
+            the_need.weight_multi = 0
+        end,
     
+        unaffect = function(self)
+            local need_c = get_component(self, component.need)
+            local the_need = get_need(need_c, "Hunger")
+            the_need.weight_multi = 1
+         end
+    }
+   
 }
