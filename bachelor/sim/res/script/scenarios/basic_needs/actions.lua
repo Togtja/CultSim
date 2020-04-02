@@ -79,18 +79,130 @@ actions.gather_food = {
     success_chance = 0.9,
     success = function(owner,target)
     
-    if cultsim.get_component(target, component.tag).tags & ETag.Inventory ~= 0  then
-      log.info("I (" .. target .. ") with tags " ..cultsim.get_component(target, component.tag).tags .." could not be picked up.")
-        return
+        if cultsim.get_component(target, component.tag).tags & ETag.Inventory ~= 0  then
+            log.info("I (" .. target .. ") with tags " ..cultsim.get_component(target, component.tag).tags .." could not be picked up.")
+            return
         end   
 
-    log.info("I (" .. owner .. ") picked up " .. target .. ".")
-    cultsim.add_to_inventory(owner,target)
-    cultsim.remove_component(target, component.position)
+        log.info("I (" .. owner .. ") picked up " .. target .. ".")
+        cultsim.add_to_inventory(owner,target)
+        cultsim.remove_component(target, component.position)
 
     end,
     failure = function(owner, target)
-    log.info("I (" .. owner .. ") failed to pick up " .. target .. ".")
+        log.info("I (" .. owner .. ") failed to pick up " .. target .. ".")
+    end,
+    abort = function(owner, target)
+    end
+}
+
+actions.take_food_from_inventory = {
+    name = "Loot food",
+    requirements = ETag.Find,
+    time_to_complete = 3.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+    
+        local inventory = cultsim.get_component(target, component.inventory)
+        if inventory == nil then
+        return
+        end
+
+        for i,content in ipairs(inventory.contents) do
+            if cultsim.get_component(content, component.tag).tags & ETag.Food then
+                cultsim.add_to_inventory(owner,content)
+                cultsim.remove_from_inventory(target,content)
+                return
+            end
+        end
+    end,
+    failure = function(owner,target)
+        local inventory = cultsim.get_component(target, component.inventory)
+        local my_pos = cultsim.get_component(target, component.position)
+
+        if inventory == nil then
+        return
+        end
+
+        for i,content in ipairs(inventory.contents) do
+            if cultsim.get_component(content, component.tag).tags & ETag.Food then
+                cultsim.remove_from_inventory(target,content)
+                local pos = cultsim.add_component(content, component.position)
+                random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0)
+                random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)
+
+                return
+            end
+        end
+    end,
+    abort = function(owner,target)
+    end
+}
+
+actions.take_water_from_inventory = {
+    name = "Loot water",
+    requirements = ETag.Find,
+    time_to_complete = 3.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+    
+        local inventory = cultsim.get_component(target, component.inventory)
+         if inventory == nil then
+        return
+        end
+
+        for i,content in ipairs(inventory.contents) do
+            if cultsim.get_component(content, component.tag).tags & ETag.Drink then
+                cultsim.add_to_inventory(owner,content)
+                cultsim.remove_from_inventory(target,content)
+                return
+            end
+        end
+    end,
+    failure = function(owner,target)
+        local inventory = cultsim.get_component(target, component.inventory)
+        local my_pos = cultsim.get_component(target, component.position)
+         if inventory == nil then
+        return
+        end
+
+        for i,content in ipairs(inventory.contents) do
+            if cultsim.get_component(content, component.tag).tags & ETag.Drink then
+                cultsim.remove_from_inventory(target,content)
+                local pos = cultsim.add_component(content, component.position)
+                random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0)
+                random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)
+
+                return
+            end
+        end
+    end,
+    abort = function(owner,target)
+    end
+}
+
+actions.steal_food_from_entity = {
+    name= "Stealing from other entity",
+    requirements = ETag.Find,
+    time_to_complete = 2.0,
+    success_chance = 0.4,
+    success = function(owner,target)
+        local inv = cultsim.get_component(target,component.inventory)
+        if(inv ~= nil) then
+            for i, content in ipairs(inv.contents) do
+                local tags = cultsim.get_component(content,component.tag)
+                if (tags ~= nil) then
+                    if tags.tags & ETag.Food then
+                        cultsim.add_to_inventory(owner,content)
+                        cultsim.remove_from_inventory(target,content)
+                        return
+                    end
+                end
+            end
+        end
+    end,
+    failure = function(owner,target)
+    --Make other entity angry at owner
     end,
     abort = function(owner, target)
     end
@@ -104,6 +216,23 @@ actions.eat_from_inventory = {
     success = function(owner,target)
         log.info("I (" .. owner .. ") ate ".. target .." from my backpack.")
         cultsim.modify_need(owner, ETag.Food, 60.0)
+        cultsim.remove_from_inventory(owner,target)
+        cultsim.kill(target)
+    end,
+    failure = function(owner,target)
+    end,
+    abort = function(owner,target)
+    end
+}
+
+actions.drink_from_inventory = {
+    name = "Drink from inventory",
+    requirements = ETag.Inventory,
+    time_to_complete = 5.0,
+    success_chance = 0.9,
+    success = function(owner,target)
+        log.info("I (" .. owner .. ") ate ".. target .." from my backpack.")
+        cultsim.modify_need(owner, ETag.Drink, 60.0)
         cultsim.remove_from_inventory(owner,target)
         cultsim.kill(target)
     end,
