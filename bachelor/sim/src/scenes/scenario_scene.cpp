@@ -335,7 +335,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Movement>::id():        
+            case entt::type_info<component::Movement>::id():
                 if (m_registry.try_get<component::Movement>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Movement>(e));
@@ -346,7 +346,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Sprite>::id():              
+            case entt::type_info<component::Sprite>::id():
                 if (m_registry.try_get<component::Sprite>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Sprite>(e));
@@ -357,7 +357,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Vision>::id():             
+            case entt::type_info<component::Vision>::id():
                 if (m_registry.try_get<component::Vision>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Vision>(e));
@@ -368,7 +368,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Tags>::id():             
+            case entt::type_info<component::Tags>::id():
                 if (m_registry.try_get<component::Tags>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Tags>(e));
@@ -379,7 +379,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Need>::id():              
+            case entt::type_info<component::Need>::id():
                 if (m_registry.try_get<component::Need>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Need>(e));
@@ -401,7 +401,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Strategy>::id():               
+            case entt::type_info<component::Strategy>::id():
                 if (m_registry.try_get<component::Strategy>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Strategy>(e));
@@ -452,7 +452,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                 }
                 else
                 {
-                    spdlog::critical("target [{}] does not have that component [{}]",e, id);
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
                     return sol::nil;
                 }
                 break;
@@ -542,7 +542,6 @@ void ScenarioScene::bind_scenario_lua_functions()
                 m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
                 tags->tags = ETag(tags->tags | TAG_Inventory);
                 inventory->contents.push_back(target);
-                spdlog::get("agent")->critical("Size of Inventory {}", inventory->contents.size());
             }
         }
     });
