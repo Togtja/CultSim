@@ -317,10 +317,16 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
+    component["personality"]  = entt::type_info<component::Personalities>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
     cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
+        if (!m_registry.valid(e))
+        {
+            return sol::nil;
+        }
+
         switch (id)
         {
             case entt::type_info<component::Position>::id():
@@ -351,6 +357,9 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
             case entt::type_info<component::Attack>::id():
                 return sol::make_object(s, &m_registry.get<component::Attack>(e));
+                break;
+            case entt::type_info<component::Personalities>::id():
+                return sol::make_object(s, &m_registry.get<component::Personalities>(e));
                 break;
             default:
                 spdlog::critical("Can not find the componet you are looking for");
