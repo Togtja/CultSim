@@ -826,7 +826,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
             for (auto&& i : traits->traits)
             {
                 ImGui::TableNextCell();
-                ImGui::Text(fmt::format("\t{}", i.name).c_str());
+                ImGui::Text(fmt::format("{}", i.name).c_str());
                 if (ImGui::IsItemHovered())
                 {
                     ImGui::SetTooltip(fmt::format("{}", i.desc).c_str());

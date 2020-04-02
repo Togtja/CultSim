@@ -1,7 +1,7 @@
 traits = { -- Also traits
     slow_digestion = {
         name = "Slow Digestion", -- a Trait
-        desc = "People with this get hungry 20%% slower", -- A description of what it does (Shows up as tool tip)
+        desc = "People with this trait get hungry 20%% slower", -- A description of what it does (Shows up as tool tip)
         
         affect = function(self)
             local need_c = cultsim.get_component(self, component.need)
