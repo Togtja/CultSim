@@ -35,6 +35,13 @@ strategies.loot_water = {
     actions = {actions.take_water_from_inventory}
 }
 
+strategies.steal_food = {
+    name = "Stealing food",
+    tags = ETag.Food | ETag.Gather | ETag.Crime | ETag.Hostile,
+    target_tags = ETag.Inventory | ETag.Creature,
+    actions = {actions.steal_food_from_entity}
+}
+
 strategies.consume_from_backpack = {
     name = "Checking backpack for food",
     tags = ETag.Food |ETag.Consume,

@@ -181,6 +181,29 @@ actions.take_water_from_inventory = {
     end
 }
 
+actions.steal_food_from_entity = {
+    name= "Stealing from other entity",
+    requirements = ETag.Find,
+    time_to_complete = 2.0,
+    success_chance = 0.4,
+    success = function(owner,target)
+        local inv = cultsim.get_component(target,component.Inventory)
+        if(inv ~= nil) then
+            for i, content in ipairs(inv.contents) do
+                if cultsim.get_component(content,component.tag).tags & ETag.Food then
+                    cultsim.add_to_inventory(owner,content)
+                    cultsim.remove_from_inventory(target,content)
+                    return
+                end
+            end
+        end
+    end,
+    failure = function(owner,target)
+    --Make other entity angry at owner
+    end,
+    abort = function(owner, target)
+    end
+}
 
 actions.eat_from_inventory = {
     name = "Eat from inventory",
