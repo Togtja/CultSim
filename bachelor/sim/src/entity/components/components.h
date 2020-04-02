@@ -237,8 +237,8 @@ struct Pregnancy
 
 namespace detail
 {
-// Defines a single personality
-struct Personality
+// Defines a single trait
+struct Trait
 {
     std::string name;
     std::string desc;
@@ -248,10 +248,10 @@ struct Personality
 };
 } // namespace detail
 
-// An Agents personalities
-struct Personalities
+// An Agents traits
+struct Traits
 {
-    std::vector<detail::Personality> personalities;
+    std::vector<detail::Trait> traits;
 };
 struct AI
 {

@@ -26,7 +26,7 @@ struct Need
         return (100 / (local.status + 1)) * local.weight * local.weight_multi;
     };
 
-    // Is only used with personalities
+    // Is only used with traits
     float weight_multi = 1.f;
     float decay_multi  = 1.f;
 };

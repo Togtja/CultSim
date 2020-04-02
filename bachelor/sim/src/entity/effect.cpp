@@ -2,17 +2,17 @@
 
 namespace cs::effect
 {
-void affect_personality(entt::entity e, const component::Personalities& personalities)
+void affect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : personalities.personalities)
+    for (const auto& i : traits.traits)
     {
         i.affect(e);
     }
 }
 
-void unaffect_personality(entt::entity e, const component::Personalities& personalities)
+void unaffect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : personalities.personalities)
+    for (const auto& i : traits.traits)
     {
         i.remove_affect(e);
     }

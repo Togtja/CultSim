@@ -26,7 +26,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"TimerComponent", spawn_timer_component},
                           {"AgeComponent", spawn_age_component},
                           {"InventoryComponent", spawn_inventory_component},
-                          {"PersonalityComponent", spawn_personality_component}};
+                          {"TraitComponent", spawn_trait_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -290,17 +290,17 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
     return true;
 }
 
-bool spawn_personality_component(entt::entity e, entt::registry& reg, sol::table table)
+bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& personality_comp = reg.assign_or_replace<component::Personalities>(e);
-    // TODO: Assign the personalites that the component has as default
-    const auto& available_personalities = table["personalities"].get_or<std::vector<sol::table>>({});
-    for (const auto& personality : available_personalities)
+    auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
+    // TODO: Assign the traits that the component has as default
+    const auto& available_traits = table["traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_traits)
     {
-        personality_comp.personalities.push_back({personality["name"].get<std::string>(),
-                                                  personality["desc"].get<std::string>(),
-                                                  personality["affect"].get<sol::function>(),
-                                                  personality["unaffect"].get<sol::function>()
+        trait_comp.traits.push_back({traits["name"].get<std::string>(),
+                                     traits["desc"].get<std::string>(),
+                                     traits["affect"].get<sol::function>(),
+                                     traits["unaffect"].get<sol::function>()
 
         });
     }

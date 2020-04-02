@@ -103,10 +103,10 @@ void Reproduction::update(float dt)
                 age->current_age = 0;
             }
 
-            if (auto per = m_context.registry->try_get<component::Personalities>(child_e); per)
+            if (auto per = m_context.registry->try_get<component::Traits>(child_e); per)
             {
-                effect::affect_personality(child_e, *per);
-                // TODO: If mom or dad has a personality we don't there should be a certain chance I get it as well
+                effect::affect_traits(child_e, *per);
+                // TODO: If mom or dad has a trait we don't there should be a certain chance I get it as well
                 // Larger chance if they both have it (Should this be scriptable as well, user decide how inheritance work?)
             }
             return;

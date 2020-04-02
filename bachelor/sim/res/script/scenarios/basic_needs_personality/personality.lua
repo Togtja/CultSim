@@ -1,6 +1,6 @@
-personalities = { -- Also traits
+traits = { -- Also traits
     slow_digestion = {
-        name = "Slow Digestion", -- Personality trait
+        name = "Slow Digestion", -- a Trait
         desc = "People with this get hungry 20%% slower", -- A description of what it does (Shows up as tool tip)
         
         affect = function(self)

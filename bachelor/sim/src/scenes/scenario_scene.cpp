@@ -65,9 +65,9 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
-    /** If there are any Personalities, run their affects */
-    auto per_view = m_registry.view<component::Personalities>();
-    per_view.each([](entt::entity e, const component::Personalities& per) { effect::affect_personality(e, per); });
+    /** If there are any Traits, run their affects */
+    auto per_view = m_registry.view<component::Traits>();
+    per_view.each([](entt::entity e, const component::Traits& per) { effect::affect_traits(e, per); });
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
@@ -322,7 +322,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
-    component["personality"]  = entt::type_info<component::Personalities>::id();
+    component["trait"]        = entt::type_info<component::Traits>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -363,8 +363,8 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Attack>::id():
                 return sol::make_object(s, &m_registry.get<component::Attack>(e));
                 break;
-            case entt::type_info<component::Personalities>::id():
-                return sol::make_object(s, &m_registry.get<component::Personalities>(e));
+            case entt::type_info<component::Traits>::id():
+                return sol::make_object(s, &m_registry.get<component::Traits>(e));
                 break;
             default:
                 spdlog::critical("Can not find the componet you are looking for");
@@ -412,12 +412,12 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
-            case entt::type_info<component::Personalities>::id():
-                if (auto per = m_registry.try_get<component::Personalities>(e); per)
+            case entt::type_info<component::Traits>::id():
+                if (auto per = m_registry.try_get<component::Traits>(e); per)
                 {
-                    effect::unaffect_personality(e, *per);
+                    effect::unaffect_traits(e, *per);
                 };
-                m_registry.remove_if_exists<component::Personalities>(e);
+                m_registry.remove_if_exists<component::Traits>(e);
                 break;
             default: break;
         }
@@ -723,7 +723,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, pers] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
@@ -732,7 +732,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                            component::Tags,
                            component::Memory,
                            component::Pregnancy,
-                           component::Personalities>(selection_info.selected_entity);
+                           component::Traits>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -817,13 +817,13 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
-    if (pers)
+    if (traits)
     {
-        if (ImGui::BeginTable("Personalities/Traits", 1))
+        if (ImGui::BeginTable("Traits", 1))
         {
-            ImGui::TableSetupColumn("Personality");
+            ImGui::TableSetupColumn("Traits");
             ImGui::TableAutoHeaders();
-            for (auto&& i : pers->personalities)
+            for (auto&& i : traits->traits)
             {
                 ImGui::TableNextCell();
                 ImGui::Text(fmt::format("\t{}", i.name).c_str());

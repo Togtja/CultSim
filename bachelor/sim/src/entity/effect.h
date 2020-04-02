@@ -3,6 +3,6 @@
 
 namespace cs::effect
 {
-void affect_personality(entt::entity e, const component::Personalities& personalities);
-void unaffect_personality(entt::entity e, const component::Personalities& personalities);
+void affect_traits(entt::entity e, const component::Traits& traits);
+void unaffect_traits(entt::entity e, const component::Traits& traits);
 } // namespace cs::effect
