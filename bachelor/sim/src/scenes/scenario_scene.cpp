@@ -253,8 +253,8 @@ void ScenarioScene::bind_actions_for_scene()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos =
-            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 1.f * dt);
+        const auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 10.f * dt);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
