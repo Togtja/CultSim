@@ -65,6 +65,7 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** If there are any Personalities, run their affects */
     auto per_view = m_registry.view<component::Personalities>();
     per_view.each([](entt::entity e, const component::Personalities& per) { effect::affect_personality(e, per); });
 
@@ -722,7 +723,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, pers] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
@@ -730,7 +731,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
                            component::Timer,
                            component::Tags,
                            component::Memory,
-                           component::Pregnancy>(selection_info.selected_entity);
+                           component::Pregnancy,
+                           component::Personalities>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -750,7 +752,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (preg && preg->is_egg)
         {
-            ImGui::Text("I am a hatching egg");
+            ImGui::Text("I am hatching an egg");
         }
         else
         {
@@ -810,6 +812,25 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("%s", need.name.c_str());
                 ImGui::TableNextCell();
                 ImGui::Text("%3.1f", need.status);
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    if (pers)
+    {
+        if (ImGui::BeginTable("Personalities/Traits", 1))
+        {
+            ImGui::TableSetupColumn("Personality");
+            ImGui::TableAutoHeaders();
+            for (auto&& i : pers->personalities)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text(fmt::format("\t{}", i.name).c_str());
+                if (ImGui::IsItemHovered())
+                {
+                    ImGui::SetTooltip(fmt::format("{}", i.desc).c_str());
+                }
             }
             ImGui::EndTable();
         }
