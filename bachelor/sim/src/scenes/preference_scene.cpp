@@ -26,10 +26,12 @@ PreferenceScene::PreferenceScene()
 }
 void PreferenceScene::on_enter()
 {
+    input::get_input().add_context(input::EKeyContext::PreferenceScene, true);
 }
 
 void PreferenceScene::on_exit()
 {
+    input::get_input().remove_context(input::EKeyContext::PreferenceScene);
 }
 
 bool PreferenceScene::update(float dt)
