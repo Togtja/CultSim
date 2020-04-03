@@ -500,8 +500,8 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     cultsim.set_function("get_strategy",
                          [](sol::this_state s, sol::object& strat_lua, std::string_view strat_name) -> sol::object {
-                             auto& strat = strat_lua.as<component::Strategy>();
-                             for (auto&& i : strat.strategies)
+                             const auto& strat = strat_lua.as<component::Strategy>();
+                             for (const auto& i : strat.strategies)
                              {
                                  if (i.name == strat_name)
                                  {
