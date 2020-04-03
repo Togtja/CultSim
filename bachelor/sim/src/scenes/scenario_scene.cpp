@@ -201,8 +201,13 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    /** It's supposed to be three of these here, do not change - not a bug */
+    // Make sure ImGui does not get more than one update per frame
+    for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
 
+    /** It's supposed to be three of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
 
