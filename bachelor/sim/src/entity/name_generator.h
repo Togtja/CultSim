@@ -7,6 +7,8 @@
 
 namespace cs
 {
+class RandomEngine;
+
 class NameGenerator
 {
 private:
@@ -24,7 +26,29 @@ private:
     robin_hood::unordered_map<std::string, Ethnicity> m_names{};
 
 public:
-    NameGenerator(sol::state_view lua, const std::string& name_table);
+    /**
+     * Initialize name generator with a table
+     *
+     * @param name_table
+     */
+    void initialize(sol::table name_table);
+
+    /** A generated name */
+    struct Name
+    {
+        std::string first{};
+        std::string last{};
+    };
+
+    /**
+     * Generate a name from the given ethnicity
+     *
+     * @param ethnicity The ethnicity to get a name from
+     * @param male The sex of the name
+     * @param rng The random generator to use for generation
+     * @return The generated name split in first and last
+     */
+    Name generate(const std::string& ethnicity, bool male, RandomEngine& rng);
 };
 
 } // namespace cs
