@@ -179,8 +179,12 @@ bool ScenarioScene::update(float dt)
 
     /** Sample data */
     m_data_collector.show_ui();
-
-    for (int i = 0; i < m_timescale; ++i)
+    auto time_step = m_timescale;
+    if (m_paused)
+    {
+        time_step = 0;
+    }
+    for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
 
@@ -277,7 +281,7 @@ void ScenarioScene::bind_actions_for_scene()
         m_timescale = std::clamp(m_timescale /= 2, 1, 100);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_paused = !m_paused; });
 
     /** Camera Controls */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
@@ -325,6 +329,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
+    component["name"]         = entt::type_info<component::Name>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -456,6 +461,17 @@ void ScenarioScene::bind_scenario_lua_functions()
                 if (m_registry.try_get<component::Inventory>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Inventory>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Name>::id():
+                if (m_registry.try_get<component::Name>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Name>(e));
                 }
                 else
                 {
@@ -722,7 +738,14 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    if (m_paused)
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, 0);
+    }
+    else
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    }
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -772,15 +795,15 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0;
+        m_paused = true;
     }
     ImGui::SameLine();
-    if (ImGui::Button("1x", {36, 24}))
+    if (ImGui::Button(">", {36, 24}))
     {
         m_timescale = 1;
     }
     ImGui::SameLine();
-    if (ImGui::Button("2x", {36, 24}))
+    if (ImGui::Button(">>", {36, 24}))
     {
         m_timescale = 2;
     }
@@ -829,8 +852,22 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    auto text = fmt::format("Ola Normann nr {}", static_cast<int64_t>(selection_info.selected_entity));
-    ImGui::Text(text.c_str());
+    auto name = m_registry.try_get<component::Name>(selection_info.selected_entity);
+    if (name && name->name != "")
+    {
+        auto text = fmt::format("{} no {}", name->name, static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
+    else if (name)
+    {
+        auto text = fmt::format("{} no {}", name->entity_type, static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
+    else
+    {
+        auto text = fmt::format("Entity no {}", static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
 
     if (health)
     {
@@ -917,44 +954,6 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
-    }
-
-    if (memories)
-    {
-        if (!memories->memory_container.empty())
-        {
-            if (ImGui::BeginTable("Entity Memories", 2))
-            {
-                ImGui::TableSetupColumn("Tags");
-                ImGui::TableSetupColumn("Size");
-                ImGui::TableAutoHeaders();
-                for (auto& memory : memories->memory_container)
-                {
-                    ImGui::TableNextCell();
-                    ImGui::Text("%s", tag_to_string(memory.memory_tags).c_str());
-                    ImGui::TableNextCell();
-                    ImGui::Text("%zu", memory.memory_storage.size());
-                    if (memory.memory_tags & ETag::TAG_Location)
-                    {
-                        if (ImGui::BeginTable(tag_to_string(memory.memory_tags).c_str(), 2))
-                        {
-                            ImGui::TableSetupColumn("Age");
-                            ImGui::TableSetupColumn("Entity Count");
-                            ImGui::TableAutoHeaders();
-                            for (auto& mem : memory.memory_storage)
-                            {
-                                ImGui::TableNextCell();
-                                ImGui::Text("%u", mem->m_time_since_creation);
-                                ImGui::TableNextCell();
-                                ImGui::Text("%u", dynamic_cast<memory::ResourceLocation*>(mem.get())->m_number_of_entities);
-                            }
-                            ImGui::EndTable();
-                        }
-                    }
-                }
-                ImGui::EndTable();
-            }
-        }
     }
 
     ImGui::End();

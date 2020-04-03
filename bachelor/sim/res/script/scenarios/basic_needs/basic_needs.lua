@@ -42,6 +42,13 @@ scenario.init = function()
         for i, need in ipairs(need_comp.required_needs) do
             need.status = random:normal(75.0, 25.0)
         end
+        local name = cultsim.get_component(deer, component.name)
+        if(cultsim.get_component(deer, component.reproduction).sex == 1) then
+            name.name = "Fawn"
+        else 
+            name.name = "Doe"
+        end
+
     end
 
     -- Spawn 75 Food Sources and Water Sources

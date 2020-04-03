@@ -220,6 +220,12 @@ struct Reproduction
     float gestation_deviation{};
 };
 
+struct Name
+{
+    std::string_view entity_type{};
+    std::string_view name{};
+};
+
 struct Pregnancy
 {
     float time_since_start{};
