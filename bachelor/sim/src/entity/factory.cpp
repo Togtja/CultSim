@@ -109,7 +109,7 @@ bool spawn_vision_component(entt::entity e, entt::registry& reg, sol::table tabl
 bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& name       = reg.assign_or_replace<component::Name>(e);
-    name.entity_type = table["entity_type"].get<std::string_view>();
+    name.entity_type = table["entity_type"].get<std::string>();
 
     return true;
 }
