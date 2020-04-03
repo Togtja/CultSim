@@ -18,7 +18,7 @@ static GLuint g_FontTexture              = 0, g_VaoHandle{};
 static GLuint g_ShaderHandle             = 0;
 static constexpr int g_AttribLocationTex = 0, g_AttribLocationProjMtx = 0;
 static constexpr int g_AttribLocationVtxPos = 0, g_AttribLocationVtxUV = 1, g_AttribLocationVtxColor = 2;
-static unsigned int g_VboHandle = 0, g_ElementsHandle = 0;
+static unsigned int g_VboHandle              = 0;
 static constexpr std::size_t g_vbo_byte_size = 1024 * 1024;
 static constexpr std::size_t g_ebo_byte_size = 1024 * 1024;
 
@@ -86,11 +86,11 @@ void ImGui_ImplOpenGL3_RenderDrawData(ImDrawData* draw_data)
 
         /** Upload vertex/index buffers */
         glNamedBufferSubData(g_VboHandle,
-                             0u,
+                             g_ebo_byte_size,
                              (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert),
                              (const GLvoid*)cmd_list->VtxBuffer.Data);
 
-        glNamedBufferSubData(g_ElementsHandle,
+        glNamedBufferSubData(g_VboHandle,
                              0u,
                              (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx),
                              (const GLvoid*)cmd_list->IdxBuffer.Data);
@@ -199,15 +199,13 @@ bool ImGui_ImplOpenGL3_CreateDeviceObjects()
 
     // Create buffers
     glCreateBuffers(1, &g_VboHandle);
-    glCreateBuffers(1, &g_ElementsHandle);
 
-    glNamedBufferStorage(g_VboHandle, g_vbo_byte_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
-    glNamedBufferStorage(g_ElementsHandle, g_ebo_byte_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+    glNamedBufferStorage(g_VboHandle, g_vbo_byte_size + g_ebo_byte_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
     // Create VAO
     glCreateVertexArrays(1, &g_VaoHandle);
-    glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, 0u, sizeof(ImDrawVert));
-    glVertexArrayElementBuffer(g_VaoHandle, g_ElementsHandle);
+    glVertexArrayVertexBuffer(g_VaoHandle, 0, g_VboHandle, g_ebo_byte_size, sizeof(ImDrawVert));
+    glVertexArrayElementBuffer(g_VaoHandle, g_VboHandle);
 
     glVertexArrayAttribBinding(g_VaoHandle, g_AttribLocationVtxPos, 0);
     glVertexArrayAttribBinding(g_VaoHandle, g_AttribLocationVtxUV, 0);
@@ -231,11 +229,6 @@ void ImGui_ImplOpenGL3_DestroyDeviceObjects()
     {
         glDeleteBuffers(1, &g_VboHandle);
         g_VboHandle = 0;
-    }
-    if (g_ElementsHandle != 0u)
-    {
-        glDeleteBuffers(1, &g_ElementsHandle);
-        g_ElementsHandle = 0;
     }
     if (g_ShaderHandle != 0u)
     {
