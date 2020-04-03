@@ -189,6 +189,7 @@ void bind_input(sol::state_view lua)
                                       {"ScenarioScene", input::EKeyContext::ScenarioScene},
                                       {"PauseMenu", input::EKeyContext::PauseMenu},
                                       {"Preference", input::EKeyContext::PreferenceScene},
+                                      {"EditorScene", input::EKeyContext::EditorScene}});
 
     lua.new_enum<input::EAction>("EAction",
                                  {{"MoveUp", input::EAction::MoveUp},
