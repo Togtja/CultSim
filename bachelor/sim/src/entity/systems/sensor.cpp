@@ -87,15 +87,6 @@ bool Sensor::is_colliding_bound(const glm::vec2& pos, const glm::vec2& pos2, flo
 void Sensor::update(float dt)
 {
     CS_AUTOTIMER(Sensor System);
-    static bool draw_fov  = false;
-    static bool draw_seen = false;
-
-    if (ImGui::TreeNode("Sensor Info"))
-    {
-        ImGui::Checkbox("Draw Field of View", &draw_fov);
-        ImGui::Checkbox("Draw Vision Lines", &draw_seen);
-        ImGui::TreePop();
-    }
 
     m_collision_grid.clear();
     auto& registry = *m_context.registry;
@@ -147,10 +138,24 @@ void Sensor::update(float dt)
     });
 
     m_context.executor->run(taskflow).get();
+}
+
+void Sensor::update_imgui()
+{
+    static bool draw_fov  = false;
+    static bool draw_seen = false;
+
+    if (ImGui::TreeNode("Sensor Info"))
+    {
+        ImGui::Checkbox("Draw Field of View", &draw_fov);
+        ImGui::Checkbox("Draw Vision Lines", &draw_seen);
+        ImGui::TreePop();
+    }
 
     /** Debug drawing */
     if (draw_fov)
     {
+        auto vis_view = m_context.registry->group<component::Vision, component::Position>();
         vis_view.each(
             [this, &renderer = gfx::get_renderer().debug()](const component::Vision& vis, const component::Position& pos) {
                 renderer.draw_circle(pos.position, vis.radius, {.33f, .33f, .33f});
