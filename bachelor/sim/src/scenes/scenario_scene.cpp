@@ -810,7 +810,7 @@ void ScenarioScene::draw_time_control_ui()
         m_timescale = 1;
     }
     ImGui::SameLine();
-    if (ImGui::Button(">>", {36, 24}))
+    if (ImGui::Button("2x", {36, 24}))
     {
         m_paused    = false;
         m_timescale = 2;
@@ -867,17 +867,17 @@ void ScenarioScene::draw_selected_entity_information_ui()
     auto name = m_registry.try_get<component::Name>(selection_info.selected_entity);
     if (name && name->name != "")
     {
-        auto text = fmt::format("{} no {}", name->name, static_cast<int64_t>(selection_info.selected_entity));
+        auto text = fmt::format("{} [ID: {}]", name->name, static_cast<int64_t>(selection_info.selected_entity));
         ImGui::Text(text.c_str());
     }
     else if (name)
     {
-        auto text = fmt::format("{} no {}", name->entity_type, static_cast<int64_t>(selection_info.selected_entity));
+        auto text = fmt::format("{} [ID: {}]", name->entity_type, static_cast<int64_t>(selection_info.selected_entity));
         ImGui::Text(text.c_str());
     }
     else
     {
-        auto text = fmt::format("Entity no {}", static_cast<int64_t>(selection_info.selected_entity));
+        auto text = fmt::format("Entity [ID: {}]", static_cast<int64_t>(selection_info.selected_entity));
         ImGui::Text(text.c_str());
     }
 
