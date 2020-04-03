@@ -27,7 +27,7 @@ void Memory::update(float dt)
     if (m_timer > 0.4f && m_timer < 0.6f)
     {
         auto view = registry->view<component::Memory, component::Vision>();
-        view.each([dt, registry](entt::entity e, component::Memory& memory, const component::Vision& vision) {
+        view.each([registry](entt::entity e, component::Memory& memory, const component::Vision& vision) {
             for (auto& container : memory.memory_container)
             {
                 int count{};
@@ -69,7 +69,7 @@ void Memory::update(float dt)
         m_timer   = 0.f;
         auto view = registry->view<component::Memory>();
 
-        view.each([dt, registry, this](entt::entity e, component::Memory& memory) {
+        view.each([registry](entt::entity e, component::Memory& memory) {
             for (auto& memory_container : memory.memory_container)
             {
                 for (auto& memory : memory_container.memory_storage)
@@ -146,8 +146,7 @@ ISystem* Memory::clone()
 
 void Memory::update_memories(const event::CreatedMemory& event)
 {
-    auto memories  = m_context.registry->try_get<component::Memory>(event.entity);
-    const auto pos = m_context.registry->try_get<component::Position>(event.entity);
+    auto memories = m_context.registry->try_get<component::Memory>(event.entity);
 
     if (memories)
     {
@@ -158,7 +157,6 @@ void Memory::update_memories(const event::CreatedMemory& event)
             if ((memory_container.memory_tags & event.memory->m_tags) == event.memory->m_tags)
             {
                 auto duplicate = false;
-                int i          = 0;
                 for (auto& memory : memory_container.memory_storage)
                 {
                     auto* res       = dynamic_cast<memory::ResourceLocation*>(memory.get());
@@ -184,8 +182,8 @@ void Memory::update_memories(const event::CreatedMemory& event)
                     {
                         std::sort(memory_container.memory_storage.begin(),
                                   memory_container.memory_storage.end(),
-                                  [pos, this, memories](const std::unique_ptr<memory::IMemory>& lhs,
-                                                        const std::unique_ptr<memory::IMemory>& rhs) {
+                                  [pos, memories](const std::unique_ptr<memory::IMemory>& lhs,
+                                                  const std::unique_ptr<memory::IMemory>& rhs) {
                                       auto res_lhs = dynamic_cast<memory::ResourceLocation*>(lhs.get());
                                       auto res_rhs = dynamic_cast<memory::ResourceLocation*>(rhs.get());
 
