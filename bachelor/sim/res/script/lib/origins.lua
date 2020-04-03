@@ -1,4 +1,4 @@
-origins = {
+local origins = {
     ethnicities = {
         african = {
             male_first = {
@@ -12335,5 +12335,7 @@ origins = {
                 "Wolff"
             }
         }
-    }
+    },
 }
+
+return origins
