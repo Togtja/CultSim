@@ -37,21 +37,31 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
-    constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
-    auto time_since_tick    = timestep;
+    constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
+    auto time_since_tick               = timestep;
+    std::array<float, 144> average_fps = {};
+    int next_fps                       = 0;
 
     /** Main Loop */
     do
     {
-        CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        time_since_tick += dt_clock.restart_time_unit();
+        auto frame_time                 = dt_clock.restart_time_unit();
+        average_fps[(++next_fps) % 144] = frame_time.count();
+        time_since_tick += frame_time;
         while (time_since_tick >= timestep)
         {
+            CS_AUTOTIMER(Update Time);
+            gfx::get_renderer().debug().clear();
+
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
+
+            /** Average FPS */
+            float average = std::accumulate(average_fps.cbegin(), average_fps.cend(), 0.f) / average_fps.size();
+            ImGui::Text("FPS: %.3fms / %.3f", average * 1000.f, 1.f / average);
 
             update(timestep.count());
             time_since_tick -= timestep;
@@ -88,16 +98,18 @@ void Application::handle_input()
         }
     }
 }
+
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
+    ImGui::Text("Lua memory: %.2f Kb", m_lua.memory_used() / 1024.f);
     m_scene_manager.update(dt);
     m_preferences.show_debug_ui();
 }
 
 void Application::draw()
 {
-    gfx::get_renderer().clear();
+    gfx::get_renderer().sprite().clear();
 
     m_scene_manager.draw();
 
@@ -195,7 +207,9 @@ bool Application::init_gl()
     glClearColor(0.02f, 0.02f, 0.02f, 0.0f);
 
     glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 #ifndef NDEBUG
     gfx::create_debug_callback();
@@ -291,7 +305,7 @@ bool Application::init_imgui()
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init("#version 450 core");
+    ImGui_ImplOpenGL45_Init();
 
     return true;
 }
