@@ -24,6 +24,7 @@ enum class EKeyContext
     PauseMenu,
     PreferenceScene,
     EditorScene,
+    LoadScenario,
 
     Count
 };
@@ -46,6 +47,7 @@ inline std::string key_context_to_string(const EKeyContext context)
         case EKeyContext::PauseMenu: return "PauseMenu";
         case EKeyContext::PreferenceScene: return "PreferenceScene";
         case EKeyContext::EditorScene: return "EditorScene";
+        case EKeyContext::LoadScenario: return "LoadScenario";
     }
     return "KeyContext not added to to_string";
 }

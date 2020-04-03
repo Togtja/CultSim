@@ -128,6 +128,13 @@ bool Application::init_input()
         m_running = false;
     });
 
+    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
+    {
+        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
+            m_scene_manager.pop();
+        });
+    }
+
     return true;
 }
 

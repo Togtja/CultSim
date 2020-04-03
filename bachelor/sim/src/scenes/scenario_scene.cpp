@@ -266,13 +266,6 @@ void ScenarioScene::bind_actions_for_scene()
         m_context->scene_manager->push<PauseMenuScene>();
     });
 
-    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
-    {
-        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
-            m_context->scene_manager->pop();
-        });
-    }
-
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
         m_timescale = std::clamp(m_timescale *= 2, 1, 100);
     });
