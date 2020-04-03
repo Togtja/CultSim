@@ -27,6 +27,8 @@ struct Movement
     float speed        = 1.f;
     float avoidance_cd = 0.f;
     int avoid_count{};
+
+    float speed_multi = 1.f;
 };
 
 struct Meta
@@ -239,6 +241,24 @@ struct Pregnancy
     bool is_egg = false;
 };
 
+namespace detail
+{
+// Defines a single trait
+struct Trait
+{
+    std::string name;
+    std::string desc;
+
+    sol::function affect;
+    sol::function remove_affect;
+};
+} // namespace detail
+
+// An Agents traits
+struct Traits
+{
+    std::vector<detail::Trait> traits;
+};
 struct AI
 {
 };

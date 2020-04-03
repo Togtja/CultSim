@@ -26,6 +26,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"TimerComponent", spawn_timer_component},
                           {"AgeComponent", spawn_age_component},
                           {"InventoryComponent", spawn_inventory_component},
+                          {"TraitComponent", spawn_trait_component},
                           {"NameComponent", spawn_name_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
@@ -298,6 +299,22 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
     return true;
 }
 
+bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
+    // TODO: Assign the traits that the component has as default
+    const auto& available_traits = table["traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_traits)
+    {
+        trait_comp.traits.push_back({traits["name"].get<std::string>(),
+                                     traits["desc"].get<std::string>(),
+                                     traits["affect"].get<sol::function>(),
+                                     traits["unaffect"].get<sol::function>()
+
+        });
+    }
+    return true;
+}
 } // namespace detail
 
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)

@@ -38,6 +38,23 @@ actions.consume_self = {
 
 }
 
+actions.attack = {
+    name = "Attack",
+    requirements = ETag.Find,
+    time_to_complete = 1,
+    success_chance = 0.5,
+    success = function(owner, target)
+            --Deals less damage as you are just fustrated
+            local damage = cultsim.get_component(owner, component.attack)
+            cultsim.apply_basic_damage(target, damage.damage/2)
+    end,
+    failure = function(owner, target)
+            -- TODO: Lower fustration a bit
+    end,
+    abort = function(owner, target)
+    end
+}
+
 actions.drink = {
     name = "Drink",
     requirements = ETag.Find,

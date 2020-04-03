@@ -104,7 +104,7 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
         }
     }
 
-    // TODO: Add checks for agents personality and personal history to further increase / decrease strategy desirability
+    // TODO: Add checks for agents traits and personal history to further increase / decrease strategy desirability
 
     if (!strategies.staged_strategies.empty())
     {
