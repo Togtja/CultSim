@@ -44,10 +44,10 @@ scenario.init = function()
         end
         local name = cultsim.get_component(deer, component.name)
         if(cultsim.get_component(deer, component.reproduction).sex == 1) then
-            local genname = cultsim.generate_name("scandinavian", true)
+            local genname = cultsim.generate_name("germanic", true)
             name.name = string.format("%s %s", genname.first, genname.last)
         else 
-            local genname = cultsim.generate_name("scandinavian", false)
+            local genname = cultsim.generate_name("germanic", false)
             name.name = string.format("%s %s", genname.first, genname.last)
         end
     end
