@@ -35,11 +35,20 @@ needs = {
         tags = ETag.Reproduce
     },
     stockpile = {
-        name = "Stockpile Food",
+        name = "Stockpile supplies",
         weight = 0.0,
         status = 0.0,
         decay_rate = 0.0,
         vitality = 0.0,
-        tags = ETag.Food | ETag.Gather
+        tags =  ETag.Gather
+	},
+    steal = {
+     name = "Steal supplies",
+     weight = 0.0,
+     status = 0.0,
+     decay_rate = 0.0,
+     vitality = 0.0,
+     tags = ETag.Crime | ETag.Gather | ETag.Hostile
 	}
+    
 }

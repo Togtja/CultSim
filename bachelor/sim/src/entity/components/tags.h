@@ -28,7 +28,9 @@ enum ETag : uint64_t
     TAG_Meat      = 1ULL << 18,
     TAG_Veggie    = 1ULL << 19,
     TAG_Inventory = 1ULL << 20,
-    TAG_Consume   = 1ULL << 21
+    TAG_Consume   = 1ULL << 21,
+    TAG_Crime     = 1ULL << 22,
+    TAG_Hostile   = 1ULL << 23,
 };
 
 inline std::string tag_to_string(ETag tag)
@@ -39,7 +41,7 @@ inline std::string tag_to_string(ETag tag)
                                        "Gather", "Delete", "Reserved",  "Carnivore", "Herbivore", "Omnivore",
                                        "Meat",   "Veggie", "Inventory", "Consume"};
 
-    for (int i = 0; i < tag_names.size(); i++)
+    for (unsigned i = 0u; i < tag_names.size(); i++)
     {
         if (tag & 1 << i)
         {
