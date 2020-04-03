@@ -989,8 +989,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (ImGui::BeginTable("Entity Needs", 2))
         {
-            ImGui::TableSetupColumn("Need");
-            ImGui::TableSetupColumn("Status");
+            ImGui::TableSetupColumn("Needs:");
+            ImGui::TableSetupColumn("Status:");
 
             // Non-clickable headers
             cs_auto_table_headers();
@@ -1010,8 +1010,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (ImGui::BeginTable("Traits", 1))
         {
-            ImGui::TableSetupColumn("Traits");
-            ImGui::TableAutoHeaders();
+            ImGui::TableSetupColumn("Traits:");
+            cs_auto_table_headers();
             for (auto&& i : traits->traits)
             {
                 ImGui::TableNextCell();
