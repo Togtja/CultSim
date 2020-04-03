@@ -266,6 +266,13 @@ void ScenarioScene::bind_actions_for_scene()
         m_context->scene_manager->push<PauseMenuScene>();
     });
 
+    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
+    {
+        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
+            m_context->scene_manager->pop();
+        });
+    }
+
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
         m_timescale = std::clamp(m_timescale *= 2, 1, 100);
     });
@@ -500,38 +507,27 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             case entt::type_info<component::Position>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Position>(e));
-                break;
             case entt::type_info<component::Movement>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Movement>(e));
-                break;
             case entt::type_info<component::Sprite>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Sprite>(e));
-                break;
             case entt::type_info<component::Vision>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Vision>(e));
-                break;
             case entt::type_info<component::Tags>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Tags>(e));
-                break;
             case entt::type_info<component::Need>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Need>(e));
-                break;
             case entt::type_info<component::Reproduction>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Reproduction>(e));
-                break;
             case entt::type_info<component::Strategy>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Strategy>(e));
-                break;
             case entt::type_info<component::Health>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Health>(e));
-                break;
             case entt::type_info<component::Memory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
-                break;
             case entt::type_info<component::Inventory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
-                break;
-            default: break;
+            default: return sol::nil;
         }
     });
 

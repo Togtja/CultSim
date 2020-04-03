@@ -1,4 +1,5 @@
 #include "pausemenu_scene.h"
+#include "input/input_handler.h"
 #include "mainmenu_scene.h"
 #include "preference_scene.h"
 #include "scene_manager.h"
@@ -11,10 +12,12 @@ namespace cs
 void PauseMenuScene::on_enter()
 {
     ImGui::OpenPopup("Paused##Menu");
+    input::get_input().add_context(input::EKeyContext::PauseMenu, true);
 }
 
 void PauseMenuScene::on_exit()
 {
+    input::get_input().remove_context(input::EKeyContext::PauseMenu);
 }
 
 bool PauseMenuScene::update(float dt)
@@ -22,6 +25,7 @@ bool PauseMenuScene::update(float dt)
     ImGui::OpenPopup("Paused##Menu");
     if (ImGui::BeginPopupModal("Paused##Menu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
     {
+        ImGui::CaptureKeyboardFromApp(false);
         ImGui::Text("You have paused.");
 
         if (ImGui::Button("Resume", {150, 25}))

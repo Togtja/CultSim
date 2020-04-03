@@ -11,6 +11,7 @@ TEST_CASE("attempting to get input handler")
 
 TEST_CASE("attempting to create a keybinding and use it")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_A;
@@ -21,9 +22,11 @@ TEST_CASE("attempting to create a keybinding and use it")
     input.handle_input(e);
     CHECK(success);
     input.clear();
+    ImGui::DestroyContext();
 }
 TEST_CASE("attempting to use keybinding after clear")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F12;
@@ -37,10 +40,12 @@ TEST_CASE("attempting to use keybinding after clear")
     input.clear();
     input.handle_input(e);
     CHECK(times == 2);
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to use keybinding after unbind")
 {
+    ImGui::CreateContext();
     SDL_Event f11{};
     f11.type                = SDL_KEYDOWN;
     f11.key.keysym.scancode = SDL_SCANCODE_F11;
@@ -66,10 +71,12 @@ TEST_CASE("attempting to use keybinding after unbind")
     CHECK(times1 == 2);
     CHECK(times0 == 1);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to bind same key to different function")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F19;
@@ -87,10 +94,12 @@ TEST_CASE("attempting to bind same key to different function")
     CHECK(times1 == 1);
     CHECK(times0 == 1);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to bind diffrent key to same action")
 {
+    ImGui::CreateContext();
     SDL_Event f19{};
     f19.type                = SDL_KEYDOWN;
     f19.key.keysym.scancode = SDL_SCANCODE_F19;
@@ -109,10 +118,12 @@ TEST_CASE("attempting to bind diffrent key to same action")
     input.handle_input(f18);
     CHECK(times == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to unbind something that is already unbound")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F19;
@@ -131,10 +142,12 @@ TEST_CASE("attempting to unbind something that is already unbound")
     input.handle_input(e);
     CHECK(times == 1);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to add default context on top of something else")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F13;
@@ -158,10 +171,12 @@ TEST_CASE("attempting to add default context on top of something else")
     CHECK(times1 == 1);
     CHECK(times0 == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to add non default context on top of another one")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F13;
@@ -191,10 +206,12 @@ TEST_CASE("attempting to add non default context on top of another one")
     CHECK(times1 == 2);
     CHECK(times0 == 1);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to remove default context from stack")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F24;
@@ -210,10 +227,12 @@ TEST_CASE("attempting to remove default context from stack")
     input.handle_input(e);
     CHECK(times == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to pop default context from stack")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F24;
@@ -228,10 +247,12 @@ TEST_CASE("attempting to pop default context from stack")
     input.handle_input(e);
     CHECK(times == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to remove non default context from stack by context")
 {
+    ImGui::CreateContext();
     SDL_Event f11{};
     f11.type                = SDL_KEYDOWN;
     f11.key.keysym.scancode = SDL_SCANCODE_F11;
@@ -269,10 +290,12 @@ TEST_CASE("attempting to remove non default context from stack by context")
     input.handle_input(f13);
     CHECK(times0 == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to remove top non default context from stack")
 {
+    ImGui::CreateContext();
     SDL_Event f11{};
     f11.type                = SDL_KEYDOWN;
     f11.key.keysym.scancode = SDL_SCANCODE_F11;
@@ -309,10 +332,12 @@ TEST_CASE("attempting to remove top non default context from stack")
     input.handle_input(f11);
     CHECK(times1 == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to clear context from all bindings")
 {
+    ImGui::CreateContext();
     SDL_Event f11{};
     f11.type                = SDL_KEYDOWN;
     f11.key.keysym.scancode = SDL_SCANCODE_F11;
@@ -337,10 +362,12 @@ TEST_CASE("attempting to clear context from all bindings")
     input.handle_input(f11);
     CHECK(times == 2);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to go back to default context")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_F11;
@@ -391,10 +418,12 @@ TEST_CASE("attempting to go back to default context")
     CHECK(times2 == 2);
 
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to create blocking context")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type                = SDL_KEYDOWN;
     e.key.keysym.scancode = SDL_SCANCODE_A;
@@ -415,10 +444,12 @@ TEST_CASE("attempting to create blocking context")
     CHECK(times0 == 0);
     CHECK(times1 == 1);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 TEST_CASE("attempting to bind mousebutton")
 {
+    ImGui::CreateContext();
     SDL_Event e{};
     e.type          = SDL_MOUSEBUTTONDOWN;
     e.button.button = 1; // Left mouse click
@@ -426,11 +457,10 @@ TEST_CASE("attempting to bind mousebutton")
     auto& input  = get_input();
     bool success = false;
     input.fast_bind_btn(EKeyContext::DefaultContext, EMouse::BtnLeft, EAction::MoveUp, [&success]() { success = true; });
-    ImGui::CreateContext();
     input.handle_input(e);
-    ImGui::DestroyContext();
     CHECK(success == true);
     input.clear();
+    ImGui::DestroyContext();
 }
 
 /*

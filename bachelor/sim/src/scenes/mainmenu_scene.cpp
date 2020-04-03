@@ -43,6 +43,7 @@ bool MainMenuScene::update(float dt)
     if (ImGui::Button("Development Editor", {150, 50}))
     {
         m_context->scene_manager->push<EditorScene>();
+        input::get_input().add_context(input::EKeyContext::EditorScene, true);
     }
     */
 

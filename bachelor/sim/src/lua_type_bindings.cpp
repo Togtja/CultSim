@@ -192,7 +192,10 @@ void bind_input(sol::state_view lua)
                                      {{"DefaultContext", input::EKeyContext::DefaultContext},
                                       {"Agent", input::EKeyContext::Agent},
                                       {"AgentOnHover", input::EKeyContext::AgentOnHover},
-                                      {"ScenarioScene", input::EKeyContext::ScenarioScene}});
+                                      {"ScenarioScene", input::EKeyContext::ScenarioScene},
+                                      {"PauseMenu", input::EKeyContext::PauseMenu},
+                                      {"Preference", input::EKeyContext::PreferenceScene},
+                                      {"EditorScene", input::EKeyContext::EditorScene}});
 
     lua.new_enum<input::EAction>("EAction",
                                  {{"MoveUp", input::EAction::MoveUp},
