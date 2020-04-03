@@ -350,18 +350,23 @@ void ContextHandler::unbind_btn(const EKeyContext context, const EMouse button)
 
 void ContextHandler::handle_input(const SDL_Event& event)
 {
-    bool block = false;
+    bool block     = false;
+    const auto& io = ImGui::GetIO();
+
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         // Handled the input
         if (event.type == SDL_KEYDOWN)
         {
-            if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
+            if (!(io.WantCaptureKeyboard || io.WantTextInput))
             {
-                block = true;
+                if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
+                {
+                    block = true;
+                }
             }
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        if (event.type == SDL_MOUSEBUTTONDOWN && !io.WantCaptureMouse)
         {
             // Translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<EMouse>(event.button.button);

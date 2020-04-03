@@ -80,12 +80,7 @@ void Application::handle_input()
                 m_running = false;
             }
         }
-
-        const auto& io = ImGui::GetIO();
-        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
-        {
-            input::get_input().handle_input(e);
-        }
+        input::get_input().handle_input(e);
     }
 }
 void Application::update(float dt)
