@@ -55,7 +55,7 @@ void PreferenceScene::key_binding()
 
     for (auto&& [context, action_h] : m_display_map)
     {
-        ImGui::Text(input::key_context_to_string(context).c_str());
+        ImGui::Text("%s", input::key_context_to_string(context).c_str());
         ImGui::BeginTable(input::key_context_to_string(context).c_str(), 3);
         ImGui::TableSetupColumn("Key");
         ImGui::TableSetupColumn("Action");
@@ -73,7 +73,7 @@ void PreferenceScene::key_binding()
             }
             ImGui::TableNextCell();
             auto action_s = input::action_to_string(action);
-            ImGui::Text(action_s.c_str());
+            ImGui::Text("%s", action_s.c_str());
 
             ImGui::TableNextCell();
             if (ImGui::Button(fmt::format("X##key{}", key).c_str()))
@@ -286,7 +286,7 @@ void PreferenceScene::quit_btn()
     ImGui::Begin("Option##quit",
                  nullptr,
                  ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    bool success = true;
+
     if (ImGui::Button("Save##ps", {100, 50}))
     {
         auto&& input = input::get_input();
