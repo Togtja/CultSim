@@ -160,6 +160,14 @@ bool Application::init_lua()
     lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
 
+    /** Load lua libraries */
+    for (const auto& lib : fs::list_directory("script/lib"))
+    {
+        spdlog::get("lua")->debug("loading lua library '{}'", lib);
+        const auto& code = fs::read_file("script/lib/" + lib);
+        m_lua.require_script(lib, code);
+    }
+
     meta::reflect_data_types();
     meta::reflect_systems();
 
