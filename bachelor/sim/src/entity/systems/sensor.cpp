@@ -164,9 +164,12 @@ void Sensor::update_imgui()
                 {
                     for (auto seen : vis.seen)
                     {
-                        renderer.draw_line(pos.position,
-                                           m_context.registry->get<component::Position>(seen).position,
-                                           {0.2f, 1.f, 0.2f});
+                        if (m_context.registry->valid(seen))
+                        {
+                            renderer.draw_line(pos.position,
+                                               m_context.registry->get<component::Position>(seen).position,
+                                               {0.2f, 1.f, 0.2f});
+                        }
                     }
                 }
             });

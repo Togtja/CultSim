@@ -176,8 +176,11 @@ void Movement::update_imgui()
         /** Draw paths */
         if (draw_paths)
         {
-            gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
-            gfx::get_renderer().debug().draw_circle(mov.desired_position.front(), 3, {0.f, 1.f, 0.f});
+            if (!mov.desired_position.empty())
+            {
+                gfx::get_renderer().debug().draw_line(pos.position, mov.desired_position.back(), {0.f, 1.f, 1.f});
+                gfx::get_renderer().debug().draw_circle(mov.desired_position.front(), 3, {0.f, 1.f, 0.f});
+            }
 
             for (int i = mov.desired_position.size() - 1; i > 0; --i)
             {
