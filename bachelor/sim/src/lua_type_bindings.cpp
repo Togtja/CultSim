@@ -188,7 +188,7 @@ void bind_input(sol::state_view lua)
                                       {"AgentOnHover", input::EKeyContext::AgentOnHover},
                                       {"ScenarioScene", input::EKeyContext::ScenarioScene},
                                       {"PauseMenu", input::EKeyContext::PauseMenu},
-                                      {"Preference", input::EKeyContext::PreferenceScene},
+                                      {"PreferenceScene", input::EKeyContext::PreferenceScene},
                                       {"EditorScene", input::EKeyContext::EditorScene}});
 
     lua.new_enum<input::EAction>("EAction",
@@ -204,7 +204,8 @@ void bind_input(sol::state_view lua)
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
                                   {"Pause", input::EAction::Pause},
-                                  {"Quit", input::EAction::Quit}});
+                                  {"Quit", input::EAction::Quit},
+                                  {"EscapeScene", input::EAction::EscapeScene}});
 
     lua.new_enum<input::EMouse>("EMouse",
                                 {{"BtnLeft", input::EMouse::BtnLeft},
