@@ -222,8 +222,8 @@ struct Reproduction
 
 struct Name
 {
-    std::string_view entity_type{};
-    std::string_view name{};
+    std::string entity_type{};
+    std::string name{};
 };
 
 struct Pregnancy

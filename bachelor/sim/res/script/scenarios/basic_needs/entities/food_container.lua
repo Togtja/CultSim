@@ -26,7 +26,7 @@ entity = {
             cultsim.add_to_inventory(e,target)
         end
     },
-        NameComponent = {
+    NameComponent = {
         entity_type = "Food Crate"
 	}
 }
