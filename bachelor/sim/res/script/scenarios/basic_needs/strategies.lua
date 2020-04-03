@@ -65,7 +65,7 @@ strategies.sleep_on_ground = {
 strategies.find_mate = {
     name = "Looking for a Mate",
     tags = ETag.Reproduce,
-    target_tags = ETag.Sleep,
+    target_tags = ETag.Reproduce,
     actions = { actions.reproduce }
 }
 

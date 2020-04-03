@@ -25,5 +25,8 @@ entity = {
             cultsim.remove_component(target, component.position)
             cultsim.add_to_inventory(e,target)
         end
-    }
+    },
+    NameComponent = {
+        entity_type = "Water Crate"
+	}
 }

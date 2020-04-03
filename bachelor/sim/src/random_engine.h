@@ -82,7 +82,7 @@ public:
     template<typename T>
     decltype(auto) pick(T& container)
     {
-        return container[uniform(0, container.size() - 1)];
+        return container[uniform<unsigned>(0, container.size() - 1)];
     }
 
     /**
@@ -93,7 +93,7 @@ public:
     template<typename T>
     decltype(auto) pick(const T& container) const
     {
-        return container[uniform(0, container.size() - 1)];
+        return container[uniform<unsigned>(0, container.size() - 1)];
     }
 };
 } // namespace cs

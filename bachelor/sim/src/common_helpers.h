@@ -3,6 +3,8 @@
 #include <cstdint>
 
 #include <entt/entity/registry.hpp>
+#include <gfx/ImGUI/imgui.h>
+#include <gfx/ImGUI/imgui_internal.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/epsilon.hpp>
 #include <sol/state_view.hpp>
@@ -62,4 +64,21 @@ inline float sigmoid(const float x)
     return exp(x) / (exp(x) + 1.f);
 }
 
+inline void cs_auto_table_headers()
+{
+    auto& g         = *ImGui::GetCurrentContext();
+    int rowCount    = g.CurrentTable->ColumnsCount;
+    auto row_height = ImGui::GetTextLineHeight();
+    ImGui::TableNextRow(ImGuiTableRowFlags_Headers, row_height);
+    for (int i = 0; i < rowCount; i++)
+    {
+        auto name = ImGui::TableGetColumnName(i);
+        // ImGui::TableHeader(name);
+        ImGui::Text(name);
+        if (i < rowCount - 1)
+        {
+            ImGui::TableNextCell();
+        }
+    }
+}
 } // namespace cs
