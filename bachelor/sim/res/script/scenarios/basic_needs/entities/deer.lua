@@ -51,5 +51,9 @@ entity = {
     AgeComponent = 
     {
         life_expectancy = 3000.0
-    }
+    },
+    NameComponent = 
+    {
+     entity_type = "Deer"
+	}
 }

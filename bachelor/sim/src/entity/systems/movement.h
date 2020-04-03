@@ -7,11 +7,17 @@ namespace cs::system
 {
 class Movement : public ISystem
 {
+private:
+    float avoid_rotation = 35.f;
+    float avoid_cd       = 0.14f;
+    float avoid_dist     = 10.f;
+    float avoid_start    = 15.f;
+
 public:
     using ISystem::ISystem;
 
     void update(float dt) override;
-
+    void update_imgui() override;
     ISystem* clone() override;
 };
 } // namespace cs::system

@@ -10,5 +10,8 @@ entity = {
     },
     TagComponent = {
         tags = ETag.Food | ETag.Consume
-    }
+    },
+    NameComponent = {
+        entity_type = "Food"
+	}
 }

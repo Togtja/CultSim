@@ -350,18 +350,23 @@ void ContextHandler::unbind_btn(const EKeyContext context, const EMouse button)
 
 void ContextHandler::handle_input(const SDL_Event& event)
 {
-    bool block = false;
+    bool block     = false;
+    const auto& io = ImGui::GetIO();
+
     for (auto it = m_active_stack.crbegin(); it != m_active_stack.crend(); it++)
     {
         // Handled the input
         if (event.type == SDL_KEYDOWN)
         {
-            if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
+            if (!(io.WantCaptureKeyboard || io.WantTextInput))
             {
-                block = true;
+                if (m_input_map.at(*it).handle_input(event.key.keysym.scancode))
+                {
+                    block = true;
+                }
             }
         }
-        if (event.type == SDL_MOUSEBUTTONDOWN)
+        if (event.type == SDL_MOUSEBUTTONDOWN && !io.WantCaptureMouse)
         {
             // Translate from SDL Mouse Enum to our Mouse enum
             auto click = static_cast<EMouse>(event.button.button);
@@ -543,10 +548,10 @@ void ContextHandler::load_binding_from_file(sol::state_view lua)
         for (auto&& [key, action] : key_action.as<sol::table>())
         {
             auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
-            spdlog::get("input")->trace("Trying to bind {} to {} in {}",
+            spdlog::get("input")->debug("Trying to bind {} to {} in {}",
                                         SDL_GetScancodeName(scancode),
-                                        action.as<EAction>(),
-                                        context.as<EKeyContext>());
+                                        action_to_string(action.as<EAction>()),
+                                        key_context_to_string(context.as<EKeyContext>()));
 
             if (scancode == SDL_SCANCODE_UNKNOWN)
             {
