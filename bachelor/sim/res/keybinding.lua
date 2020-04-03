@@ -4,6 +4,9 @@ action_key_bindings = {
 	[EKeyContext.PreferenceScene] = {
 		["Escape"] = EAction.EscapeScene,
 	},
+	[EKeyContext.LoadScenario] = {
+		["Escape"] = EAction.EscapeScene,
+	},
 	[EKeyContext.Agent] = {
 		["Escape"] = EAction.EscapeScene,
 	},

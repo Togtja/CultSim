@@ -25,7 +25,7 @@ void AutoTimer::show_debug_ui()
             ImGui::TableNextCell();
             ImGui::Text("%s", k.name.data());
             ImGui::TableNextCell();
-            ImGui::TextColored(glm::mix(s_ms_col[0], s_ms_col[1], glm::vec4(k.time_ms / 16.f)), "%.2lf", k.time_ms);
+            ImGui::TextColored(glm::mix(s_ms_col[0], s_ms_col[1], glm::vec4(k.time_ms / 16.f)), "%.3lf", k.time_ms);
         }
         ImGui::EndTable();
     }

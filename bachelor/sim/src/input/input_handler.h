@@ -24,6 +24,7 @@ enum class EKeyContext
     PauseMenu,
     PreferenceScene,
     EditorScene,
+    LoadScenario,
 
     Count
 };
@@ -39,6 +40,7 @@ inline std::string key_context_to_string(const EKeyContext context)
 {
     switch (context)
     {
+        case EKeyContext::None: return "None";
         case EKeyContext::DefaultContext: return "DefaultContext";
         case EKeyContext::Agent: return "Agent";
         case EKeyContext::AgentOnHover: return "AgentOnHover";
@@ -46,8 +48,9 @@ inline std::string key_context_to_string(const EKeyContext context)
         case EKeyContext::PauseMenu: return "PauseMenu";
         case EKeyContext::PreferenceScene: return "PreferenceScene";
         case EKeyContext::EditorScene: return "EditorScene";
+        case EKeyContext::LoadScenario: return "LoadScenario";
+        default: return "Error: Invalid Context (Consider adding it to_string)";
     }
-    return "KeyContext not added to to_string";
 }
 
 /**
@@ -87,6 +90,7 @@ inline std::string action_to_string(const EAction action)
 {
     switch (action)
     {
+        case EAction::None: return "None";
         case EAction::MoveUp: return "MoveUp";
         case EAction::MoveLeft: return "MoveLeft";
         case EAction::MoveRight: return "MoveRight";
@@ -101,8 +105,8 @@ inline std::string action_to_string(const EAction action)
         case EAction::Pause: return "Pause";
         case EAction::Quit: return "Quit";
         case EAction::EscapeScene: return "EscapeScene";
+        default: return "Action not added to to_string";
     }
-    return "Action not added to to_string";
 }
 
 /**

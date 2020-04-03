@@ -26,4 +26,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/editor_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/editor_scene.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/loadsenario_scene.h
+        ${CMAKE_CURRENT_LIST_DIR}/loadsenario_scene.cpp
 )

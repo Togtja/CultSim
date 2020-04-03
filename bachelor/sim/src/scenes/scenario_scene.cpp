@@ -187,6 +187,7 @@ bool ScenarioScene::update(float dt)
     for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
+        m_simtime += dt;
 
         /** Update systems */
         for (auto&& system : m_active_systems)
@@ -256,8 +257,8 @@ void ScenarioScene::bind_actions_for_scene()
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
         // TODO: Steal UE4 FInterpretTo
-        auto pos =
-            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 0.05f);
+        const auto pos =
+            glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 10.f * dt);
 
         gfx::get_renderer().set_camera_position_2d(pos);
     });
@@ -265,13 +266,6 @@ void ScenarioScene::bind_actions_for_scene()
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::PauseMenu, [this] {
         m_context->scene_manager->push<PauseMenuScene>();
     });
-
-    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
-    {
-        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
-            m_context->scene_manager->pop();
-        });
-    }
 
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SpeedUp, [this]() {
         m_timescale = std::clamp(m_timescale *= 2, 1, 100);
@@ -624,7 +618,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
 
     /** Impregnate */
-    cultsim.set_function("impregnate", [this](sol::this_state s, entt::entity father, entt::entity mother) {
+    cultsim.set_function("impregnate", [this](entt::entity father, entt::entity mother) {
         /** Figure out "type" of mother and spawn a child based on that */
 
         /** Give a Pregnancy component to the mother */
