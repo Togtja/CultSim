@@ -800,31 +800,37 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::SameLine();
     if (ImGui::Button(">", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 1;
     }
     ImGui::SameLine();
     if (ImGui::Button(">>", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 2;
     }
     ImGui::SameLine();
     if (ImGui::Button("5x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 5;
     }
     ImGui::SameLine();
     if (ImGui::Button("10x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 10;
     }
     ImGui::SameLine();
     if (ImGui::Button("20x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 20;
     }
     ImGui::SameLine();
     if (ImGui::Button("50x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 50;
     }
     ImGui::End();
