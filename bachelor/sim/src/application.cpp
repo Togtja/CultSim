@@ -53,6 +53,7 @@ void Application::run(const std::vector<char*>& args)
         while (time_since_tick >= timestep)
         {
             CS_AUTOTIMER(Update Time);
+            gfx::get_renderer().debug().clear();
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
@@ -108,7 +109,7 @@ void Application::update(float dt)
 
 void Application::draw()
 {
-    gfx::get_renderer().clear();
+    gfx::get_renderer().sprite().clear();
 
     m_scene_manager.draw();
 
