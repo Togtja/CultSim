@@ -25,8 +25,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"MemoryComponent", spawn_memory_component},
                           {"TimerComponent", spawn_timer_component},
                           {"AgeComponent", spawn_age_component},
-                          {"InventoryComponent", spawn_inventory_component}};
-
+                          {"InventoryComponent", spawn_inventory_component},
+                          {"NameComponent", spawn_name_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -102,6 +102,14 @@ bool spawn_vision_component(entt::entity e, entt::registry& reg, sol::table tabl
     auto& vis  = reg.assign_or_replace<component::Vision>(e);
     vis.radius = table["radius"].get<float>();
     vis.fov    = table["fov"].get<uint8_t>();
+
+    return true;
+}
+
+bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& name       = reg.assign_or_replace<component::Name>(e);
+    name.entity_type = table["entity_type"].get<std::string>();
 
     return true;
 }

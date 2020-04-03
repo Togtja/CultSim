@@ -13,6 +13,7 @@
 #include "scenes/pausemenu_scene.h"
 
 #include <functional>
+#include <numeric>
 
 #include <gfx/ImGUI/imgui.h>
 #include <gfx/ImGUI/imgui_impl_opengl3.h>
@@ -38,6 +39,7 @@ void Application::run(const std::vector<char*>& args)
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
     constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
+    bool meta_window_visible           = false;
     auto time_since_tick               = timestep;
     std::array<float, 144> average_fps = {};
     int next_fps                       = 0;
@@ -58,15 +60,11 @@ void Application::run(const std::vector<char*>& args)
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
-
-            /** Average FPS */
             float average = std::accumulate(average_fps.cbegin(), average_fps.cend(), 0.f) / average_fps.size();
             ImGui::Text("FPS: %.3fms / %.3f", average * 1000.f, 1.f / average);
 
             update(timestep.count());
             time_since_tick -= timestep;
-            AutoTimer::show_debug_ui();
-
             ImGui::Render();
         }
 
@@ -90,12 +88,7 @@ void Application::handle_input()
                 m_running = false;
             }
         }
-
-        const auto& io = ImGui::GetIO();
-        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
-        {
-            input::get_input().handle_input(e);
-        }
+        input::get_input().handle_input(e);
     }
 }
 
@@ -146,13 +139,20 @@ bool Application::init_input()
         m_running = false;
     });
 
+    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
+    {
+        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
+            m_scene_manager.pop();
+        });
+    }
+
     return true;
 }
 
 bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
-    m_lua.open_libraries(sol::lib::base, sol::lib::math);
+    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
     m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
@@ -177,6 +177,14 @@ bool Application::init_lua()
     lua::bind_systems(m_lua.lua_state());
     lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
+
+    /** Load lua libraries */
+    for (const auto& lib : fs::list_directory("script/lib"))
+    {
+        spdlog::get("lua")->info("loading lua library '{}'", lib.substr(0, lib.size() - 4));
+        const auto& code = fs::read_file("script/lib/" + lib);
+        m_lua.require_script(lib.substr(0, lib.size() - 4), code);
+    }
 
     meta::reflect_data_types();
     meta::reflect_systems();

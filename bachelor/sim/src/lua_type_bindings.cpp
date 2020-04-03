@@ -8,6 +8,7 @@
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+#include "entity/name_generator.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -59,6 +60,12 @@ void bind_dataonly(sol::state_view lua)
                         {"Consume", ETag::TAG_Consume},
                         {"Crime", ETag::TAG_Crime},
                         {"Hostile", ETag::TAG_Hostile}});
+
+    lua.new_usertype<NameGenerator::Name>("GeneratedName",
+                                          "first",
+                                          &NameGenerator::Name::first,
+                                          "last",
+                                          &NameGenerator::Name::last);
 }
 
 void bind_components(sol::state_view lua)
@@ -151,6 +158,12 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Age>("AgeComponent", "life_expectancy", &component::Age::average_life_expectancy);
 
+    lua.new_usertype<component::Name>("NameComponent",
+                                      "entity_type",
+                                      &component::Name::entity_type,
+                                      "name",
+                                      &component::Name::name);
+
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
 }
@@ -186,7 +199,11 @@ void bind_input(sol::state_view lua)
                                      {{"DefaultContext", input::EKeyContext::DefaultContext},
                                       {"Agent", input::EKeyContext::Agent},
                                       {"AgentOnHover", input::EKeyContext::AgentOnHover},
-                                      {"ScenarioScene", input::EKeyContext::ScenarioScene}});
+                                      {"ScenarioScene", input::EKeyContext::ScenarioScene},
+                                      {"PauseMenu", input::EKeyContext::PauseMenu},
+                                      {"PreferenceScene", input::EKeyContext::PreferenceScene},
+                                      {"EditorScene", input::EKeyContext::EditorScene},
+                                      {"LoadScenario", input::EKeyContext::LoadScenario}});
 
     lua.new_enum<input::EAction>("EAction",
                                  {{"MoveUp", input::EAction::MoveUp},
@@ -201,7 +218,8 @@ void bind_input(sol::state_view lua)
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
                                   {"Pause", input::EAction::Pause},
-                                  {"Quit", input::EAction::Quit}});
+                                  {"Quit", input::EAction::Quit},
+                                  {"EscapeScene", input::EAction::EscapeScene}});
 
     lua.new_enum<input::EMouse>("EMouse",
                                 {{"BtnLeft", input::EMouse::BtnLeft},

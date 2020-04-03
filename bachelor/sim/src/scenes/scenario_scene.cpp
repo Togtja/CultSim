@@ -137,6 +137,7 @@ void ScenarioScene::reset_simulation()
 
 void ScenarioScene::on_enter()
 {
+    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
     initialize_simulation();
 
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
@@ -179,8 +180,12 @@ bool ScenarioScene::update(float dt)
 
     /** Sample data */
     m_data_collector.show_ui();
-
-    for (int i = 0; i < m_timescale; ++i)
+    auto time_step = m_timescale;
+    if (m_paused)
+    {
+        time_step = 0;
+    }
+    for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
         m_simtime += dt;
@@ -197,8 +202,13 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    /** It's supposed to be three of these here, do not change - not a bug */
+    // Make sure ImGui does not get more than one update per frame
+    for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
 
+    /** It's supposed to be three of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
 
@@ -271,7 +281,7 @@ void ScenarioScene::bind_actions_for_scene()
         m_timescale = std::clamp(m_timescale /= 2, 1, 100);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_paused = !m_paused; });
 
     /** Camera Controls */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
@@ -319,6 +329,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
+    component["name"]         = entt::type_info<component::Name>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -457,6 +468,17 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
+            case entt::type_info<component::Name>::id():
+                if (m_registry.try_get<component::Name>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Name>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             default:
                 spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
@@ -480,43 +502,33 @@ void ScenarioScene::bind_scenario_lua_functions()
             default: break;
         }
     });
+
     cultsim.set_function("add_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
         switch (id)
         {
             case entt::type_info<component::Position>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Position>(e));
-                break;
             case entt::type_info<component::Movement>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Movement>(e));
-                break;
             case entt::type_info<component::Sprite>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Sprite>(e));
-                break;
             case entt::type_info<component::Vision>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Vision>(e));
-                break;
             case entt::type_info<component::Tags>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Tags>(e));
-                break;
             case entt::type_info<component::Need>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Need>(e));
-                break;
             case entt::type_info<component::Reproduction>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Reproduction>(e));
-                break;
             case entt::type_info<component::Strategy>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Strategy>(e));
-                break;
             case entt::type_info<component::Health>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Health>(e));
-                break;
             case entt::type_info<component::Memory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
-                break;
             case entt::type_info<component::Inventory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
-                break;
-            default: break;
+            default: return sol::nil;
         }
     });
 
@@ -683,6 +695,11 @@ void ScenarioScene::bind_scenario_lua_functions()
             }
         }
     });
+
+    /** Generate a random name */
+    cultsim.set_function("generate_name", [this](const std::string& ethnicity, bool is_male) {
+        return m_name_generator.generate(ethnicity, is_male, m_rng);
+    });
 }
 
 void ScenarioScene::setup_docking_ui()
@@ -727,7 +744,14 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    if (m_paused)
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, 0);
+    }
+    else
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    }
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -777,36 +801,42 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0;
+        m_paused = true;
     }
     ImGui::SameLine();
-    if (ImGui::Button("1x", {36, 24}))
+    if (ImGui::Button(">", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 1;
     }
     ImGui::SameLine();
     if (ImGui::Button("2x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 2;
     }
     ImGui::SameLine();
     if (ImGui::Button("5x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 5;
     }
     ImGui::SameLine();
     if (ImGui::Button("10x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 10;
     }
     ImGui::SameLine();
     if (ImGui::Button("20x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 20;
     }
     ImGui::SameLine();
     if (ImGui::Button("50x", {36, 24}))
     {
+        m_paused    = false;
         m_timescale = 50;
     }
     ImGui::End();
@@ -834,8 +864,22 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    auto text = fmt::format("Ola Normann nr {}", static_cast<int64_t>(selection_info.selected_entity));
-    ImGui::Text("%s", text.c_str());
+    auto name = m_registry.try_get<component::Name>(selection_info.selected_entity);
+    if (name && name->name != "")
+    {
+        auto text = fmt::format("{} [ID: {}]", name->name, static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
+    else if (name)
+    {
+        auto text = fmt::format("{} [ID: {}]", name->entity_type, static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
+    else
+    {
+        auto text = fmt::format("Entity [ID: {}]", static_cast<int64_t>(selection_info.selected_entity));
+        ImGui::Text(text.c_str());
+    }
 
     if (health)
     {
@@ -901,7 +945,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
         {
             ImGui::TableSetupColumn("Need");
             ImGui::TableSetupColumn("Status");
-            ImGui::TableAutoHeaders();
+
+            // Non-clickable headers
+            cs_auto_table_headers();
+
             for (const auto& need : needs->needs)
             {
                 ImGui::TableNextCell();
@@ -922,44 +969,6 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
-    }
-
-    if (memories)
-    {
-        if (!memories->memory_container.empty())
-        {
-            if (ImGui::BeginTable("Entity Memories", 2))
-            {
-                ImGui::TableSetupColumn("Tags");
-                ImGui::TableSetupColumn("Size");
-                ImGui::TableAutoHeaders();
-                for (auto& memory : memories->memory_container)
-                {
-                    ImGui::TableNextCell();
-                    ImGui::Text("%s", tag_to_string(memory.memory_tags).c_str());
-                    ImGui::TableNextCell();
-                    ImGui::Text("%zu", memory.memory_storage.size());
-                    if (memory.memory_tags & ETag::TAG_Location)
-                    {
-                        if (ImGui::BeginTable(tag_to_string(memory.memory_tags).c_str(), 2))
-                        {
-                            ImGui::TableSetupColumn("Age");
-                            ImGui::TableSetupColumn("Entity Count");
-                            ImGui::TableAutoHeaders();
-                            for (auto& mem : memory.memory_storage)
-                            {
-                                ImGui::TableNextCell();
-                                ImGui::Text("%f", mem->m_time_since_creation);
-                                ImGui::TableNextCell();
-                                ImGui::Text("%u", dynamic_cast<memory::ResourceLocation*>(mem.get())->m_number_of_entities);
-                            }
-                            ImGui::EndTable();
-                        }
-                    }
-                }
-                ImGui::EndTable();
-            }
-        }
     }
 
     ImGui::End();

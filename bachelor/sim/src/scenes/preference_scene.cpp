@@ -1,8 +1,8 @@
 #include "preference_scene.h"
+#include "common_helpers.h"
 #include "preferences.h"
 #include "scene_manager.h"
 
-#include <common_helpers.h>
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
@@ -26,10 +26,12 @@ PreferenceScene::PreferenceScene()
 }
 void PreferenceScene::on_enter()
 {
+    input::get_input().add_context(input::EKeyContext::PreferenceScene, true);
 }
 
 void PreferenceScene::on_exit()
 {
+    input::get_input().remove_context(input::EKeyContext::PreferenceScene);
 }
 
 bool PreferenceScene::update(float dt)
@@ -60,7 +62,7 @@ void PreferenceScene::key_binding()
         ImGui::TableSetupColumn("Key");
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
-        ImGui::TableAutoHeaders();
+        cs_auto_table_headers();
 
         int i = 0;
         for (auto&& [key, action] : action_h)

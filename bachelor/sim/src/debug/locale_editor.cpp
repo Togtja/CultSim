@@ -1,6 +1,8 @@
 #include "locale_editor.h"
+#include "common_helpers.h"
 #include "filesystem/filesystem.h"
 #include "l10n/lang_manager.h"
+
 
 #include <algorithm>
 
@@ -46,7 +48,7 @@ void LocaleEditor::show()
     {
         ImGui::TableSetupColumn(locale.c_str());
     }
-    ImGui::TableAutoHeaders();
+    cs_auto_table_headers();
 
     int cell = 0;
     for (auto&& [k, v] : m_translations)
