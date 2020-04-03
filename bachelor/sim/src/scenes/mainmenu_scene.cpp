@@ -39,10 +39,12 @@ bool MainMenuScene::update(float dt)
         m_context->scene_manager->push<PreferenceScene>();
     }
 
+    /*
     if (ImGui::Button("Development Editor", {150, 50}))
     {
         m_context->scene_manager->push<EditorScene>();
     }
+    */
 
     if (ImGui::Button("Exit", {150, 50}))
     {

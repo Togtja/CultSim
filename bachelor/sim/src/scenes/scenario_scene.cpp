@@ -179,8 +179,12 @@ bool ScenarioScene::update(float dt)
 
     /** Sample data */
     m_data_collector.show_ui();
-
-    for (int i = 0; i < m_timescale; ++i)
+    auto time_step = m_timescale;
+    if (m_paused)
+    {
+        time_step = 0;
+    }
+    for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
 
@@ -270,7 +274,7 @@ void ScenarioScene::bind_actions_for_scene()
         m_timescale = std::clamp(m_timescale /= 2, 1, 100);
     });
 
-    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_timescale = 0; });
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::Pause, [this]() { m_paused = !m_paused; });
 
     /** Camera Controls */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::MoveUp, [](float dt) {
@@ -726,7 +730,14 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::SameLine();
     ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
     ImGui::SameLine();
-    ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    if (m_paused)
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, 0);
+    }
+    else
+    {
+        ImGui::TextColored({1., 0.627, 0.478, 1.}, "Runtime: %4.1f (%dx)", m_simtime, m_timescale);
+    }
     ImGui::Spacing();
     ImGui::PopFont();
     ImGui::Separator();
@@ -776,15 +787,15 @@ void ScenarioScene::draw_time_control_ui()
     ImGui::Text("Time Scaling");
     if (ImGui::Button("||", {36, 24}))
     {
-        m_timescale = 0;
+        m_paused = true;
     }
     ImGui::SameLine();
-    if (ImGui::Button("1x", {36, 24}))
+    if (ImGui::Button(">", {36, 24}))
     {
         m_timescale = 1;
     }
     ImGui::SameLine();
-    if (ImGui::Button("2x", {36, 24}))
+    if (ImGui::Button(">>", {36, 24}))
     {
         m_timescale = 2;
     }

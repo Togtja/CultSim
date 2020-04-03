@@ -37,8 +37,9 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
-    constexpr auto timestep = DeltaClock::TimeUnit{1.f / 60.f};
-    auto time_since_tick    = timestep;
+    constexpr auto timestep  = DeltaClock::TimeUnit{1.f / 60.f};
+    auto time_since_tick     = timestep;
+    bool meta_window_visible = false;
 
     /** Main Loop */
     do
@@ -52,11 +53,11 @@ void Application::run(const std::vector<char*>& args)
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
-
+            ImGui::Begin("Meta window", &meta_window_visible);
             update(timestep.count());
             time_since_tick -= timestep;
             AutoTimer::show_debug_ui();
-
+            ImGui::End();
             ImGui::Render();
         }
 
