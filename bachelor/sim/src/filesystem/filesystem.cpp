@@ -92,7 +92,7 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
 
     /** Note is a u64bit int, where the 64bit is failure */
     auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
-    if (write_bytes == data.length())
+    if (write_bytes == static_cast<PHYSFS_sint64>(data.length()))
     {
         spdlog::get("filesystem")->info("wrote file '{}'", rpath);
         PHYSFS_close(file);

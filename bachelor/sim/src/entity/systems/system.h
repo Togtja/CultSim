@@ -49,6 +49,7 @@ public:
 
     virtual void update(float dt) = 0;
 
+    virtual void update_imgui(){};
     /**
      * Implement in subclasses to create clones of a system
      *

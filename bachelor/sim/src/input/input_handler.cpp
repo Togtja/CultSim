@@ -548,7 +548,7 @@ void ContextHandler::load_binding_from_file(sol::state_view lua)
         for (auto&& [key, action] : key_action.as<sol::table>())
         {
             auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
-            spdlog::get("input")->trace("Trying to bind {} to {} in {}",
+            spdlog::get("input")->debug("Trying to bind {} to {} in {}",
                                         SDL_GetScancodeName(scancode),
                                         action_to_string(action.as<EAction>()),
                                         key_context_to_string(context.as<EKeyContext>()));
