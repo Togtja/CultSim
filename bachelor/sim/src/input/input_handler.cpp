@@ -550,8 +550,8 @@ void ContextHandler::load_binding_from_file(sol::state_view lua)
             auto scancode = SDL_GetScancodeFromName(key.as<std::string>().c_str());
             spdlog::get("input")->trace("Trying to bind {} to {} in {}",
                                         SDL_GetScancodeName(scancode),
-                                        action.as<EAction>(),
-                                        context.as<EKeyContext>());
+                                        action_to_string(action.as<EAction>()),
+                                        key_context_to_string(context.as<EKeyContext>()));
 
             if (scancode == SDL_SCANCODE_UNKNOWN)
             {
