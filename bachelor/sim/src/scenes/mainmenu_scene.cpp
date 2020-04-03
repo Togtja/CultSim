@@ -1,4 +1,5 @@
 #include "mainmenu_scene.h"
+#include "common_helpers.h"
 #include "editor_scene.h"
 #include "entity/scenario.h"
 #include "preference_scene.h"
@@ -6,7 +7,6 @@
 #include "scenario_scene.h"
 #include "scene_manager.h"
 
-#include <common_helpers.h>
 #include <gfx/ImGUI/imgui.h>
 
 namespace cs
