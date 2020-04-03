@@ -53,11 +53,9 @@ void Application::run(const std::vector<char*>& args)
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplSDL2_NewFrame(m_window.get());
             ImGui::NewFrame();
-            ImGui::Begin("Meta window", &meta_window_visible);
             update(timestep.count());
             time_since_tick -= timestep;
             AutoTimer::show_debug_ui();
-            ImGui::End();
             ImGui::Render();
         }
 

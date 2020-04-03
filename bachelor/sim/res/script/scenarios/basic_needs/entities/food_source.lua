@@ -22,5 +22,8 @@ entity = {
             cultsim.spawn_at("food", Vec2:new(random:uniform(my_pos.position.x - 50.0, my_pos.position.x + 50.0),
                                               random:uniform(my_pos.position.y - 50.0, my_pos.position.y + 50.0)))
         end
-    }
+    },
+    NameComponent = {
+        entity_type = "Tree"
+	}
 }

@@ -151,6 +151,12 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<component::Age>("AgeComponent", "life_expectancy", &component::Age::average_life_expectancy);
 
+    lua.new_usertype<component::Name>("NameComponent",
+                                      "entity_type",
+                                      &component::Name::entity_type,
+                                      "name",
+                                      &component::Name::name);
+
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
 }
