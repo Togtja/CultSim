@@ -8,6 +8,7 @@
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+#include "entity/name_generator.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -59,6 +60,12 @@ void bind_dataonly(sol::state_view lua)
                         {"Consume", ETag::TAG_Consume},
                         {"Crime", ETag::TAG_Crime},
                         {"Hostile", ETag::TAG_Hostile}});
+
+    lua.new_usertype<NameGenerator::Name>("GeneratedName",
+                                          "first",
+                                          &NameGenerator::Name::first,
+                                          "last",
+                                          &NameGenerator::Name::last);
 }
 
 void bind_components(sol::state_view lua)

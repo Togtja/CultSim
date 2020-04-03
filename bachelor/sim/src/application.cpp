@@ -152,7 +152,7 @@ bool Application::init_input()
 bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
-    m_lua.open_libraries(sol::lib::base, sol::lib::math);
+    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
     m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
@@ -177,6 +177,14 @@ bool Application::init_lua()
     lua::bind_systems(m_lua.lua_state());
     lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
+
+    /** Load lua libraries */
+    for (const auto& lib : fs::list_directory("script/lib"))
+    {
+        spdlog::get("lua")->info("loading lua library '{}'", lib.substr(0, lib.size() - 4));
+        const auto& code = fs::read_file("script/lib/" + lib);
+        m_lua.require_script(lib.substr(0, lib.size() - 4), code);
+    }
 
     meta::reflect_data_types();
     meta::reflect_systems();

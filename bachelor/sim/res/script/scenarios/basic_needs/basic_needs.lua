@@ -44,11 +44,12 @@ scenario.init = function()
         end
         local name = cultsim.get_component(deer, component.name)
         if(cultsim.get_component(deer, component.reproduction).sex == 1) then
-            name.name = "Fawn"
+            local genname = cultsim.generate_name("germanic", true)
+            name.name = string.format("%s %s", genname.first, genname.last)
         else 
-            name.name = "Doe"
+            local genname = cultsim.generate_name("germanic", false)
+            name.name = string.format("%s %s", genname.first, genname.last)
         end
-
     end
 
     -- Spawn 75 Food Sources and Water Sources

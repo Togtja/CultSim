@@ -137,6 +137,7 @@ void ScenarioScene::reset_simulation()
 
 void ScenarioScene::on_enter()
 {
+    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
     initialize_simulation();
 
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
@@ -201,8 +202,13 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    /** It's supposed to be three of these here, do not change - not a bug */
+    // Make sure ImGui does not get more than one update per frame
+    for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
 
+    /** It's supposed to be three of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
 
@@ -496,6 +502,7 @@ void ScenarioScene::bind_scenario_lua_functions()
             default: break;
         }
     });
+
     cultsim.set_function("add_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
         switch (id)
         {
@@ -687,6 +694,11 @@ void ScenarioScene::bind_scenario_lua_functions()
                 preg->children_in_pregnancy = 1;
             }
         }
+    });
+
+    /** Generate a random name */
+    cultsim.set_function("generate_name", [this](const std::string& ethnicity, bool is_male) {
+        return m_name_generator.generate(ethnicity, is_male, m_rng);
     });
 }
 
