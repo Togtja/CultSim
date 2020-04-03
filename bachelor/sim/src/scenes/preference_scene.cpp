@@ -3,7 +3,6 @@
 #include "preferences.h"
 #include "scene_manager.h"
 
-
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
@@ -63,7 +62,7 @@ void PreferenceScene::key_binding()
         ImGui::TableSetupColumn("Key");
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
-        ImGui::TableAutoHeaders();
+        cs_auto_table_headers();
 
         int i = 0;
         for (auto&& [key, action] : action_h)

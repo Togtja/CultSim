@@ -933,7 +933,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
         {
             ImGui::TableSetupColumn("Need");
             ImGui::TableSetupColumn("Status");
-            ImGui::TableAutoHeaders();
+
+            // Non-clickable headers
+            cs_auto_table_headers();
+
             for (const auto& need : needs->needs)
             {
                 ImGui::TableNextCell();
