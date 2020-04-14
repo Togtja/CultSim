@@ -84,6 +84,10 @@ void bind_components(sol::state_view lua)
                                &ai::Need::vitality,
                                "tags",
                                &ai::Need::tags,
+                               "weight_multi",
+                               &ai::Need::weight_multi,
+                               "decay_multi",
+                               &ai::Need::decay_multi,
                                "weight_func",
                                &ai::Need::weight_func);
 
@@ -129,7 +133,9 @@ void bind_components(sol::state_view lua)
                                           "direction",
                                           &component::Movement::direction,
                                           "speed",
-                                          &component::Movement::speed);
+                                          &component::Movement::speed,
+                                          "speed_multi",
+                                          &component::Movement::speed_multi);
 
     lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
 

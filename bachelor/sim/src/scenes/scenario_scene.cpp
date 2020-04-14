@@ -6,6 +6,7 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
+#include "entity/effect.h"
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
@@ -63,6 +64,10 @@ void ScenarioScene::initialize_simulation()
 
     /** Call lua init function for this scenario */
     m_scenario.init();
+
+    /** If there are any Traits, run their affects */
+    auto per_view = m_registry.view<component::Traits>();
+    per_view.each([](entt::entity e, const component::Traits& per) { effect::affect_traits(e, per); });
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
@@ -328,12 +333,18 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["health"]       = entt::type_info<component::Health>::id();
     component["memory"]       = entt::type_info<component::Memory>::id();
     component["attack"]       = entt::type_info<component::Attack>::id();
+    component["trait"]        = entt::type_info<component::Traits>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
     cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
+        if (!m_registry.valid(e))
+        {
+            return sol::nil;
+        }
+
         switch (id)
         {
             case entt::type_info<component::Position>::id():
@@ -468,6 +479,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
+            case entt::type_info<component::Traits>::id(): return sol::make_object(s, &m_registry.get<component::Traits>(e));
             case entt::type_info<component::Name>::id():
                 if (m_registry.try_get<component::Name>(e))
                 {
@@ -485,6 +497,33 @@ void ScenarioScene::bind_scenario_lua_functions()
                 break;
         }
     });
+
+    cultsim.set_function("get_strategy",
+                         [](sol::this_state s, const sol::object& strat_lua, std::string_view strat_name) -> sol::object {
+                             const auto& strat = strat_lua.as<component::Strategy>();
+                             for (const auto& i : strat.strategies)
+                             {
+                                 if (i.name == strat_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
+    cultsim.set_function("get_need",
+                         [](sol::this_state s, const sol::object& need_lua, std::string_view need_name) -> sol::object {
+                             const auto& need = need_lua.as<component::Need>();
+                             for (const auto& i : need.needs)
+                             {
+                                 if (i.name == need_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
@@ -498,6 +537,12 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Traits>::id():
+                if (auto per = m_registry.try_get<component::Traits>(e); per)
+                {
+                    effect::unaffect_traits(e, *per);
+                };
+                m_registry.remove_if_exists<component::Traits>(e);
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
@@ -850,7 +895,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
@@ -858,7 +903,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
                            component::Timer,
                            component::Tags,
                            component::Memory,
-                           component::Pregnancy>(selection_info.selected_entity);
+                           component::Pregnancy,
+                           component::Traits>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -892,7 +938,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (preg && preg->is_egg)
         {
-            ImGui::Text("I am a hatching egg");
+            ImGui::Text("I am hatching an egg");
         }
         else
         {
@@ -943,8 +989,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         if (ImGui::BeginTable("Entity Needs", 2))
         {
-            ImGui::TableSetupColumn("Need");
-            ImGui::TableSetupColumn("Status");
+            ImGui::TableSetupColumn("Needs:");
+            ImGui::TableSetupColumn("Status:");
 
             // Non-clickable headers
             cs_auto_table_headers();
@@ -955,6 +1001,25 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("%s", need.name.c_str());
                 ImGui::TableNextCell();
                 ImGui::Text("%3.1f", need.status);
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    if (traits)
+    {
+        if (ImGui::BeginTable("Traits", 1))
+        {
+            ImGui::TableSetupColumn("Traits:");
+            cs_auto_table_headers();
+            for (auto&& i : traits->traits)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text(fmt::format("{}", i.name).c_str());
+                if (ImGui::IsItemHovered())
+                {
+                    ImGui::SetTooltip(fmt::format("{}", i.desc).c_str());
+                }
             }
             ImGui::EndTable();
         }

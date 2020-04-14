@@ -1,6 +1,7 @@
 #include "reproduction.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "entity/effect.h"
 #include "entity/factory.h"
 
 namespace cs::system
@@ -96,10 +97,17 @@ void Reproduction::update(float dt)
 
         if (!child.is_egg)
         {
-            auto age = m_context.registry->try_get<component::Age>(child_e);
-            if (age)
+            // TODO: Figure out if this is redundant
+            if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
             {
                 age->current_age = 0;
+            }
+
+            if (auto per = m_context.registry->try_get<component::Traits>(child_e); per)
+            {
+                effect::affect_traits(child_e, *per);
+                // TODO: If mom or dad has a trait we don't there should be a certain chance I get it as well
+                // Larger chance if they both have it (Should this be scriptable as well, user decide how inheritance work?)
             }
             return;
         }
