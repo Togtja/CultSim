@@ -764,6 +764,12 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("generate_name", [this](const std::string& ethnicity, bool is_male) {
         return m_name_generator.generate(ethnicity, is_male, m_rng);
     });
+
+    /** Allow Lua to use Views */
+    cultsim.set_function("view", [this](sol::object types) {
+        auto vec = types.as<std::vector<uint32_t>>();
+        return m_registry.runtime_view(vec.begin(), vec.end());
+    });
 }
 
 void ScenarioScene::setup_docking_ui()
