@@ -4,9 +4,35 @@ traits = { -- Also traits
         desc = "People with this trait get hungry 20%% slower", -- A description of what it does (Shows up as tool tip)
         attain_condition = function(self) -- must return a bool, true if it should be attaied 
             local need_c = cultsim.get_component(self, component.need)
-            need_c
+            if need_c == nil then
+                log.warn("I(" .. self .. ") am invalid")
+                return false
+            end
+            local the_need = cultsim.get_need(need_c, "Hunger")
+            if(the_need == nil) then
+                log.warn("I(" .. self .. ") can not find the Hunger Component")
+                return false
+            end
+            if the_need.status > 90 then
+                return true
+            end
+            return false
         end,
         lose_condition = function(self)   -- must return a bool, true if it should be removed
+            local need_c = cultsim.get_component(self, component.need)
+            if need_c == nil then
+                log.warn("I(" .. self .. ") am invalid")
+                return false
+            end
+            local the_need = cultsim.get_need(need_c, "Hunger")
+            if(the_need == nil) then
+                log.warn("I(" .. self .. ") can not find the Hunger Component")
+                return false
+            end
+            if the_need.status < 60 then
+                return true
+            end
+            return false
         end,
         affect = function(self)
             local need_c = cultsim.get_component(self, component.need)
