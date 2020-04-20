@@ -337,6 +337,25 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
 
+#define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent##N>::id()
+    REGISTER_LUA_COMPONENT(1);
+    REGISTER_LUA_COMPONENT(2);
+    REGISTER_LUA_COMPONENT(3);
+    REGISTER_LUA_COMPONENT(4);
+    REGISTER_LUA_COMPONENT(5);
+    REGISTER_LUA_COMPONENT(6);
+    REGISTER_LUA_COMPONENT(7);
+    REGISTER_LUA_COMPONENT(8);
+    REGISTER_LUA_COMPONENT(9);
+    REGISTER_LUA_COMPONENT(10);
+    REGISTER_LUA_COMPONENT(11);
+    REGISTER_LUA_COMPONENT(12);
+    REGISTER_LUA_COMPONENT(13);
+    REGISTER_LUA_COMPONENT(14);
+    REGISTER_LUA_COMPONENT(15);
+    REGISTER_LUA_COMPONENT(16);
+#undef REGISTER_LUA_COMPONENT
+
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
     cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
