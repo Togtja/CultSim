@@ -249,8 +249,16 @@ struct Trait
     std::string name;
     std::string desc;
 
+    sol::function attain;
+    sol::function lose;
+
     sol::function affect;
     sol::function remove_affect;
+
+    bool operator==(Trait trait)
+    {
+        return name == trait.name;
+    }
 };
 } // namespace detail
 
