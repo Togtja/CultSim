@@ -12,6 +12,7 @@
 #include <entt/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <sol/object.hpp>
 
 namespace cs::component
 {
@@ -259,7 +260,35 @@ struct Traits
 {
     std::vector<detail::Trait> traits;
 };
+
 struct AI
 {
 };
+
+#define LUA_COMPONENT(N)                                                                                                         \
+    /** Custom Lua Component #N */                                                                                               \
+    struct LuaComponent##N                                                                                                       \
+    {                                                                                                                            \
+        sol::object lua_data{};                                                                                                  \
+    };
+
+LUA_COMPONENT(1)
+LUA_COMPONENT(2)
+LUA_COMPONENT(3)
+LUA_COMPONENT(4)
+LUA_COMPONENT(5)
+LUA_COMPONENT(6)
+LUA_COMPONENT(7)
+LUA_COMPONENT(8)
+LUA_COMPONENT(9)
+LUA_COMPONENT(10)
+LUA_COMPONENT(11)
+LUA_COMPONENT(12)
+LUA_COMPONENT(13)
+LUA_COMPONENT(14)
+LUA_COMPONENT(15)
+LUA_COMPONENT(16)
+
+#undef LUA_COMPONENT
+
 } // namespace cs::component
