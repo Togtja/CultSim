@@ -17,8 +17,9 @@ void Traits::update(float dt)
             if (it == traits.acquired_traits.end())
             {
                 // Check if we satisfy the user typed requirement
-                if (i.attain.as<bool>())
+                if (i.attain(e))
                 {
+                    i.affect(e);
                     traits.acquired_traits.push_back(i);
                 }
             }
@@ -28,8 +29,9 @@ void Traits::update(float dt)
         // Add traits to be deleted (to avoid deleting in loop)
         for (auto&& i : traits.acquired_traits)
         {
-            if (i.lose.as<bool>())
+            if (i.lose(e))
             {
+                i.remove_affect(e);
                 to_delete.push_back(i);
             }
         }

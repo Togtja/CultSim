@@ -2,7 +2,7 @@ traits = { -- Also traits
     slow_digestion = {
         name = "Slow Digestion", -- a Trait
         desc = "People with this trait get hungry 20%% slower", -- A description of what it does (Shows up as tool tip)
-        
+
         attain_condition = function(self) -- must return a bool, true if it should be attaied 
             local need_c = cultsim.get_component(self, component.need)
             if need_c == nil then
