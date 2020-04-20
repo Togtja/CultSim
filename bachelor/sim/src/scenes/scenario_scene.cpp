@@ -1012,7 +1012,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         {
             ImGui::TableSetupColumn("Traits:");
             cs_auto_table_headers();
-            for (auto&& i : traits->default_traits)
+            for (auto&& i : traits->acquired_traits)
             {
                 ImGui::TableNextCell();
                 ImGui::Text("%s", fmt::format("{}", i.name).c_str());

@@ -257,7 +257,12 @@ struct Trait
 // An Agents traits
 struct Traits
 {
+    // The trait everybody has
     std::vector<detail::Trait> default_traits;
+    // List of possible atainable traits
+    std::vector<detail::Trait> attainable_traits;
+    // The traits that the agent currently has
+    std::vector<detail::Trait> acquired_traits;
 };
 struct AI
 {
