@@ -23,6 +23,7 @@ scenario.systems = {
     "MovementSystem",
     "InventorySystem",
     "HealthSystem",
+    "TraitsSystem",
     "DeletionSystem"
 }
 
