@@ -74,7 +74,7 @@ inline void cs_auto_table_headers()
     {
         auto name = ImGui::TableGetColumnName(i);
         // ImGui::TableHeader(name);
-        ImGui::Text(name);
+        ImGui::Text("%s", name);
         if (i < rowCount - 1)
         {
             ImGui::TableNextCell();

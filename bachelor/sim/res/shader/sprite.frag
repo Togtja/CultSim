@@ -65,7 +65,7 @@ void main()
     const vec3 normal = sample_normal().rgb * 2.0 - 1.0;
     const uint material_id = bitfieldExtract(vs_in.texture, 13, 3);
 
-    /* Rotate light to illuminate sprite from correct diraction based on normals */
+    /* Rotate light to illuminate sprite from correct direction based on normals */
     const vec3 rotated_light = normalize(vec3(vs_in.light_mat * env.sun_direction.xy, env.sun_direction.z));
     const vec3 specular_direction = normalize(vec3(0, 0, 1) + rotated_light);
 

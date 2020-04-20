@@ -914,17 +914,17 @@ void ScenarioScene::draw_selected_entity_information_ui()
     if (name && name->name != "")
     {
         auto text = fmt::format("{} [ID: {}]", name->name, static_cast<int64_t>(selection_info.selected_entity));
-        ImGui::Text(text.c_str());
+        ImGui::Text("%s", text.c_str());
     }
     else if (name)
     {
         auto text = fmt::format("{} [ID: {}]", name->entity_type, static_cast<int64_t>(selection_info.selected_entity));
-        ImGui::Text(text.c_str());
+        ImGui::Text("%s", text.c_str());
     }
     else
     {
         auto text = fmt::format("Entity [ID: {}]", static_cast<int64_t>(selection_info.selected_entity));
-        ImGui::Text(text.c_str());
+        ImGui::Text("%s", text.c_str());
     }
 
     if (health)
@@ -1015,10 +1015,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
             for (auto&& i : traits->traits)
             {
                 ImGui::TableNextCell();
-                ImGui::Text(fmt::format("{}", i.name).c_str());
+                ImGui::Text("%s", fmt::format("{}", i.name).c_str());
                 if (ImGui::IsItemHovered())
                 {
-                    ImGui::SetTooltip(fmt::format("{}", i.desc).c_str());
+                    ImGui::SetTooltip("%s", fmt::format("{}", i.desc).c_str());
                 }
             }
             ImGui::EndTable();
