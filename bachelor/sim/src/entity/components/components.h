@@ -257,7 +257,7 @@ struct Trait
 // An Agents traits
 struct Traits
 {
-    std::vector<detail::Trait> traits;
+    std::vector<detail::Trait> default_traits;
 };
 struct AI
 {
