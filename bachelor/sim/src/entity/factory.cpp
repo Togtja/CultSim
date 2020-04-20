@@ -308,6 +308,8 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
     {
         trait_comp.default_traits.push_back({traits["name"].get<std::string>(),
                                              traits["desc"].get<std::string>(),
+                                             traits["attain_condition"].get<sol::function>(),
+                                             traits["lose_condition"].get<sol::function>(),
                                              traits["affect"].get<sol::function>(),
                                              traits["unaffect"].get<sol::function>()
 
@@ -316,10 +318,12 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
     const auto& available_attainable = table["attainable_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_attainable)
     {
-        trait_comp.default_traits.push_back({traits["name"].get<std::string>(),
-                                             traits["desc"].get<std::string>(),
-                                             traits["affect"].get<sol::function>(),
-                                             traits["unaffect"].get<sol::function>()
+        trait_comp.attainable_traits.push_back({traits["name"].get<std::string>(),
+                                                traits["desc"].get<std::string>(),
+                                                traits["attain_condition"].get<sol::function>(),
+                                                traits["lose_condition"].get<sol::function>(),
+                                                traits["affect"].get<sol::function>(),
+                                                traits["unaffect"].get<sol::function>()
 
         });
     }
