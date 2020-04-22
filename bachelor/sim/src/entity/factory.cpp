@@ -354,7 +354,7 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
     const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_default)
     {
-        if (traits["trait"].valid() && traits["chance"].valid())
+        if (traits["trait"].get_type() == sol::type::table && traits["chance"].get_type() == sol::type::number)
         {
             if (reg.ctx<RandomEngine*>()->trigger(traits["chance"]))
             {
