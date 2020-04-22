@@ -56,7 +56,7 @@ entity = {
     TraitComponent = {
         -- Other parts of lua code may add and remove a trait(s)
         -- However this is what all the "Deers" would start with
-        default_traits = {traits.fast},
-        attainable_traits = {traits.slow_digestion, traits.random_mutation}
+        start_traits = {traits.fast},
+        attainable_traits = {traits.slow_digestion, traits.random_mutation, traits.fast}
     }
 }

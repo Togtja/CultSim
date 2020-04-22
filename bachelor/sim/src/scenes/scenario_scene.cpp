@@ -69,7 +69,7 @@ void ScenarioScene::initialize_simulation()
     auto per_view = m_registry.view<component::Traits>();
     per_view.each([](entt::entity e, component::Traits& per) {
         // Add default traits to acquired traits
-        for (auto&& i : per.default_traits)
+        for (auto&& i : per.start_traits)
         {
             per.acquired_traits.push_back(i);
         }

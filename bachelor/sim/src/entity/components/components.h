@@ -271,8 +271,8 @@ struct Trait
 // An Agents traits
 struct Traits
 {
-    // The trait everybody has
-    std::vector<detail::Trait> default_traits;
+    // The trait a species/aganets start with when running a simulation
+    std::vector<detail::Trait> start_traits;
     // List of possible atainable traits
     std::vector<detail::Trait> attainable_traits;
     // The traits that the agent currently has

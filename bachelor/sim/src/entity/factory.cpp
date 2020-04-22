@@ -349,10 +349,10 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
 {
     auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
     // TODO: Assign the traits that the component has as default
-    const auto& available_default = table["default_traits"].get_or<std::vector<sol::table>>({});
+    const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_default)
     {
-        trait_comp.default_traits.push_back(get_trait(traits));
+        trait_comp.start_traits.push_back(get_trait(traits));
     }
     const auto& available_attainable = table["attainable_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_attainable)
