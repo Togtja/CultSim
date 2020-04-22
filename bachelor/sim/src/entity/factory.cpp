@@ -299,19 +299,67 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
     return true;
 }
 
+component::detail::Trait get_trait(sol::table traits)
+{
+    component::detail::Trait trait;
+    trait.name          = traits["name"];
+    trait.desc          = traits["desc"];
+    trait.affect        = traits["affect"];
+    trait.remove_affect = traits["unaffect"];
+
+    if (traits["can_inherit"].get_type() == sol::type::boolean)
+    {
+        trait.can_inherit = traits["can_inherit"];
+        if (traits["inherit_chance"].get_type() == sol::type::number)
+        {
+            trait.inherit_chance = traits["inherit_chance"];
+        }
+    }
+
+    if (traits["mutable"].get_type() == sol::type::boolean)
+    {
+        trait.can_mutate = traits["can_mutate"];
+        if (traits["mutate_chance"].get_type() == sol::type::number)
+        {
+            trait.mutate_chance = traits["mutate_chance"];
+        }
+    }
+
+    if (traits["attain_condition"].get_type() == sol::type::function)
+    {
+        trait.attain = traits["attain_condition"];
+    }
+    else
+    {
+        // Give a default function/bool
+        spdlog::warn("No attain condition");
+    }
+
+    if (traits["lose_condition"].get_type() == sol::type::function)
+    {
+        trait.lose = traits["lose_condition"];
+    }
+    else
+    {
+        // Give a default function/bool
+        spdlog::warn("No lose condition");
+    }
+    return trait;
+}
+
 bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
     // TODO: Assign the traits that the component has as default
-    const auto& available_traits = table["traits"].get_or<std::vector<sol::table>>({});
-    for (const auto& traits : available_traits)
+    const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_default)
     {
-        trait_comp.traits.push_back({traits["name"].get<std::string>(),
-                                     traits["desc"].get<std::string>(),
-                                     traits["affect"].get<sol::function>(),
-                                     traits["unaffect"].get<sol::function>()
-
-        });
+        trait_comp.start_traits.push_back(get_trait(traits));
+    }
+    const auto& available_attainable = table["attainable_traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_attainable)
+    {
+        trait_comp.attainable_traits.push_back(get_trait(traits));
     }
     return true;
 }

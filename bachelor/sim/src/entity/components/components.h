@@ -249,15 +249,34 @@ struct Trait
     std::string name;
     std::string desc;
 
+    bool can_inherit     = false;
+    float inherit_chance = 1.0f;
+
+    bool can_mutate     = false;
+    float mutate_chance = 0.0001;
+
+    sol::function attain;
+    sol::function lose;
+
     sol::function affect;
     sol::function remove_affect;
+
+    bool operator==(Trait trait)
+    {
+        return name == trait.name;
+    }
 };
 } // namespace detail
 
 // An Agents traits
 struct Traits
 {
-    std::vector<detail::Trait> traits;
+    // The trait a species/aganets start with when running a simulation
+    std::vector<detail::Trait> start_traits;
+    // List of possible atainable traits
+    std::vector<detail::Trait> attainable_traits;
+    // The traits that the agent currently has
+    std::vector<detail::Trait> acquired_traits;
 };
 struct AI
 {

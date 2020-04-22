@@ -4,7 +4,7 @@ namespace cs::effect
 {
 void affect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : traits.traits)
+    for (const auto& i : traits.acquired_traits)
     {
         i.affect(e);
     }
@@ -12,7 +12,7 @@ void affect_traits(entt::entity e, const component::Traits& traits)
 
 void unaffect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : traits.traits)
+    for (const auto& i : traits.acquired_traits)
     {
         i.remove_affect(e);
     }
