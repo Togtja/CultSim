@@ -92,5 +92,29 @@ traits = { -- Also traits
             move_c.speed_multi = move_c.speed_multi - 0.2
         end
 
+   },
+   random_mutation = {
+    name = "Random mutation",
+    desc = "This is a test for mutation, if you have this triat mutation works",
+
+    can_inherit  = true, 
+    inherit_chance = 0.1, 
+    mutable = true, 
+    mutate_chance = 0.7, 
+    --TODO: if no attain or lose default to this:
+    attain_condition = function(self)
+        return false
+    end,
+
+    lose_condition = function(self)
+        return false
+    end,
+
+    affect = function(self)
+        log.debug("I have mutated")
+    end,
+
+    unaffect = function(self)
+    end
    }
 }
