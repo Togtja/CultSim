@@ -337,7 +337,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
 
-#define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent##N>::id()
+#define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
     REGISTER_LUA_COMPONENT(1);
     REGISTER_LUA_COMPONENT(2);
     REGISTER_LUA_COMPONENT(3);
