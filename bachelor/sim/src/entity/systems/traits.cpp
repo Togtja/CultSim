@@ -13,7 +13,7 @@ void Traits::update(float dt)
         for (auto&& i : traits.attainable_traits)
         {
             // As long as the attainable trait is not already required
-            auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), i);
+            const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), i);
             if (it == traits.acquired_traits.end())
             {
                 // Check if we satisfy the user typed requirement
@@ -39,7 +39,7 @@ void Traits::update(float dt)
         // Delete the traits we found
         for (auto&& i : to_delete)
         {
-            auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), i);
+            const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), i);
             if (it != traits.acquired_traits.end())
             {
                 traits.acquired_traits.erase(it);
