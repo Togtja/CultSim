@@ -6,6 +6,8 @@
 #include "random_engine.h"
 #include "strategy.h"
 #include "tags.h"
+#include "action.h"
+#include "goal.h"
 
 #include <vector>
 
@@ -241,6 +243,15 @@ struct Pregnancy
     bool is_egg = false;
 };
 
+struct Goal
+{
+    std::vector<cs::gob::Goal> goals{};
+};
+
+struct Action
+{
+    std::vector < cs::gob::Action> actions{};
+};
 namespace detail
 {
 // Defines a single trait
