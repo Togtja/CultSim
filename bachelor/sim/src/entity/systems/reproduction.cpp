@@ -95,45 +95,83 @@ void Reproduction::update(float dt)
     {
         auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
 
-        if (!child.is_egg)
+        if (child.is_egg)
         {
-            // TODO: Figure out if this is redundant
-            if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
-            {
-                age->current_age = 0;
-            }
+            auto& egg_time     = m_context.registry->get<component::Reproduction>(child_e);
+            auto& egg_hatching = m_context.registry->assign_or_replace<component::Pregnancy>(child_e);
+            egg_time.lays_eggs = false;
 
-            if (auto per = m_context.registry->try_get<component::Traits>(child_e); per)
+            egg_hatching.children_in_pregnancy = 1;
+            egg_hatching.parents.first         = child.parents.first;
+            egg_hatching.parents.second        = child.parents.second;
+            egg_hatching.is_egg                = true;
+
+            if (egg_time.gestation_deviation > 0)
             {
-                effect::affect_traits(child_e, *per);
-                // TODO: If mom or dad has a trait we don't there should be a certain chance I get it as well
-                // Larger chance if they both have it (Should this be scriptable as well, user decide how inheritance work?)
+                egg_hatching.gestation_period =
+                    std::round(m_context.rng->normal(egg_time.average_gestation_period, egg_time.gestation_deviation));
             }
+            else
+            {
+                egg_hatching.gestation_period = egg_time.average_gestation_period;
+            }
+            // Makes sure the eggs spawn the parent type
+            m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
             return;
         }
 
-        auto& egg_time     = m_context.registry->get<component::Reproduction>(child_e);
-        auto& egg_hatching = m_context.registry->assign_or_replace<component::Pregnancy>(child_e);
-        egg_time.lays_eggs = false;
-
-        egg_hatching.children_in_pregnancy = 1;
-        egg_hatching.parents.first         = child.parents.first;
-        egg_hatching.parents.second        = child.parents.second;
-        egg_hatching.is_egg                = true;
-
-        if (egg_time.gestation_deviation > 0)
+        // TODO: Figure out if this is redundant
+        if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
         {
-            egg_hatching.gestation_period =
-                std::round(m_context.rng->normal(egg_time.average_gestation_period, egg_time.gestation_deviation));
+            age->current_age = 0;
         }
-        else
+
+        if (auto traits = m_context.registry->try_get<component::Traits>(child_e); traits)
         {
-            egg_hatching.gestation_period = egg_time.average_gestation_period;
+            // Check if we can mutate something
+            for (auto&& i : traits->attainable_traits)
+            {
+                if (i.can_mutate && m_context.rng->trigger(i.mutate_chance))
+                {
+                    traits->acquired_traits.push_back(i);
+                }
+            }
+            // Tries to inherit mom's acquired traits
+            if (child.parents.first != entt::null)
+            {
+                if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
+                {
+                    for (auto&& i : mom_traits->acquired_traits)
+                    {
+                        if (i.can_inherit && m_context.rng->trigger(i.inherit_chance))
+                        {
+                            traits->acquired_traits.push_back(i);
+                        }
+                    }
+                }
+            }
+            if (child.parents.second != entt::null)
+            {
+                // Tries to inherit dad's acquired traits
+                if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
+                {
+                    for (auto&& i : dad_traits->acquired_traits)
+                    {
+                        if (i.can_inherit && m_context.rng->trigger(i.inherit_chance))
+                        {
+                            traits->acquired_traits.push_back(i);
+                        }
+                    }
+                }
+            }
+            // Make our list unique
+            auto it = std::unique(traits->acquired_traits.begin(), traits->acquired_traits.end());
+            traits->acquired_traits.resize(std::distance(traits->acquired_traits.begin(), it));
+            // Run the effect of the acquired traits
+            effect::affect_traits(child_e, *traits);
         }
-        // Makes sure the eggs spawn the parent type
-        m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
     }
-}
+} // namespace cs::system
 
 ISystem* Reproduction::clone()
 {

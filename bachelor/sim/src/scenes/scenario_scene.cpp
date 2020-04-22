@@ -65,9 +65,17 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
-    /** If there are any Traits, run their affects */
+    /** If there are any default Traits, run their affects and add them*/
     auto per_view = m_registry.view<component::Traits>();
-    per_view.each([](entt::entity e, const component::Traits& per) { effect::affect_traits(e, per); });
+    per_view.each([](entt::entity e, component::Traits& per) {
+        // Add default traits to acquired traits
+        for (auto&& i : per.start_traits)
+        {
+            per.acquired_traits.push_back(i);
+        }
+        // Run their affects
+        effect::affect_traits(e, per);
+    });
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
@@ -1012,7 +1020,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         {
             ImGui::TableSetupColumn("Traits:");
             cs_auto_table_headers();
-            for (auto&& i : traits->traits)
+            for (auto&& i : traits->acquired_traits)
             {
                 ImGui::TableNextCell();
                 ImGui::Text("%s", fmt::format("{}", i.name).c_str());
