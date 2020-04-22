@@ -5,8 +5,8 @@ traits = { -- Also traits
 
         can_inherit  = true, -- This can be transfered to its children (default false)
         inherit_chance = 0.7, -- If can_inherit is true, you can set a chance to inherit(probability run twice if both parents has it) (default 100%/1.0)
-        mutable = true, -- Can get it even if no parents has it (default false)
-        mutate_chance = 0.0001, -- chance of getting it when no parents has it (default SOME LOW ASS NUMBER)
+        can_mutate = true, -- Can get it even if no parents has it (default false)
+        mutate_chance = 0.0001, -- chance of getting it when no parents has it (default 0.0001)
 
         attain_condition = function(self) -- must return a bool, true if it should be attaied 
             local need_c = cultsim.get_component(self, component.need)
@@ -94,27 +94,27 @@ traits = { -- Also traits
 
    },
    random_mutation = {
-    name = "Random mutation",
-    desc = "This is a test for mutation, if you have this triat mutation works",
+        name = "Random mutation",
+        desc = "This is a test for mutation, if you have this triat mutation works",
 
-    can_inherit  = true, 
-    inherit_chance = 0.1, 
-    mutable = true, 
-    mutate_chance = 0.7, 
-    --TODO: if no attain or lose default to this:
-    attain_condition = function(self)
-        return false
-    end,
+        can_inherit  = true, 
+        inherit_chance = 0.1, 
+        can_mutate = true, 
+        mutate_chance = 0.7, 
+        --TODO: if no attain or lose default to this:
+        attain_condition = function(self)
+            return false
+        end,
+        
+        lose_condition = function(self)
+            return false
+        end,
 
-    lose_condition = function(self)
-        return false
-    end,
+        affect = function(self)
+            log.debug("I have mutated")
+        end,
 
-    affect = function(self)
-        log.debug("I have mutated")
-    end,
-
-    unaffect = function(self)
-    end
+        unaffect = function(self)
+        end
    }
 }

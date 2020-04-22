@@ -251,8 +251,8 @@ struct Trait
 
     bool can_inherit     = false;
     float inherit_chance = 1.0f;
-    //"mutable" is a C++ keyword, so mutatable it is
-    bool mutatable      = false;
+
+    bool can_mutate     = false;
     float mutate_chance = 0.0001;
 
     sol::function attain;

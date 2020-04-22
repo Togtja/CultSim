@@ -131,7 +131,7 @@ void Reproduction::update(float dt)
             // Check if we can mutate something
             for (auto&& i : traits->attainable_traits)
             {
-                if (i.mutatable && m_context.rng->trigger(i.mutate_chance))
+                if (i.can_mutate && m_context.rng->trigger(i.mutate_chance))
                 {
                     traits->acquired_traits.push_back(i);
                 }

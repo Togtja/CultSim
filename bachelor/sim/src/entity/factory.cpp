@@ -298,6 +298,7 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
     inventory_component.max_size = table["max_size"].get<uint16_t>();
     return true;
 }
+
 component::detail::Trait get_trait(sol::table traits)
 {
     component::detail::Trait trait;
@@ -317,7 +318,7 @@ component::detail::Trait get_trait(sol::table traits)
 
     if (traits["mutable"].get_type() == sol::type::boolean)
     {
-        trait.mutatable = traits["mutable"];
+        trait.can_mutate = traits["can_mutate"];
         if (traits["mutate_chance"].get_type() == sol::type::number)
         {
             trait.mutate_chance = traits["mutate_chance"];
@@ -345,6 +346,7 @@ component::detail::Trait get_trait(sol::table traits)
     }
     return trait;
 }
+
 bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
