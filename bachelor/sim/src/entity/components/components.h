@@ -249,6 +249,12 @@ struct Trait
     std::string name;
     std::string desc;
 
+    bool can_inherit     = false;
+    float inherit_chance = 1.0f;
+    //"mutable" is a C++ keyword, so mutatable it is
+    bool mutatable      = false;
+    float mutate_chance = 0.0001;
+
     sol::function attain;
     sol::function lose;
 
