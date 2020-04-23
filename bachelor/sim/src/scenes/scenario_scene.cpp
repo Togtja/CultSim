@@ -142,12 +142,12 @@ void ScenarioScene::reset_simulation()
 
 void ScenarioScene::on_enter()
 {
-    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
-    initialize_simulation();
-
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
+
+    initialize_simulation();
 }
 
 void ScenarioScene::on_exit()
