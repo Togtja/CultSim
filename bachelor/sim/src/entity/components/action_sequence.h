@@ -8,6 +8,7 @@ namespace cs::gob
 {
 class action_sequence
 {
+public:
     std::string m_name{};
     ETag m_tags{};
 
