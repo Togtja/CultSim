@@ -4,6 +4,16 @@
 
 namespace cs::system
 {
+void Relationship::add_agent(entt::entity me)
+{
+    auto view = m_context.registry->view<component::Relationship>();
+
+    view.each([this, me](entt::entity e, const component::Relationship& relationship) {
+        if (me == e)
+        {
+        }
+    });
+}
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);
@@ -11,6 +21,7 @@ void Relationship::update(float dt)
     view.each([this](entt::entity e, component::Relationship& relationship) {
         if (relationship.new_create)
         {
+            add_agent(e);
             relationship.new_create = false;
         }
     });

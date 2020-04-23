@@ -15,6 +15,7 @@ private:
 public:
     using ISystem::ISystem;
 
+    void add_agent(entt::entity me);
     void update(float dt) override;
 
     ISystem* clone() override;
