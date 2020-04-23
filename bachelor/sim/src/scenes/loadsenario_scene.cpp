@@ -48,6 +48,8 @@ bool LoadScenarioScene::update(float dt)
                 }
             }
         }
+
+        /** Exit the loading screen */
         if (ImGui::Button("Cancel", {150, 25}))
         {
             m_context->scene_manager->pop();
