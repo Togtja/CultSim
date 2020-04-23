@@ -10,15 +10,14 @@ void Goal::update(float dt)
 
     auto& registry = *m_context.registry;
 
-    auto view = registry.view<component::Goals>();
-    view.each([this, dt](entt::entity e) 
-        {
+    auto view = registry.view<component::Goal>();
+    view.each([this, dt](entt::entity e, component::Goal& goal) {
 
-        });
+    });
 }
 
 ISystem* Goal::clone()
 {
-   return new Goal(m_context);
+    return new Goal(m_context);
 }
 } // namespace cs::system
