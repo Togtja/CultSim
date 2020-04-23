@@ -11,9 +11,7 @@ void GOB::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Goal, component::Action>();
-    view.each([this, dt](entt::entity e, component::Goal& goal, component::Action& action) {
-
-    });
+    view.each([this, dt](entt::entity e, component::Goal& goal, component::Action& action) { if (!action.working_on_action) });
 }
 ISystem* GOB::clone()
 {
