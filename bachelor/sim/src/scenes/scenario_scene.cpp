@@ -546,7 +546,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
-            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e);
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
             case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
             case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
             case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
@@ -562,6 +562,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     effect::unaffect_traits(e, *per);
                 };
                 m_registry.remove_if_exists<component::Traits>(e);
+                break;
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
