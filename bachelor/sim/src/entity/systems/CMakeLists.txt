@@ -46,6 +46,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/goal.cpp
         ${CMAKE_CURRENT_LIST_DIR}/goal.h
         
+        ${CMAKE_CURRENT_LIST_DIR}/gob.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/gob.h
+
         ${CMAKE_CURRENT_LIST_DIR}/deletion.cpp
         ${CMAKE_CURRENT_LIST_DIR}/deletion.h
 )
