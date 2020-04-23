@@ -6,7 +6,7 @@ namespace cs::system
 {
 void Goal::update(float dt)
 {
-    CS_AUTOTIMER(Deletion System);
+    CS_AUTOTIMER(Goal System);
 
     auto& registry = *m_context.registry;
 
@@ -14,11 +14,11 @@ void Goal::update(float dt)
     view.each([this, dt](entt::entity e, component::Goal& goal) {
         for (auto current_goal : goal.goals)
         {
-            current_goal.age += dt;
+            current_goal.m_age += dt;
         }
         // Puts the most pressing goal in the back
         std::sort(goal.goals.begin(), goal.goals.end(), [](const gob::Goal lhs, const gob::Goal rhs) {
-            return lhs.weight_function < rhs.weight_function;
+            return lhs.m_weight_function < rhs.m_weight_function;
         });
     });
 }
