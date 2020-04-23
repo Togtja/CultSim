@@ -4,6 +4,8 @@
 
 #include <entt/fwd.hpp>
 
+#include <sol/table.hpp>
+
 namespace cs::debug
 {
 class CollectorLivingEntities : public DataCollector::Command
@@ -32,6 +34,9 @@ public:
     std::string_view get_name() override;
 };
 
+/**
+ * Data collector that fetches the average value of a need
+ */
 class CollectorNeed : public DataCollector::Command
 {
 private:
@@ -65,5 +70,31 @@ public:
 
     float execute() override;
     std::string_view get_name() override;
+};
+
+/**
+ * Base class for creating custom data collectors in Lua
+ */
+class LuaCollector : public DataCollector::Command
+{
+private:
+    std::string m_name{};
+
+    sol::table m_data{};
+
+public:
+    LuaCollector(std::string name, sol::table data) : m_name(name), m_data(data)
+    {
+    }
+
+    float execute() override
+    {
+        return m_data["execute"]();
+    }
+
+    std::string_view get_name() override
+    {
+        return m_name;
+    }
 };
 } // namespace cs::debug
