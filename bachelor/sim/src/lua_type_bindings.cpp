@@ -208,8 +208,6 @@ void bind_systems(sol::state_view lua)
                                &Scenario::update,
                                "draw",
                                &Scenario::draw,
-                               "random_seed",
-                               &Scenario::random_seed,
                                "shutdown",
                                &Scenario::shutdown);
 }
