@@ -73,8 +73,8 @@ void ScenarioScene::initialize_simulation()
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
     m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
-    m_data_collector.add_collector<debug::CollectorMouse>(true);
-    m_data_collector.add_collector<debug::CollectorMouse>(false);
+    m_data_collector.add_collector<debug::CollectorMouse>(true, m_resolution);
+    m_data_collector.add_collector<debug::CollectorMouse>(false, m_resolution);
 
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
