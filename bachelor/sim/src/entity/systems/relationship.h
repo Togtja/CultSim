@@ -16,6 +16,8 @@ public:
     using ISystem::ISystem;
 
     void add_agent(entt::entity me);
+    // Get what "me" feel about the other part
+    uint8_t get_friendship(entt::entity me, entt::entity other);
     void update(float dt) override;
 
     ISystem* clone() override;

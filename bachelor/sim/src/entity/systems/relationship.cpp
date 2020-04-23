@@ -14,6 +14,11 @@ void Relationship::add_agent(entt::entity me)
         }
     });
 }
+
+uint8_t Relationship::get_friendship(entt::entity me, entt::entity other)
+{
+    return (rel_table[me][other] >> 8);
+}
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);
