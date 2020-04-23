@@ -62,7 +62,7 @@ std::string_view CollectorNeed::get_name()
     return m_need_name;
 }
 
-CollectorMouse::CollectorMouse(bool x_axis) : m_x_axis(x_axis)
+CollectorMouse::CollectorMouse(bool x_axis, glm::ivec2 resolution) : m_x_axis(x_axis), m_resolution(resolution)
 {
     m_name = "Mouse " + std::string(x_axis ? "X" : "Y");
 }
@@ -71,11 +71,11 @@ float CollectorMouse::execute()
 {
     if (m_x_axis)
     {
-        return input::get_input().get_mouse_pos().x;
+        return input::get_input().get_mouse_pos().x / m_resolution.x;
     }
     else
     {
-        return input::get_input().get_mouse_pos().y;
+        return input::get_input().get_mouse_pos().y / m_resolution.y;
     }
 }
 

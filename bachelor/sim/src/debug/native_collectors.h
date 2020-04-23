@@ -48,15 +48,20 @@ public:
     std::string_view get_name() override;
 };
 
+/**
+ * Data collector that fetches normalized mouse coordinates
+ */
 class CollectorMouse : public DataCollector::Command
 {
 private:
     bool m_x_axis = false;
 
+    glm::ivec2 m_resolution{};
+
     std::string m_name{};
 
 public:
-    CollectorMouse(bool x_axis);
+    CollectorMouse(bool x_axis, glm::ivec2 resolution);
 
     float execute() override;
     std::string_view get_name() override;
