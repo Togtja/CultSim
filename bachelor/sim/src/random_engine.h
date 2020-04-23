@@ -28,6 +28,8 @@ public:
 
     RandomEngine(const RandomEngine&) = delete;
     RandomEngine& operator=(const RandomEngine&) = delete;
+    RandomEngine(RandomEngine&&)                 = default;
+    RandomEngine& operator=(RandomEngine&&) = default;
 
     /**
      * Create a uniform randomly distributed number in the given range
