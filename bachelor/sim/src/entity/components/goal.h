@@ -12,9 +12,12 @@ class Goal
     float weight{};
     float age{};
 
-    
-    std::variant<sol::function, std::function<float(const Need&)>> weight_func = [](const ai::Need& local) {
-        return (100 / (local.status + 1)) * local.weight * local.weight_multi;
+
+    std::variant<sol::function, std::function<float()>> weight_function = [this]() {
+        return age;
+    };
+    std::variant<sol::function, std::function<float(const float)>> change_over_time = [this](const float dt) {
+        return dt ;
     };
 };
 } // namespace cs::gob
