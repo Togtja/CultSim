@@ -24,5 +24,9 @@ public:
     std::variant<sol::function, std::function<float(const float)>> m_change_over_time = [this](const float dt) {
         return dt;
     };
+
+    std::variant<sol::function, std::function<float(const float)>> m_get_discontentment = [this](const float dt) {
+
+    }
 };
 } // namespace cs::gob
