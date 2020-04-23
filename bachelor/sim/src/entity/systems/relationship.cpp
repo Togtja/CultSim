@@ -19,6 +19,12 @@ uint8_t Relationship::get_friendship(entt::entity me, entt::entity other)
 {
     return (rel_table[me][other] >> 8);
 }
+
+// Get what "me" feel about the other part
+uint8_t Relationship::get_romace(entt::entity me, entt::entity other)
+{
+    return (rel_table[me][other] & 0x00FF);
+}
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);
