@@ -58,5 +58,7 @@ entity = {
         -- However this is what all the "Deers" would start with
         start_traits = {traits.fast},
         attainable_traits = {traits.slow_digestion, traits.random_mutation, traits.fast}
-    }
+    },
+    
+    RelationshipComponent = {}
 }
