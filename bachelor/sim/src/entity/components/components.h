@@ -281,6 +281,8 @@ struct Traits
 
 struct Relationship
 {
+    // Used to add a new entry in the relatip table
+    bool new_create        = true;
 };
 
 struct AI
