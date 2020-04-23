@@ -3,7 +3,6 @@
 
 #include <string>
 #include <variant>
-#include <vector>
 
 namespace cs::gob
 {
@@ -22,7 +21,6 @@ public:
     };
 
     std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
-
         return m_required_time;
     };
 
