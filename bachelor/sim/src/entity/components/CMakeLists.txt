@@ -13,5 +13,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/action.h
 
+        ${CMAKE_CURRENT_LIST_DIR}/action_sequence.h
+
         ${CMAKE_CURRENT_LIST_DIR}/goal.h
 )
