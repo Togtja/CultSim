@@ -9,6 +9,7 @@
 #include "preferences.h"
 #include "random_engine.h"
 #include "entity/name_generator.h"
+#include "debug/native_collectors.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -207,6 +208,8 @@ void bind_systems(sol::state_view lua)
                                &Scenario::update,
                                "draw",
                                &Scenario::draw,
+                               "random_seed",
+                               &Scenario::random_seed,
                                "shutdown",
                                &Scenario::shutdown);
 }
@@ -287,6 +290,10 @@ void bind_utils(sol::state_view lua)
                                         &PreferenceManager::get_fullscreen,
                                         "set_fullscreen",
                                         &PreferenceManager::set_fullscreen);
+
+    /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
+     * float. */
+    lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
