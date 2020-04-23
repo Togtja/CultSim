@@ -61,6 +61,7 @@ void ScenarioScene::initialize_simulation()
 
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
+    m_registry.set<RandomEngine*>(&m_rng);
 
     /** Call lua init function for this scenario */
     m_scenario.init();
@@ -1014,7 +1015,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
-    if (traits)
+    if (traits && !traits->acquired_traits.empty())
     {
         if (ImGui::BeginTable("Traits", 1))
         {
