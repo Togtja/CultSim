@@ -2,8 +2,24 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
+#include <sol/sol.hpp>
+
 namespace cs::system
 {
+void Relationship::initialize()
+{
+    sol::table cultsim = (*m_context.lua_state)["cultsim"];
+    cultsim.set_function("get_friendship",
+                         [this](entt::entity e, entt::entity other) -> uint8_t { return get_friendship(e, other); });
+    cultsim.set_function("get_romace", [this](entt::entity e, entt::entity other) -> uint8_t { return get_romace(e, other); });
+
+    cultsim.set_function("add_friendship", [this](entt::entity e, entt::entity other, uint8_t amount) -> void {
+        add_friendship(e, other, amount);
+    });
+    cultsim.set_function("add_romace",
+                         [this](entt::entity e, entt::entity other, uint8_t amount) -> void { add_romace(e, other, amount); });
+};
+
 void Relationship::add_agent(entt::entity me)
 {
     auto view = m_context.registry->view<component::Relationship>();
@@ -70,7 +86,7 @@ void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);
     auto view = m_context.registry->view<component::Relationship>();
-    view.each([this](entt::entity e, component::Relationship& relationship) {
+    view.each([this, &view](entt::entity e, component::Relationship& relationship) {
         if (relationship.new_create)
         {
             add_agent(e);

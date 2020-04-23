@@ -15,12 +15,18 @@ private:
 public:
     using ISystem::ISystem;
 
+    void initialize() override;
+
     void add_agent(entt::entity me);
-    // Get what "me" feel about the other part
+    /** Get what "me" feel about the other agent */
     uint8_t get_friendship(entt::entity me, entt::entity other);
+
     void add_friendship(entt::entity me, entt::entity other, uint8_t amount);
-    // Get what "me" feel about the other part
+
+    /** Get what "me" feel about the other agent */
     uint8_t get_romace(entt::entity me, entt::entity other);
+
+    /** */
     void add_romace(entt::entity me, entt::entity other, uint8_t amount);
 
     void update(float dt) override;
