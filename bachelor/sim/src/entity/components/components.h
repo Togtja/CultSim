@@ -278,6 +278,11 @@ struct Traits
     // The traits that the agent currently has
     std::vector<detail::Trait> acquired_traits;
 };
+
+struct Relationship
+{
+};
+
 struct AI
 {
 };
