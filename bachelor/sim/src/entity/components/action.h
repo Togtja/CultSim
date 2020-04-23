@@ -1,8 +1,12 @@
 #pragma once
 #include "goal.h"
+#include "tags.h"
 
+#include <functional>
 #include <string>
 #include <variant>
+
+#include <sol/sol.hpp>
 
 namespace cs::gob
 {
@@ -23,6 +27,8 @@ public:
     std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
         return m_required_time;
     };
+
+    Action() = default;
 
     Action(std::string name,
            ETag tags,
