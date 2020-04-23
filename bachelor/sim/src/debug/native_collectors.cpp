@@ -71,11 +71,11 @@ float CollectorMouse::execute()
 {
     if (m_x_axis)
     {
-        return input::get_input().get_mouse_pos().x / m_resolution.x;
+        return input::get_input().get_mouse_pos().x / static_cast<float>(m_resolution.x);
     }
     else
     {
-        return input::get_input().get_mouse_pos().y / m_resolution.y;
+        return input::get_input().get_mouse_pos().y / static_cast<float>(m_resolution.y);
     }
 }
 
