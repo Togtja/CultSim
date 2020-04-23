@@ -1,12 +1,15 @@
 #pragma once
 #include "action.h"
+#include "tags.h"
 
+#include <functional>
 #include <memory>
 #include <vector>
 
+#include <sol/sol.hpp>
 namespace cs::gob
 {
-class action_sequence
+class Action_Sequence
 {
 public:
     std::string m_name{};
@@ -14,18 +17,18 @@ public:
 
     std::vector<std::unique_ptr<Action>> m_actions{};
 
-    std::variant<sol::function, std::function<float(const Goal)>> m_get_goal_change = [](const Goal goal) {
+    std::variant<sol::function, std::function<float(const Goal)>> m_get_goal_change = [this](const Goal goal) {
         /**-1 for undefined */
         float result = 0;
         for (auto& action : m_actions)
         {
-            if (action->get_goal_change.index() == 0)
+            if (action->m_get_goal_change.index() == 0)
             {
-                result += std::get<sol::function>(action->m_get_goal_change)(goal);
+                result += std::get<sol::function>(action->m_get_goal_change)(goal).get<float>();
             }
             else
             {
-                result += std::get<std::function<float(const Goal)>>(action - m_get_goal_change)(goal);
+                result += std::get<std::function<float(const Goal)>>(action->m_get_goal_change)(goal);
             }
         }
         return result;
@@ -33,33 +36,34 @@ public:
 
     std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
         float result = 0;
-        for (auto& action : actions)
+        for (auto& action : m_actions)
         {
-            if (action->get_duration.index() == 0)
+            if (action->m_get_duration.index() == 0)
             {
-                result += std::get<sol::function>(action->get_duration)();
+                result += std::get<sol::function>(action->m_get_duration)().get<float>();
             }
             else
             {
-                result += std::get<std::function<float()>>(action->get_duration)();
+                result += std::get<std::function<float()>>(action->m_get_duration)();
             }
         }
         return result;
     };
 
-    Action(const Action& other) :
-        name(other.name),
-        tags(other.tags),
-        required_time(other.required_time),
-        success_chance(other.success_chance),
-        get_goal_change(other.get_goal_change),
+    Action_Sequence() = default;
+
+    Action_Sequence(const Action_Sequence& other) :
+        m_name(other.m_name),
+        m_tags(other.m_tags),
+        m_get_duration(other.m_get_duration),
+        m_get_goal_change(other.m_get_goal_change)
     {
-        for (const auto& ptr : other.actions)
+        for (const auto& ptr : other.m_actions)
         {
-            actions.emplace_back(ptr->clone());
+            m_actions.emplace_back(ptr->clone());
         }
     }
-    Action& operator=(const Action& other)
+    Action_Sequence& operator=(const Action_Sequence& other)
     {
         /** Protect against self-copy */
         if (this == &other)
@@ -68,33 +72,32 @@ public:
         }
 
         /** Clean up existing members */
-        actions.clear();
-        tags            = ETag::TAG_None;
-        required_time   = 0;
-        success_chance  = 0;
-        get_goal_change = [](const Goal goal) {
+        m_name = "";
+        m_tags = ETag::TAG_None;
+        m_actions.clear();
+        m_get_goal_change = [](const cs::gob::Goal goal) {
             return 0;
         };
-        get_duration = []() {
+        m_get_duration = []() {
             return 0;
         };
 
         /** Copy members from the other */
-        tags            = other.tags;
-        required_time   = other.required_time;
-        success_chance  = other.success_chance;
-        get_goal_change = other.get_goal_change;
-        get_duration    = other.get_duration;
+        m_name            = other.m_name;
+        m_tags            = other.m_tags;
+        m_get_goal_change = other.m_get_goal_change;
+        m_get_duration    = other.m_get_duration;
 
-        for (const auto& ptr : other.actions)
+        for (const auto& ptr : other.m_actions)
         {
-            actions.emplace_back(ptr->clone());
+            m_actions.emplace_back(ptr->clone());
         }
 
         return *this;
     }
 
-    Action(Action&&) = default;
-    Action& operator=(Action&&) = default;
+    Action_Sequence(Action_Sequence&&) = default;
+    Action_Sequence& operator=(Action_Sequence&&) = default;
 };
+
 } // namespace cs::gob
