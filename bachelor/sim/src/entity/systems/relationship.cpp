@@ -13,9 +13,12 @@ void Relationship::add_agent(entt::entity me)
         {
             // First 8 bits is friendship, last 8 bits is romance
             add_friendship(e, me, relationship.self_friend);
+            add_romace(e, me, relationship.self_romace);
+            return;
         }
         // TODO: for family add better relationship
         add_friendship(e, me, relationship.default_friend);
+        add_romace(e, me, relationship.default_romace);
     });
 }
 
@@ -45,6 +48,24 @@ uint8_t Relationship::get_romace(entt::entity me, entt::entity other)
 {
     return (rel_table[me][other] & 0x00FF);
 }
+
+void Relationship::add_romace(entt::entity me, entt::entity other, uint8_t amount)
+{
+    uint8_t romace_lvl = rel_table[me][other] & 0x00FF;
+    if (romace_lvl + amount > 0xFF)
+    {
+        rel_table[me][other] |= 0x00FF;
+    }
+    else if (romace_lvl + amount < 0)
+    {
+        rel_table[me][other] &= 0xFF00;
+    }
+    else
+    {
+        rel_table[me][other] += amount;
+    }
+}
+
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);

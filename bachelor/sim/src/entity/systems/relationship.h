@@ -21,6 +21,8 @@ public:
     void add_friendship(entt::entity me, entt::entity other, uint8_t amount);
     // Get what "me" feel about the other part
     uint8_t get_romace(entt::entity me, entt::entity other);
+    void add_romace(entt::entity me, entt::entity other, uint8_t amount);
+
     void update(float dt) override;
 
     ISystem* clone() override;
