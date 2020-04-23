@@ -12,7 +12,14 @@ void Goal::update(float dt)
 
     auto view = registry.view<component::Goal>();
     view.each([this, dt](entt::entity e, component::Goal& goal) {
-
+        for (auto current_goal : goal.goals)
+        {
+            current_goal.age += dt;
+        }
+        // Puts the most pressing goal in the back
+        std::sort(goal.goals.begin(), goal.goals.end(), [](const gob::Goal lhs, const gob::Goal rhs) {
+            return lhs.weight_function < rhs.weight_function;
+        });
     });
 }
 
