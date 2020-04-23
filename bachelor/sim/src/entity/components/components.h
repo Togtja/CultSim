@@ -1,13 +1,14 @@
 #pragma once
 
+#include "action.h"
+#include "action_sequence.h"
 #include "entity/memories/container.h"
 #include "gfx/render_data.h"
+#include "goal.h"
 #include "need.h"
 #include "random_engine.h"
 #include "strategy.h"
 #include "tags.h"
-#include "action.h"
-#include "goal.h"
 
 #include <vector>
 
@@ -250,8 +251,10 @@ struct Goal
 
 struct Action
 {
-    std::vector < cs::gob::Action> actions{};
+    cs::gob::Action_Sequence current_action{};
+    std::vector<cs::gob::Action_Sequence> actions{};
 };
+
 namespace detail
 {
 // Defines a single trait
