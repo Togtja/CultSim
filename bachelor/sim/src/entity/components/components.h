@@ -251,7 +251,7 @@ struct Goal
 
 struct Action
 {
-    cs::gob::Action_Sequence current_action{};
+    cs::gob::Action_Sequence current_action_sequence{};
     std::vector<cs::gob::Action_Sequence> actions{};
 };
 

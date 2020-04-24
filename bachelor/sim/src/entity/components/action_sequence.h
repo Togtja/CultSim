@@ -6,7 +6,9 @@
 #include <memory>
 #include <vector>
 
+#include <entt/entt.hpp>
 #include <sol/sol.hpp>
+
 namespace cs::gob
 {
 class Action_Sequence
@@ -16,6 +18,45 @@ public:
     ETag m_tags{};
 
     std::vector<std::unique_ptr<Action>> m_actions{};
+
+    Action* current_action;
+
+    std::variant<sol::function, std::function<bool(entt::entity, std::string)>> m_run_actions = [this](const entt::entity e,
+                                                                                                       std::string error) {
+        bool finished = false;
+        if (current_action->m_action.index() == 0)
+        {
+            finished = std::get<sol::function>(current_action->m_action)(e, error).get<bool>();
+        }
+        else
+        {
+            finished = std::get<std::function<bool(entt::entity, std::string&)>>(current_action->m_action)(e, error);
+        }
+
+        if (error != "")
+        {
+            return false;
+        }
+        else if (finished)
+        {
+            if (current_action == m_actions.front().get())
+            {
+                return true;
+            }
+            else
+            {
+                for (int i = m_actions.size() - 1; i >= 0; i--)
+                {
+                    if (current_action == m_actions[i].get())
+                    {
+                        current_action = m_actions[i - 1].get();
+                        break;
+                    }
+                }
+                return false;
+            }
+        }
+    };
 
     std::variant<sol::function, std::function<float(const Goal)>> m_get_goal_change = [this](const Goal goal) {
         /**-1 for undefined */

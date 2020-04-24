@@ -6,7 +6,9 @@
 #include <string>
 #include <variant>
 
+#include <entt/entt.hpp>
 #include <sol/sol.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::gob
 {
@@ -19,6 +21,8 @@ public:
     float m_required_time{};
     float m_success_chance{};
 
+    uint32_t flags{};
+
     std::variant<sol::function, std::function<float(const Goal)>> m_get_goal_change = [](const Goal goal) {
         /**-1 for undefined */
         return -1;
@@ -26,6 +30,12 @@ public:
 
     std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
         return m_required_time;
+    };
+
+    std::variant<sol::function, std::function<bool(entt::entity, std::string&)>> m_action = [this](entt::entity e,
+                                                                                                   std::string& error) {
+        error = fmt::format("Undefined action {} for entity {}, please define an m_action function.", m_name, e);
+        return false;
     };
 
     Action() = default;
@@ -50,4 +60,36 @@ public:
         return new Action(m_name, m_tags, m_required_time, m_success_chance, m_get_goal_change, m_get_duration);
     }
 };
+inline bool operator==(const Action& lhs, const Action& rhs)
+{
+    if (lhs.m_name != rhs.m_name)
+    {
+        return false;
+    }
+    if (lhs.m_required_time != rhs.m_required_time)
+    {
+        return false;
+    }
+    if (lhs.m_success_chance != rhs.m_success_chance)
+    {
+        return false;
+    }
+    if (lhs.m_tags != rhs.m_tags)
+    {
+        return false;
+    }
+    if (lhs.m_action != rhs.m_action)
+    {
+        return false;
+    }
+    if (lhs.m_get_duration != rhs.m_get_duration)
+    {
+        return false;
+    }
+    if (lhs.m_get_goal_change != rhs.m_get_goal_change)
+    {
+        return false;
+    }
+    return true;
+}
 } // namespace cs::gob
