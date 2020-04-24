@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string_view>
-
+#include "components/components.h"
 #include <entt/entity/registry.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <robin_hood.h>
 #include <sol/state_view.hpp>
 #include <sol/table.hpp>
+#include <string_view>
 
 namespace cs
 {
