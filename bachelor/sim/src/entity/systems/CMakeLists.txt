@@ -13,6 +13,9 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/memory.cpp
         ${CMAKE_CURRENT_LIST_DIR}/memory.h
+        
+        ${CMAKE_CURRENT_LIST_DIR}/lua_system.h
+        ${CMAKE_CURRENT_LIST_DIR}/lua_system.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/mitigation_test.cpp
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.cpp
