@@ -1,4 +1,5 @@
 #include "lua_type_bindings.h"
+#include "debug/native_collectors.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
@@ -9,6 +10,7 @@
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
+
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -194,6 +196,18 @@ void bind_components(sol::state_view lua)
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
+
+    /** Bind View */
+    lua.new_usertype<entt::runtime_view>("View",
+                                         sol::no_constructor,
+                                         "empty",
+                                         &entt::runtime_view::empty,
+                                         "size",
+                                         &entt::runtime_view::size,
+                                         "each",
+                                         &entt::runtime_view::each<sol::function>,
+                                         "contains",
+                                         &entt::runtime_view::contains);
 }
 
 void bind_systems(sol::state_view lua)
@@ -297,6 +311,10 @@ void bind_utils(sol::state_view lua)
                                         &PreferenceManager::get_fullscreen,
                                         "set_fullscreen",
                                         &PreferenceManager::set_fullscreen);
+
+    /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
+     * float. */
+    lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)

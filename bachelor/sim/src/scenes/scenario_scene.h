@@ -87,8 +87,7 @@ private:
     bool m_paused = false;
 
 public:
-    explicit ScenarioScene(std::string_view scenario);
-    explicit ScenarioScene(lua::Scenario scenario);
+    explicit ScenarioScene(std::string_view scenario, uint32_t random_seed);
 
     void on_enter() override;
 
