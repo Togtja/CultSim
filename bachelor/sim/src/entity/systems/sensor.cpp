@@ -101,41 +101,45 @@ void Sensor::update(float dt)
     auto vis_view = registry.group<component::Vision, component::Position>();
 
     tf::Taskflow taskflow{};
-    taskflow.parallel_for(vis_view.begin(), vis_view.end(), [this, &registry, &vis_view](entt::entity e) {
-        auto&& vis      = vis_view.get<component::Vision>(e);
-        const auto& pos = vis_view.get<component::Position>(e);
+    taskflow.parallel_for(
+        vis_view.begin(),
+        vis_view.end(),
+        [this, &registry, &vis_view](entt::entity e) {
+            auto&& vis      = vis_view.get<component::Vision>(e);
+            const auto& pos = vis_view.get<component::Position>(e);
 
-        auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
-        auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
+            auto min = ai::world_to_grid(pos.position - glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
+            auto max = ai::world_to_grid(pos.position + glm::vec3(vis.radius, vis.radius, 0), SIM_GRID_SIZE);
 
-        for (int x = min.x; x <= max.x; x++)
-        {
-            for (int y = min.y; y <= max.y; y++)
+            for (int x = min.x; x <= max.x; x++)
             {
-                auto bounded = ai::world_to_grid_bound(glm::vec2(x * SIM_GRID_SIZE, y * SIM_GRID_SIZE),
-                                                       SIM_GRID_SIZE,
-                                                       m_context.scenario->bounds);
-
-                if (m_collision_grid.find(bounded.x * SIM_GRID_SIZE + bounded.y) == m_collision_grid.end())
+                for (int y = min.y; y <= max.y; y++)
                 {
-                    continue;
-                }
+                    auto bounded = ai::world_to_grid_bound(glm::vec2(x * SIM_GRID_SIZE, y * SIM_GRID_SIZE),
+                                                           SIM_GRID_SIZE,
+                                                           m_context.scenario->bounds);
 
-                for (auto e2 : m_collision_grid[bounded.x * SIM_GRID_SIZE + bounded.y])
-                {
-                    auto& pos2 = registry.get<component::Position>(e2);
-                    if (e == e2)
+                    if (m_collision_grid.find(bounded.x * SIM_GRID_SIZE + bounded.y) == m_collision_grid.end())
                     {
                         continue;
                     }
-                    if (is_visible_bound(pos.position, pos2.position, vis.radius, m_context.scenario->bounds))
+
+                    for (auto e2 : m_collision_grid[bounded.x * SIM_GRID_SIZE + bounded.y])
                     {
-                        vis.seen.push_back(e2);
+                        auto& pos2 = registry.get<component::Position>(e2);
+                        if (e == e2)
+                        {
+                            continue;
+                        }
+                        if (is_visible_bound(pos.position, pos2.position, vis.radius, m_context.scenario->bounds))
+                        {
+                            vis.seen.push_back(e2);
+                        }
                     }
                 }
             }
-        }
-    });
+        },
+        s_chunk_size);
 
     m_context.executor->run(taskflow).get();
 }

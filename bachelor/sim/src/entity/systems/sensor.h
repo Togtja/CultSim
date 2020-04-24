@@ -11,6 +11,8 @@ namespace cs::system
 class Sensor : public ISystem
 {
 private:
+    static inline constexpr int s_chunk_size = 128;
+
     robin_hood::unordered_flat_map<int, std::vector<entt::entity>> m_collision_grid{};
 
 public:
