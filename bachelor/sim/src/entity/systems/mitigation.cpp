@@ -26,7 +26,7 @@ void Mitigation::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Need, component::Strategy, component::Tags>();
-    view.each([this, dt](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
+    view.each([this](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
             auto temp = needs.vital_needs.front();
@@ -55,12 +55,10 @@ void Mitigation::update(float dt)
         {
             if (strategies.staged_strategies.empty())
             {
-                RandomEngine rng{};
-                auto result = rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)));
-
-                if (!(add_strategies(strategies,
-                                     needs.leisure_needs[rng.uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
-                                     tags)))
+                if (!(add_strategies(
+                        strategies,
+                        needs.leisure_needs[m_context.rng->uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
+                        tags)))
                 {
                     spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
                 }
@@ -106,7 +104,7 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
         }
     }
 
-    // TODO: Add checks for agents personality and personal history to further increase / decrease strategy desirability
+    // TODO: Add checks for agents traits and personal history to further increase / decrease strategy desirability
 
     if (!strategies.staged_strategies.empty())
     {

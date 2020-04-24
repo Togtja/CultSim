@@ -6,10 +6,13 @@
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
+#include "preferences.h"
 #include "random_engine.h"
+#include "entity/name_generator.h"
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
+#include <spdlog/spdlog.h>
 
 namespace cs::lua
 {
@@ -43,13 +46,26 @@ void bind_dataonly(sol::state_view lua)
                         {"Vision", ETag::TAG_Vision},
                         {"Avoidable", ETag::TAG_Avoidable},
                         {"Reproduce", ETag::TAG_Reproduce},
-                        {"Human", ETag::TAG_Human},
+                        {"Creature", ETag::TAG_Creature},
                         {"Tag", ETag::TAG_Tag},
                         {"Gather", ETag::TAG_Gather},
                         {"Reserved", ETag::TAG_Reserved},
                         {"Delete", ETag::TAG_Delete},
+                        {"Carnivore", ETag::TAG_Carnivore},
+                        {"Herbivore", ETag::TAG_Herbivore},
+                        {"Omnivore", ETag::TAG_Omnivore},
+                        {"Meat", ETag::TAG_Meat},
+                        {"Veggie", ETag::TAG_Veggie},
                         {"Inventory", ETag::TAG_Inventory},
-                        {"Consume", ETag::TAG_Consume}});
+                        {"Consume", ETag::TAG_Consume},
+                        {"Crime", ETag::TAG_Crime},
+                        {"Hostile", ETag::TAG_Hostile}});
+
+    lua.new_usertype<NameGenerator::Name>("GeneratedName",
+                                          "first",
+                                          &NameGenerator::Name::first,
+                                          "last",
+                                          &NameGenerator::Name::last);
 }
 
 void bind_components(sol::state_view lua)
@@ -67,7 +83,13 @@ void bind_components(sol::state_view lua)
                                "vitality",
                                &ai::Need::vitality,
                                "tags",
-                               &ai::Need::tags);
+                               &ai::Need::tags,
+                               "weight_multi",
+                               &ai::Need::weight_multi,
+                               "decay_multi",
+                               &ai::Need::decay_multi,
+                               "weight_func",
+                               &ai::Need::weight_func);
 
     lua.new_usertype<action::Action>("Action",
                                      "name",
@@ -111,7 +133,9 @@ void bind_components(sol::state_view lua)
                                           "direction",
                                           &component::Movement::direction,
                                           "speed",
-                                          &component::Movement::speed);
+                                          &component::Movement::speed,
+                                          "speed_multi",
+                                          &component::Movement::speed_multi);
 
     lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
 
@@ -135,6 +159,16 @@ void bind_components(sol::state_view lua)
                                       &component::Need::leisure_needs);
 
     lua.new_usertype<component::Strategy>("StrategyComponent", "strategies", &component::Strategy::strategies);
+
+    lua.new_usertype<component::Attack>("AttackComponent", "damage", &component::Attack::damage);
+
+    lua.new_usertype<component::Age>("AgeComponent", "life_expectancy", &component::Age::average_life_expectancy);
+
+    lua.new_usertype<component::Name>("NameComponent",
+                                      "entity_type",
+                                      &component::Name::entity_type,
+                                      "name",
+                                      &component::Name::name);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
@@ -171,7 +205,11 @@ void bind_input(sol::state_view lua)
                                      {{"DefaultContext", input::EKeyContext::DefaultContext},
                                       {"Agent", input::EKeyContext::Agent},
                                       {"AgentOnHover", input::EKeyContext::AgentOnHover},
-                                      {"ScenarioScene", input::EKeyContext::ScenarioScene}});
+                                      {"ScenarioScene", input::EKeyContext::ScenarioScene},
+                                      {"PauseMenu", input::EKeyContext::PauseMenu},
+                                      {"PreferenceScene", input::EKeyContext::PreferenceScene},
+                                      {"EditorScene", input::EKeyContext::EditorScene},
+                                      {"LoadScenario", input::EKeyContext::LoadScenario}});
 
     lua.new_enum<input::EAction>("EAction",
                                  {{"MoveUp", input::EAction::MoveUp},
@@ -185,7 +223,9 @@ void bind_input(sol::state_view lua)
                                   {"FollowEntity", input::EAction::FollowEntity},
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
-                                  {"Pause", input::EAction::Pause}});
+                                  {"Pause", input::EAction::Pause},
+                                  {"Quit", input::EAction::Quit},
+                                  {"EscapeScene", input::EAction::EscapeScene}});
 
     lua.new_enum<input::EMouse>("EMouse",
                                 {{"BtnLeft", input::EMouse::BtnLeft},
@@ -215,6 +255,43 @@ void bind_utils(sol::state_view lua)
                                    &RandomEngine::trigger,
                                    "roll",
                                    &RandomEngine::roll);
+
+    lua.new_usertype<Preference>("Preference",
+                                 sol::no_constructor,
+                                 "name",
+                                 sol::readonly(&Preference::name),
+                                 "description",
+                                 sol::readonly(&Preference::description),
+                                 "value",
+                                 &Preference::value);
+
+    lua.new_usertype<PreferenceManager>("PreferenceManager",
+                                        sol::no_constructor,
+                                        "get_resolution",
+                                        &PreferenceManager::get_resolution,
+                                        "set_resolution",
+                                        &PreferenceManager::set_resolution,
+                                        "get_fullscreen",
+                                        &PreferenceManager::get_fullscreen,
+                                        "set_fullscreen",
+                                        &PreferenceManager::set_fullscreen);
+}
+
+int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
+{
+    auto logger = spdlog::get("lua");
+    if (maybe_exception)
+    {
+        const auto& ex = *maybe_exception;
+        logger->critical("Lua exception thrown: [[[{}]]]", ex.what());
+    }
+    else
+    {
+        logger->critical("Lua error thrown: [[[{}]]]", std::string_view(description.data(), description.size()));
+        std::cout << std::endl;
+    }
+
+    return sol::stack::push(L, description);
 }
 
 } // namespace cs::lua

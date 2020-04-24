@@ -10,9 +10,10 @@
 #include "input/input_handler.h"
 #include "lua_type_bindings.h"
 #include "scenes/mainmenu_scene.h"
-
+#include "scenes/pausemenu_scene.h"
 
 #include <functional>
+#include <numeric>
 
 #include <gfx/ImGUI/imgui.h>
 #include <gfx/ImGUI/imgui_impl_opengl3.h>
@@ -37,19 +38,35 @@ void Application::run(const std::vector<char*>& args)
 
     /** Temporary replacement of DT until we figure out frame rate issues! */
     DeltaClock dt_clock{};
+    constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
+    bool meta_window_visible           = false;
+    auto time_since_tick               = timestep;
+    std::array<float, 144> average_fps = {};
+    int next_fps                       = 0;
 
     /** Main Loop */
     do
     {
-        CS_AUTOTIMER(Frame Time);
         handle_input();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame(m_window.get());
-        ImGui::NewFrame();
+        auto frame_time                 = dt_clock.restart_time_unit();
+        average_fps[(++next_fps) % 144] = frame_time.count();
+        time_since_tick += frame_time;
+        while (time_since_tick >= timestep)
+        {
+            CS_AUTOTIMER(Update Time);
+            gfx::get_renderer().debug().clear();
 
-        update(dt_clock.restart());
-        AutoTimer::show_debug_ui();
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplSDL2_NewFrame(m_window.get());
+            ImGui::NewFrame();
+            float average = std::accumulate(average_fps.cbegin(), average_fps.cend(), 0.f) / average_fps.size();
+            ImGui::Text("FPS: %.3fms / %.3f", average * 1000.f, 1.f / average);
+
+            update(timestep.count());
+            time_since_tick -= timestep;
+            ImGui::Render();
+        }
 
         draw();
     } while (m_running && !m_scene_manager.empty());
@@ -63,36 +80,34 @@ void Application::handle_input()
     while (SDL_PollEvent(&e))
     {
         ImGui_ImplSDL2_ProcessEvent(&e);
-        if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+
+        if (e.type == SDL_QUIT)
         {
-            if (m_window.confirm_dialog("Quit!", "Really quit?"))
+            if (m_window.confirm_dialog("Quit?", "Do you really want to quit?"))
             {
                 m_running = false;
             }
         }
-        const auto& io = ImGui::GetIO();
-
-        if (!(io.WantCaptureMouse || io.WantCaptureKeyboard || io.WantTextInput))
-        {
-            input::get_input().handle_input(e);
-        }
+        input::get_input().handle_input(e);
     }
 }
 
 void Application::update(float dt)
 {
     input::get_input().handle_live_input(dt);
+    ImGui::Text("Lua memory: %.2f Kb", m_lua.memory_used() / 1024.f);
     m_scene_manager.update(dt);
     m_preferences.show_debug_ui();
 }
 
 void Application::draw()
 {
+    gfx::get_renderer().sprite().clear();
+
     m_scene_manager.draw();
 
     gfx::get_renderer().display();
 
-    ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     m_window.display();
@@ -120,8 +135,16 @@ bool Application::init_input()
 
     // Load the bindings from a keybinding preference file
     inputs.load_binding_from_file(m_lua.lua_state());
+    inputs.fast_bind_key(input::EKeyContext::DefaultContext, SDL_SCANCODE_ESCAPE, input::EAction::Quit, [this] {
+        m_running = false;
+    });
 
-    /* TODO: Fix to not return true */
+    for (int i = static_cast<int>(input::EKeyContext::None) + 1; i < static_cast<int>(input::EKeyContext::Count); i++)
+    {
+        input::get_input().bind_action(static_cast<input::EKeyContext>(i), input::EAction::EscapeScene, [this] {
+            m_scene_manager.pop();
+        });
+    }
 
     return true;
 }
@@ -129,16 +152,17 @@ bool Application::init_input()
 bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
-    m_lua.open_libraries(sol::lib::base, sol::lib::math);
+    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+    m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
-    m_lua.set_function("writeFile", fs::write_file);
-    m_lua.set_function("readFile", fs::read_file);
-    m_lua.set_function("makeDirectory", fs::mkdir);
-    m_lua.set_function("moveFile", fs::move_file);
-    m_lua.set_function("fileExists", fs::exists);
-    m_lua.set_function("deleteFile", fs::delete_file);
-    m_lua.set_function("copyFile", fs::copy_file);
+    m_lua.set_function("write_file", fs::write_file);
+    m_lua.set_function("read_file", fs::read_file);
+    m_lua.set_function("make_directory", fs::mkdir);
+    m_lua.set_function("move_file", fs::move_file);
+    m_lua.set_function("file_exists", fs::exists);
+    m_lua.set_function("delete_file", fs::delete_file);
+    m_lua.set_function("copy_file", fs::copy_file);
 
     /* Bind Log Functions (available in log.*) */
     auto log_table = m_lua.create_table("log");
@@ -153,6 +177,14 @@ bool Application::init_lua()
     lua::bind_systems(m_lua.lua_state());
     lua::bind_input(m_lua.lua_state());
     lua::bind_utils(m_lua.lua_state());
+
+    /** Load lua libraries */
+    for (const auto& lib : fs::list_directory("script/lib"))
+    {
+        spdlog::get("lua")->info("loading lua library '{}'", lib.substr(0, lib.size() - 4));
+        const auto& code = fs::read_file("script/lib/" + lib);
+        m_lua.require_script(lib.substr(0, lib.size() - 4), code);
+    }
 
     meta::reflect_data_types();
     meta::reflect_systems();
@@ -183,7 +215,9 @@ bool Application::init_gl()
     glClearColor(0.02f, 0.02f, 0.02f, 0.0f);
 
     glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 #ifndef NDEBUG
     gfx::create_debug_callback();
@@ -279,13 +313,14 @@ bool Application::init_imgui()
 
     // Set up Platform & renderer Bindings
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
-    ImGui_ImplOpenGL3_Init("#version 450 core");
+    ImGui_ImplOpenGL45_Init();
 
     return true;
 }
 
 void Application::deinit()
 {
+    m_scene_manager.clear();
     input::get_input().save_binding_to_file();
     deinit_preferences();
     deinit_imgui();

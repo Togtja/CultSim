@@ -13,4 +13,10 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/factory.h
         ${CMAKE_CURRENT_LIST_DIR}/factory.cpp
+
+        ${CMAKE_CURRENT_LIST_DIR}/effect.h
+        ${CMAKE_CURRENT_LIST_DIR}/effect.cpp
+        
+        ${CMAKE_CURRENT_LIST_DIR}/name_generator.h
+        ${CMAKE_CURRENT_LIST_DIR}/name_generator.cpp
 )

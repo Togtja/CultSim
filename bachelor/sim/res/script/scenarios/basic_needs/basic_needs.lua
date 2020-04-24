@@ -22,7 +22,6 @@ scenario.systems = {
     "TimerSystem",
     "MovementSystem",
     "InventorySystem",
-    "RenderingSystem",
     "HealthSystem",
     "DeletionSystem"
 }
@@ -43,6 +42,14 @@ scenario.init = function()
         for i, need in ipairs(need_comp.required_needs) do
             need.status = random:normal(75.0, 25.0)
         end
+        local name = cultsim.get_component(deer, component.name)
+        if(cultsim.get_component(deer, component.reproduction).sex == 1) then
+            local genname = cultsim.generate_name("germanic", true)
+            name.name = string.format("%s %s", genname.first, genname.last)
+        else 
+            local genname = cultsim.generate_name("germanic", false)
+            name.name = string.format("%s %s", genname.first, genname.last)
+        end
     end
 
     -- Spawn 75 Food Sources and Water Sources
@@ -55,6 +62,12 @@ scenario.init = function()
     for i=1,50 do
         cultsim.spawn_at("water", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
         cultsim.spawn_at("food", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
+    end
+
+    --Create some food / water containers
+    for i = 1, 10 do
+        cultsim.spawn("food_container")
+        cultsim.spawn("water_container")
     end
 end
 

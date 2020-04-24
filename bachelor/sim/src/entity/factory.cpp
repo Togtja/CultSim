@@ -21,9 +21,13 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"ReproductionComponent", spawn_reproduction_component},
                           {"StrategyComponent", spawn_strategy_component},
                           {"HealthComponent", spawn_health_component},
+                          {"AttackComponent", spawn_attack_component},
                           {"MemoryComponent", spawn_memory_component},
                           {"TimerComponent", spawn_timer_component},
-                          {"InventoryComponent", spawn_inventory_component}};
+                          {"AgeComponent", spawn_age_component},
+                          {"InventoryComponent", spawn_inventory_component},
+                          {"TraitComponent", spawn_trait_component},
+                          {"NameComponent", spawn_name_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -103,6 +107,14 @@ bool spawn_vision_component(entt::entity e, entt::registry& reg, sol::table tabl
     return true;
 }
 
+bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& name       = reg.assign_or_replace<component::Name>(e);
+    name.entity_type = table["entity_type"].get<std::string>();
+
+    return true;
+}
+
 bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     reg.assign_or_replace<component::Tags>(e, table["tags"].get<ETag>());
@@ -118,12 +130,18 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 
     for (const auto& need_table : required_needs)
     {
-        need.needs.push_back(ai::Need{need_table["name"].get<std::string>(),
-                                      need_table["weight"].get<float>(),
-                                      need_table["status"].get<float>(),
-                                      need_table["decay_rate"].get<float>(),
-                                      need_table["vitality"].get<float>(),
-                                      need_table["tags"].get<ETag>()});
+        auto need_struct = ai::Need{need_table["name"].get<std::string>(),
+                                    need_table["weight"].get<float>(),
+                                    need_table["status"].get<float>(),
+                                    need_table["decay_rate"].get<float>(),
+                                    need_table["vitality"].get<float>(),
+                                    need_table["tags"].get<ETag>()};
+
+        if (need_table["weight_func"].get_type() == sol::type::function)
+        {
+            need_struct.weight_func = need_table["weight_func"].get<sol::function>();
+        }
+        need.needs.push_back(need_struct);
     }
 
     for (const auto& need_table : leisure_needs)
@@ -144,8 +162,49 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
 
     repl.sex = table["sex"].get<component::Reproduction::ESex>();
 
+    repl.mean_children_pp = table["mean_offspring"].get<int>();
+    if (table["offspring_deviation"].get_type() == sol::type::number)
+    {
+        repl.children_deviation = table["offspring_deviation"].get<float>();
+    }
+
+    if (table["fertility"].get_type() == sol::type::number)
+    {
+        repl.fertility     = table["fertility"].get<float>();
+        repl.has_fertility = false;
+    }
+    else if (table["fertility"].get_type() == sol::type::boolean && table["fertility"].get<bool>())
+    {
+        if (!table["start_fertility"].valid() || !table["peak_fertility"].valid() || !table["end_fertility"].valid())
+        {
+            spdlog::get("lua")->critical("fertility is true, so you need to set start, peak and end fertility");
+        }
+        repl.has_fertility   = true;
+        repl.start_fertility = table["start_fertility"].get<float>();
+        repl.peak_fertility  = table["peak_fertility"].get<float>();
+        repl.end_fertility   = table["end_fertility"].get<float>();
+    }
+
+    if (table["lays_eggs"].get_type() == sol::type::boolean)
+    {
+        repl.lays_eggs = table["lays_eggs"].get<bool>();
+        if (repl.lays_eggs && table["egg_type"].valid())
+        {
+            repl.egg_type = table["egg_type"].get<std::string>();
+        }
+    }
+
+    if (table["incubator"].valid())
+    {
+        repl.incubator = table["incubator"].get<component::Reproduction::ESex>();
+    }
+    if (table["average_gestation"].get_type() == sol::type::number)
+    {
+        repl.average_gestation_period = table["average_gestation"].get<float>();
+        repl.gestation_deviation      = table["gestation_deviation"].get<float>();
+    }
     return true;
-}
+} // namespace detail
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -196,6 +255,12 @@ bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table tabl
     return true;
 }
 
+bool spawn_attack_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign_or_replace<component::Attack>(e, table["damage"].get<float>());
+    return true;
+}
+
 bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     const std::vector<ETag>& allowed_memories = table["allowed_memories"].get_or<std::vector<ETag>>({});
@@ -220,6 +285,13 @@ bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table
     return true;
 }
 
+bool spawn_age_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& age_component                   = reg.assign_or_replace<component::Age>(e);
+    age_component.average_life_expectancy = table["life_expectancy"].get<float>();
+    return true;
+}
+
 bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& inventory_component    = reg.assign_or_replace<component::Inventory>(e);
@@ -227,6 +299,81 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
     return true;
 }
 
+component::detail::Trait get_trait(sol::table traits)
+{
+    component::detail::Trait trait;
+    trait.name          = traits["name"];
+    trait.desc          = traits["desc"];
+    trait.affect        = traits["affect"];
+    trait.remove_affect = traits["unaffect"];
+
+    if (traits["can_inherit"].get_type() == sol::type::boolean)
+    {
+        trait.can_inherit = traits["can_inherit"];
+        if (traits["inherit_chance"].get_type() == sol::type::number)
+        {
+            trait.inherit_chance = traits["inherit_chance"];
+        }
+    }
+
+    if (traits["mutable"].get_type() == sol::type::boolean)
+    {
+        trait.can_mutate = traits["can_mutate"];
+        if (traits["mutate_chance"].get_type() == sol::type::number)
+        {
+            trait.mutate_chance = traits["mutate_chance"];
+        }
+    }
+
+    if (traits["attain_condition"].get_type() == sol::type::function)
+    {
+        trait.attain = traits["attain_condition"];
+    }
+    else
+    {
+        // Give a default function/bool
+        spdlog::warn("No attain condition");
+    }
+
+    if (traits["lose_condition"].get_type() == sol::type::function)
+    {
+        trait.lose = traits["lose_condition"];
+    }
+    else
+    {
+        // Give a default function/bool
+        spdlog::warn("No lose condition");
+    }
+    return trait;
+}
+
+bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
+    // TODO: Assign the traits that the component has as default
+    const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_default)
+    {
+        if (traits["trait"].get_type() == sol::type::table && traits["chance"].get_type() == sol::type::number)
+        {
+            if (reg.ctx<RandomEngine*>()->trigger(traits["chance"]))
+            {
+                trait_comp.start_traits.push_back(get_trait(traits["trait"]));
+            }
+        }
+        else
+        {
+            trait_comp.start_traits.push_back(get_trait(traits));
+        }
+    }
+
+    const auto& available_attainable = table["attainable_traits"].get_or<std::vector<sol::table>>({});
+    for (const auto& traits : available_attainable)
+    {
+        trait_comp.attainable_traits.push_back(get_trait(traits));
+    }
+    return true;
+}
 } // namespace detail
 
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)

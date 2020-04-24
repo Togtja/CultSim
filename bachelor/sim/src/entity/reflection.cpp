@@ -13,6 +13,7 @@
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
 #include "entity/systems/timer.h"
+#include "entity/systems/traits.h"
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -78,13 +79,13 @@ void reflect_systems()
     entt::meta<system::Mitigation>().alias("MitigationSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Movement>().alias("MovementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Need>().alias("NeedSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
-    entt::meta<system::Rendering>().alias("RenderingSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Reproduction>().alias("ReproductionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Requirement>().alias("RequirementSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Timer>().alias("TimerSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Memory>().alias("MemorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Deletion>().alias("DeletionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Inventory>().alias("InventorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Traits>().alias("TraitsSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta

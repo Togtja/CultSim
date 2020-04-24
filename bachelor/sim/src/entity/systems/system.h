@@ -18,6 +18,7 @@ struct SystemContext
     RandomEngine* rng{nullptr};
     lua::Scenario* scenario{nullptr};
     tf::Executor* executor{nullptr};
+    sol::state_view* lua_state{nullptr};
 };
 
 class ISystem
@@ -48,6 +49,7 @@ public:
 
     virtual void update(float dt) = 0;
 
+    virtual void update_imgui(){};
     /**
      * Implement in subclasses to create clones of a system
      *

@@ -1,8 +1,8 @@
 #include "preference_scene.h"
+#include "common_helpers.h"
 #include "preferences.h"
 #include "scene_manager.h"
 
-#include <common_helpers.h>
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
@@ -26,10 +26,12 @@ PreferenceScene::PreferenceScene()
 }
 void PreferenceScene::on_enter()
 {
+    input::get_input().add_context(input::EKeyContext::PreferenceScene, true);
 }
 
 void PreferenceScene::on_exit()
 {
+    input::get_input().remove_context(input::EKeyContext::PreferenceScene);
 }
 
 bool PreferenceScene::update(float dt)
@@ -55,12 +57,12 @@ void PreferenceScene::key_binding()
 
     for (auto&& [context, action_h] : m_display_map)
     {
-        ImGui::Text(input::key_context_to_string(context).c_str());
+        ImGui::Text("%s", input::key_context_to_string(context).c_str());
         ImGui::BeginTable(input::key_context_to_string(context).c_str(), 3);
         ImGui::TableSetupColumn("Key");
         ImGui::TableSetupColumn("Action");
         ImGui::TableSetupColumn("");
-        ImGui::TableAutoHeaders();
+        cs_auto_table_headers();
 
         int i = 0;
         for (auto&& [key, action] : action_h)
@@ -73,7 +75,7 @@ void PreferenceScene::key_binding()
             }
             ImGui::TableNextCell();
             auto action_s = input::action_to_string(action);
-            ImGui::Text(action_s.c_str());
+            ImGui::Text("%s", action_s.c_str());
 
             ImGui::TableNextCell();
             if (ImGui::Button(fmt::format("X##key{}", key).c_str()))
@@ -286,7 +288,7 @@ void PreferenceScene::quit_btn()
     ImGui::Begin("Option##quit",
                  nullptr,
                  ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove);
-    bool success = true;
+
     if (ImGui::Button("Save##ps", {100, 50}))
     {
         auto&& input = input::get_input();

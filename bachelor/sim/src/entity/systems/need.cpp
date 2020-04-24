@@ -16,7 +16,7 @@ void Need::update(float dt)
         for (auto& need : needs.needs)
         {
             // Ensure statuses cannot go below 0% or above 100%
-            need.status = std::clamp(need.status - (need.decay_rate * dt), 0.f, 100.f);
+            need.status = std::clamp(need.status - (need.decay_rate * need.decay_multi * dt), 0.f, 100.f);
 
             auto found = std::find(needs.vital_needs.begin(), needs.vital_needs.end(), need);
             // If the need does exist in pressing needs

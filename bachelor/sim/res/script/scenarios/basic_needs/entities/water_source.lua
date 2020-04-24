@@ -21,5 +21,8 @@ entity = {
             cultsim.spawn_at("water", Vec2:new(random:uniform(my_pos.position.x - 20.0, my_pos.position.x + 20.0),
                                               random:uniform(my_pos.position.y - 20.0, my_pos.position.y + 20.0)))
         end
-    }
+    },
+    NameComponent = {
+        entity_type = "Well"
+	}
 }

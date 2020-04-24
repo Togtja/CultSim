@@ -9,6 +9,9 @@ entity = {
         scale = 6
     },
     TagComponent = {
-        tags = ETag.Drink
-    }
+        tags = ETag.Drink | ETag.Consume
+    },
+        NameComponent = {
+        entity_type = "Water"
+	}
 }

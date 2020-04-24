@@ -1,4 +1,5 @@
 #include "auto_timer.h"
+#include "common_helpers.h"
 
 #include <algorithm>
 #include <array>
@@ -17,7 +18,7 @@ void AutoTimer::show_debug_ui()
     {
         ImGui::TableSetupColumn("Timer ID");
         ImGui::TableSetupColumn("Time (ms)");
-        ImGui::TableAutoHeaders();
+        cs_auto_table_headers();
 
         std::sort(s_results.begin(), s_results.end(), [](auto&& a, auto&& b) { return a.time_ms > b.time_ms; });
         for (const auto& k : s_results)
@@ -25,7 +26,7 @@ void AutoTimer::show_debug_ui()
             ImGui::TableNextCell();
             ImGui::Text("%s", k.name.data());
             ImGui::TableNextCell();
-            ImGui::TextColored(glm::mix(s_ms_col[0], s_ms_col[1], glm::vec4(k.time_ms / 16.f)), "%.2lf", k.time_ms);
+            ImGui::TextColored(glm::mix(s_ms_col[0], s_ms_col[1], glm::vec4(k.time_ms / 16.f)), "%.3lf", k.time_ms);
         }
         ImGui::EndTable();
     }

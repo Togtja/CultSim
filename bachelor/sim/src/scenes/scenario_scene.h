@@ -1,19 +1,20 @@
 #pragma once
+#include "common_helpers.h"
+#include "debug/data_collector.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
-#include "debug/data_collector.h"
 #include "random_engine.h"
-#include "common_helpers.h"
+#include "entity/name_generator.h"
 #include "scene.h"
 
 #include <string_view>
 #include <vector>
 
-#include <robin_hood.h>
 #include <entt/entity/registry.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/process/scheduler.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <robin_hood.h>
 #include <taskflow/core/executor.hpp>
 
 namespace cs
@@ -52,8 +53,8 @@ private:
     /** Enabled Systems for this Scenario */
     std::vector<std::unique_ptr<system::ISystem>> m_active_systems{};
 
-    /** Disabled Systems for this Scenario */
-    std::vector<std::unique_ptr<system::ISystem>> m_inactive_systems{};
+    /** Systems that must run in the draw phase for this Scenario */
+    std::vector<std::unique_ptr<system::ISystem>> m_draw_systems{};
 
     /** Storage of bound lua events */
     std::vector<std::unique_ptr<LuaEventHandle>> m_lua_event_handlers{};
@@ -70,6 +71,9 @@ private:
     /** Create a data collector for this scenario */
     debug::DataCollector m_data_collector{};
 
+    /** Name generator used for scenario */
+    NameGenerator m_name_generator;
+
     /** Keep track of screen resolution */
     glm::vec2 m_resolution{};
 
@@ -77,7 +81,10 @@ private:
     float m_simtime = 0.f;
 
     /** Current time scale of simulation */
-    float m_timescale = 1.f;
+    int m_timescale = 1;
+
+    /** If we are currently paused or not*/
+    bool m_paused = false;
 
 public:
     explicit ScenarioScene(std::string_view scenario);

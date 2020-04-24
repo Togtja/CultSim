@@ -27,6 +27,8 @@ struct Movement
     float speed        = 1.f;
     float avoidance_cd = 0.f;
     int avoid_count{};
+
+    float speed_multi = 1.f;
 };
 
 struct Meta
@@ -70,22 +72,6 @@ struct Hearing
     float radius{};
 };
 
-struct Reproduction
-{
-    enum ESex
-    {
-        Male   = true,
-        Female = false
-    };
-
-    ESex sex = Male;
-    uint16_t number_of_children{};
-
-    float fertility{};
-
-    int max_children_per_pregnancy{};
-};
-
 struct Timer
 {
     using OnCompleteFunction = std::function<void(entt::entity, entt::registry&)>;
@@ -105,11 +91,16 @@ struct Health
     ETag need_tags{};
 };
 
+struct Attack
+{
+    float damage{};
+};
+
 struct Age
 {
     float current_age{};
 
-    float max_age{};
+    float average_life_expectancy{};
 };
 
 struct DropItems
@@ -197,18 +188,96 @@ struct Delete
 {
 };
 
+struct Reproduction
+{
+    enum ESex
+    {
+        Male   = true,
+        Female = false
+    };
+
+    ESex sex = Male;
+    uint16_t number_of_children{};
+
+    bool lays_eggs = false;
+    std::string egg_type;
+
+    ESex incubator = Female;
+
+    // If true then users says they has specified start/peak/end fertility
+    bool has_fertility = false;
+    // Needs age component to work
+    float start_fertility{};
+    float peak_fertility{};
+    float end_fertility{};
+
+    // General Pregnancy stat
+    int mean_children_pp = 1;
+    float children_deviation{};
+
+    // Static fertility
+    float fertility = 1.f;
+
+    float average_gestation_period{};
+    float gestation_deviation{};
+};
+
+struct Name
+{
+    std::string entity_type{};
+    std::string name{};
+};
+
 struct Pregnancy
 {
     float time_since_start{};
     float gestation_period{};
 
-    entt::entity father{};
+    // First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad)
+    std::pair<entt::entity, entt::entity> parents = {entt::null, entt::null};
 
-    int number_of_children{};
+    uint16_t children_in_pregnancy{};
 
-    sol::function birth{};
+    bool is_egg = false;
 };
 
+namespace detail
+{
+// Defines a single trait
+struct Trait
+{
+    std::string name;
+    std::string desc;
+
+    bool can_inherit     = false;
+    float inherit_chance = 1.0f;
+
+    bool can_mutate     = false;
+    float mutate_chance = 0.0001;
+
+    sol::function attain;
+    sol::function lose;
+
+    sol::function affect;
+    sol::function remove_affect;
+
+    bool operator==(Trait trait)
+    {
+        return name == trait.name;
+    }
+};
+} // namespace detail
+
+// An Agents traits
+struct Traits
+{
+    // The trait a species/aganets start with when running a simulation
+    std::vector<detail::Trait> start_traits;
+    // List of possible atainable traits
+    std::vector<detail::Trait> attainable_traits;
+    // The traits that the agent currently has
+    std::vector<detail::Trait> acquired_traits;
+};
 struct AI
 {
 };

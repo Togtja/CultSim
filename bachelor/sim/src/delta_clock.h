@@ -23,11 +23,19 @@ public:
      * @return Time in seconds since last restart
      */
     [[nodiscard]] float elapsed() const;
+
     /**
      * Restart the clock and get the time since last restart
      *
      * @return Time since last restart in seconds
      */
     [[nodiscard]] float restart();
+
+    /**
+     * Restart the clock and get the time since last restart
+     *
+     * @return Time since last restart in the time unit of the clock
+     */
+    [[nodiscard]] TimeUnit restart_time_unit();
 };
 } // namespace cs

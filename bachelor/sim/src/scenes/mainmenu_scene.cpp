@@ -1,12 +1,13 @@
 #include "mainmenu_scene.h"
+#include "common_helpers.h"
 #include "editor_scene.h"
 #include "entity/scenario.h"
+#include "loadsenario_scene.h"
 #include "preference_scene.h"
 #include "preferences.h"
 #include "scenario_scene.h"
 #include "scene_manager.h"
 
-#include <common_helpers.h>
 #include <gfx/ImGUI/imgui.h>
 
 namespace cs
@@ -31,43 +32,25 @@ bool MainMenuScene::update(float dt)
 
     if (ImGui::Button("Load Scenario", {150, 50}))
     {
-        ImGui::OpenPopup("Select##Scenario");
+        m_context->scene_manager->push<LoadScenarioScene>();
     }
 
-    if (ImGui::Button("Preferences", {150, 50}))
+    if (ImGui::Button("Key Bindings", {150, 50}))
     {
         m_context->scene_manager->push<PreferenceScene>();
     }
 
+    /*
     if (ImGui::Button("Development Editor", {150, 50}))
     {
         m_context->scene_manager->push<EditorScene>();
+        input::get_input().add_context(input::EKeyContext::EditorScene, true);
     }
+    */
 
     if (ImGui::Button("Exit", {150, 50}))
     {
         m_context->scene_manager->clear();
-    }
-
-    /** Shows the popup to select scenario (TODO: Lua-fi) */
-    if (ImGui::BeginPopupModal("Select##Scenario", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
-    {
-        auto&& scenarios = fs::list_directory("script/scenarios/");
-        for (auto&& scenario : scenarios)
-        {
-            if (fs::is_directory("script/scenarios/" + scenario))
-            {
-                if (ImGui::Button(scenario.c_str(), {150, 50}))
-                {
-                    m_context->scene_manager->push<ScenarioScene>(fmt::format("script/scenarios/{}", scenario));
-                }
-            }
-        }
-        if (ImGui::Button("Cancel", {150, 25}))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
     }
 
     ImGui::End();

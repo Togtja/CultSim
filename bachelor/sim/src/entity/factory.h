@@ -22,9 +22,14 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_health_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_attack_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_memory_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_timer_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_age_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table);
+
 } // namespace detail
 
 /**

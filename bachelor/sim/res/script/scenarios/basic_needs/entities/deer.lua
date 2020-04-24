@@ -7,29 +7,33 @@ entity = {
         speed = 80.0
     },
     SpriteComponent = {
-        color = Vec3:new(1.0, 0.50, 0.60),
-        texture = "sprites/agent_c.png",
-        normal = "sprites/agent_n.png"
+        color = Vec3:new(1.0, 1.0, 1.0),
+        texture = "sprites/deer_c.png",
+        normal = "sprites/deer_n.png",
+        scale = 20
     },
     VisionComponent = {
         radius = 40.0,
         fov = 0 -- 0 means no FOV
     },
     TagComponent = {
-        tags = ETag.Avoidable
+        tags = ETag.Avoidable | ETag.Creature
     },
     NeedComponent = {
         -- Corresponds to entires in the needs.lua file
         required_needs = { needs.hunger, needs.thirst, needs.sleep},
-        leisure_needs = { needs.stockpile, needs.reproduce }
+        leisure_needs = { needs.stockpile, needs.reproduce, needs.steal }
     },
     ReproductionComponent = {
         sex = random:randint(0, 1),
-        max_children = 10
+        mean_offspring = 2,
+        offspring_deviation = 1,
+        average_gestation = 90,
+        gestation_deviation = 5
     },
     StrategyComponent = {
         -- Corresponds to entries in the strategies.lua file
-        strategies = { strategies.find_food, strategies.consume_from_backpack, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate, strategies.forage_for_food}
+        strategies = {strategies.forage_for_food, strategies.steal_food, strategies.find_food, strategies.consume_from_backpack,strategies.drink_from_backpack, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate, strategies.loot_food, strategies.loot_water}
     },
     HealthComponent = {
         health = 100.0,
@@ -43,5 +47,13 @@ entity = {
         max_memories = 10,
         max_retention_time = 1000.0,
         allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location },
-    }
+    },
+    AgeComponent = 
+    {
+        life_expectancy = 3000.0
+    },
+    NameComponent = 
+    {
+     entity_type = "Deer"
+	}
 }

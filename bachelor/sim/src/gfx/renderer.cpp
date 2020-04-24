@@ -4,6 +4,12 @@
 
 namespace cs::gfx
 {
+void Renderer::clear()
+{
+    m_sprite_renderer.clear();
+    m_debug_renderer.clear();
+}
+
 void Renderer::display()
 {
     m_matrix_ubo.flush(m_camera.get_view_matrix());
