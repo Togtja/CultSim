@@ -12,6 +12,7 @@
 #include <entt/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <sol/object.hpp>
 
 namespace cs::component
 {
@@ -293,4 +294,13 @@ struct Relationship
 struct AI
 {
 };
+
+/** Component for use in Lua */
+template<uint8_t number>
+struct LuaComponent
+{
+    static inline constexpr auto s_lua_comp_id = number;
+    sol::object lua_data{};
+};
+
 } // namespace cs::component

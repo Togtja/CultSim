@@ -36,10 +36,9 @@ void Application::run(const std::vector<char*>& args)
     /** Add default scene */
     m_scene_manager.push<MainMenuScene>();
 
-    /** Temporary replacement of DT until we figure out frame rate issues! */
+    /** Fixed timestep set-up */
     DeltaClock dt_clock{};
     constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
-    bool meta_window_visible           = false;
     auto time_since_tick               = timestep;
     std::array<float, 144> average_fps = {};
     int next_fps                       = 0;
@@ -52,6 +51,8 @@ void Application::run(const std::vector<char*>& args)
         auto frame_time                 = dt_clock.restart_time_unit();
         average_fps[(++next_fps) % 144] = frame_time.count();
         time_since_tick += frame_time;
+
+        /** Update until we caught up, or only when needed otherwise */
         while (time_since_tick >= timestep)
         {
             CS_AUTOTIMER(Update Time);
