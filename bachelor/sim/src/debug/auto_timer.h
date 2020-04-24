@@ -12,6 +12,7 @@ namespace cs
 #define _CS_CONCAT_(x, y) x##y
 #define CS_CONCAT(x, y) _CS_CONCAT_(x, y)
 #define CS_AUTOTIMER(name) const auto CS_CONCAT(cs_auto_timer_,__COUNTER__) = AutoTimer{#name}
+#define CS_AUTOTIMER_EXPRNAME(name) const auto CS_CONCAT(cs_auto_timer_,__COUNTER__) = AutoTimer{name}
 /* clang-format on */
 
 /**
