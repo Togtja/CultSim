@@ -59,9 +59,6 @@ void ScenarioScene::initialize_simulation()
     m_registry.set<EntitySelectionHelper>();
     m_registry.set<RandomEngine*>(&m_rng);
 
-    /** Call lua init function for this scenario */
-    m_scenario.init();
-
     /** If there are any default Traits, run their affects and add them*/
     auto per_view = m_registry.view<component::Traits>();
     per_view.each([](entt::entity e, component::Traits& per) {
@@ -98,6 +95,9 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Call lua init function for this scenario */
+    m_scenario.init();
 
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(

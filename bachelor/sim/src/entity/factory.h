@@ -29,6 +29,7 @@ bool spawn_age_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table table);
 component::detail::Trait get_trait(sol::table traits);
 bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table);
 
 } // namespace detail
