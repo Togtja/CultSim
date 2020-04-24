@@ -27,7 +27,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"AgeComponent", spawn_age_component},
                           {"InventoryComponent", spawn_inventory_component},
                           {"TraitComponent", spawn_trait_component},
-                          {"NameComponent", spawn_name_component}};
+                          {"NameComponent", spawn_name_component},
+                          {"RelationshipComponent", spawn_relationship_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -372,6 +373,13 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
     {
         trait_comp.attainable_traits.push_back(get_trait(traits));
     }
+    return true;
+}
+
+bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& rel_comp = reg.assign_or_replace<component::Relationship>(e);
+
     return true;
 }
 } // namespace detail
