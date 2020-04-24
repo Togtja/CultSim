@@ -12,7 +12,7 @@ void GOB::update(float dt)
 
     auto view = registry.view<component::Goal, component::Action>();
     view.each([this, dt](const component::Goal& goal, component::Action& action) {
-        if (action.current_action.m_name == "")
+        if (action.current_action_sequence.m_name == "")
         {
             auto best_action = action.actions[0];
             auto best_value  = calculate_discontentment(action.actions[0], goal.goals);
@@ -26,7 +26,7 @@ void GOB::update(float dt)
                 }
             }
 
-            action.current_action = best_action;
+            action.current_action_sequence = best_action;
         }
     });
 }
