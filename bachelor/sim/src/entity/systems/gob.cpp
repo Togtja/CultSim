@@ -68,14 +68,12 @@ float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob
 
         if (goal.m_change_over_time.index() == 0)
         {
-            time_value *= std::get<sol::function>(goal.m_change_over_time)().get<float>();
+            value += std::get<sol::function>(goal.m_change_over_time)(time_value).get<float>();
         }
         else
         {
-            time_value *= std::get<std::function<float()>>(goal.m_change_over_time)();
+            value += std::get<std::function<float(const float)>>(goal.m_change_over_time)(time_value);
         }
-
-        value += time_value;
 
         if (goal.m_get_discontentment.index() == 0)
         {
