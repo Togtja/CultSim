@@ -2,10 +2,17 @@
 
 #include "scene.h"
 
+#include <string>
+
 namespace cs
 {
 class LoadScenarioScene : public IScene
 {
+private:
+    static inline constexpr unsigned s_seed_length = 32;
+
+    char m_seed[s_seed_length];
+
 public:
     void on_enter() override;
 

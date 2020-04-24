@@ -39,32 +39,25 @@ extern ImFont* g_light_font;
 
 namespace cs
 {
-ScenarioScene::ScenarioScene(std::string_view scenario)
+ScenarioScene::ScenarioScene(std::string_view scenario, uint32_t random_seed) : m_rng(RandomEngine(random_seed))
 {
     m_scenario.script_path = scenario;
-}
-
-ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
-{
 }
 
 void ScenarioScene::initialize_simulation()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
-    m_context->lua_state["random"] = &m_rng;
     bind_actions_for_scene();
     bind_available_lua_events();
     bind_scenario_lua_functions();
-    m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
+    m_context->lua_state["random"] = &m_rng;
+    m_scenario                     = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
 
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
     m_registry.set<RandomEngine*>(&m_rng);
-
-    /** Call lua init function for this scenario */
-    m_scenario.init();
 
     /** If there are any default Traits, run their affects and add them*/
     auto per_view = m_registry.view<component::Traits>();
@@ -82,8 +75,8 @@ void ScenarioScene::initialize_simulation()
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
     m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
-    m_data_collector.add_collector<debug::CollectorMouse>(true);
-    m_data_collector.add_collector<debug::CollectorMouse>(false);
+    m_data_collector.add_collector<debug::CollectorMouse>(true, m_resolution);
+    m_data_collector.add_collector<debug::CollectorMouse>(false, m_resolution);
 
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
@@ -102,6 +95,9 @@ void ScenarioScene::initialize_simulation()
             spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
         }
     }
+
+    /** Call lua init function for this scenario */
+    m_scenario.init();
 
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
@@ -151,12 +147,12 @@ void ScenarioScene::reset_simulation()
 
 void ScenarioScene::on_enter()
 {
-    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
-    initialize_simulation();
-
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
+
+    initialize_simulation();
 }
 
 void ScenarioScene::on_exit()
@@ -345,6 +341,25 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["trait"]        = entt::type_info<component::Traits>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
+
+#define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
+    REGISTER_LUA_COMPONENT(1);
+    REGISTER_LUA_COMPONENT(2);
+    REGISTER_LUA_COMPONENT(3);
+    REGISTER_LUA_COMPONENT(4);
+    REGISTER_LUA_COMPONENT(5);
+    REGISTER_LUA_COMPONENT(6);
+    REGISTER_LUA_COMPONENT(7);
+    REGISTER_LUA_COMPONENT(8);
+    REGISTER_LUA_COMPONENT(9);
+    REGISTER_LUA_COMPONENT(10);
+    REGISTER_LUA_COMPONENT(11);
+    REGISTER_LUA_COMPONENT(12);
+    REGISTER_LUA_COMPONENT(13);
+    REGISTER_LUA_COMPONENT(14);
+    REGISTER_LUA_COMPONENT(15);
+    REGISTER_LUA_COMPONENT(16);
+#undef REGISTER_LUA_COMPONENT
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -536,7 +551,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
-            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e);
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
             case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
             case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
             case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
@@ -552,6 +567,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     effect::unaffect_traits(e, *per);
                 };
                 m_registry.remove_if_exists<component::Traits>(e);
+                break;
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
@@ -753,6 +769,12 @@ void ScenarioScene::bind_scenario_lua_functions()
     /** Generate a random name */
     cultsim.set_function("generate_name", [this](const std::string& ethnicity, bool is_male) {
         return m_name_generator.generate(ethnicity, is_male, m_rng);
+    });
+
+    /** Allow Lua to use Views */
+    cultsim.set_function("view", [this](sol::object types) {
+        auto vec = types.as<std::vector<uint32_t>>();
+        return m_registry.runtime_view(vec.begin(), vec.end());
     });
 }
 

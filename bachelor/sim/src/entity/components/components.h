@@ -12,6 +12,7 @@
 #include <entt/fwd.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <sol/object.hpp>
 
 namespace cs::component
 {
@@ -278,7 +279,28 @@ struct Traits
     // The traits that the agent currently has
     std::vector<detail::Trait> acquired_traits;
 };
+
+struct Relationship
+{
+    // Used to add a new entry in the relatip table
+    bool new_create         = true;
+    uint8_t default_friend  = 0;
+    uint8_t default_romance = 0;
+
+    uint8_t self_friend  = 0;
+    uint8_t self_romance = 0;
+};
+
 struct AI
 {
 };
+
+/** Component for use in Lua */
+template<uint8_t number>
+struct LuaComponent
+{
+    static inline constexpr auto s_lua_comp_id = number;
+    sol::object lua_data{};
+};
+
 } // namespace cs::component
