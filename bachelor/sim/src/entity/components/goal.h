@@ -25,8 +25,8 @@ public:
         return dt;
     };
 
-    std::variant<sol::function, std::function<float(const float)>> m_get_discontentment = [this](const float dt) {
-
-    }
+    std::variant<sol::function, std::function<float(const float)>> m_get_discontentment = [this](const float new_value) {
+        return pow(new_value, 2.f);
+    };
 };
 } // namespace cs::gob
