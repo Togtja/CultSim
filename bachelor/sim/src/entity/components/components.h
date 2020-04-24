@@ -280,6 +280,17 @@ struct Traits
     std::vector<detail::Trait> acquired_traits;
 };
 
+struct Relationship
+{
+    // Used to add a new entry in the relatip table
+    bool new_create         = true;
+    uint8_t default_friend  = 0;
+    uint8_t default_romance = 0;
+
+    uint8_t self_friend  = 0;
+    uint8_t self_romance = 0;
+};
+
 struct AI
 {
 };

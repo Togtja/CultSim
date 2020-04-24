@@ -25,6 +25,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/need.cpp
         ${CMAKE_CURRENT_LIST_DIR}/need.h
 
+        ${CMAKE_CURRENT_LIST_DIR}/relationship.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/relationship.h
+
         ${CMAKE_CURRENT_LIST_DIR}/rendering.cpp
         ${CMAKE_CURRENT_LIST_DIR}/rendering.h
 

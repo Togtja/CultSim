@@ -8,12 +8,14 @@
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
+#include "entity/systems/relationship.h"
 #include "entity/systems/rendering.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
 #include "entity/systems/timer.h"
 #include "entity/systems/traits.h"
+
 
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
@@ -86,6 +88,7 @@ void reflect_systems()
     entt::meta<system::Deletion>().alias("DeletionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Inventory>().alias("InventorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Traits>().alias("TraitsSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Relationship>().alias("RelationshipSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta
