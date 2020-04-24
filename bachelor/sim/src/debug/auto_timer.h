@@ -66,4 +66,22 @@ public:
      */
     static void show_debug_ui();
 };
+
+/**
+ * Measure the execution time of a single callable
+ *
+ * @param func The callable to measure
+ * @param args The arguments to pass to the callable
+ * @tparam Callable The type of the function
+ * @tparam Args The argument types for the function
+ * @return The execution time in milliseconds
+ */
+template<typename Callable, typename... Args, typename = std::enable_if_t<std::is_invocable_v<Callable, Args...>>>
+double measure_callable(Callable&& func, Args&&... args)
+{
+    auto before = std::chrono::steady_clock::now();
+    std::invoke(func, std::forward<Args>(args)...);
+    auto after = std::chrono::steady_clock::now();
+    return std::chrono::duration<double, std::milli>(after - before).count();
+}
 } // namespace cs
