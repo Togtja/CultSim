@@ -41,7 +41,7 @@ scenario.init = function()
 
         -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
         if i == 100 then
-            cultsim.add_romace(99, 99, 30)
+            cultsim.add_romance(99, 99, 30)
         end
         local need_comp = cultsim.get_component(deer, component.need)
         for i, need in ipairs(need_comp.required_needs) do

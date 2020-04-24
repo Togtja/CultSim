@@ -24,10 +24,10 @@ public:
     void add_friendship(entt::entity me, entt::entity other, uint8_t amount);
 
     /** Get what "me" feel about the other agent */
-    uint8_t get_romace(entt::entity me, entt::entity other);
+    uint8_t get_romance(entt::entity me, entt::entity other);
 
     /** */
-    void add_romace(entt::entity me, entt::entity other, uint8_t amount);
+    void add_romance(entt::entity me, entt::entity other, uint8_t amount);
 
     void update(float dt) override;
 
