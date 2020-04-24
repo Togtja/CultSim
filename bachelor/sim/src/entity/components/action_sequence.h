@@ -24,6 +24,8 @@ public:
     std::variant<sol::function, std::function<bool(entt::entity, std::string)>> m_run_actions = [this](const entt::entity e,
                                                                                                        std::string error) {
         bool finished = false;
+
+        /**As long as we have not completed our action, keep working on it*/
         if (current_action->m_action.index() == 0)
         {
             finished = std::get<sol::function>(current_action->m_action)(e, error).get<bool>();
@@ -33,10 +35,26 @@ public:
             finished = std::get<std::function<bool(entt::entity, std::string&)>>(current_action->m_action)(e, error);
         }
 
-        if (error != "")
+        /**We cannot complete the action*/
+        if (error == "")
         {
-            return false;
+            if (current_action = m_actions.back().get())
+            {
+                return false;
+            }
+            else
+            {
+                for (int i = m_actions.size() - 1; i >= 0; i--)
+                {
+                    if (m_actions[i].get() == current_action)
+                    {
+                        current_action->flags = 0;
+                        current_action        = m_actions[i + 1].get();
+                    }
+                }
+            }
         }
+        /**We have completed the action*/
         else if (finished)
         {
             if (current_action == m_actions.front().get())
