@@ -43,10 +43,6 @@ scenario.init = function()
         if i == 100 then
             cultsim.add_romance(deer, deer, 30)
             cultsim.add_attainable_trait(deer, traits.random_mutation)
-            local attain_traits = cultsim.get_attainable_traits(deer)
-            for i, trait in ipairs(attain_traits) do
-                log.critical("trait name " .. trait.name .. "!")
-            end 
         end
         local need_comp = cultsim.get_component(deer, component.need)
         for i, need in ipairs(need_comp.required_needs) do

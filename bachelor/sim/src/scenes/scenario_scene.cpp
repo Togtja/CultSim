@@ -571,15 +571,15 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             auto& trait   = detail::get_trait(sol_trait);
             const auto it = std::find(trait_c->acquired_traits.begin(), trait_c->acquired_traits.end(), trait);
-            if (it != trait_c->acquired_traits.end())
+            if (it == trait_c->acquired_traits.end())
             {
                 trait_c->acquired_traits.push_back(trait);
                 return;
             }
-            spdlog::info("add_acquired_trait: the given trait is already acquired");
+            spdlog::get("lua")->info("add_acquired_trait: the given trait is already acquired");
             return;
         }
-        spdlog::warn("add_acquired_trait: the entity argument does not have the trait component");
+        spdlog::get("lua")->warn("add_acquired_trait: the entity argument does not have the trait component");
     });
 
     cultsim.set_function("get_attainable_traits", [this](sol::this_state s, entt::entity e) -> sol::object {
@@ -595,15 +595,15 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             auto& trait   = detail::get_trait(sol_trait);
             const auto it = std::find(trait_c->attainable_traits.begin(), trait_c->attainable_traits.end(), trait);
-            if (it != trait_c->attainable_traits.end())
+            if (it == trait_c->attainable_traits.end())
             {
                 trait_c->attainable_traits.push_back(trait);
                 return;
             }
-            spdlog::info("add_attainable_trait: the given trait is already attainable");
+            spdlog::get("lua")->info("add_attainable_trait: the given trait is already attainable");
             return;
         }
-        spdlog::warn("add_attainable_trait: the entity argument does not have the trait component");
+        spdlog::get("lua")->warn("add_attainable_trait: the entity argument does not have the trait component");
     });
 
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
