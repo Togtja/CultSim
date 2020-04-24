@@ -11,29 +11,26 @@ void GOB::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Goal, component::Action>();
-    view.each([this, dt](entt::entity e, component::Goal& goal, component::Action& action) {
+    view.each([this, dt](const component::Goal& goal, component::Action& action) {
         if (action.current_action.m_name == "")
         {
-            /**We are not currently working on any action and must therefore choose a new action*/
+            auto best_action = action.actions[0];
+            auto best_value  = calculate_discontentment(action.actions[0], goal.goals);
+            for (auto action : action.actions)
+            {
+                auto value = calculate_discontentment(action, goal.goals);
+                if (value < best_value)
+                {
+                    best_value  = value;
+                    best_action = action;
+                }
+            }
+
+            action.current_action = best_action;
         }
     });
 }
-gob::Action_Sequence GOB::choose_action(std::vector<gob::Action_Sequence> actions, std::vector<gob::Goal> goals)
-{
-    auto best_action = actions[0];
-    auto best_value  = calculate_discontentment(actions[0], goals);
-    for (auto action : actions)
-    {
-        auto value = calculate_discontentment(action, goals);
-        if (value < best_value)
-        {
-            best_value  = value;
-            best_action = action;
-        }
-    }
 
-    return best_action;
-}
 float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob::Goal> goals)
 {
     auto discontentment = 0.f;
@@ -79,8 +76,17 @@ float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob
         }
 
         value += time_value;
+
+        if (goal.m_get_discontentment.index() == 0)
+        {
+            discontentment += std::get<sol::function>(goal.m_get_discontentment)(value).get<float>();
+        }
+        else
+        {
+            discontentment += std::get<std::function<float(const float)>>(goal.m_get_discontentment)(value);
+        }
     }
-    return 0.0f;
+    return discontentment;
 }
 ISystem* GOB::clone()
 {
