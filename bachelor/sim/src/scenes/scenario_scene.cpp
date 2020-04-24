@@ -567,9 +567,16 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     cultsim.set_function("add_acquired_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
-        if (auto trait = m_registry.try_get<component::Traits>(e); trait)
+        if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
-            trait->acquired_traits.push_back(detail::get_trait(sol_trait));
+            auto& trait   = detail::get_trait(sol_trait);
+            const auto it = std::find(trait_c->acquired_traits.begin(), trait_c->acquired_traits.end(), trait);
+            if (it != trait_c->acquired_traits.end())
+            {
+                trait_c->acquired_traits.push_back(trait);
+                return;
+            }
+            spdlog::info("add_acquired_trait: the given trait is already acquired");
             return;
         }
         spdlog::warn("add_acquired_trait: the entity argument does not have the trait component");
@@ -584,9 +591,16 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     cultsim.set_function("add_attainable_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
-        if (auto trait = m_registry.try_get<component::Traits>(e); trait)
+        if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
-            trait->attainable_traits.push_back(detail::get_trait(sol_trait));
+            auto& trait   = detail::get_trait(sol_trait);
+            const auto it = std::find(trait_c->attainable_traits.begin(), trait_c->attainable_traits.end(), trait);
+            if (it != trait_c->attainable_traits.end())
+            {
+                trait_c->attainable_traits.push_back(trait);
+                return;
+            }
+            spdlog::info("add_attainable_trait: the given trait is already attainable");
             return;
         }
         spdlog::warn("add_attainable_trait: the entity argument does not have the trait component");
