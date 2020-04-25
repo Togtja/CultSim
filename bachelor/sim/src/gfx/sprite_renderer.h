@@ -57,6 +57,8 @@ private:
 public:
     explicit SpriteRenderer(Camera& camera);
 
+    ~SpriteRenderer() noexcept;
+
     /**
      * Clear all cached sprites to allow for re-submission
      */
