@@ -4,7 +4,7 @@
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
 #include "entity/scenario.h"
-#include "entity/systems/system.h"
+#include "entity/systems/lua_system.h"
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
@@ -189,7 +189,14 @@ void bind_components(sol::state_view lua)
 
 void bind_systems(sol::state_view lua)
 {
-    lua.new_usertype<system::ISystem>("ISystem", "update", &system::ISystem::update);
+    lua.new_usertype<system::LuaSystem>("System",
+                                        sol::no_constructor,
+                                        "initialize",
+                                        &system::LuaSystem::initialize,
+                                        "deinitialize",
+                                        &system::LuaSystem::deinitialize,
+                                        "update",
+                                        &system::LuaSystem::update);
 
     lua.new_usertype<Scenario>("Scenario",
                                "name",
