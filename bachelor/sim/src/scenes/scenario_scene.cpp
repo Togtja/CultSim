@@ -15,6 +15,7 @@
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/lua_system.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
@@ -81,18 +82,30 @@ void ScenarioScene::initialize_simulation()
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
-        auto type = entt::resolve(entt::hashed_string(system.c_str()));
-        if (type)
+        auto ctx = system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state};
+
+        if (system.get_type() == sol::type::string)
         {
-            auto meta = type.construct(
-                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
-            system::ISystem& temp_ref = meta.cast<system::ISystem>();
-            m_active_systems.emplace_back(temp_ref.clone());
-            m_active_systems.back()->initialize();
+            auto type = entt::resolve(entt::hashed_string(system.as<std::string>().c_str()));
+            if (type)
+            {
+                auto meta                 = type.construct(ctx);
+                system::ISystem& temp_ref = meta.cast<system::ISystem>();
+                m_active_systems.emplace_back(temp_ref.clone());
+                m_active_systems.back()->initialize();
+            }
+            else
+            {
+                spdlog::get("lua")->warn("attempt to add unknown native system: {}", system.as<std::string>());
+            }
+        }
+        else if (system.get_type() == sol::type::table)
+        {
+            m_active_systems.emplace_back(new system::LuaSystem(ctx, system.as<sol::table>()));
         }
         else
         {
-            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
+            spdlog::get("lua")->error("failed to spawn Lua system. ensure parameters are correct to scenario.systems.");
         }
     }
 

@@ -23,7 +23,8 @@ scenario.systems = {
     "MovementSystem",
     "InventorySystem",
     "HealthSystem",
-    "DeletionSystem"
+    "DeletionSystem",
+    systems.be_stupid_system
 }
 
 -- Decides how many seconds between each data sample taken in this scenario. IE: (also accuracy / granularity of graphs and output)
