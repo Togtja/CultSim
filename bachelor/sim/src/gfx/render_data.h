@@ -95,4 +95,12 @@ struct DebugInstanceVertex
     glm::vec3 color{};
 };
 
+/** Program information that the shader might enjoy looking at */
+struct ProgramInformation
+{
+    glm::vec2 resolution{};
+    glm::vec2 cursor_position{};
+    float runtime{};
+};
+
 } // namespace cs::gfx

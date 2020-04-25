@@ -14,6 +14,8 @@ void Renderer::display()
 {
     m_matrix_ubo.flush(m_camera.get_view_matrix());
     m_matrix_ubo.bind(0u);
+    m_programinfo_ubo.flush();
+    m_programinfo_ubo.bind(2u);
     m_sprite_renderer.display();
     m_debug_renderer.display();
 }
@@ -61,6 +63,13 @@ glm::vec2 Renderer::get_camera_position2d()
 void Renderer::set_camera_bounds(glm::vec2 bounds)
 {
     m_camera.set_boundaries(bounds);
+}
+
+void Renderer::update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution)
+{
+    m_programinfo_ubo.get().runtime         = runtime;
+    m_programinfo_ubo.get().cursor_position = cursorpos;
+    m_programinfo_ubo.get().resolution      = resolution;
 }
 
 glm::vec3 Renderer::screen_to_world_pos(glm::ivec2 screen_pos, glm::vec2 viewport_size, float desired_z)

@@ -4,6 +4,7 @@
 #include "debug_renderer.h"
 #include "sprite_renderer.h"
 #include "uniform_buffer.h"
+#include "render_data.h"
 
 namespace cs::gfx
 {
@@ -17,6 +18,8 @@ private:
     SpriteRenderer m_sprite_renderer;
 
     UniformBuffer<glm::mat4> m_matrix_ubo{};
+
+    UniformBuffer<ProgramInformation> m_programinfo_ubo{};
 
 public:
     friend Renderer& get_renderer();
@@ -62,6 +65,8 @@ public:
     glm::vec2 get_camera_position2d();
 
     void set_camera_bounds(glm::vec2 bounds);
+
+    void update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution);
 
     /**
      * Convert a screen coordinate to a world position
