@@ -115,6 +115,7 @@ void ScenarioScene::initialize_simulation()
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
         new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+    m_draw_systems.back()->initialize();
 
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
@@ -139,7 +140,7 @@ void ScenarioScene::clean_simulation()
 
     for (auto& system : m_draw_systems)
     {
-        system->initialize();
+        system->deinitialize();
     }
     m_draw_systems.clear();
 
@@ -208,6 +209,8 @@ bool ScenarioScene::update(float dt)
     {
         time_step = 0;
     }
+
+    gfx::get_renderer().update_program_info(m_simtime, input::get_input().get_mouse_pos(), m_resolution);
     for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);

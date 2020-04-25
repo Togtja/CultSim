@@ -4,6 +4,8 @@
 #include "gfx/raymarching_renderer.h"
 #include "system.h"
 
+#include <memory>
+
 namespace cs::system
 {
 class Rendering : public ISystem
@@ -13,10 +15,14 @@ private:
 
     gfx::Camera m_camera{};
 
-    gfx::RaymarchingRenderer m_3d_renderer{m_camera};
+    std::unique_ptr<gfx::RaymarchingRenderer> m_3d_renderer{new gfx::RaymarchingRenderer(m_camera)};
 
 public:
     Rendering(SystemContext context);
+
+    void initialize() override;
+
+    void deinitialize() override;
 
     void update(float dt) override;
 

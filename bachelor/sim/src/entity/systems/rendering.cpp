@@ -3,6 +3,7 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "gfx/renderer.h"
+#include "input/input_handler.h"
 
 #include <array>
 #include <numeric>
@@ -18,6 +19,20 @@ Rendering::Rendering(SystemContext context) : ISystem(context)
     /** Submit sprites to renderer, for each layer */
     m_shadow_texture              = gfx::get_renderer().sprite().get_texture("sprites/shadow_c.png");
     m_shadow_texture.material_idx = MATERIAL_IDX_NOSPEC;
+}
+
+void Rendering::initialize()
+{
+    auto& handler = input::get_input();
+    handler.add_context(input::EKeyContext::RenderingSystem);
+    handler.fast_bind_key(input::EKeyContext::RenderingSystem, SDL_SCANCODE_R, input::EAction::ReloadShaders, [this] {
+        m_3d_renderer = std::make_unique<gfx::RaymarchingRenderer>(m_camera);
+    });
+}
+
+void Rendering::deinitialize()
+{
+    input::get_input().remove_context(input::EKeyContext::RenderingSystem);
 }
 
 void Rendering::update(float dt)
@@ -62,7 +77,7 @@ void Rendering::update(float dt)
     //        gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {1.f, 1.f, 0.f});
     //    });
 
-    m_3d_renderer.display();
+    m_3d_renderer->display();
 }
 
 ISystem* Rendering::clone()
