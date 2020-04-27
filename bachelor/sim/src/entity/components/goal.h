@@ -15,7 +15,6 @@ public:
     std::string m_name{};
     ETag m_tags{};
 
-    float m_weight{};
     float m_age{};
 
     std::variant<sol::function, std::function<float()>> m_weight_function = [this]() {
