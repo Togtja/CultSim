@@ -153,7 +153,7 @@ bool Application::init_input()
 bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
-    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table);
     m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */
