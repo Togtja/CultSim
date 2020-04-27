@@ -94,8 +94,6 @@ void bind_components(sol::state_view lua)
     lua.new_usertype<gob::Goal>("Goal",
                                 "name",
                                 &gob::Goal::m_name,
-                                "weight",
-                                &gob::Goal::m_weight,
                                 "age",
                                 &gob::Goal::m_age,
                                 "tags",

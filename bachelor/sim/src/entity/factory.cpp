@@ -125,7 +125,7 @@ bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 
 bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    reg.assign_or_replace<component::Action>(e, table["actions"].get_or<std::vector<sol::table>>({}));
+    reg.assign_or_replace<component::Action>(e);
     return true;
 }
 
