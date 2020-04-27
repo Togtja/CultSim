@@ -336,6 +336,8 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["trait"]        = entt::type_info<component::Traits>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
+    component["action"]       = entt::type_info<component::Action>::id();
+    component["goal"]         = entt::type_info<component::Goal>::id();
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -491,6 +493,28 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
+            case entt::type_info<component::Action>::id():
+                if (m_registry.try_get<component::Action>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Action>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Goal>::id():
+                if (m_registry.try_get<component::Goal>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Goal>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             default:
                 spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
@@ -524,6 +548,19 @@ void ScenarioScene::bind_scenario_lua_functions()
                              return sol::nil;
                          });
 
+    cultsim.set_function("get_goal",
+                         [](sol::this_state s, const sol::object& goal_lua, std::string_view goal_name) -> sol::object {
+                             const auto& goal = goal_lua.as<component::Goal>();
+                             for (const auto& i : goal.goals)
+                             {
+                                 if (i.m_name == goal_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
@@ -537,6 +574,8 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Action>::id(): m_registry.remove_if_exists<component::Action>(e); break;
+            case entt::type_info<component::Goal>::id(): m_registry.remove_if_exists<component::Goal>(e); break;
             case entt::type_info<component::Traits>::id():
                 if (auto per = m_registry.try_get<component::Traits>(e); per)
                 {
@@ -573,6 +612,10 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
             case entt::type_info<component::Inventory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
+            case entt::type_info<component::Action>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Action>(e));
+            case entt::type_info<component::Goal>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Goal>(e));
             default: return sol::nil;
         }
     });
