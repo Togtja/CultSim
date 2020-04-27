@@ -938,8 +938,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits] =
+    const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits] =
         m_registry.try_get<component::Need,
+                           component::Goal,
+                           component::Action,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
@@ -1046,6 +1048,50 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("%3.1f", need.status);
             }
             ImGui::EndTable();
+        }
+    }
+
+    if (goal)
+    {
+        if (ImGui::BeginTable("Entity Goals", 2))
+        {
+            ImGui::TableSetupColumn("Goals:");
+            ImGui::TableSetupColumn("Weight:");
+
+            // Non-clickable headers
+            cs_auto_table_headers();
+
+            for (const auto& goal : goal->goals)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text("%s", goal.m_name.c_str());
+                ImGui::TableNextCell();
+                ImGui::Text("%3.1f", goal.m_weight);
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    if (action)
+    {
+        if (action->current_action_sequence.m_name != "")
+        {
+            ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
+            if (action->current_action_sequence.current_action->m_name != "")
+            {
+                int action_index = 0;
+                for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
+                {
+                    if (action->current_action_sequence.m_actions[i].get() == action->current_action_sequence.current_action)
+                    {
+                        action_index = i;
+                    }
+                }
+                ImGui::Text("Current Action: %s (Action %d out of %d)",
+                            action->current_action_sequence.current_action->m_name.c_str(),
+                            action_index,
+                            action->current_action_sequence.m_actions.size());
+            }
         }
     }
 
