@@ -119,7 +119,7 @@ void Reproduction::update(float dt)
             m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
             return;
         }
-
+        m_context.dispatcher->enqueue<event::BornEntity>(event::BornEntity{child_e});
         // TODO: Figure out if this is redundant
         if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
         {

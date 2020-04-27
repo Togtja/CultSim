@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/events.h"
 #include "entt/entity/registry.hpp"
 #include "robin_hood.h"
 #include "system.h"
@@ -16,6 +17,7 @@ public:
     using ISystem::ISystem;
 
     void initialize() override;
+
 
     void add_agent(entt::entity me);
     /** Get what "me" feel about the other agent */

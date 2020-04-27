@@ -8,6 +8,7 @@ namespace cs::system
 {
 void Relationship::initialize()
 {
+    m_context.dispatcher->sink<event::BornEntity>().connect<&Relationship::new_child_to_reg>(*this);
     sol::table cultsim = (*m_context.lua_state)["cultsim"];
     cultsim.set_function("get_friendship",
                          [this](entt::entity e, entt::entity other) -> uint8_t { return get_friendship(e, other); });
@@ -20,6 +21,12 @@ void Relationship::initialize()
                          [this](entt::entity e, entt::entity other, uint8_t amount) -> void { add_romance(e, other, amount); });
 };
 
+void Relationship::deinitialize()
+{
+    m_context.dispatcher->sink<event::BornEntity>().disconnect<&Relationship::new_child_to_reg>(*this);
+}
+
+}
 void Relationship::add_agent(entt::entity me)
 {
     auto view = m_context.registry->view<component::Relationship>();
