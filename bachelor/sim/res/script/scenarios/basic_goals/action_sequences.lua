@@ -5,7 +5,6 @@ action_sequences = {
 	find_food = {
 	name = "find_food",
     tags = ETag.Food | ETag.Consume,
-    current_action = {},
     actions = {actions.find_and_eat},
     run_actions = function(entity, error)
     end
