@@ -27,7 +27,9 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"AgeComponent", spawn_age_component},
                           {"InventoryComponent", spawn_inventory_component},
                           {"TraitComponent", spawn_trait_component},
-                          {"NameComponent", spawn_name_component}};
+                          {"NameComponent", spawn_name_component},
+                          {"ActionComponent", spawn_action_component},
+                          {"GoalComponent", spawn_goal_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -118,6 +120,18 @@ bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table)
 bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     reg.assign_or_replace<component::Tags>(e, table["tags"].get<ETag>());
+    return true;
+}
+
+bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign_or_replace<component::Action>(e, table["actions"].get_or<std::vector<sol::table>>({}));
+    return true;
+}
+
+bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign_or_replace<component::Goal>(e, table["goals"].get_or<std::vector<sol::table>>({}));
     return true;
 }
 
