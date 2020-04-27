@@ -17,6 +17,11 @@ void Camera::init(glm::vec3 position)
 
 glm::mat4 Camera::get_view_matrix() const
 {
+    return glm::translate(glm::mat4(1.f), -m_pos);
+}
+
+glm::mat4 Camera::get_view_projection_matrix() const
+{
     return glm::ortho(m_pos.z * -640.f + m_pos.x,
                       m_pos.z * 640.f + m_pos.x,
                       m_pos.z * -360.f + m_pos.y,
