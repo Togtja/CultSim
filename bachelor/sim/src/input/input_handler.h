@@ -78,6 +78,8 @@ enum class EAction
     Quit,
     EscapeScene,
     ReloadShaders,
+    SetMode2D,
+    SetMode3D,
 
     Count
 };
@@ -109,6 +111,8 @@ inline std::string action_to_string(const EAction action)
         case EAction::Quit: return "Quit";
         case EAction::EscapeScene: return "EscapeScene";
         case EAction::ReloadShaders: return "ReloadShaders";
+        case EAction::SetMode2D: return "SetMode2D";
+        case EAction::SetMode3D: return "SetMode3D";
         default: return "Action not added to to_string";
     }
 }

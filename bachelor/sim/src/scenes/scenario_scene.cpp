@@ -283,6 +283,15 @@ void ScenarioScene::bind_actions_for_scene()
         }
     });
 
+    /** Change render mode */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode2D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_2D);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode3D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_3D);
+    });
+
     /** Move to selected entity */
     input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::FollowEntity, [this](float dt) {
         auto&& select_helper = m_registry.ctx<EntitySelectionHelper>();

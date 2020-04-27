@@ -247,6 +247,8 @@ void bind_input(sol::state_view lua)
                                   {"Pause", input::EAction::Pause},
                                   {"ReloadShaders", input::EAction::ReloadShaders},
                                   {"Quit", input::EAction::Quit},
+                                  {"SetMode2D", input::EAction::SetMode2D},
+                                  {"SetMode3D", input::EAction::SetMode3D},
                                   {"EscapeScene", input::EAction::EscapeScene}});
 
     lua.new_enum<input::EMouse>("EMouse",

@@ -15,6 +15,7 @@ layout(location = 0) out vec3 vs_color;
 /** Uniforms */
 layout(binding = 0, std140) uniform Matrices
 {
+    mat4 u_view;
     mat4 u_projection;
 };
 
