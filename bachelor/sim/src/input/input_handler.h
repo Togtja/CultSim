@@ -25,6 +25,7 @@ enum class EKeyContext
     PreferenceScene,
     EditorScene,
     LoadScenario,
+    RenderingSystem,
 
     Count
 };
@@ -49,6 +50,7 @@ inline std::string key_context_to_string(const EKeyContext context)
         case EKeyContext::PreferenceScene: return "PreferenceScene";
         case EKeyContext::EditorScene: return "EditorScene";
         case EKeyContext::LoadScenario: return "LoadScenario";
+        case EKeyContext::RenderingSystem: return "RenderingSystem";
         default: return "Error: Invalid Context (Consider adding it to_string)";
     }
 }
@@ -75,6 +77,7 @@ enum class EAction
     Pause,
     Quit,
     EscapeScene,
+    ReloadShaders,
 
     Count
 };
@@ -105,6 +108,7 @@ inline std::string action_to_string(const EAction action)
         case EAction::Pause: return "Pause";
         case EAction::Quit: return "Quit";
         case EAction::EscapeScene: return "EscapeScene";
+        case EAction::ReloadShaders: return "ReloadShaders";
         default: return "Action not added to to_string";
     }
 }
