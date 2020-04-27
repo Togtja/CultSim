@@ -22,7 +22,7 @@ public:
     Action current_action;
 
     std::variant<sol::function, std::function<bool(entt::entity, std::string)>> m_run_actions = [this](const entt::entity e,
-                                                                                                       std::string error) {
+                                                                                                       std::string& error) {
         bool finished = false;
 
         /**As long as we have not completed our action, keep working on it*/
@@ -74,7 +74,7 @@ public:
         float result = 0;
         for (auto& action : m_actions)
         {
-            result += action.m_get_goal_change(goal);
+            result += action.m_get_goal_change(goal).get<float>();
         }
         return result;
     };
