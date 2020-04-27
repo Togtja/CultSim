@@ -228,8 +228,12 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    // Make sure ImGui does not get more than one update per frame
+    /** Deal with ImGui updates once per tick */
     for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
+    for (auto&& system : m_draw_systems)
     {
         system->update_imgui();
     }
