@@ -5,19 +5,35 @@
 #include "robin_hood.h"
 #include "system.h"
 
+#include <entt/signal/dispatcher.hpp>
+
 namespace cs::system
 {
 class Relationship : public ISystem
 {
 private:
-    // A Table of relationship (To consider, make it a std::pair of uint8)
+    /** A Table of relationship (To consider, make it a std::pair of uint8) */
     robin_hood::unordered_map<entt::entity, robin_hood::unordered_map<entt::entity, uint16_t>> rel_table;
+
+    /** A new registry of every spawned agent */
+    entt::registry parents_reg;
 
 public:
     using ISystem::ISystem;
 
+    Relationship(Relationship&&) = default;
+
+    Relationship& operator=(Relationship&&) = default;
+
+    Relationship(const Relationship& other);
+
+    Relationship& operator=(const Relationship& other);
+
     void initialize() override;
 
+    void deinitialize() override;
+
+    void new_child_to_reg(const event::BornEntity& event);
 
     void add_agent(entt::entity me);
     /** Get what "me" feel about the other agent */

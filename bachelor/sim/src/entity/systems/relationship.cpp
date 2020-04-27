@@ -6,6 +6,23 @@
 
 namespace cs::system
 {
+Relationship::Relationship(const Relationship& other) : rel_table(other.rel_table), ISystem(other)
+{
+    parents_reg = other.parents_reg.clone();
+}
+
+Relationship& Relationship::operator=(const Relationship& other)
+{
+    if (&other == this)
+    {
+        return *this;
+    }
+    m_context   = other.m_context;
+    rel_table   = other.rel_table;
+    parents_reg = other.parents_reg.clone();
+    return *this;
+}
+
 void Relationship::initialize()
 {
     m_context.dispatcher->sink<event::BornEntity>().connect<&Relationship::new_child_to_reg>(*this);
@@ -26,7 +43,17 @@ void Relationship::deinitialize()
     m_context.dispatcher->sink<event::BornEntity>().disconnect<&Relationship::new_child_to_reg>(*this);
 }
 
+void Relationship::new_child_to_reg(const event::BornEntity& event)
+{
+    auto new_entt = parents_reg.create();
+    parents_reg.visit([this, event, new_entt](uint32_t comp_id) {
+        if (comp_id == entt::type_info<component::Name>::id())
+        {
+            parents_reg.assign<component::Name>(new_entt, m_context.registry->get<component::Name>(event.new_born));
+        }
+    });
 }
+
 void Relationship::add_agent(entt::entity me)
 {
     auto view = m_context.registry->view<component::Relationship>();
