@@ -16,6 +16,7 @@ void Renderer::display()
     m_matrix_ubo.bind(0u);
     m_programinfo_ubo.flush();
     m_programinfo_ubo.bind(2u);
+    m_env_ubo.bind(5u);
     m_sprite_renderer.display();
     m_debug_renderer.display();
 }
@@ -70,6 +71,18 @@ void Renderer::update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2
     m_programinfo_ubo.get().runtime         = runtime;
     m_programinfo_ubo.get().cursor_position = cursorpos;
     m_programinfo_ubo.get().resolution      = resolution;
+}
+
+void Renderer::set_sun_direction(glm::vec3 dir)
+{
+    m_env_ubo.get().sun_direction = glm::normalize(dir);
+    m_env_ubo.flush();
+}
+
+void Renderer::set_sun_color(glm::vec4 col)
+{
+    m_env_ubo.get().sun_color = col;
+    m_env_ubo.flush();
 }
 
 glm::vec3 Renderer::screen_to_world_pos(glm::ivec2 screen_pos, glm::vec2 viewport_size, float desired_z)

@@ -21,6 +21,9 @@ private:
 
     UniformBuffer<ProgramInformation> m_programinfo_ubo{};
 
+    /** Sunlight environment UBO */
+    UniformBuffer<Environment> m_env_ubo{};
+
 public:
     friend Renderer& get_renderer();
 
@@ -67,6 +70,10 @@ public:
     void set_camera_bounds(glm::vec2 bounds);
 
     void update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution);
+
+    void set_sun_direction(glm::vec3 dir);
+
+    void set_sun_color(glm::vec4 col);
 
     /**
      * Convert a screen coordinate to a world position

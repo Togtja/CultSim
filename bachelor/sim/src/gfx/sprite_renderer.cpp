@@ -243,8 +243,6 @@ void SpriteRenderer::init_ubos()
 
     m_material_ubo->bind(1);
     m_material_ubo->flush();
-    m_env_ubo.bind(5);
-    m_env_ubo.flush();
 }
 
 } // namespace cs::gfx

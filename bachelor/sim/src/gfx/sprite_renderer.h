@@ -51,9 +51,6 @@ private:
     /** Materials */
     std::unique_ptr<UniformBuffer<Material, 8>> m_material_ubo{};
 
-    /** Sunlight environment UBO */
-    UniformBuffer<Environment> m_env_ubo{};
-
 public:
     explicit SpriteRenderer(Camera& camera);
 
