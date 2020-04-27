@@ -84,4 +84,20 @@ ISystem* Rendering::clone()
 {
     return new Rendering(m_context);
 }
+
+void Rendering::update_imgui()
+{
+    static glm::vec3 light_dir{.8f, .4f, .2f};
+    static glm::vec3 light_col{7.f, 5.f, 3.f};
+
+    if (ImGui::DragFloat3("Sun Direction", (float*)&light_dir, 0.01f, -1.f, 1.f))
+    {
+        gfx::get_renderer().set_sun_direction(light_dir);
+    }
+
+    if (ImGui::ColorEdit3("Sun Color", (float*)&light_col, ImGuiColorEditFlags_HDR))
+    {
+        gfx::get_renderer().set_sun_color({light_col, 1.f});
+    }
+}
 } // namespace cs::system

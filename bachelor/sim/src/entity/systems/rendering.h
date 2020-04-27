@@ -27,5 +27,8 @@ public:
     void update(float dt) override;
 
     ISystem* clone() override;
+
+    void update_imgui() override;
 };
+
 } // namespace cs::system
