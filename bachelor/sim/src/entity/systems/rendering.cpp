@@ -25,9 +25,10 @@ void Rendering::initialize()
 {
     auto& handler = input::get_input();
     handler.add_context(input::EKeyContext::RenderingSystem);
-    handler.fast_bind_key(input::EKeyContext::RenderingSystem, SDL_SCANCODE_R, input::EAction::ReloadShaders, [this] {
-        m_3d_renderer = std::make_unique<gfx::RaymarchingRenderer>(m_camera);
-    });
+    handler.fast_bind_key(input::EKeyContext::RenderingSystem,
+                          SDL_SCANCODE_R,
+                          input::EAction::ReloadShaders,
+                          [&r = gfx::get_renderer().raymarch()] { r.reload(); });
 }
 
 void Rendering::deinitialize()
@@ -42,42 +43,39 @@ void Rendering::update(float dt)
     auto& registry = *m_context.registry;
 
     /** Apply rotation on sprites from movement */
-    //    registry.view<component::Movement, component::Sprite>().each([](const component::Movement& mov, component::Sprite&
-    //    sprite) {
-    //        sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
-    //    });
+    registry.view<component::Movement, component::Sprite>().each([](const component::Movement& mov, component::Sprite& sprite) {
+        sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
+    });
 
-    //    registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
-    //        [](const component::Sprite& sprite, const component::Position& pos) {
-    //            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
-    //        });
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
 
-    //    registry.view<component::Sprite, component::Position, entt::tag<"layer_1"_hs>>().less(
-    //        [](const component::Sprite& sprite, const component::Position& pos) {
-    //            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
-    //        });
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_1"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
 
-    //    registry.view<component::Sprite, component::Position, entt::tag<"layer_2"_hs>>().less(
-    //        [](const component::Sprite& sprite, const component::Position& pos) {
-    //            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
-    //        });
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_2"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
 
-    //    registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
-    //        [](const component::Sprite& sprite, const component::Position& pos) {
-    //            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
-    //        });
+    registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
+        [](const component::Sprite& sprite, const component::Position& pos) {
+            gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
 
-    //    /** Selected / hovered */
-    //    registry.view<component::Position, entt::tag<"selected"_hs>>().less([](const component::Position& pos) {
-    //        gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {0.f, 1.f, 0.f});
-    //        gfx::get_renderer().debug().draw_rect(pos.position, {15.f, 15.f}, {0.f, 1.f, 0.f});
-    //    });
+    /** Selected / hovered */
+    registry.view<component::Position, entt::tag<"selected"_hs>>().less([](const component::Position& pos) {
+        gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {0.f, 1.f, 0.f});
+        gfx::get_renderer().debug().draw_rect(pos.position, {15.f, 15.f}, {0.f, 1.f, 0.f});
+    });
 
-    //    registry.view<component::Position, entt::tag<"hovered"_hs>>().less([](const component::Position& pos) {
-    //        gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {1.f, 1.f, 0.f});
-    //    });
-
-    m_3d_renderer->display();
+    registry.view<component::Position, entt::tag<"hovered"_hs>>().less([](const component::Position& pos) {
+        gfx::get_renderer().debug().draw_circle(pos.position, 10.f, {1.f, 1.f, 0.f});
+    });
 }
 
 ISystem* Rendering::clone()
