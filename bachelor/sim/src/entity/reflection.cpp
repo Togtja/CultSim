@@ -2,6 +2,9 @@
 #include "entity/components/components.h"
 #include "entity/systems/action.h"
 #include "entity/systems/deletion.h"
+#include "entity/systems/goal.h"
+#include "entity/systems/gob.h"
+#include "entity/systems/gobbas.h"
 #include "entity/systems/health.h"
 #include "entity/systems/inventory.h"
 #include "entity/systems/memory.h"
@@ -84,6 +87,9 @@ void reflect_systems()
     entt::meta<system::Memory>().alias("MemorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Deletion>().alias("DeletionSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Inventory>().alias("InventorySystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::Goal>().alias("GoalSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::GOB>().alias("GOBSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
+    entt::meta<system::GOBBAS>().alias("GOBBASystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
 }
 
 } // namespace cs::meta
