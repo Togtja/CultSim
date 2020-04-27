@@ -229,6 +229,7 @@ void bind_input(sol::state_view lua)
                                       {"PauseMenu", input::EKeyContext::PauseMenu},
                                       {"PreferenceScene", input::EKeyContext::PreferenceScene},
                                       {"EditorScene", input::EKeyContext::EditorScene},
+                                      {"RenderingSystem", input::EKeyContext::RenderingSystem},
                                       {"LoadScenario", input::EKeyContext::LoadScenario}});
 
     lua.new_enum<input::EAction>("EAction",
@@ -244,6 +245,7 @@ void bind_input(sol::state_view lua)
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
                                   {"Pause", input::EAction::Pause},
+                                  {"ReloadShaders", input::EAction::ReloadShaders},
                                   {"Quit", input::EAction::Quit},
                                   {"EscapeScene", input::EAction::EscapeScene}});
 
