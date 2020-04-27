@@ -101,6 +101,7 @@ struct ProgramInformation
     glm::vec2 resolution{};
     glm::vec2 cursor_position{};
     float runtime{};
+    float _pad1;
 };
 
 } // namespace cs::gfx
