@@ -69,11 +69,12 @@ void Reproduction::update(float dt)
                     if (preg.is_egg)
                     {
                         auto egg_pos = m_context.registry->get<component::Position>(e).position;
-                        children.push_back(Child{parent_name, egg_pos, false});
+                        children.push_back(
+                            Child{parent_name, egg_pos, false, parent_name, {preg.parents.first, preg.parents.second}});
                     }
                     else
                     {
-                        children.push_back(Child{parent_name, new_pos, false});
+                        children.push_back(Child{parent_name, new_pos, false, parent_name, preg.parents});
                     }
                 }
             }
@@ -137,7 +138,7 @@ void Reproduction::update(float dt)
                 }
             }
             // Tries to inherit mom's acquired traits
-            if (child.parents.first != entt::null)
+            if (m_context.registry->valid(child.parents.first))
             {
                 if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
                 {
@@ -150,7 +151,8 @@ void Reproduction::update(float dt)
                     }
                 }
             }
-            if (child.parents.second != entt::null)
+
+            if (m_context.registry->valid(child.parents.second))
             {
                 // Tries to inherit dad's acquired traits
                 if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
@@ -170,6 +172,17 @@ void Reproduction::update(float dt)
             // Run the effect of the acquired traits
             effect::affect_traits(child_e, *traits);
         }
+        if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
+        {
+            if (m_context.registry->valid(child.parents.first))
+            {
+                rel_c->parent_1.first = child.parents.first;
+            }
+            if (m_context.registry->valid(child.parents.second))
+            {
+                rel_c->parent_2.first = child.parents.second;
+            }
+        }
     }
 } // namespace cs::system
 
@@ -184,7 +197,7 @@ void Reproduction::delete_father(const event::DeleteEntity& event)
     view.each([&event](component::Pregnancy& preg) {
         if (preg.parents.first == event.entity)
         {
-            preg.parents.second = entt::null;
+            // preg.parents.second = entt::null;
         }
     });
 }

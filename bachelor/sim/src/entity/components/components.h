@@ -289,6 +289,24 @@ struct Relationship
 
     uint8_t self_friend  = 0;
     uint8_t self_romance = 0;
+
+    // Below used for family tree:
+
+    /** parent_1.first is entt id for context registry
+     * parent_1.second is entt id for relationship registry */
+    std::pair<entt::entity, entt::entity> parent_1 = {entt::null, entt::null};
+
+    /** parent_2.first is entt id for context registry
+     * parent_2.second is entt id for relationship registry */
+    std::pair<entt::entity, entt::entity> parent_2 = {entt::null, entt::null};
+
+    // me is entt id for context registry
+    entt::entity old_id = entt::null;
+};
+
+// Only used for the relationship registry
+struct Family
+{
 };
 
 struct AI
