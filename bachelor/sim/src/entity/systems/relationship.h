@@ -13,10 +13,10 @@ class Relationship : public ISystem
 {
 private:
     /** A Table of relationship (To consider, make it a std::pair of uint8) */
-    robin_hood::unordered_map<entt::entity, robin_hood::unordered_map<entt::entity, uint16_t>> rel_table;
+    robin_hood::unordered_map<entt::entity, robin_hood::unordered_map<entt::entity, uint16_t>> m_rel_table;
 
     /** A new registry of every spawned agent */
-    entt::registry parents_reg;
+    entt::registry m_parents_reg;
 
 public:
     using ISystem::ISystem;
