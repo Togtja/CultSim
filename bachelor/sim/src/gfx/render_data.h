@@ -111,4 +111,9 @@ struct ProgramInformation
     float _pad1;
 };
 
+struct SphereShape
+{
+    glm::vec4 position;
+};
+
 } // namespace cs::gfx

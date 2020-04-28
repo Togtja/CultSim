@@ -103,6 +103,7 @@ void Application::update(float dt)
 
 void Application::draw()
 {
+    gfx::get_renderer().raymarch().clear();
     gfx::get_renderer().sprite().clear();
 
     m_scene_manager.draw();

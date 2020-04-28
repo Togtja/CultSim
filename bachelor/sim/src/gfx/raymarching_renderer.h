@@ -1,6 +1,9 @@
 #pragma once
 
 #include "camera.h"
+#include "render_data.h"
+
+#include <vector>
 
 namespace cs::gfx
 {
@@ -13,10 +16,16 @@ private:
     /** Active shader */
     uint32_t m_shader;
 
+    uint32_t m_sphere_buffer;
+
+    std::vector<SphereShape> m_spheres{};
+
 public:
     RaymarchingRenderer(Camera& camera);
 
     ~RaymarchingRenderer() noexcept;
+
+    void clear();
 
     /**
      * Make the renderer display it's data to the screen
@@ -27,6 +36,14 @@ public:
      * Reload the renderer to it's initial state
      */
     void reload();
+
+    /**
+     * Draw a sphere
+     *
+     * @param pos Position to draw it
+     * @param r Radius of sphere
+     */
+    void draw_sphere(const glm::vec3& pos, float r);
 
 private:
     void init();
