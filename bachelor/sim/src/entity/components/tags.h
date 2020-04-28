@@ -43,7 +43,7 @@ inline std::string tag_to_string(ETag tag)
 
     for (unsigned i = 0u; i < tag_names.size(); i++)
     {
-        if (tag & 1 << i)
+        if (tag & 1ULL << i)
         {
             result += " " + tag_names[i];
         }
