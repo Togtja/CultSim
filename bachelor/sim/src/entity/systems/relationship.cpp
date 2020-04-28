@@ -45,11 +45,36 @@ void Relationship::deinitialize()
 
 void Relationship::new_child_to_reg(const event::BornEntity& event)
 {
-    auto new_entt = parents_reg.create();
-    parents_reg.visit([this, event, new_entt](uint32_t comp_id) {
+    auto new_entt = m_parents_reg.create();
+    m_context.registry->visit([this, event, new_entt](uint32_t comp_id) {
         if (comp_id == entt::type_info<component::Name>::id())
         {
-            parents_reg.assign<component::Name>(new_entt, m_context.registry->get<component::Name>(event.new_born));
+            m_parents_reg.assign<component::Name>(new_entt, m_context.registry->get<component::Name>(event.new_born));
+        }
+        if (comp_id == entt::type_info<component::Relationship>::id())
+        {
+            auto rel_c = m_context.registry->get<component::Relationship>(event.new_born);
+            if (rel_c.parent_1.first != entt::null && rel_c.parent_2.first != entt::null)
+            {
+                component::Relationship fam;
+                fam.old_id         = event.new_born;
+                fam.parent_1.first = rel_c.parent_1.first;
+                fam.parent_2.first = rel_c.parent_2.first;
+
+                auto view = m_parents_reg.view<component::Relationship>();
+                view.each([&fam](const component::Relationship& rel_p1) {
+                    if (rel_p1.old_id == fam.parent_1.first)
+                    {
+                        fam.parent_1.second = fam.parent_1.first;
+                    }
+                    if (rel_p1.old_id == fam.parent_2.first)
+                    {
+                        fam.parent_2.second = fam.parent_2.first;
+                    }
+                    // TODO: Solve for first time agents where parents are not in here
+                });
+                m_parents_reg.assign<component::Relationship>(new_entt, fam);
+            }
         }
     });
 }
