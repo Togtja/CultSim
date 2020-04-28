@@ -17,9 +17,9 @@ public:
     std::string m_name{};
     ETag m_tags{};
 
-    std::vector<Action> m_actions{};
-
     Action current_action;
+
+    std::vector<Action> m_actions{};
 
     std::variant<sol::function, std::function<bool(entt::entity, std::string)>> m_run_actions = [this](const entt::entity e,
                                                                                                        std::string& error) {
@@ -41,8 +41,8 @@ public:
                 {
                     if (m_actions[i] == current_action)
                     {
-                        current_action.flags = 0;
-                        current_action       = m_actions[i + 1];
+                        current_action.m_flags = 0;
+                        current_action         = m_actions[i + 1];
                     }
                 }
             }
