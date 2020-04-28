@@ -21,7 +21,7 @@ public:
     float m_required_time{};
     float m_success_chance{};
 
-    uint32_t flags{};
+    uint32_t m_flags{};
 
     sol::function m_action{};
 
@@ -30,26 +30,8 @@ public:
     std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
         return m_required_time;
     };
-
-    Action() = default;
-
-    Action(std::string name,
-           ETag tags,
-           float required_time,
-           float success_chance,
-           sol::function action,
-           sol::function get_goal_change,
-           std::variant<sol::function, std::function<float()>> get_duration) :
-        m_name(name),
-        m_tags(tags),
-        m_required_time(required_time),
-        m_success_chance(success_chance),
-        m_action(action),
-        m_get_goal_change(get_goal_change),
-        m_get_duration(get_duration)
-    {
-    }
 };
+
 inline bool operator==(const Action& lhs, const Action& rhs)
 {
     if (lhs.m_name != rhs.m_name)
