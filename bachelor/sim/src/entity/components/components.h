@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/memories/container.h"
+#include "entity/systems/relationship.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "random_engine.h"
@@ -292,15 +293,13 @@ struct Relationship
 
     // Below used for family tree:
 
-    /** parent_1.first is entt id for context registry
-     * parent_1.second is entt id for relationship registry */
-    std::pair<entt::entity, entt::entity> parent_1 = {entt::null, entt::null};
+    // Mother Ids for Global and Relationship Ids
+    system::ParentEntityIds mom = {entt::null, entt::null};
 
-    /** parent_2.first is entt id for context registry
-     * parent_2.second is entt id for relationship registry */
-    std::pair<entt::entity, entt::entity> parent_2 = {entt::null, entt::null};
+    // Father Ids for Global and Relationship Ids
+    system::ParentEntityIds dad = {entt::null, entt::null};
 
-    // me is entt id for context registry
+    // old_id is entt id for context registry
     entt::entity old_id = entt::null;
 };
 
