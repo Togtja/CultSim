@@ -11,13 +11,13 @@ namespace cs::system
 {
 struct ParentEntityIds
 {
-    entt::entity global_registry_id;
-    entt::entity relationship_registry_id;
+    entt::entity global_registry_id       = entt::null;
+    entt::entity relationship_registry_id = entt::null;
 };
 struct ParentName
 {
-    entt::entity relationship_registry_id;
-    std::string name;
+    ParentEntityIds ids{};
+    std::string name{};
 };
 struct BothParentName
 {
