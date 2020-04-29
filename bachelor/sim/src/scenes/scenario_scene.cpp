@@ -1061,12 +1061,19 @@ void ScenarioScene::draw_selected_entity_information_ui()
             // Non-clickable headers
             cs_auto_table_headers();
 
-            for (const auto& goal : goal->goals)
+            for (const auto goal : goal->goals)
             {
                 ImGui::TableNextCell();
                 ImGui::Text("%s", goal.m_name.c_str());
                 ImGui::TableNextCell();
-                ImGui::Text("%3.1f", goal.m_weight);
+                if (goal.m_weight_function.index() == 0)
+                {
+                    ImGui::Text("%3.1f", std::get<sol::function>(goal.m_weight_function)().get<float>());
+                }
+                else
+                {
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal.m_weight_function)());
+                }
             }
             ImGui::EndTable();
         }
@@ -1077,18 +1084,18 @@ void ScenarioScene::draw_selected_entity_information_ui()
         if (action->current_action_sequence.m_name != "")
         {
             ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
-            if (action->current_action_sequence.current_action->m_name != "")
+            if (action->current_action_sequence.current_action.m_name != "")
             {
                 int action_index = 0;
                 for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
                 {
-                    if (action->current_action_sequence.m_actions[i].get() == action->current_action_sequence.current_action)
+                    if (action->current_action_sequence.m_actions[i] == action->current_action_sequence.current_action)
                     {
                         action_index = i;
                     }
                 }
                 ImGui::Text("Current Action: %s (Action %d out of %d)",
-                            action->current_action_sequence.current_action->m_name.c_str(),
+                            action->current_action_sequence.current_action.m_name.c_str(),
                             action_index,
                             action->current_action_sequence.m_actions.size());
             }
