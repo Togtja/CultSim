@@ -52,7 +52,10 @@ public:
      * @note Assumes that the entity has both a relationship and name component
      */
     entt::entity add_to_reg(const entt::entity e);
+
     void new_child_to_reg(const event::BornEntity& event);
+
+    void delete_father(const event::DeleteEntity& event);
 
     void add_agent(entt::entity me);
     /** Get what "me" feel about the other agent */

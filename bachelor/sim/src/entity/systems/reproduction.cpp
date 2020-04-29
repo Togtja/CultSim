@@ -6,15 +6,6 @@
 
 namespace cs::system
 {
-void Reproduction::initialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(*this);
-}
-
-void Reproduction::deinitialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Reproduction::delete_father>(*this);
-}
 void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(Reproduction System);
@@ -191,15 +182,5 @@ ISystem* Reproduction::clone()
     return new Reproduction(m_context);
 }
 
-void Reproduction::delete_father(const event::DeleteEntity& event)
-{
-    auto view = m_context.registry->view<component::Pregnancy>();
-    view.each([&event](component::Pregnancy& preg) {
-        if (preg.parents.first == event.entity)
-        {
-            // preg.parents.second = entt::null;
-        }
-    });
-}
 
 } // namespace cs::system
