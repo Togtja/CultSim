@@ -62,6 +62,8 @@ public:
     /** */
     void add_romance(entt::entity me, entt::entity other, uint8_t amount);
 
+    BothParentName get_parent(entt::entity me, bool is_regrel_nr = false);
+
     void update(float dt) override;
 
     ISystem* clone() override;

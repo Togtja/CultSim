@@ -137,6 +137,44 @@ void Relationship::add_romance(entt::entity me, entt::entity other, uint8_t amou
     }
 }
 
+BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
+{
+    if (is_regrel_nr)
+    {
+        const auto& rel = m_parents_reg.get<component::Relationship>(me);
+        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
+        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
+        return {{rel.mom.relationship_registry_id, par1_name.name}, {rel.dad.relationship_registry_id, par2_name.name}};
+    }
+    auto view = m_parents_reg.view<component::Relationship>();
+    for (auto&& ent : view)
+    {
+        const auto& rel = m_parents_reg.get<component::Relationship>(ent);
+        if (rel.old_id == me)
+        {
+            if (m_parents_reg.valid(rel.mom.relationship_registry_id) && m_parents_reg.valid(rel.dad.relationship_registry_id))
+            {
+                auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
+                auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
+                if (par1_name.name.empty())
+                {
+                    par1_name.name = par1_name.entity_type;
+                }
+                if (par2_name.name.empty())
+                {
+                    par2_name.name = par2_name.entity_type;
+                }
+                return {{rel.mom.relationship_registry_id, par1_name.name}, {rel.dad.relationship_registry_id, par2_name.name}};
+            }
+            else
+            {
+                // The parents are First spawners
+            }
+        }
+    }
+    return {{entt::null, ""}, {entt::null, ""}};
+}
+
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);
