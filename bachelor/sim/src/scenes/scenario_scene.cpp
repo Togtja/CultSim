@@ -1093,7 +1093,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
                 else
                 {
-                    ImGui::Text("My Dad is Simulation");
+                    ImGui::Text("My Dad is the Simulation");
                 }
             }
         }
