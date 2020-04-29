@@ -3,16 +3,24 @@
 goals = {
 	eat = {
     name = "eat",
-    weight = 0,
     age = 0,
     tags = ETag.Food,
     weight_function = function()
+        return age*age
     end
 	,
     change_over_time = function(dt)
+        return ((age+dt)*(age+dt)) - (age*age)
     end
 	,
     get_discontentment = function(value)
+        return value * value
     end
     }
 }
+
+
+
+
+
+

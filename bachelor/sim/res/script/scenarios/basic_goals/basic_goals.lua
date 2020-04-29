@@ -36,18 +36,10 @@ scenario.init = function()
         local deer = cultsim.spawn("deer")
 
         -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
-        local need_comp = cultsim.get_component(deer, component.need)
-        for i, need in ipairs(need_comp.required_needs) do
-            need.status = random:normal(75.0, 25.0)
-        end
+       
         local name = cultsim.get_component(deer, component.name)
-        if(cultsim.get_component(deer, component.reproduction).sex == 1) then
-            local genname = cultsim.generate_name("germanic", true)
-            name.name = string.format("%s %s", genname.first, genname.last)
-        else 
-            local genname = cultsim.generate_name("germanic", false)
-            name.name = string.format("%s %s", genname.first, genname.last)
-        end
+        local genname = cultsim.generate_name("germanic", true)
+        name.name = string.format("%s %s", genname.first, genname.last)
     end
 
     -- Spawn 75 Food Sources and Water Sources

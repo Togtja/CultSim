@@ -29,7 +29,7 @@ public:
         current_action.m_action(e, error);
 
         /**We cannot complete the action*/
-        if (error == "")
+        if (error != "")
         {
             if (current_action == m_actions.back())
             {

@@ -19,39 +19,12 @@ entity = {
     TagComponent = {
         tags = ETag.Avoidable | ETag.Creature
     },
-    NeedComponent = {
-        -- Corresponds to entires in the needs.lua file
-        required_needs = { needs.hunger, needs.thirst, needs.sleep},
-        leisure_needs = { needs.stockpile, needs.reproduce, needs.steal }
-    },
-    ReproductionComponent = {
-        sex = random:randint(0, 1),
-        mean_offspring = 2,
-        offspring_deviation = 1,
-        average_gestation = 90,
-        gestation_deviation = 5
-    },
-    StrategyComponent = {
-        -- Corresponds to entries in the strategies.lua file
-        strategies = {strategies.forage_for_food, strategies.steal_food, strategies.find_food, strategies.consume_from_backpack,strategies.drink_from_backpack, strategies.find_water, strategies.sleep_on_ground, strategies.find_mate, strategies.loot_food, strategies.loot_water}
-    },
-    HealthComponent = {
-        health = 100.0,
-        tickdown_rate = 1.0,
-        vital_needs = ETag.Food | ETag.Drink | ETag.Sleep
-    },
-    InventoryComponent = {
-        max_size = 5
-    },
-    MemoryComponent = {
-        max_memories = 10,
-        max_retention_time = 1000.0,
-        allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location },
-    },
-    AgeComponent = 
-    {
-        life_expectancy = 3000.0
-    },
+    GoalComponent = {
+     goals = {goals.eat}
+	},
+    ActionComponent = {
+     actions = {action_sequences.find_food}
+	},
     NameComponent = 
     {
      entity_type = "Deer"

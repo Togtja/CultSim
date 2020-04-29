@@ -5,14 +5,6 @@ action_sequences = {
 	find_food = {
 	name = "find_food",
     tags = ETag.Food | ETag.Consume,
-    actions = {actions.find_and_eat},
-    run_actions = function(entity, error)
-    end
-    ,
-    get_duration = function()
-    end
-    ,
-    get_goal_change = function(goal)
-    end
+    actions = {actions.find_and_eat}
 	}
 }
