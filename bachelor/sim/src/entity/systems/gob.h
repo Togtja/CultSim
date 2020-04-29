@@ -14,9 +14,7 @@ class GOB : public ISystem
 
     void update(float dt) override;
 
-    gob::Action_Sequence choose_action(std::vector<gob::Action_Sequence> actions, std::vector<gob::Goal> goals);
-
-    float calculate_discontentment(gob::Action_Sequence action, std::vector<gob::Goal> goals);
+    float calculate_discontentment(const gob::Action_Sequence& action, const std::vector<gob::Goal>& goals);
 
     ISystem* clone() override;
 };

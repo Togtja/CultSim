@@ -12,7 +12,8 @@ void GOB::update(float dt)
 
     auto view = registry.view<component::Goal, component::Action>();
     view.each([this, dt](const component::Goal& goal, component::Action& action) {
-        if (action.current_action_sequence.m_name == "")
+        spdlog::get("agent")->warn("Action sequence name = {}",action.current_action_sequence.m_name);
+        if (action.current_action_sequence.m_name.empty())
         {
             auto best_action = action.actions[0];
             auto best_value  = calculate_discontentment(action.actions[0], goal.goals);
@@ -31,7 +32,7 @@ void GOB::update(float dt)
     });
 }
 
-float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob::Goal> goals)
+float GOB::calculate_discontentment(const gob::Action_Sequence& action,const std::vector<gob::Goal>& goals)
 {
     auto discontentment = 0.f;
 
@@ -40,7 +41,7 @@ float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob
         auto value = 0.f;
         if (goal.m_weight_function.index() == 0)
         {
-            value += std::get<sol::function>(goal.m_weight_function)().get<float>();
+            value += std::get<sol::function>(goal.m_weight_function)(goal).get<float>();
         }
         else
         {
@@ -53,7 +54,7 @@ float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob
         }
         else
         {
-            value += std::get<std::function<float(const gob::Goal)>>(action.m_get_goal_change)(goal);
+            value += std::get<std::function<float(const gob::Action_Sequence&,const gob::Goal&)>>(action.m_get_goal_change)(action,goal);
         }
 
         auto time_value = 0;
@@ -63,12 +64,12 @@ float GOB::calculate_discontentment(gob::Action_Sequence action, std::vector<gob
         }
         else
         {
-            time_value += std::get<std::function<float()>>(action.m_get_duration)();
+            time_value += std::get<std::function<float(const gob::Action_Sequence&)>>(action.m_get_duration)(action);
         }
 
         if (goal.m_change_over_time.index() == 0)
         {
-            value += std::get<sol::function>(goal.m_change_over_time)(time_value).get<float>();
+            value += std::get<sol::function>(goal.m_change_over_time)(goal, time_value).get<float>();
         }
         else
         {

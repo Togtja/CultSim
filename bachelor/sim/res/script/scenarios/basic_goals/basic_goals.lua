@@ -29,7 +29,6 @@ scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
 scenario.init = function()
-    cultsim.connect("ScenarioLoaded", function(event) log.info("Scenario loaded.") end)
 
     -- Spawn 100 Deer
     for i=1,100 do
@@ -45,20 +44,13 @@ scenario.init = function()
     -- Spawn 75 Food Sources and Water Sources
     for i=1,75 do
         cultsim.spawn("food_source")
-        cultsim.spawn("water_source")
     end
 
     -- Create some food / water initially
     for i=1,50 do
-        cultsim.spawn_at("water", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
         cultsim.spawn_at("food", Vec2:new(random:normal(0.0, 70.0), random:normal(0.0, 70.0)))
     end
 
-    --Create some food / water containers
-    for i = 1, 10 do
-        cultsim.spawn("food_container")
-        cultsim.spawn("water_container")
-    end
 end
 
 -- This function is called every frame of the simulation

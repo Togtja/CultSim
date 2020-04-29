@@ -23,13 +23,12 @@ public:
 
     std::variant<sol::function, std::function<bool(entt::entity, std::string&)>> m_run_actions = [this](const entt::entity e,
                                                                                                         std::string& error) {
-        bool finished = false;
 
         /**As long as we have not completed our action, keep working on it*/
-        current_action.m_action(e, error);
+        auto finished = current_action.m_action(current_action,e, error);
 
         /**We cannot complete the action*/
-        if (error != "")
+        if (!error.empty())
         {
             if (current_action == m_actions.back())
             {
@@ -45,6 +44,7 @@ public:
                         current_action         = m_actions[i + 1];
                     }
                 }
+                error.clear();
             }
         }
         /**We have completed the action*/
@@ -67,29 +67,30 @@ public:
                 return false;
             }
         }
+        return false;
     };
 
-    std::variant<sol::function, std::function<float(const Goal)>> m_get_goal_change = [this](const Goal goal) {
+    std::variant<sol::function, std::function<float(const Action_Sequence&, const Goal&)>> m_get_goal_change = [this](const Action_Sequence& action_sequence,const Goal& goal) {
         /**-1 for undefined */
         float result = 0;
-        for (auto& action : m_actions)
+        for (auto& action : action_sequence.m_actions)
         {
             result += action.m_get_goal_change(goal).get<float>();
         }
         return result;
     };
 
-    std::variant<sol::function, std::function<float()>> m_get_duration = [this]() {
+    std::variant<sol::function, std::function<float(const Action_Sequence&)>> m_get_duration = [this](const Action_Sequence& action_sequence) {
         float result = 0;
-        for (auto& action : m_actions)
+        for (auto& action : action_sequence.m_actions)
         {
             if (action.m_get_duration.index() == 0)
             {
-                result += std::get<sol::function>(action.m_get_duration)().get<float>();
+                result += std::get<sol::function>(action.m_get_duration)(action).get<float>();
             }
             else
             {
-                result += std::get<std::function<float()>>(action.m_get_duration)();
+                result += std::get<std::function<float(const Action&)>>(action.m_get_duration)(action);
             }
         }
         return result;

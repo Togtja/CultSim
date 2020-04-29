@@ -7,18 +7,18 @@ actions = {
      flags = 0,
      required_time = 30,
      success_chance = 0.8,
-     action = function(entity, error)
+     action = function(self,entity, error)
         
         --We are not by the desired type of entity
         
-        if  flags ~ 1 then
+        if  self.flags ~ 1 then
             for i,target in ipairs(cultsim.get_component(entity,component.vision).seen) do
                 --if we find our target
                 if cultsim.get_component(target,component.tags).tags & ETag.Food then
                     local t_pos = cultsim.get_component(target,component.position).position
                     local e_pos = cultsim.get_component(target,component.position).position
                    if(cultsim.distance(t_pos,e_pos,10.0))then
-                        flags = (flags | 1)
+                        self.flags = (self.flags | 1)
                         return false
                    end
                    if cultsim.get_component(entity,component.movement).desired_position.empty() then
@@ -74,7 +74,7 @@ actions = {
         if(goal.tags & ETag.Food)then
             return -50.0
         end
-        return 0
+        return 0.0
      end
 	}
 }

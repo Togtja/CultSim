@@ -5,12 +5,12 @@ goals = {
     name = "eat",
     age = 0,
     tags = ETag.Food,
-    weight_function = function()
-        return age*age
+    weight_function = function(self)
+        return self.age*self.age
     end
 	,
-    change_over_time = function(dt)
-        return ((age+dt)*(age+dt)) - (age*age)
+    change_over_time = function(self,dt)
+        return ((self.age+dt)*(self.age+dt)) - (self.age*self.age)
     end
 	,
     get_discontentment = function(value)

@@ -125,7 +125,7 @@ bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 
 bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto actions                       = reg.assign_or_replace<component::Action>(e);
+    auto& actions                       = reg.assign_or_replace<component::Action>(e);
     const auto& action_sequence_tables = table["actions"].get_or<std::vector<sol::table>>({});
     for (const auto& action_sequence_table : action_sequence_tables)
     {
@@ -133,19 +133,6 @@ bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table tabl
             action_sequence_table["name"].get<std::string>(),
             action_sequence_table["tags"].get<ETag>(),
         };
-
-        auto current_action            = action_sequence_table["current_action"].get<sol::table>();
-        action_sequence.current_action = gob::Action{current_action["name"].get<std::string>(),
-                                                     current_action["tags"].get<ETag>(),
-                                                     current_action["required_time"].get<float>(),
-                                                     current_action["success_chance"].get<float>(),
-                                                     current_action["flags"].get<uint32_t>(),
-                                                     current_action["action"].get<sol::function>(),
-                                                     current_action["get_goal_change"].get<sol::function>()};
-        if (current_action["get_duration"].get_type() == sol::type::function)
-        {
-            action_sequence.current_action.m_get_duration = current_action["get_duration"].get<sol::function>();
-        }
 
         for (const auto& action_table : action_sequence_table["actions"].get_or<std::vector<sol::table>>({}))
         {
@@ -187,7 +174,7 @@ bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table tabl
 
 bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto goal_comp    = reg.assign_or_replace<component::Goal>(e);
+    auto& goal_comp    = reg.assign_or_replace<component::Goal>(e);
     const auto& goals = table["goals"].get_or<std::vector<sol::table>>({});
     for (const auto& goal_table : goals)
     {

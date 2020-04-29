@@ -17,13 +17,13 @@ void Goal::update(float dt)
             current_goal.m_age += dt;
         }
         // Puts the most pressing goal in the back
-        std::sort(goal.goals.begin(), goal.goals.end(), [](const gob::Goal lhs, const gob::Goal rhs) {
+        std::sort(goal.goals.begin(), goal.goals.end(), [](const gob::Goal& lhs, const gob::Goal& rhs) {
             float lhs_v = 0;
             float rhs_v = 0;
 
             if (lhs.m_weight_function.index() == 0)
             {
-                lhs_v = std::get<sol::function>(lhs.m_weight_function)().get<float>();
+                lhs_v = std::get<sol::function>(lhs.m_weight_function)(lhs).get<float>();
             }
             else
             {
@@ -32,7 +32,7 @@ void Goal::update(float dt)
 
             if (rhs.m_weight_function.index() == 0)
             {
-                rhs_v = std::get<sol::function>(rhs.m_weight_function)().get<float>();
+                rhs_v = std::get<sol::function>(rhs.m_weight_function)(rhs).get<float>();
             }
             else
             {
