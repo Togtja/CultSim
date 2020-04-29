@@ -185,7 +185,13 @@ void bind_components(sol::state_view lua)
                                           "speed_multi",
                                           &component::Movement::speed_multi);
 
-    lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
+    lua.new_usertype<component::Vision>("VisionComponent",
+                                        "seen",
+                                        &component::Vision::seen,
+                                        "radius",
+                                        &component::Vision::radius,
+                                        "fov",
+                                        &component::Vision::fov);
 
     lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
     lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);

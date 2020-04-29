@@ -1,4 +1,5 @@
 #include "scenario_scene.h"
+#include "ai/path_finding.h"
 #include "common_helpers.h"
 #include "constants.h"
 #include "debug/native_collectors.h"
@@ -708,6 +709,21 @@ void ScenarioScene::bind_scenario_lua_functions()
             tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
         }
     });
+
+    /** Move to position */
+    cultsim.set_function("goto", [this](entt::entity e, glm::vec3 goal) {
+        auto* movement = m_registry.try_get<component::Movement>(e);
+        auto* position = m_registry.try_get<component::Position>(e);
+        if (movement && position)
+        {
+            if (!ai::find_path_astar(position->position, goal, movement->desired_position, m_scenario.bounds))
+            {
+                spdlog::get("agent")->debug("could not create path to target");
+            };
+        }
+    });
+
+    cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b, float threshold) { return close_enough(a, b, threshold); });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
