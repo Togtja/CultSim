@@ -711,7 +711,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Move to position */
-    cultsim.set_function("goto", [this](entt::entity e, glm::vec3 goal) {
+    cultsim.set_function("move_to", [this](entt::entity e, glm::vec3 goal) {
         auto* movement = m_registry.try_get<component::Movement>(e);
         auto* position = m_registry.try_get<component::Position>(e);
         if (movement && position)
