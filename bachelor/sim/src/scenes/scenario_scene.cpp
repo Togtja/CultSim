@@ -14,6 +14,7 @@
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
+#include "entity/systems/relationship.h"
 #include "entity/systems/rendering.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
@@ -926,7 +927,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits] =
+    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
         m_registry.try_get<component::Need,
                            component::Health,
                            component::Strategy,
@@ -935,7 +936,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
                            component::Tags,
                            component::Memory,
                            component::Pregnancy,
-                           component::Traits>(selection_info.selected_entity);
+                           component::Traits,
+                           component::Relationship>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -1065,6 +1067,36 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
+    }
+
+    if (relship)
+    {
+        system::Relationship* test;
+        for (auto&& system : m_active_systems)
+        {
+            const auto rel = dynamic_cast<system::Relationship*>(system.get());
+            if (rel)
+            {
+                const auto parents = rel->get_parent(selection_info.selected_entity);
+                if (parents.mom.relationship_registry_id != entt::null)
+                {
+                    ImGui::Text("My Mom is %s", parents.mom.name.c_str());
+                }
+                else
+                {
+                    ImGui::Text("My Mom is the Simulation");
+                }
+                if (parents.dad.relationship_registry_id != entt::null)
+                {
+                    ImGui::Text("My Dad is %s", parents.dad.name.c_str());
+                }
+
+                else
+                {
+                    ImGui::Text("My Dad is Simulation");
+                }
+            }
+        }
     }
 
     ImGui::End();
