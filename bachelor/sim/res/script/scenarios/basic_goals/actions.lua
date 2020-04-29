@@ -11,7 +11,7 @@ actions = {
         
         --We are not by the desired type of entity
         
-        if !(flags & 1) then
+        if  flags ~ 1 then
             for i,target in ipairs(cultsim.get_component(entity,component.vision).seen) do
                 --if we find our target
                 if cultsim.get_component(target,component.tags).tags & ETag.Food then
@@ -21,8 +21,8 @@ actions = {
                         flags = (flags | 1)
                         return false
                    end
-                   if !cultsim.get_component(entity,component.movement).desired_position then
-                        cultsim.goto(entity,pos)
+                   if cultsim.get_component(entity,component.movement).desired_position.empty() then
+                        cultsim.move_to(entity,t_pos)
                         return false
                    end
                 end
@@ -32,8 +32,8 @@ actions = {
 
             local x = random.uniform(-scenario.bounds.x,scenario.bounds.x)
             local y = random.uniform(-scenario.bounds.y,scenario.bounds.y)
-            local z = 0.f
-            cultsim.goto(entity,Vec3:new(x,y,z))
+            local z = 0.0
+            cultsim.move_to(entity,Vec3:new(x,y,z))
             return
         end
 
@@ -44,7 +44,8 @@ actions = {
                 
                 for i,goal in ipairs(cultsim.get_component(entity,component.goal).goals)do
                     if goal.tags & ETag.Food then
-                    goals[i].weight -= 50.0
+                        goals[i].weight = goals[i].weight - 50.0
+                    end
                 end
 
                 cultsim.kill(target)
@@ -62,7 +63,8 @@ actions = {
         --If we can already see our target, we will complete the action near instantly
         for i,target in pairs(cultsim.get_component(entity,component.vision).seen)do
             if(cultsim.get_component(target,component.tags).tags & ETag.Food) then
-            return 1.0
+                return 1.0
+            end
         end
         --If not, it will take on average ((number of spaces to check)/(speed to check 1 space))/2 to find food (Probably wildly off, but this is just a demo anyway)
         return (((scenario.bounds.x*2) * (scenario.bounds.y*2)) / (cultsim.get_component(entity,component.movement).speed * cultsim.get_component(entity,component.movement).speed_multi))/2
