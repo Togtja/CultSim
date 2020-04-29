@@ -160,12 +160,17 @@ void Relationship::add_romance(entt::entity me, entt::entity other, uint8_t amou
 
 BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
 {
+    BothParentName ret;
     if (is_regrel_nr)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(me);
         auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
         auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
-        return {{rel.mom.relationship_registry_id, par1_name.name}, {rel.dad.relationship_registry_id, par2_name.name}};
+        ret.mom.name    = par1_name.name;
+        ret.dad.name    = par2_name.name;
+        ret.mom.ids     = rel.mom;
+        ret.dad.ids     = rel.dad;
+        return ret;
     }
     auto view = m_parents_reg.view<component::Relationship>();
     for (auto&& ent : view)
@@ -185,7 +190,11 @@ BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
                 {
                     par2_name.name = par2_name.entity_type;
                 }
-                return {{rel.mom.relationship_registry_id, par1_name.name}, {rel.dad.relationship_registry_id, par2_name.name}};
+                ret.mom.name = par1_name.name;
+                ret.dad.name = par2_name.name;
+                ret.mom.ids  = rel.mom;
+                ret.dad.ids  = rel.dad;
+                return ret;
             }
             else
             {
@@ -193,7 +202,7 @@ BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
             }
         }
     }
-    return {{entt::null, ""}, {entt::null, ""}};
+    return ret;
 }
 
 void Relationship::update(float dt)
