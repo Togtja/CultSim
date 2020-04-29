@@ -184,7 +184,6 @@ bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table tabl
     }
     return true;
 }
-} // namespace detail
 
 bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -294,7 +293,7 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
         repl.gestation_deviation      = table["gestation_deviation"].get<float>();
     }
     return true;
-} // namespace detail
+}
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -406,6 +405,7 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
     return true;
 }
 
+} // namespace detail
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)
 {
     auto out = spawn_entity(reg, lua, entity);
