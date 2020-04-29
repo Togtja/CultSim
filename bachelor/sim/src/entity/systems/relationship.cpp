@@ -43,6 +43,18 @@ void Relationship::deinitialize()
     m_context.dispatcher->sink<event::BornEntity>().disconnect<&Relationship::new_child_to_reg>(*this);
 }
 
+entt::entity Relationship::add_to_reg(const entt::entity e)
+{
+    auto new_e        = m_parents_reg.create();
+    const auto name_c = m_context.registry->get<component::Name>(e);
+    m_parents_reg.assign<component::Name>(new_e, name_c.entity_type, name_c.name);
+
+    auto relship_comp   = m_context.registry->get<component::Relationship>(e);
+    relship_comp.old_id = e;
+    m_parents_reg.assign<component::Relationship>(new_e, relship_comp);
+    return new_e;
+}
+
 void Relationship::new_child_to_reg(const event::BornEntity& event)
 {
     auto new_entt = m_parents_reg.create();
@@ -73,23 +85,13 @@ void Relationship::new_child_to_reg(const event::BornEntity& event)
         if (fam.mom.relationship_registry_id == entt::null)
         {
             // Mom is a first gen
-            auto mom_entt         = m_parents_reg.create();
-            const auto mom_name_c = m_context.registry->get<component::Name>(fam.mom.global_registry_id);
-            m_parents_reg.assign<component::Name>(mom_entt, mom_name_c.entity_type, mom_name_c.name);
-
-            auto mom_relship_comp = m_context.registry->get<component::Relationship>(fam.mom.global_registry_id);
-            m_parents_reg.assign<component::Relationship>(mom_entt, mom_relship_comp);
+            auto mom_entt                    = add_to_reg(fam.mom.global_registry_id);
             fam.mom.relationship_registry_id = mom_entt;
         }
         if (fam.dad.relationship_registry_id == entt::null)
         {
             // Dad is a first gen
-            auto dad_entt         = m_parents_reg.create();
-            const auto dad_name_c = m_context.registry->get<component::Name>(fam.dad.global_registry_id);
-            m_parents_reg.assign<component::Name>(dad_entt, dad_name_c.entity_type, dad_name_c.name);
-
-            auto dad_relship_comp = m_context.registry->get<component::Relationship>(fam.dad.global_registry_id);
-            m_parents_reg.assign<component::Relationship>(dad_entt, dad_relship_comp);
+            auto dad_entt                    = add_to_reg(fam.dad.global_registry_id);
             fam.dad.relationship_registry_id = dad_entt;
         }
         m_parents_reg.assign<component::Relationship>(new_entt, fam);

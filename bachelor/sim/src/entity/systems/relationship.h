@@ -48,6 +48,10 @@ public:
 
     void deinitialize() override;
 
+    /**
+     * @note Assumes that the entity has both a relationship and name component
+     */
+    entt::entity add_to_reg(const entt::entity e);
     void new_child_to_reg(const event::BornEntity& event);
 
     void add_agent(entt::entity me);
