@@ -176,11 +176,11 @@ void Reproduction::update(float dt)
         {
             if (m_context.registry->valid(child.parents.first))
             {
-                rel_c->parent_1.first = child.parents.first;
+                rel_c->mom.global_registry_id = child.parents.first;
             }
             if (m_context.registry->valid(child.parents.second))
             {
-                rel_c->parent_2.first = child.parents.second;
+                rel_c->dad.global_registry_id = child.parents.second;
             }
         }
     }
