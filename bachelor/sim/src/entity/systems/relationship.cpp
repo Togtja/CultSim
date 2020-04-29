@@ -50,27 +50,48 @@ void Relationship::new_child_to_reg(const event::BornEntity& event)
     const auto name_c = m_context.registry->get<component::Name>(event.new_born);
     m_parents_reg.assign<component::Name>(new_entt, name_c.entity_type, name_c.name);
 
-    auto relship_comp = m_context.registry->try_get<component::Relationship>(event.new_born);
-    if (relship_comp && relship_comp->mom.global_registry_id != entt::null && relship_comp->dad.global_registry_id != entt::null)
+    auto relship_comp = m_context.registry->get<component::Relationship>(event.new_born);
+    if (relship_comp.mom.global_registry_id != entt::null && relship_comp.dad.global_registry_id != entt::null)
     {
         component::Relationship fam{};
         fam.old_id                 = event.new_born;
-        fam.mom.global_registry_id = relship_comp->mom.global_registry_id;
-        fam.dad.global_registry_id = relship_comp->dad.global_registry_id;
+        fam.mom.global_registry_id = relship_comp.mom.global_registry_id;
+        fam.dad.global_registry_id = relship_comp.dad.global_registry_id;
 
         auto view = m_parents_reg.view<component::Relationship>();
         view.each([&fam](entt::entity e, const component::Relationship& relship_comp_parent) {
             if (relship_comp_parent.old_id == fam.mom.global_registry_id)
             {
                 // Set my relationship component to have my parents relationship registry ID/entt
-                fam.mom.global_registry_id = e;
+                fam.mom.relationship_registry_id = e;
             }
             if (relship_comp_parent.old_id == fam.dad.global_registry_id)
             {
-                fam.dad.global_registry_id = e;
+                fam.dad.relationship_registry_id = e;
             }
-            // TODO: Solve for first time agents where parents are not in here
         });
+        if (fam.mom.relationship_registry_id == entt::null)
+        {
+            // Mom is a first gen
+            auto mom_entt         = m_parents_reg.create();
+            const auto mom_name_c = m_context.registry->get<component::Name>(fam.mom.global_registry_id);
+            m_parents_reg.assign<component::Name>(mom_entt, mom_name_c.entity_type, mom_name_c.name);
+
+            auto mom_relship_comp = m_context.registry->get<component::Relationship>(fam.mom.global_registry_id);
+            m_parents_reg.assign<component::Relationship>(mom_entt, mom_relship_comp);
+            fam.mom.relationship_registry_id = mom_entt;
+        }
+        if (fam.dad.relationship_registry_id == entt::null)
+        {
+            // Dad is a first gen
+            auto dad_entt         = m_parents_reg.create();
+            const auto dad_name_c = m_context.registry->get<component::Name>(fam.dad.global_registry_id);
+            m_parents_reg.assign<component::Name>(dad_entt, dad_name_c.entity_type, dad_name_c.name);
+
+            auto dad_relship_comp = m_context.registry->get<component::Relationship>(fam.dad.global_registry_id);
+            m_parents_reg.assign<component::Relationship>(dad_entt, dad_relship_comp);
+            fam.dad.relationship_registry_id = dad_entt;
+        }
         m_parents_reg.assign<component::Relationship>(new_entt, fam);
     }
 }
