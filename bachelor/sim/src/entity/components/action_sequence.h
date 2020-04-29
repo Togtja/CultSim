@@ -21,8 +21,8 @@ public:
 
     std::vector<Action> m_actions{};
 
-    std::variant<sol::function, std::function<bool(entt::entity, std::string)>> m_run_actions = [this](const entt::entity e,
-                                                                                                       std::string& error) {
+    std::variant<sol::function, std::function<bool(entt::entity, std::string&)>> m_run_actions = [this](const entt::entity e,
+                                                                                                        std::string& error) {
         bool finished = false;
 
         /**As long as we have not completed our action, keep working on it*/
