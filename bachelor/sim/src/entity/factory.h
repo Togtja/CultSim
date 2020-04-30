@@ -1,18 +1,20 @@
 #pragma once
 
-#include <string_view>
-
+#include "components/components.h"
 #include <entt/entity/registry.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <robin_hood.h>
 #include <sol/state_view.hpp>
 #include <sol/table.hpp>
+#include <string_view>
 
 namespace cs
 {
 namespace detail
 {
+component::detail::Trait get_trait(sol::table traits);
+
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_movement_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table table);

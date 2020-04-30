@@ -1,15 +1,16 @@
 #include "lua_type_bindings.h"
+#include "debug/native_collectors.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
+#include "entity/name_generator.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
-#include "entity/name_generator.h"
-#include "debug/native_collectors.h"
+
 
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
@@ -170,6 +171,28 @@ void bind_components(sol::state_view lua)
                                       &component::Name::entity_type,
                                       "name",
                                       &component::Name::name);
+
+    lua.new_usertype<component::detail::Trait>("Trait",
+                                               "name",
+                                               &component::detail::Trait::name,
+                                               "desc",
+                                               &component::detail::Trait::desc,
+                                               "can_inherit",
+                                               &component::detail::Trait::can_inherit,
+                                               "inherit_chance",
+                                               &component::detail::Trait::inherit_chance,
+                                               "can_mutate",
+                                               &component::detail::Trait::can_mutate,
+                                               "mutate_chance",
+                                               &component::detail::Trait::mutate_chance,
+                                               "attain",
+                                               &component::detail::Trait::attain,
+                                               "lose",
+                                               &component::detail::Trait::lose,
+                                               "affect",
+                                               &component::detail::Trait::affect,
+                                               "unaffect",
+                                               &component::detail::Trait::remove_affect);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
