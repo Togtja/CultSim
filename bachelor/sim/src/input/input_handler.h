@@ -25,6 +25,7 @@ enum class EKeyContext
     PreferenceScene,
     EditorScene,
     LoadScenario,
+    RenderingSystem,
 
     Count
 };
@@ -49,6 +50,8 @@ inline std::string key_context_to_string(const EKeyContext context)
         case EKeyContext::PreferenceScene: return "PreferenceScene";
         case EKeyContext::EditorScene: return "EditorScene";
         case EKeyContext::LoadScenario: return "LoadScenario";
+        case EKeyContext::RenderingSystem: return "RenderingSystem";
+
         default: return "Error: Invalid Context (Consider adding it to_string)";
     }
 }
@@ -75,6 +78,9 @@ enum class EAction
     Pause,
     Quit,
     EscapeScene,
+    ReloadShaders,
+    SetMode2D,
+    SetMode3D,
 
     Count
 };
@@ -105,6 +111,10 @@ inline std::string action_to_string(const EAction action)
         case EAction::Pause: return "Pause";
         case EAction::Quit: return "Quit";
         case EAction::EscapeScene: return "EscapeScene";
+        case EAction::ReloadShaders: return "ReloadShaders";
+        case EAction::SetMode2D: return "SetMode2D";
+        case EAction::SetMode3D: return "SetMode3D";
+
         default: return "Action not added to to_string";
     }
 }
@@ -151,8 +161,8 @@ inline std::string mouse_to_string(const EMouse btn)
         case EMouse::BtnWheelRight: return "BtnWheelRight";
         case EMouse::BtnWheelLeft: return "BtnWheelLeft";
         case EMouse::BtnMove: return "BtnMove";
+        case EMouse::BtnNone: return "Error None Button";
 
-        case EMouse::BtnNone:
         case EMouse::Count: return "Error Button";
     }
     return "Mouse not added to to_string";

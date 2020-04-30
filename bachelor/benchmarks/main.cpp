@@ -1,3 +1,5 @@
+#include "functions.h"
+
 #include <cmath>
 #include <vector>
 #include <memory>
@@ -113,6 +115,34 @@ static void bm_meta_update(benchmark::State& state)
     }
 }
 
-BENCHMARK(bm_virtual_update)->RangeMultiplier(2)->Range(4, 128);
-BENCHMARK(bm_meta_update)->RangeMultiplier(2)->Range(4, 128);
+static void bm_0_arg_func(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto result = func_0_vars();
+        benchmark::DoNotOptimize(result);
+    }
+}
+
+static void bm_1_arg_func(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto result = func_1_vars(state.range(0));
+        benchmark::DoNotOptimize(result);
+    }
+}
+
+static void bm_2_arg_func(benchmark::State& state)
+{
+    for (auto _ : state)
+    {
+        auto result = func_2_vars(state.range(0), state.range(1));
+        benchmark::DoNotOptimize(result);
+    }
+}
+
+BENCHMARK(bm_0_arg_func);
+BENCHMARK(bm_1_arg_func)->Ranges({{-8, 33}});
+BENCHMARK(bm_2_arg_func)->Ranges({{-8, 33}});
 BENCHMARK_MAIN();
