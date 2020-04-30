@@ -73,7 +73,7 @@ public:
     entt::entity add_to_reg(const entt::entity e);
 
     /**
-     * It adds the new entity to local registry, along with information of who its parents was.
+     * Adds the new entity to local registry, along with information of who its parents was.
      *
      * This function triggers every time a new entity is born (made during runtime between two entities)
      *

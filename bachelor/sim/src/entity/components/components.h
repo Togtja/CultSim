@@ -259,8 +259,8 @@ struct Trait
     bool can_inherit     = false;
     float inherit_chance = 1.0f;
 
-    bool can_mutate     = false;
-    float mutate_chance = 0.0001f;
+    bool can_mutate       = false;
+    float mutation_chance = 0.0001f;
 
     sol::function attain;
     sol::function lose;

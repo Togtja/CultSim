@@ -11,7 +11,6 @@
 #include "preferences.h"
 #include "random_engine.h"
 
-
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
 #include <spdlog/spdlog.h>
@@ -183,8 +182,8 @@ void bind_components(sol::state_view lua)
                                                &component::detail::Trait::inherit_chance,
                                                "can_mutate",
                                                &component::detail::Trait::can_mutate,
-                                               "mutate_chance",
-                                               &component::detail::Trait::mutate_chance,
+                                               "mutation_chance",
+                                               &component::detail::Trait::mutation_chance,
                                                "attain",
                                                &component::detail::Trait::attain,
                                                "lose",
