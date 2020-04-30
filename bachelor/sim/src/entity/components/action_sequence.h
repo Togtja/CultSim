@@ -21,27 +21,27 @@ public:
 
     std::vector<Action> m_actions{};
 
-    std::variant<sol::function, std::function<bool(entt::entity, std::string&)>> m_run_actions = [this](const entt::entity e,
+    std::variant<sol::function, std::function<bool(Action_Sequence&,entt::entity, std::string&)>> m_run_actions = [this](Action_Sequence& self,const entt::entity e,
                                                                                                         std::string& error) {
 
         /**As long as we have not completed our action, keep working on it*/
-        auto finished = current_action.m_action(current_action,e, error);
+        auto finished = self.current_action.m_action(current_action,e, error);
 
         /**We cannot complete the action*/
         if (!error.empty())
         {
-            if (current_action == m_actions.back())
+            if (self.current_action == m_actions.back())
             {
                 return false;
             }
             else
             {
-                for (int i = m_actions.size() - 1; i >= 0; i--)
+                for (int i = self.m_actions.size() - 1; i >= 0; i--)
                 {
-                    if (m_actions[i] == current_action)
+                    if (self.m_actions[i] == self.current_action)
                     {
-                        current_action.m_flags = 0;
-                        current_action         = m_actions[i + 1];
+                        self.current_action.m_flags = 0;
+                        self.current_action         = self.m_actions[i + 1];
                     }
                 }
                 error.clear();
@@ -50,17 +50,17 @@ public:
         /**We have completed the action*/
         else if (finished)
         {
-            if (current_action == m_actions.front())
+            if (self.current_action == self.m_actions.front())
             {
                 return true;
             }
             else
             {
-                for (int i = m_actions.size() - 1; i >= 0; i--)
+                for (int i = self.m_actions.size() - 1; i >= 0; i--)
                 {
-                    if (current_action == m_actions[i])
+                    if (self.current_action == self.m_actions[i])
                     {
-                        current_action = m_actions[i - 1];
+                        self.current_action = self.m_actions[i - 1];
                         break;
                     }
                 }
@@ -80,17 +80,17 @@ public:
         return result;
     };
 
-    std::variant<sol::function, std::function<float(const Action_Sequence&)>> m_get_duration = [this](const Action_Sequence& action_sequence) {
-        float result = 0;
+    std::variant<sol::function, std::function<float(const Action_Sequence&, entt::entity e)>> m_get_duration = [this](const Action_Sequence& action_sequence, entt::entity e) {
+        float result = 0.0;
         for (auto& action : action_sequence.m_actions)
         {
             if (action.m_get_duration.index() == 0)
             {
-                result += std::get<sol::function>(action.m_get_duration)(action).get<float>();
+                result += std::get<sol::function>(action.m_get_duration)(action,e).get<float>();
             }
             else
             {
-                result += std::get<std::function<float(const Action&)>>(action.m_get_duration)(action);
+                result += std::get<std::function<float(const Action&,entt::entity)>>(action.m_get_duration)(action,e);
             }
         }
         return result;

@@ -14,7 +14,7 @@ actions = {
         if  self.flags ~ 1 then
             for i,target in ipairs(cultsim.get_component(entity,component.vision).seen) do
                 --if we find our target
-                if cultsim.get_component(target,component.tags).tags & ETag.Food then
+                if cultsim.get_component(target,component.tag).tags & ETag.Food then
                     local t_pos = cultsim.get_component(target,component.position).position
                     local e_pos = cultsim.get_component(target,component.position).position
                    if(cultsim.distance(t_pos,e_pos,10.0))then
@@ -30,8 +30,8 @@ actions = {
 
             --We cannot see any appropriate entity
 
-            local x = random.uniform(-scenario.bounds.x,scenario.bounds.x)
-            local y = random.uniform(-scenario.bounds.y,scenario.bounds.y)
+            local x = random:uniform(-scenario.bounds.x,scenario.bounds.x)
+            local y = random:uniform(-scenario.bounds.y,scenario.bounds.y)
             local z = 0.0
             cultsim.move_to(entity,Vec3:new(x,y,z))
             return
@@ -40,7 +40,7 @@ actions = {
         --We are by the desired type of enity
 
         for i,target in ipairs(cultsim.get_component(entity,component.vision).seen)do
-            if cultsim.get_component(target,component.tags).tags & ETag.Food then
+            if cultsim.get_component(target,component.tag).tags & ETag.Food then
                 
                 for i,goal in ipairs(cultsim.get_component(entity,component.goal).goals)do
                     if goal.tags & ETag.Food then
@@ -59,15 +59,15 @@ actions = {
         return false
      end
      ,
-     get_duration = function(entity)
+     get_duration = function(self, entity)
         --If we can already see our target, we will complete the action near instantly
-        for i,target in pairs(cultsim.get_component(entity,component.vision).seen)do
-            if(cultsim.get_component(target,component.tags).tags & ETag.Food) then
+        for i,target in ipairs(cultsim.get_component(entity,component.vision).seen)do
+            if(cultsim.get_component(target,component.tag).tags & ETag.Food) then
                 return 1.0
             end
         end
         --If not, it will take on average ((number of spaces to check)/(speed to check 1 space))/2 to find food (Probably wildly off, but this is just a demo anyway)
-        return (((scenario.bounds.x*2) * (scenario.bounds.y*2)) / (cultsim.get_component(entity,component.movement).speed * cultsim.get_component(entity,component.movement).speed_multi))/2
+        return (((scenario.bounds.x*2) * (scenario.bounds.y*2)) / (cultsim.get_component(entity,component.movement).speed * cultsim.get_component(entity,component.movement).speed_multi))/2.0
      end
      ,
      get_goal_change = function(goal)

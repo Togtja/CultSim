@@ -11,15 +11,14 @@ void GOB::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Goal, component::Action>();
-    view.each([this, dt](const component::Goal& goal, component::Action& action) {
-        spdlog::get("agent")->warn("Action sequence name = {}",action.current_action_sequence.m_name);
+    view.each([this, dt](entt::entity e, const component::Goal& goal, component::Action& action) {
         if (action.current_action_sequence.m_name.empty())
         {
             auto best_action = action.actions[0];
-            auto best_value  = calculate_discontentment(action.actions[0], goal.goals);
+            auto best_value  = calculate_discontentment(e, action.actions[0], goal.goals);
             for (auto action : action.actions)
             {
-                auto value = calculate_discontentment(action, goal.goals);
+                auto value = calculate_discontentment(e, action, goal.goals);
                 if (value < best_value)
                 {
                     best_value  = value;
@@ -27,12 +26,13 @@ void GOB::update(float dt)
                 }
             }
 
-            action.current_action_sequence = best_action;
+            action.current_action_sequence                = best_action;
+            action.current_action_sequence.current_action = action.current_action_sequence.m_actions.back();
         }
     });
 }
 
-float GOB::calculate_discontentment(const gob::Action_Sequence& action,const std::vector<gob::Goal>& goals)
+float GOB::calculate_discontentment(entt::entity e, const gob::Action_Sequence& action, const std::vector<gob::Goal>& goals)
 {
     auto discontentment = 0.f;
 
@@ -54,17 +54,19 @@ float GOB::calculate_discontentment(const gob::Action_Sequence& action,const std
         }
         else
         {
-            value += std::get<std::function<float(const gob::Action_Sequence&,const gob::Goal&)>>(action.m_get_goal_change)(action,goal);
+            value += std::get<std::function<float(const gob::Action_Sequence&, const gob::Goal&)>>(
+                action.m_get_goal_change)(action, goal);
         }
 
         auto time_value = 0;
         if (action.m_get_duration.index() == 0)
         {
-            time_value += std::get<sol::function>(action.m_get_duration)().get<float>();
+            time_value += std::get<sol::function>(action.m_get_duration)(action, e).get<float>();
         }
         else
         {
-            time_value += std::get<std::function<float(const gob::Action_Sequence&)>>(action.m_get_duration)(action);
+            time_value +=
+                std::get<std::function<float(const gob::Action_Sequence&, entt::entity)>>(action.m_get_duration)(action, e);
         }
 
         if (goal.m_change_over_time.index() == 0)

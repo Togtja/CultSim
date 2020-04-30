@@ -1077,18 +1077,18 @@ void ScenarioScene::draw_selected_entity_information_ui()
             // Non-clickable headers
             cs_auto_table_headers();
 
-            for (const auto goal : goal->goals)
+            for (const auto& goal_t : goal->goals)
             {
                 ImGui::TableNextCell();
-                ImGui::Text("%s", goal.m_name.c_str());
+                ImGui::Text("%s", goal_t.m_name.c_str());
                 ImGui::TableNextCell();
-                if (goal.m_weight_function.index() == 0)
+                if (goal_t.m_weight_function.index() == 0)
                 {
-                    ImGui::Text("%3.1f", std::get<sol::function>(goal.m_weight_function)().get<float>());
+                    ImGui::Text("%3.1f", std::get<sol::function>(goal_t.m_weight_function)(goal_t).get<float>());
                 }
                 else
                 {
-                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal.m_weight_function)());
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.m_weight_function)());
                 }
             }
             ImGui::EndTable();
@@ -1112,7 +1112,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 }
                 ImGui::Text("Current Action: %s (Action %d out of %d)",
                             action->current_action_sequence.current_action.m_name.c_str(),
-                            action_index,
+                            action_index+1,
                             action->current_action_sequence.m_actions.size());
             }
         }

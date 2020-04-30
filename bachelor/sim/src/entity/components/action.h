@@ -27,7 +27,7 @@ public:
 
     sol::function m_get_goal_change{};
 
-    std::variant<sol::function, std::function<float(const Action& action)>> m_get_duration = [this](const Action& action) {
+    std::variant<sol::function, std::function<float(const Action& action, entt::entity e)>> m_get_duration = [this](const Action& action,entt::entity e) {
         return action.m_required_time;
     };
 };

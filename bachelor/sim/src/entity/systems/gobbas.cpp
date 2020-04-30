@@ -23,7 +23,7 @@ void GOBBAS::update(float dt)
         else
         {
             finished =
-                std::get<std::function<bool(entt::entity, std::string&)>>(action.current_action_sequence.m_run_actions)(e, error);
+                std::get<std::function<bool(gob::Action_Sequence&, entt::entity, std::string&)>>(action.current_action_sequence.m_run_actions)(action.current_action_sequence,e, error);
         }
 
         /**If we get an error or finish, clear our current action sequence*/
