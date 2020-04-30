@@ -1,8 +1,16 @@
 -- Defines custom systems
 systems = {
-    be_stupid_system = cultlib.create_system("Be stupid", {
-        initialize = function() log.info("Hi, I am the stupid system!") end,
-        update = function(dt) end,
-        deinitialize = function() log.info("Bye, I was the stupid system!") end
-    })
+    dummy_system = {
+        -- initialize = function() log.error("Initialize Dummy!") end,
+        -- deinitialize = function() log.info("De-Initialize Dummy!") end,
+        -- update = function(dt) log.info("YO!") end
+    }
 }
+
+-- Set system metatable for all systems
+for k,v in pairs(systems) do
+    setmetatable(v, {
+        __index = cultlib.LuaSystem,
+        __tostring = function(table) return k end
+    })
+end
