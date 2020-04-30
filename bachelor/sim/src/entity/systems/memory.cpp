@@ -4,6 +4,7 @@
 #include "entity/memories/resource_location.h"
 
 #include <glm/glm.hpp>
+#include <taskflow/taskflow.hpp>
 
 namespace cs::system
 {
@@ -66,10 +67,15 @@ void Memory::update(float dt)
 
     if (m_timer >= 1)
     {
-        m_timer   = 0.f;
+        m_timer = 0.f;
+
         auto view = registry->view<component::Memory>();
 
-        view.each([registry](entt::entity e, component::Memory& memory) {
+        tf::Taskflow taskflow{};
+
+        taskflow.parallel_for(view.begin(), view.end(), [registry, this, &view](entt::entity e) {
+            auto& memory = view.get(e);
+
             for (auto& memory_container : memory.memory_container)
             {
                 for (auto& memory : memory_container.memory_storage)
@@ -136,6 +142,8 @@ void Memory::update(float dt)
                 }
             }
         });
+
+        m_context.executor->run(taskflow).get();
     }
 }
 

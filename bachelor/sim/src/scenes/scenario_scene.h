@@ -89,18 +89,25 @@ private:
 public:
     explicit ScenarioScene(std::string_view scenario, uint32_t random_seed);
 
+    /** Scene Interface */
     void on_enter() override;
 
+    /** Scene Interface */
     void on_exit() override;
 
+    /** Scene Interface */
     bool update(float dt) override;
 
+    /** Scene Interface */
     bool draw() override;
 
+    /** Load all variables and data about the current scenario */
     void initialize_simulation();
 
+    /** Clean up and reset all variables and the data related to the ongoing simulation */
     void clean_simulation();
 
+    /** Utility to clean an initialize simulation */
     void reset_simulation();
 
 private:
@@ -120,8 +127,14 @@ private:
 
     void draw_selected_entity_information_ui();
 
+    /**
+     * Update the state of currently hovered entity
+     */
     void update_entity_hover();
 
+    /**
+     * Handles preference change events, specifically for resolution changes
+     */
     void handle_preference_changed(const Preference& before, const Preference& after);
 };
 

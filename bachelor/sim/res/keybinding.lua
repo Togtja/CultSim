@@ -38,6 +38,8 @@ action_key_bindings = {
 		[","] = EAction.SpeedDown,
 		["Up"] = EAction.MoveUp,
 		["Left"] = EAction.MoveLeft,
+		["F2"] = EAction.SetMode2D,
+		["F3"] = EAction.SetMode3D
 	},
 }
 action_mouse_bindings = {

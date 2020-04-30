@@ -15,6 +15,7 @@
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/lua_system.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
@@ -81,18 +82,31 @@ void ScenarioScene::initialize_simulation()
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
-        auto type = entt::resolve(entt::hashed_string(system.c_str()));
-        if (type)
+        auto ctx = system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state};
+
+        if (system.get_type() == sol::type::string)
         {
-            auto meta = type.construct(
-                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
-            system::ISystem& temp_ref = meta.cast<system::ISystem>();
-            m_active_systems.emplace_back(temp_ref.clone());
+            auto type = entt::resolve(entt::hashed_string(system.as<std::string>().c_str()));
+            if (type)
+            {
+                auto meta                 = type.construct(ctx);
+                system::ISystem& temp_ref = meta.cast<system::ISystem>();
+                m_active_systems.emplace_back(temp_ref.clone());
+                m_active_systems.back()->initialize();
+            }
+            else
+            {
+                spdlog::get("lua")->warn("attempt to add unknown native system: {}", system.as<std::string>());
+            }
+        }
+        else if (system.get_type() == sol::type::table)
+        {
+            m_active_systems.emplace_back(new system::LuaSystem(ctx, system.as<sol::table>()));
             m_active_systems.back()->initialize();
         }
         else
         {
-            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
+            spdlog::get("lua")->error("failed to spawn Lua system. ensure parameters are correct to scenario.systems.");
         }
     }
 
@@ -102,6 +116,7 @@ void ScenarioScene::initialize_simulation()
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
         new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+    m_draw_systems.back()->initialize();
 
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
@@ -126,7 +141,7 @@ void ScenarioScene::clean_simulation()
 
     for (auto& system : m_draw_systems)
     {
-        system->initialize();
+        system->deinitialize();
     }
     m_draw_systems.clear();
 
@@ -195,6 +210,8 @@ bool ScenarioScene::update(float dt)
     {
         time_step = 0;
     }
+
+    gfx::get_renderer().update_program_info(m_simtime, input::get_input().get_mouse_pos(), m_resolution);
     for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
@@ -212,8 +229,12 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    // Make sure ImGui does not get more than one update per frame
+    /** Deal with ImGui updates once per tick */
     for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
+    for (auto&& system : m_draw_systems)
     {
         system->update_imgui();
     }
@@ -261,6 +282,15 @@ void ScenarioScene::bind_actions_for_scene()
         {
             m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
         }
+    });
+
+    /** Change render mode */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode2D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_2D);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode3D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_3D);
     });
 
     /** Move to selected entity */

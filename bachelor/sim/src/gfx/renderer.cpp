@@ -12,9 +12,20 @@ void Renderer::clear()
 
 void Renderer::display()
 {
-    m_matrix_ubo.flush(m_camera.get_view_matrix());
+    m_matrix_ubo.flush(MatrixData{m_camera.get_view_matrix(), m_camera.get_view_projection_matrix()});
     m_matrix_ubo.bind(0u);
-    m_sprite_renderer.display();
+    m_programinfo_ubo.bind(2u);
+    m_env_ubo.bind(5u);
+
+    if (m_mode == ERenderingMode::Render_2D)
+    {
+        m_sprite_renderer.display();
+    }
+    else
+    {
+        m_raymarch_renderer.display();
+    }
+
     m_debug_renderer.display();
 }
 
@@ -31,6 +42,21 @@ const DebugRenderer& Renderer::debug() const
 SpriteRenderer& Renderer::sprite()
 {
     return m_sprite_renderer;
+}
+
+RaymarchingRenderer& Renderer::raymarch()
+{
+    return m_raymarch_renderer;
+}
+
+void Renderer::set_render_mode(ERenderingMode mode)
+{
+    m_mode = mode;
+}
+
+const RaymarchingRenderer& Renderer::raymarch() const
+{
+    return m_raymarch_renderer;
 }
 
 const SpriteRenderer& Renderer::sprite() const
@@ -63,13 +89,33 @@ void Renderer::set_camera_bounds(glm::vec2 bounds)
     m_camera.set_boundaries(bounds);
 }
 
+void Renderer::update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution)
+{
+    m_programinfo_ubo.get().runtime         = runtime;
+    m_programinfo_ubo.get().cursor_position = cursorpos;
+    m_programinfo_ubo.get().resolution      = resolution;
+    m_programinfo_ubo.flush();
+}
+
+void Renderer::set_sun_direction(glm::vec3 dir)
+{
+    m_env_ubo.get().sun_direction = glm::normalize(dir);
+    m_env_ubo.flush();
+}
+
+void Renderer::set_sun_color(glm::vec4 col)
+{
+    m_env_ubo.get().sun_color = col;
+    m_env_ubo.flush();
+}
+
 glm::vec3 Renderer::screen_to_world_pos(glm::ivec2 screen_pos, glm::vec2 viewport_size, float desired_z)
 {
-    const auto& view_matrix = m_camera.get_view_matrix();
+    const auto& view_matrix = m_camera.get_view_projection_matrix();
     return glm::unProject(glm::vec3(screen_pos, desired_z), glm::mat4(1.f), view_matrix, glm::vec4(0.f, 0.f, viewport_size));
 }
 
-Renderer::Renderer() : m_debug_renderer(m_camera), m_sprite_renderer(m_camera)
+Renderer::Renderer() : m_debug_renderer(m_camera), m_sprite_renderer(m_camera), m_raymarch_renderer(m_camera)
 {
     m_camera.init({0.f, 0.f, 1.f});
 }
