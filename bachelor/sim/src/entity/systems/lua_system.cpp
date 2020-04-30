@@ -23,7 +23,7 @@ void LuaSystem::deinitialize()
 
 void LuaSystem::update(float dt)
 {
-    CS_AUTOTIMER_EXPRNAME(m_data["name"].get<std::string>());
+    CS_AUTOTIMER_EXPRNAME("LuaSystems");
     m_data.get<sol::function>("update")(dt);
 }
 
