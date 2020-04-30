@@ -11,6 +11,7 @@ systems = {
 for k,v in pairs(systems) do
     setmetatable(v, {
         __index = cultlib.LuaSystem,
-        __tostring = function(table) return k end
+        __tostring = function(table) return k end,
+        name = k
     })
 end
