@@ -64,11 +64,11 @@ public:
     void deinitialize() override;
 
     /**
-     * Adds a entity from the global registry to the local registry
+     * Add the entity to the local registry
      *
      * @note Assumes that the entity has both a relationship and name component
-     * @param e the entity global registry id
-     * @return the entity local registry id
+     * @param e The entity global registry id
+     * @return The entity local registry id
      */
     entt::entity add_to_reg(const entt::entity e);
 
@@ -77,18 +77,18 @@ public:
      *
      * This function triggers every time a new entity is born (made during runtime between two entities)
      *
-     * @param event the event information that the function is subscribed to
+     * @param event The event information that the function is subscribed to
      */
     void new_child_to_reg(const event::BornEntity& event);
 
     /**
      * Handles deletion of the father, during the moms pregnancy
      *
-     * Function is subscirbed to the deletion event, and checks if there are any moms out there
+     * Function is subscribed to the deletion event, and checks if there are any moms out there
      * that is pregnant and has the deletion event entity has a father, if so we add the father to
      * the local registry, using the add_to_reg function
      *
-     * @param event the event information that the function is subscribed to
+     * @param event The event information that the function is subscribed to
      */
     void delete_father(const event::DeleteEntity& event);
 
@@ -105,47 +105,47 @@ public:
     /**
      * Get the friendship value between e to other that goes from 0 to 255
      *
-     * @param e who's entity table you want to check for
-     * @param other the other entity you want to index in the table
-     * @return the value of e's friendship to other
+     * @param e Who's entity table you want to check for
+     * @param other The other entity you want to index in the table
+     * @return The value of e's friendship to other
      */
     uint8_t get_friendship(entt::entity e, entt::entity other);
 
     /**
      * Add amount to the friendship value that is there
      *
-     * @note to remove just "add" a negative number
-     * @param e who's entity table you want to add for
-     * @param other the other entity you want to index in the table
-     * @param amount the amount you want to add
+     * @note To remove just "add" a negative number
+     * @param e Who's entity table you want to add for
+     * @param other The other entity you want to index in the table
+     * @param amount The amount you want to add
      */
     void add_friendship(entt::entity e, entt::entity other, uint8_t amount);
 
     /**
      * Get the romatic value between e to other that goes from 0 to 255
      *
-     * @param e who's entity table you want to check for
-     * @param other the other entity you want to index in the table
-     * @return the value of e's romatic instrest to other
+     * @param e Who's entity table you want to check for
+     * @param other The other entity you want to index in the table
+     * @return The value of e's romatic instrest to other
      */
     uint8_t get_romance(entt::entity e, entt::entity other);
 
     /**
      * Add amount to the romatic value that is there
      *
-     * @note to remove just "add" a negative number
-     * @param e who's entity table you want to add for
-     * @param other the other entity you want to index in the table
-     * @param amount the amount you want to add
+     * @note To remove just "add" a negative number
+     * @param e Who's entity table you want to add for
+     * @param other The other entity you want to index in the table
+     * @param amount The amount you want to add
      */
     void add_romance(entt::entity e, entt::entity other, uint8_t amount);
 
     /**
      * Get the name and ids of an entity's parents
      *
-     * @param e the entity you want to get the parents of
-     * @param is_local_ids true if the entity is from the local registry, false if it is from the global registry
-     * @return the struct BothParentName that include the name, local- and global entity ids
+     * @param e The entity you want to get the parents of
+     * @param is_local_ids True if the entity is from the local registry. False if it is from the global registry
+     * @return The struct BothParentName that include the name, local- and global entity ids
      */
     BothParentName get_parent(entt::entity e, bool is_local_ids = false);
 

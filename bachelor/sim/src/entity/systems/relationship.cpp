@@ -154,7 +154,6 @@ void Relationship::add_friendship(entt::entity e, entt::entity other, uint8_t am
     }
 }
 
-// Get what "me" feel about the other part
 uint8_t Relationship::get_romance(entt::entity e, entt::entity other)
 {
     return (m_rel_table[e][other] & 0x00FF);
