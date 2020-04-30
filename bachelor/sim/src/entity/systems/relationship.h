@@ -21,8 +21,8 @@ struct ParentName
 };
 struct BothParentName
 {
-    ParentName mom;
-    ParentName dad;
+    ParentName mom{};
+    ParentName dad{};
 };
 class Relationship : public ISystem
 {
@@ -57,19 +57,16 @@ public:
 
     void delete_father(const event::DeleteEntity& event);
 
-    void add_agent(entt::entity me);
-    /** Get what "me" feel about the other agent */
-    uint8_t get_friendship(entt::entity me, entt::entity other);
+    void add_relationship_table(entt::entity e);
 
-    void add_friendship(entt::entity me, entt::entity other, uint8_t amount);
+    uint8_t get_friendship(entt::entity e, entt::entity other);
 
-    /** Get what "me" feel about the other agent */
-    uint8_t get_romance(entt::entity me, entt::entity other);
+    void add_friendship(entt::entity e, entt::entity other, uint8_t amount);
+    uint8_t get_romance(entt::entity e, entt::entity other);
 
-    /** */
-    void add_romance(entt::entity me, entt::entity other, uint8_t amount);
+    void add_romance(entt::entity e, entt::entity other, uint8_t amount);
 
-    BothParentName get_parent(entt::entity me, bool is_regrel_nr = false);
+    BothParentName get_parent(entt::entity e, bool is_local_ids = false);
 
     void update(float dt) override;
 

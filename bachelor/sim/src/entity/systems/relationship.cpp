@@ -115,74 +115,74 @@ void Relationship::delete_father(const event::DeleteEntity& event)
         });
 }
 
-void Relationship::add_agent(entt::entity me)
+void Relationship::add_relationship_table(entt::entity e)
 {
     auto view = m_context.registry->view<component::Relationship>();
 
-    view.each([this, me](entt::entity e, const component::Relationship& relationship) {
-        if (me == e)
+    view.each([this, e](entt::entity e, const component::Relationship& relationship) {
+        if (e == e)
         {
             // First 8 bits is friendship, last 8 bits is romance
-            add_friendship(e, me, relationship.self_friend);
-            add_romance(e, me, relationship.self_romance);
+            add_friendship(e, e, relationship.self_friend);
+            add_romance(e, e, relationship.self_romance);
             return;
         }
         // TODO: for family add better relationship
-        add_friendship(e, me, relationship.default_friend);
-        add_romance(e, me, relationship.default_romance);
+        add_friendship(e, e, relationship.default_friend);
+        add_romance(e, e, relationship.default_romance);
     });
 }
 
-uint8_t Relationship::get_friendship(entt::entity me, entt::entity other)
+uint8_t Relationship::get_friendship(entt::entity e, entt::entity other)
 {
-    return (m_rel_table[me][other] >> 8);
+    return (m_rel_table[e][other] >> 8);
 }
-void Relationship::add_friendship(entt::entity me, entt::entity other, uint8_t amount)
+void Relationship::add_friendship(entt::entity e, entt::entity other, uint8_t amount)
 {
-    uint8_t friend_lvl = m_rel_table[me][other] >> 8;
+    uint8_t friend_lvl = m_rel_table[e][other] >> 8;
     if (friend_lvl + amount > 0xFF)
     {
-        m_rel_table[me][other] |= 0xFF00;
+        m_rel_table[e][other] |= 0xFF00;
     }
     else if (friend_lvl + amount < 0)
     {
-        m_rel_table[me][other] &= 0x00FF;
+        m_rel_table[e][other] &= 0x00FF;
     }
     else
     {
-        m_rel_table[me][other] += (amount << 8);
+        m_rel_table[e][other] += (amount << 8);
     }
 }
 
 // Get what "me" feel about the other part
-uint8_t Relationship::get_romance(entt::entity me, entt::entity other)
+uint8_t Relationship::get_romance(entt::entity e, entt::entity other)
 {
-    return (m_rel_table[me][other] & 0x00FF);
+    return (m_rel_table[e][other] & 0x00FF);
 }
 
-void Relationship::add_romance(entt::entity me, entt::entity other, uint8_t amount)
+void Relationship::add_romance(entt::entity e, entt::entity other, uint8_t amount)
 {
-    uint8_t romance_lvl = m_rel_table[me][other] & 0x00FF;
+    uint8_t romance_lvl = m_rel_table[e][other] & 0x00FF;
     if (romance_lvl + amount > 0xFF)
     {
-        m_rel_table[me][other] |= 0x00FF;
+        m_rel_table[e][other] |= 0x00FF;
     }
     else if (romance_lvl + amount < 0)
     {
-        m_rel_table[me][other] &= 0xFF00;
+        m_rel_table[e][other] &= 0xFF00;
     }
     else
     {
-        m_rel_table[me][other] += amount;
+        m_rel_table[e][other] += amount;
     }
 }
 
-BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
+BothParentName Relationship::get_parent(entt::entity e, bool is_local_ids)
 {
     BothParentName ret;
-    if (is_regrel_nr)
+    if (is_local_ids)
     {
-        const auto& rel = m_parents_reg.get<component::Relationship>(me);
+        const auto& rel = m_parents_reg.get<component::Relationship>(e);
         auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
         auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
         ret.mom.name    = par1_name.name;
@@ -195,7 +195,7 @@ BothParentName Relationship::get_parent(entt::entity me, bool is_regrel_nr)
     for (auto&& ent : view)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(ent);
-        if (rel.old_id == me)
+        if (rel.old_id == e)
         {
             if (m_parents_reg.valid(rel.mom.relationship_registry_id) && m_parents_reg.valid(rel.dad.relationship_registry_id))
             {
@@ -231,7 +231,7 @@ void Relationship::update(float dt)
     view.each([this, &view](entt::entity e, component::Relationship& relationship) {
         if (relationship.new_create)
         {
-            add_agent(e);
+            add_relationship_table(e);
             relationship.new_create = false;
         }
     });
