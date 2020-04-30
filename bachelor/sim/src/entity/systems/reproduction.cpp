@@ -165,14 +165,8 @@ void Reproduction::update(float dt)
         }
         if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
         {
-            if (m_context.registry->valid(child.parents.first))
-            {
-                rel_c->mom.global_registry_id = child.parents.first;
-            }
-            if (m_context.registry->valid(child.parents.second))
-            {
-                rel_c->dad.global_registry_id = child.parents.second;
-            }
+            rel_c->mom.global_registry_id = child.parents.first;
+            rel_c->dad.global_registry_id = child.parents.second;
         }
     }
 } // namespace cs::system
@@ -181,6 +175,5 @@ ISystem* Reproduction::clone()
 {
     return new Reproduction(m_context);
 }
-
 
 } // namespace cs::system

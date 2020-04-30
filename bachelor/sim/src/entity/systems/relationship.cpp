@@ -91,7 +91,8 @@ void Relationship::new_child_to_reg(const event::BornEntity& event)
             auto mom_entt                    = add_to_reg(fam.mom.global_registry_id);
             fam.mom.relationship_registry_id = mom_entt;
         }
-        if (fam.dad.relationship_registry_id == entt::null)
+        // Make sure dad is still valid, could have died during pregnancy
+        if (fam.dad.relationship_registry_id == entt::null && m_context.registry->valid(fam.dad.global_registry_id))
         {
             // Dad is a first gen
             auto dad_entt                    = add_to_reg(fam.dad.global_registry_id);
