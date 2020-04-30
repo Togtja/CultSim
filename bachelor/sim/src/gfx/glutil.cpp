@@ -84,6 +84,25 @@ GLuint create_program(const std::vector<GLuint>& shaders)
     return program;
 }
 
+GLuint fcreate_program(const std::vector<ShaderFile>& shaders)
+{
+    /** Compile Shaders */
+    std::vector<GLuint> compiled_shaders{};
+    for (const auto& file : shaders)
+    {
+        compiled_shaders.push_back(fcompile_shader(file.path, file.type));
+    }
+
+    /** Link program and clean up shaders */
+    GLuint program = create_program(compiled_shaders);
+    for (auto shader : compiled_shaders)
+    {
+        glDeleteShader(shader);
+    }
+
+    return program;
+}
+
 std::string get_gl_shader_type_name(GLenum type)
 {
     switch (type)

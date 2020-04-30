@@ -242,6 +242,11 @@ struct Pregnancy
     bool is_egg = false;
 };
 
+struct Sphere3D
+{
+    float radius = 1.f;
+};
+
 namespace detail
 {
 // Defines a single trait

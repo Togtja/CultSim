@@ -24,11 +24,18 @@ public:
     void init(glm::vec3 position);
 
     /**
+     * Get the current view matrix from the camera
+     *
+     * @return Current view matrix based on the camera state
+     */
+    [[nodiscard]] glm::mat4 get_view_matrix() const;
+
+    /**
      * Get the current view-projection matrix from the camera
      *
      * @return Current view-projection matrix based on the camera state
      */
-    [[nodiscard]] glm::mat4 get_view_matrix() const;
+    [[nodiscard]] glm::mat4 get_view_projection_matrix() const;
 
     void set_position_2d(glm::vec2 position);
 
