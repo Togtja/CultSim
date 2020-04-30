@@ -1,5 +1,4 @@
 #include "factory.h"
-#include "components/components.h"
 #include "filesystem/filesystem.h"
 #include "gfx/renderer.h"
 
