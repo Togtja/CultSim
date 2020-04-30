@@ -102,6 +102,7 @@ void ScenarioScene::initialize_simulation()
         else if (system.get_type() == sol::type::table)
         {
             m_active_systems.emplace_back(new system::LuaSystem(ctx, system.as<sol::table>()));
+            m_active_systems.back()->initialize();
         }
         else
         {
