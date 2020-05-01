@@ -60,6 +60,22 @@ void DataCollector::show_ui()
         data_offset = 10;
     }
 
+    if (ImGui::BeginPlot("Data Plot"))
+    {
+        int offset = 0;
+        int count  = m_samples[0].size();
+
+        // Set offset based on slider
+        if (m_samples[0].size() >= data_offset)
+        {
+            offset = m_samples[0].size() - data_offset;
+            count  = data_offset;
+        }
+        ImGui::PlotLines("Living People", m_samples[0].data(), m_samples[0].size());
+        ImGui::PlotBar("Living Peeps", m_samples[0].data(), m_samples[0].size(), 0.6700000167F, 0.f, data_offset);
+        ImGui::EndPlot();
+    }
+
     if (ImGui::TreeNode("Data Collection"))
     {
         for (unsigned i = 0u; i < m_collectors.size(); ++i)
