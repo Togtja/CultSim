@@ -407,155 +407,127 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     return sol::make_object(s, &m_registry.get<component::Position>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Movement>::id():
                 if (m_registry.try_get<component::Movement>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Movement>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Sprite>::id():
                 if (m_registry.try_get<component::Sprite>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Sprite>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Vision>::id():
                 if (m_registry.try_get<component::Vision>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Vision>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Tags>::id():
                 if (m_registry.try_get<component::Tags>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Tags>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Need>::id():
                 if (m_registry.try_get<component::Need>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Need>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Reproduction>::id():
                 if (m_registry.try_get<component::Reproduction>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Reproduction>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Strategy>::id():
                 if (m_registry.try_get<component::Strategy>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Strategy>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Health>::id():
                 if (m_registry.try_get<component::Health>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Health>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Memory>::id():
                 if (m_registry.try_get<component::Memory>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Memory>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Attack>::id():
                 if (m_registry.try_get<component::Attack>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Attack>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Inventory>::id():
                 if (m_registry.try_get<component::Inventory>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Inventory>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Traits>::id():
                 if (m_registry.try_get<component::Traits>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Traits>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
             case entt::type_info<component::Name>::id():
                 if (m_registry.try_get<component::Name>(e))
                 {
                     return sol::make_object(s, &m_registry.get<component::Name>(e));
                 }
-                else
-                {
-                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
-                    return sol::nil;
-                }
-                break;
+                spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                return sol::nil;
+                /** Add cases for lua components */
+#define LUA_COMPONENT_CASE(N)                                                                                                    \
+    case entt::type_info<component::LuaComponent<N>>::id():                                                                      \
+        if (m_registry.has<component::LuaComponent<N>>(e))                                                                       \
+        {                                                                                                                        \
+            return m_registry.get<component::LuaComponent<N>>(e).lua_data;                                                       \
+        }                                                                                                                        \
+        spdlog::critical("target [{}] does not have that component [{}]", e, id);                                                \
+        return sol::nil;
+
+                LUA_COMPONENT_CASE(1)
+                LUA_COMPONENT_CASE(2)
+                LUA_COMPONENT_CASE(3)
+                LUA_COMPONENT_CASE(4)
+                LUA_COMPONENT_CASE(5)
+                LUA_COMPONENT_CASE(6)
+                LUA_COMPONENT_CASE(7)
+                LUA_COMPONENT_CASE(8)
+                LUA_COMPONENT_CASE(9)
+                LUA_COMPONENT_CASE(10)
+                LUA_COMPONENT_CASE(11)
+                LUA_COMPONENT_CASE(12)
+                LUA_COMPONENT_CASE(13)
+                LUA_COMPONENT_CASE(14)
+                LUA_COMPONENT_CASE(15)
+                LUA_COMPONENT_CASE(16)
+                /** Clean up macro */
+#undef LUA_COMPONENT_CASE
             default:
                 spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
@@ -597,7 +569,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_acquired_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_acquired_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -621,7 +593,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_attainable_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_attainable_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -844,7 +816,8 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_f->average_gestation_period;
                 }
-                // Here the incubator is the dad
+
+                /** Here the incubator is the dad */
                 preg->parents.second = mother;
                 preg->parents.first  = father;
             }
