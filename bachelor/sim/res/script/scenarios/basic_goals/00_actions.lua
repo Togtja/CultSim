@@ -11,51 +11,54 @@ actions = {
         
         --We are not by the desired type of entity
         
-        if  self.flags ~ 1 then
+        if not cultsim.has_set_flags(self,1) then
             for i,target in ipairs(cultsim.get_component(entity,component.vision).seen) do
                 --if we find our target
-                if cultsim.get_component(target,component.tag).tags & ETag.Food then
+                if cultsim.has_tags(target,(ETag.Food | ETag.Consume)) and not cultsim.has_tags(target,ETag.Delete) then
                     local t_pos = cultsim.get_component(target,component.position).position
-                    local e_pos = cultsim.get_component(target,component.position).position
-                   if(cultsim.distance(t_pos,e_pos,10.0))then
-                        self.flags = (self.flags | 1)
+                    local e_pos = cultsim.get_component(entity,component.position).position
+                   if(cultsim.distance(t_pos,e_pos) <= 10.0)then
+                        cultsim.set_flags(self,1)
                         return false
                    end
-                   if cultsim.get_component(entity,component.movement).desired_position.empty() then
+                   local mov_comp = cultsim.get_component(entity,component.movement)
+                   if mov_comp.desired_position:empty() or cultsim.distance(mov_comp.desired_position:at(1),t_pos) > 10.0  then
+                        mov_comp.desired_position:clear()
                         cultsim.move_to(entity,t_pos)
-                        return false
                    end
+                   return false
                 end
             end
 
             --We cannot see any appropriate entity
-
-            local x = random:uniform(-scenario.bounds.x,scenario.bounds.x)
-            local y = random:uniform(-scenario.bounds.y,scenario.bounds.y)
-            local z = 0.0
-            cultsim.move_to(entity,Vec3:new(x,y,z))
-            return
+            if cultsim.get_component(entity,component.movement).desired_position:empty() then
+                local x = random:uniform(-scenario.bounds.x,scenario.bounds.x)
+                local y = random:uniform(-scenario.bounds.y,scenario.bounds.y)
+                local z = 0.0
+                cultsim.move_to(entity,Vec3:new(x,y,z))
+            end
+            return false
         end
 
         --We are by the desired type of enity
-
         for i,target in ipairs(cultsim.get_component(entity,component.vision).seen)do
-            if cultsim.get_component(target,component.tag).tags & ETag.Food then
+            if cultsim.has_tags(target,(ETag.Food | ETag.Consume)) and not cultsim.has_tags(target,ETag.Delete) then
                 
                 for i,goal in ipairs(cultsim.get_component(entity,component.goal).goals)do
                     if goal.tags & ETag.Food then
-                        goals[i].weight = goals[i].weight - 50.0
+                        goal.age = 0
                     end
                 end
 
                 cultsim.kill(target)
+                self.flags = 0
                 return true
             end
 		end
 
         --The Entity dissapeared after we went to eat it
-
         error = "We lost our target after finding it"
+        self.flags = 0
         return false
      end
      ,
