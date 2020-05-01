@@ -6,7 +6,7 @@
 
 namespace cs::system
 {
-Relationship::Relationship(const Relationship& other) : m_rel_table(other.m_rel_table), ISystem(other)
+Relationship::Relationship(const Relationship& other) : ISystem(other), m_rel_table(other.m_rel_table)
 {
     m_parents_reg = other.m_parents_reg.clone();
 }
@@ -119,8 +119,8 @@ void Relationship::add_relationship_table(entt::entity e)
 {
     auto view = m_context.registry->view<component::Relationship>();
 
-    view.each([this, e](entt::entity e, const component::Relationship& relationship) {
-        if (e == e)
+    view.each([this, e](entt::entity e2, const component::Relationship& relationship) {
+        if (e == e2)
         {
             // First 8 bits is friendship, last 8 bits is romance
             add_friendship(e, e, relationship.self_friend);

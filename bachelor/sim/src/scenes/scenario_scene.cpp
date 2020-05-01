@@ -1159,7 +1159,6 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (relship)
     {
-        system::Relationship* test;
         for (auto&& system : m_active_systems)
         {
             const auto rel = dynamic_cast<system::Relationship*>(system.get());
@@ -1168,7 +1167,9 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 const auto parents = rel->get_parent(selection_info.selected_entity);
                 if (parents.mom.ids.relationship_registry_id != entt::null)
                 {
-                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
+                    ImGui::Text("My Mom is %s (%u)",
+                                parents.mom.name.c_str(),
+                                static_cast<unsigned>(parents.mom.ids.global_registry_id));
                 }
                 else
                 {
@@ -1176,7 +1177,9 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 }
                 if (parents.dad.ids.relationship_registry_id != entt::null)
                 {
-                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
+                    ImGui::Text("My Dad is %s (%u)",
+                                parents.dad.name.c_str(),
+                                static_cast<unsigned>(parents.dad.ids.global_registry_id));
                 }
 
                 else

@@ -79,7 +79,7 @@ target_compile_options(
         $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:Clang>>:-fprofile-instr-generate -fcoverage-mapping>
         $<$<AND:$<CONFIG:Debug>,$<CXX_COMPILER_ID:GNU>>:--coverage>
         $<$<CXX_COMPILER_ID:MSVC>:-bigobj /W4>
-        $<$<CXX_COMPILER_ID:GNU>:-Wall -Werror=format-security -Wl,-z,defs -Wl,-z,now -Wl,-z,relro -Wextra -Wno-unused-macros -Wredundant-decls -Wno-shadow -Wno-switch-enum -Wno-unknown-pragmas -Wno-unused-parameter>
+        $<$<CXX_COMPILER_ID:GNU>:-Wall -Werror=format-security -Wl,-z,defs -Wl,-z,now -Wl,-z,relro -Wextra -Werror=format -Wno-unused-macros -Wredundant-decls -Wno-shadow -Wno-switch-enum -Wno-unknown-pragmas -Wno-unused-parameter>
 )
 
 # Zip Resource folder and copy to binary directory so we can mount it with PhysFS

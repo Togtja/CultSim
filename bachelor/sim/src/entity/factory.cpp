@@ -377,8 +377,7 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
 
 bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& rel_comp = reg.assign_or_replace<component::Relationship>(e);
-
+    reg.assign_or_replace<component::Relationship>(e);
     return true;
 }
 } // namespace detail
