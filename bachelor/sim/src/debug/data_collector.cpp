@@ -8,6 +8,7 @@
 
 #include <gfx/ImGUI/imgui.h>
 #include <gfx/ImGUI/imgui_plot.h>
+#include <gfx/ImGUI/implot.h>
 #include <spdlog/fmt/fmt.h>
 
 namespace cs::debug

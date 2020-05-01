@@ -27,4 +27,7 @@ target_sources(
 
     ${CMAKE_CURRENT_LIST_DIR}/imgui_plot.h
     ${CMAKE_CURRENT_LIST_DIR}/imgui_plot.cpp
+
+    ${CMAKE_CURRENT_LIST_DIR}/implot.h
+    ${CMAKE_CURRENT_LIST_DIR}/implot.cpp
 )
