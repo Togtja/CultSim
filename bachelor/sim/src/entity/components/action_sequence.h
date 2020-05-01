@@ -25,12 +25,12 @@ public:
                                                                                                         std::string& error) {
 
         /**As long as we have not completed our action, keep working on it*/
-        auto finished = self.current_action.m_action(current_action,e, error);
+        auto finished = self.current_action.m_action(self.current_action,e, error);
 
         /**We cannot complete the action*/
         if (!error.empty())
         {
-            if (self.current_action == m_actions.back())
+            if (self.current_action == self.m_actions.back())
             {
                 return false;
             }
