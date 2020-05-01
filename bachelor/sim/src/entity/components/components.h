@@ -1,6 +1,7 @@
 #pragma once
 
 #include "entity/memories/container.h"
+#include "entity/systems/relationship.h"
 #include "gfx/render_data.h"
 #include "need.h"
 #include "random_engine.h"
@@ -205,18 +206,18 @@ struct Reproduction
 
     ESex incubator = Female;
 
-    // If true then users says they has specified start/peak/end fertility
+    /** If true then users says they has specified start/peak/end fertility */
     bool has_fertility = false;
-    // Needs age component to work
+    /** Needs age component to work */
     float start_fertility{};
     float peak_fertility{};
     float end_fertility{};
 
-    // General Pregnancy stat
+    /** General Pregnancy stat */
     int mean_children_pp = 1;
     float children_deviation{};
 
-    // Static fertility
+    /** Static fertility */
     float fertility = 1.f;
 
     float average_gestation_period{};
@@ -234,7 +235,7 @@ struct Pregnancy
     float time_since_start{};
     float gestation_period{};
 
-    // First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad)
+    /** First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad) */
     std::pair<entt::entity, entt::entity> parents = {entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
@@ -249,7 +250,7 @@ struct Sphere3D
 
 namespace detail
 {
-// Defines a single trait
+/** Defines a single trait */
 struct Trait
 {
     std::string name;
@@ -258,8 +259,8 @@ struct Trait
     bool can_inherit     = false;
     float inherit_chance = 1.0f;
 
-    bool can_mutate     = false;
-    float mutate_chance = 0.0001;
+    bool can_mutate       = false;
+    float mutation_chance = 0.0001f;
 
     sol::function attain;
     sol::function lose;
@@ -274,26 +275,37 @@ struct Trait
 };
 } // namespace detail
 
-// An Agents traits
+/** An Agents traits */
 struct Traits
 {
-    // The trait a species/aganets start with when running a simulation
+    /** The trait a species/aganets start with when running a simulation */
     std::vector<detail::Trait> start_traits;
-    // List of possible atainable traits
+    /** List of possible atainable traits */
     std::vector<detail::Trait> attainable_traits;
-    // The traits that the agent currently has
+    /** The traits that the agent currently has */
     std::vector<detail::Trait> acquired_traits;
 };
 
 struct Relationship
 {
-    // Used to add a new entry in the relatip table
+    /** Used to add a new entry in the relatip table */
     bool new_create         = true;
     uint8_t default_friend  = 0;
     uint8_t default_romance = 0;
 
     uint8_t self_friend  = 0;
     uint8_t self_romance = 0;
+
+    /** Below used for family tree: */
+
+    /** Mother Ids for Global and Relationship Ids */
+    system::ParentEntityIds mom = {entt::null, entt::null};
+
+    /** Father Ids for Global and Relationship Ids */
+    system::ParentEntityIds dad = {entt::null, entt::null};
+
+    /** old_id is entt id for context registry */
+    entt::entity old_id = entt::null;
 };
 
 struct AI

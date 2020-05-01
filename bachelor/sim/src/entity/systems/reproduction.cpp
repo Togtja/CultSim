@@ -6,15 +6,6 @@
 
 namespace cs::system
 {
-void Reproduction::initialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Reproduction::delete_father>(*this);
-}
-
-void Reproduction::deinitialize()
-{
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Reproduction::delete_father>(*this);
-}
 void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(Reproduction System);
@@ -69,11 +60,12 @@ void Reproduction::update(float dt)
                     if (preg.is_egg)
                     {
                         auto egg_pos = m_context.registry->get<component::Position>(e).position;
-                        children.push_back(Child{parent_name, egg_pos, false});
+                        children.push_back(
+                            Child{parent_name, egg_pos, false, parent_name, {preg.parents.first, preg.parents.second}});
                     }
                     else
                     {
-                        children.push_back(Child{parent_name, new_pos, false});
+                        children.push_back(Child{parent_name, new_pos, false, parent_name, preg.parents});
                     }
                 }
             }
@@ -119,7 +111,7 @@ void Reproduction::update(float dt)
             m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
             return;
         }
-
+        m_context.dispatcher->enqueue<event::BornEntity>(event::BornEntity{child_e});
         // TODO: Figure out if this is redundant
         if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
         {
@@ -131,13 +123,13 @@ void Reproduction::update(float dt)
             // Check if we can mutate something
             for (auto&& i : traits->attainable_traits)
             {
-                if (i.can_mutate && m_context.rng->trigger(i.mutate_chance))
+                if (i.can_mutate && m_context.rng->trigger(i.mutation_chance))
                 {
                     traits->acquired_traits.push_back(i);
                 }
             }
             // Tries to inherit mom's acquired traits
-            if (child.parents.first != entt::null)
+            if (m_context.registry->valid(child.parents.first))
             {
                 if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
                 {
@@ -150,7 +142,8 @@ void Reproduction::update(float dt)
                     }
                 }
             }
-            if (child.parents.second != entt::null)
+
+            if (m_context.registry->valid(child.parents.second))
             {
                 // Tries to inherit dad's acquired traits
                 if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
@@ -170,23 +163,17 @@ void Reproduction::update(float dt)
             // Run the effect of the acquired traits
             effect::affect_traits(child_e, *traits);
         }
+        if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
+        {
+            rel_c->mom.global_registry_id = child.parents.first;
+            rel_c->dad.global_registry_id = child.parents.second;
+        }
     }
 } // namespace cs::system
 
 ISystem* Reproduction::clone()
 {
     return new Reproduction(m_context);
-}
-
-void Reproduction::delete_father(const event::DeleteEntity& event)
-{
-    auto view = m_context.registry->view<component::Pregnancy>();
-    view.each([&event](component::Pregnancy& preg) {
-        if (preg.parents.first == event.entity)
-        {
-            preg.parents.second = entt::null;
-        }
-    });
 }
 
 } // namespace cs::system
