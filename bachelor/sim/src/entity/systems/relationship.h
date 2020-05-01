@@ -11,23 +11,24 @@ namespace cs::system
 {
 /**
  * ParentEntityIds keeps track on their ids in the diffrent registry
- * global_registry_id for the m_context.registry id
- * and relationship_registry_id for the local m_parents_reg
  */
 struct ParentEntityIds
 {
-    entt::entity global_registry_id       = entt::null;
+    /** global_registry_id for the m_context.registry id */
+    entt::entity global_registry_id = entt::null;
+
+    /** relationship_registry_id for the local m_parents_reg */
     entt::entity relationship_registry_id = entt::null;
 };
 
 /**
  * ParentName keeps the parent's name (if any), and it's set of IDs
- * ids for the global and relationship registry ids
- * name for it's name, if no name it will default to type
  */
 struct ParentName
 {
+    /** ids for the global and relationship registry ids */
     ParentEntityIds ids{};
+    /** name for it's name, if no name it will default to the name components type */
     std::string name{};
 };
 
