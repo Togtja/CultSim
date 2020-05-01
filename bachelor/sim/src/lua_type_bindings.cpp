@@ -183,7 +183,9 @@ void bind_components(sol::state_view lua)
                                           "speed",
                                           &component::Movement::speed,
                                           "speed_multi",
-                                          &component::Movement::speed_multi);
+                                          &component::Movement::speed_multi,
+                                          "desired_position",
+                                          &component::Movement::desired_position);
 
     lua.new_usertype<component::Vision>("VisionComponent",
                                         "seen",
