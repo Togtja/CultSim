@@ -723,7 +723,34 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b, float threshold) { return close_enough(a, b, threshold); });
+    cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
+
+    cultsim.set_function("has_tags", [this](entt::entity e, ETag tags) {
+        auto t_comp = m_registry.try_get<component::Tags>(e);
+        if (!t_comp)
+        {
+            spdlog::get("default")->error("The entity does not have a tag component.");
+            return false;
+        }
+        return (t_comp->tags & tags) == tags;
+    });
+
+    cultsim.set_function("set_tags", [this](entt::entity e, ETag tags) {
+        auto t_comp = m_registry.try_get<component::Tags>(e);
+        if (!t_comp)
+        {
+            spdlog::get("default")->error("The entity does not have a tag component.");
+            return false;
+        }
+             t_comp->tags = ETag(t_comp->tags | tags);
+    });
+    cultsim.set_function("has_set_flags",
+                         [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
+
+    cultsim.set_function("set_flags", [this](gob::Action& action, uint32_t flags) {
+        
+        action.m_flags |= flags;
+    });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -1112,7 +1139,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 }
                 ImGui::Text("Current Action: %s (Action %d out of %d)",
                             action->current_action_sequence.current_action.m_name.c_str(),
-                            action_index+1,
+                            action_index + 1,
                             action->current_action_sequence.m_actions.size());
             }
         }
