@@ -12,7 +12,7 @@ void Goal::update(float dt)
 
     auto view = registry.view<component::Goal>();
     view.each([this, dt](entt::entity e, component::Goal& goal) {
-        for (auto current_goal : goal.goals)
+        for (auto& current_goal : goal.goals)
         {
             current_goal.m_age += dt;
         }
