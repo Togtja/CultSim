@@ -16,7 +16,6 @@
 #include "entity/systems/timer.h"
 #include "entity/systems/traits.h"
 
-
 #include <entt/core/hashed_string.hpp>
 #include <entt/meta/factory.hpp>
 

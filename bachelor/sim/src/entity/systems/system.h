@@ -30,6 +30,13 @@ public:
     ISystem(SystemContext context) : m_context(context)
     {
     }
+
+    ISystem(const ISystem&) = default;
+    ISystem& operator=(const ISystem&) = default;
+
+    ISystem(ISystem&&) = default;
+    ISystem& operator=(ISystem&&) = default;
+
     virtual ~ISystem() noexcept = default;
 
     /**

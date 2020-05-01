@@ -60,5 +60,9 @@ entity = {
         attainable_traits = {traits.slow_digestion, traits.random_mutation, traits.fast}
     },
     
+    NameComponent = {
+        entity_type = "Deer"
+    },
+
     RelationshipComponent = {}
 }

@@ -319,9 +319,9 @@ component::detail::Trait get_trait(sol::table traits)
     if (traits["mutable"].get_type() == sol::type::boolean)
     {
         trait.can_mutate = traits["can_mutate"];
-        if (traits["mutate_chance"].get_type() == sol::type::number)
+        if (traits["mutation_chance"].get_type() == sol::type::number)
         {
-            trait.mutate_chance = traits["mutate_chance"];
+            trait.mutation_chance = traits["mutation_chance"];
         }
     }
 
