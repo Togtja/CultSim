@@ -31,7 +31,7 @@ scenario.sampling_rate = 1.0;
 scenario.init = function()
 
     -- Spawn 100 Deer
-    for i=1,10 do
+    for i=1,100 do
         local deer = cultsim.spawn("deer")
 
         -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
