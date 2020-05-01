@@ -119,17 +119,24 @@ void Relationship::add_relationship_table(entt::entity e)
 {
     auto view = m_context.registry->view<component::Relationship>();
 
-    view.each([this, e](entt::entity e, const component::Relationship& relationship) {
-        if (e == e)
+    auto relship_c = m_context.registry->get<component::Relationship>(e);
+
+    view.each([this, e, relship_c](entt::entity e2, const component::Relationship& relationship) {
+        if (e == e2)
         {
             // First 8 bits is friendship, last 8 bits is romance
-            add_friendship(e, e, relationship.self_friend);
-            add_romance(e, e, relationship.self_romance);
+            add_friendship(e, e2, relationship.self_friend);
+            add_romance(e, e2, relationship.self_romance);
             return;
         }
         // TODO: for family add better relationship
-        add_friendship(e, e, relationship.default_friend);
-        add_romance(e, e, relationship.default_romance);
+        // What I feel for others
+        add_friendship(e, e2, relship_c.default_friend);
+        add_romance(e, e2, relship_c.default_romance);
+
+        // What others feel for me
+        add_friendship(e2, e, relationship.default_friend);
+        add_romance(e2, e, relationship.default_romance);
     });
 }
 
