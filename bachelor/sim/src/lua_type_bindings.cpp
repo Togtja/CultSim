@@ -92,6 +92,54 @@ void bind_components(sol::state_view lua)
                                "weight_func",
                                &ai::Need::weight_func);
 
+    lua.new_usertype<gob::Goal>("Goal",
+                                "name",
+                                &gob::Goal::m_name,
+                                "tags",
+                                &gob::Goal::m_tags,
+                                "age",
+                                &gob::Goal::m_age,
+                                "weight_function",
+                                &gob::Goal::m_weight_function,
+                                "change_over_time",
+                                &gob::Goal::m_change_over_time,
+                                "get_discontentment",
+                                &gob::Goal::m_get_discontentment);
+
+    lua.new_usertype<gob::Action_Sequence>("Action_Sequence",
+                                           "name",
+                                           &gob::Action_Sequence::m_name,
+                                           "tags",
+                                           &gob::Action_Sequence::m_tags,
+                                           "current_action",
+                                           &gob::Action_Sequence::current_action,
+                                           "actions",
+                                           &gob::Action_Sequence::m_actions,
+                                           "run_actions",
+                                           &gob::Action_Sequence::m_run_actions,
+                                           "get_duration",
+                                           &gob::Action_Sequence::m_get_duration,
+                                           "get_goal_change",
+                                           &gob::Action_Sequence::m_get_goal_change);
+
+    lua.new_usertype<gob::Action>("GOB_Action",
+                                  "name",
+                                  &gob::Action::m_name,
+                                  "tags",
+                                  &gob::Action::m_tags,
+                                  "required_time",
+                                  &gob::Action::m_required_time,
+                                  "success_chance",
+                                  &gob::Action::m_success_chance,
+                                  "flags",
+                                  &gob::Action::m_flags,
+                                  "action",
+                                  &gob::Action::m_action,
+                                  "get_goal_change",
+                                  &gob::Action::m_get_goal_change,
+                                  "get_duration",
+                                  &gob::Action::m_get_duration);
+
     lua.new_usertype<action::Action>("Action",
                                      "name",
                                      &action::Action::name,
@@ -136,9 +184,17 @@ void bind_components(sol::state_view lua)
                                           "speed",
                                           &component::Movement::speed,
                                           "speed_multi",
-                                          &component::Movement::speed_multi);
+                                          &component::Movement::speed_multi,
+                                          "desired_position",
+                                          &component::Movement::desired_position);
 
-    lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
+    lua.new_usertype<component::Vision>("VisionComponent",
+                                        "seen",
+                                        &component::Vision::seen,
+                                        "radius",
+                                        &component::Vision::radius,
+                                        "fov",
+                                        &component::Vision::fov);
 
     lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
     lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
@@ -170,6 +226,11 @@ void bind_components(sol::state_view lua)
                                       &component::Name::entity_type,
                                       "name",
                                       &component::Name::name);
+
+
+    lua.new_usertype<component::Action>("ActionComponent", "actions", &component::Action::actions);
+
+    lua.new_usertype<component::Goal>("GoalComponent", "goals", &component::Goal::goals);
 
     lua.new_usertype<component::detail::Trait>("Trait",
                                                "name",

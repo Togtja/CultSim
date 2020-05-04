@@ -1,8 +1,11 @@
 #pragma once
 
+#include "action.h"
+#include "action_sequence.h"
 #include "entity/memories/container.h"
 #include "entity/systems/relationship.h"
 #include "gfx/render_data.h"
+#include "goal.h"
 #include "need.h"
 #include "random_engine.h"
 #include "strategy.h"
@@ -241,6 +244,17 @@ struct Pregnancy
     uint16_t children_in_pregnancy{};
 
     bool is_egg = false;
+};
+
+struct Goal
+{
+    std::vector<cs::gob::Goal> goals{};
+};
+
+struct Action
+{
+    cs::gob::Action_Sequence current_action_sequence{};
+    std::vector<cs::gob::Action_Sequence> actions{};
 };
 
 struct Sphere3D

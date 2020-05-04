@@ -1,4 +1,5 @@
 #include "scenario_scene.h"
+#include "ai/path_finding.h"
 #include "common_helpers.h"
 #include "constants.h"
 #include "debug/native_collectors.h"
@@ -372,6 +373,8 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["trait"]        = entt::type_info<component::Traits>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
+    component["action"]       = entt::type_info<component::Action>::id();
+    component["goal"]         = entt::type_info<component::Goal>::id();
 
 #define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
     REGISTER_LUA_COMPONENT(1);
@@ -556,6 +559,28 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
+            case entt::type_info<component::Action>::id():
+                if (m_registry.try_get<component::Action>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Action>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Goal>::id():
+                if (m_registry.try_get<component::Goal>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Goal>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             default:
                 spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
@@ -582,6 +607,19 @@ void ScenarioScene::bind_scenario_lua_functions()
                              for (const auto& i : need.needs)
                              {
                                  if (i.name == need_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
+    cultsim.set_function("get_goal",
+                         [](sol::this_state s, const sol::object& goal_lua, std::string_view goal_name) -> sol::object {
+                             const auto& goal = goal_lua.as<component::Goal>();
+                             for (const auto& i : goal.goals)
+                             {
+                                 if (i.m_name == goal_name)
                                  {
                                      return sol::make_object(s, &i);
                                  }
@@ -650,6 +688,8 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Action>::id(): m_registry.remove_if_exists<component::Action>(e); break;
+            case entt::type_info<component::Goal>::id(): m_registry.remove_if_exists<component::Goal>(e); break;
             case entt::type_info<component::Traits>::id():
                 if (auto per = m_registry.try_get<component::Traits>(e); per)
                 {
@@ -687,6 +727,10 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
             case entt::type_info<component::Inventory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
+            case entt::type_info<component::Action>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Action>(e));
+            case entt::type_info<component::Goal>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Goal>(e));
             default: return sol::nil;
         }
     });
@@ -778,6 +822,48 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
         }
+    });
+
+    /** Move to position */
+    cultsim.set_function("move_to", [this](entt::entity e, glm::vec3 goal) {
+        auto* movement = m_registry.try_get<component::Movement>(e);
+        auto* position = m_registry.try_get<component::Position>(e);
+        if (movement && position)
+        {
+            if (!ai::find_path_astar(position->position, goal, movement->desired_position, m_scenario.bounds))
+            {
+                spdlog::get("agent")->debug("could not create path to target");
+            };
+        }
+    });
+
+    cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
+
+    cultsim.set_function("has_tags", [this](entt::entity e, ETag tags) {
+        auto t_comp = m_registry.try_get<component::Tags>(e);
+        if (!t_comp)
+        {
+            spdlog::get("default")->error("The entity does not have a tag component.");
+            return false;
+        }
+        return (t_comp->tags & tags) == tags;
+    });
+
+    cultsim.set_function("set_tags", [this](entt::entity e, ETag tags) {
+        auto t_comp = m_registry.try_get<component::Tags>(e);
+        if (!t_comp)
+        {
+            spdlog::get("default")->error("The entity does not have a tag component.");
+            return false;
+        }
+             t_comp->tags = ETag(t_comp->tags | tags);
+    });
+    cultsim.set_function("has_set_flags",
+                         [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
+
+    cultsim.set_function("set_flags", [this](gob::Action& action, uint32_t flags) {
+        
+        action.m_flags |= flags;
     });
 
     /** Check entity validity */
@@ -1015,8 +1101,11 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
+
+    const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
         m_registry.try_get<component::Need,
+                           component::Goal,
+                           component::Action,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
@@ -1124,6 +1213,57 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("%3.1f", need.status);
             }
             ImGui::EndTable();
+        }
+    }
+
+    if (goal)
+    {
+        if (ImGui::BeginTable("Entity Goals", 2))
+        {
+            ImGui::TableSetupColumn("Goals:");
+            ImGui::TableSetupColumn("Weight:");
+
+            // Non-clickable headers
+            cs_auto_table_headers();
+
+            for (const auto& goal_t : goal->goals)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text("%s", goal_t.m_name.c_str());
+                ImGui::TableNextCell();
+                if (goal_t.m_weight_function.index() == 0)
+                {
+                    ImGui::Text("%3.1f", std::get<sol::function>(goal_t.m_weight_function)(goal_t).get<float>());
+                }
+                else
+                {
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.m_weight_function)());
+                }
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    if (action)
+    {
+        if (action->current_action_sequence.m_name != "")
+        {
+            ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
+            if (action->current_action_sequence.current_action.m_name != "")
+            {
+                int action_index = 0;
+                for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
+                {
+                    if (action->current_action_sequence.m_actions[i] == action->current_action_sequence.current_action)
+                    {
+                        action_index = i;
+                    }
+                }
+                ImGui::Text("Current Action: %s (Action %d out of %d)",
+                            action->current_action_sequence.current_action.m_name.c_str(),
+                            action_index + 1,
+                            action->current_action_sequence.m_actions.size());
+            }
         }
     }
 
