@@ -19,6 +19,12 @@ struct LoadedTexture
     std::vector<uint8_t> pixels = {};
 };
 
+struct ShaderFile
+{
+    std::string path;
+    GLenum type;
+};
+
 /**
  * Compile a shader from the provided shader source code
  *
@@ -44,6 +50,14 @@ GLuint fcompile_shader(std::string_view rpath, GLenum type);
  * @return OpenGL Name of the newly created program
  */
 GLuint create_program(const std::vector<GLuint>& shaders);
+
+/**
+ * Create and link a program from a number of shader files
+ *
+ * @param shaders A vector that describes where to find the shaders, and their types
+ * @return OpenGL name of the newly created program
+ */
+GLuint fcreate_program(const std::vector<ShaderFile>& shaders);
 
 /**
  * Convert a shader type to a human readable string

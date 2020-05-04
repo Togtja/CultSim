@@ -15,7 +15,9 @@
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
+#include "entity/systems/relationship.h"
 #include "entity/systems/rendering.h"
+#include "entity/systems/lua_system.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
@@ -40,64 +42,83 @@ extern ImFont* g_light_font;
 
 namespace cs
 {
-ScenarioScene::ScenarioScene(std::string_view scenario)
+ScenarioScene::ScenarioScene(std::string_view scenario, uint32_t random_seed) : m_rng(RandomEngine(random_seed))
 {
     m_scenario.script_path = scenario;
-}
-
-ScenarioScene::ScenarioScene(lua::Scenario scenario) : m_scenario(std::move(scenario))
-{
 }
 
 void ScenarioScene::initialize_simulation()
 {
     /** Run all initialization functions from Lua and required once for this scenario */
-    m_context->lua_state["random"] = &m_rng;
     bind_actions_for_scene();
     bind_available_lua_events();
     bind_scenario_lua_functions();
-    m_scenario = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
+    m_context->lua_state["random"] = &m_rng;
+    m_scenario                     = lua::quick_load_scenario(m_context->lua_state, m_scenario.script_path);
     gfx::get_renderer().set_camera_bounds(m_scenario.bounds);
     gfx::get_renderer().set_camera_position({0.f, 0.f, 1.f});
 
     /** Set up context variables in EnTT */
     m_registry.set<EntitySelectionHelper>();
+    m_registry.set<RandomEngine*>(&m_rng);
 
-    /** Call lua init function for this scenario */
-    m_scenario.init();
-
-    /** If there are any Traits, run their affects */
+    /** If there are any default Traits, run their affects and add them*/
     auto per_view = m_registry.view<component::Traits>();
-    per_view.each([](entt::entity e, const component::Traits& per) { effect::affect_traits(e, per); });
+    per_view.each([](entt::entity e, component::Traits& per) {
+        // Add default traits to acquired traits
+        for (auto&& i : per.start_traits)
+        {
+            per.acquired_traits.push_back(i);
+        }
+        // Run their affects
+        effect::affect_traits(e, per);
+    });
 
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
     m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
-    m_data_collector.add_collector<debug::CollectorMouse>(true);
-    m_data_collector.add_collector<debug::CollectorMouse>(false);
+    m_data_collector.add_collector<debug::CollectorMouse>(true, m_resolution);
+    m_data_collector.add_collector<debug::CollectorMouse>(false, m_resolution);
 
     /** Add systems specified by scenario */
     for (const auto& system : m_scenario.systems)
     {
-        auto type = entt::resolve(entt::hashed_string(system.c_str()));
-        if (type)
+        auto ctx = system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state};
+
+        if (system.get_type() == sol::type::string)
         {
-            auto meta = type.construct(
-                system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor, &m_context->lua_state});
-            system::ISystem& temp_ref = meta.cast<system::ISystem>();
-            m_active_systems.emplace_back(temp_ref.clone());
+            auto type = entt::resolve(entt::hashed_string(system.as<std::string>().c_str()));
+            if (type)
+            {
+                auto meta                 = type.construct(ctx);
+                system::ISystem& temp_ref = meta.cast<system::ISystem>();
+                m_active_systems.emplace_back(temp_ref.clone());
+                m_active_systems.back()->initialize();
+            }
+            else
+            {
+                spdlog::get("lua")->warn("attempt to add unknown native system: {}", system.as<std::string>());
+            }
+        }
+        else if (system.get_type() == sol::type::table)
+        {
+            m_active_systems.emplace_back(new system::LuaSystem(ctx, system.as<sol::table>()));
             m_active_systems.back()->initialize();
         }
         else
         {
-            spdlog::get("scenario")->warn("adding system \"{}\" that is unknown", system);
+            spdlog::get("lua")->error("failed to spawn Lua system. ensure parameters are correct to scenario.systems.");
         }
     }
+
+    /** Call lua init function for this scenario */
+    m_scenario.init();
 
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
         new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+    m_draw_systems.back()->initialize();
 
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
@@ -122,7 +143,7 @@ void ScenarioScene::clean_simulation()
 
     for (auto& system : m_draw_systems)
     {
-        system->initialize();
+        system->deinitialize();
     }
     m_draw_systems.clear();
 
@@ -143,12 +164,12 @@ void ScenarioScene::reset_simulation()
 
 void ScenarioScene::on_enter()
 {
-    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
-    initialize_simulation();
-
     m_resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     m_context->preferences->on_preference_changed.connect<&ScenarioScene::handle_preference_changed>(this);
+    m_name_generator.initialize(m_context->lua_state["origins"].get<sol::table>());
     input::get_input().add_context(input::EKeyContext::ScenarioScene);
+
+    initialize_simulation();
 }
 
 void ScenarioScene::on_exit()
@@ -191,6 +212,8 @@ bool ScenarioScene::update(float dt)
     {
         time_step = 0;
     }
+
+    gfx::get_renderer().update_program_info(m_simtime, input::get_input().get_mouse_pos(), m_resolution);
     for (int i = 0; i < time_step; ++i)
     {
         m_data_collector.update(dt);
@@ -208,8 +231,12 @@ bool ScenarioScene::update(float dt)
         m_scenario.update(dt);
     }
 
-    // Make sure ImGui does not get more than one update per frame
+    /** Deal with ImGui updates once per tick */
     for (auto&& system : m_active_systems)
+    {
+        system->update_imgui();
+    }
+    for (auto&& system : m_draw_systems)
     {
         system->update_imgui();
     }
@@ -257,6 +284,15 @@ void ScenarioScene::bind_actions_for_scene()
         {
             m_registry.assign<entt::tag<"selected"_hs>>(select_helper.selected_entity);
         }
+    });
+
+    /** Change render mode */
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode2D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_2D);
+    });
+
+    input::get_input().bind_action(input::EKeyContext::ScenarioScene, input::EAction::SetMode3D, [] {
+        gfx::get_renderer().set_render_mode(gfx::ERenderingMode::Render_3D);
     });
 
     /** Move to selected entity */
@@ -339,6 +375,25 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["name"]         = entt::type_info<component::Name>::id();
     component["action"]       = entt::type_info<component::Action>::id();
     component["goal"]         = entt::type_info<component::Goal>::id();
+
+#define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
+    REGISTER_LUA_COMPONENT(1);
+    REGISTER_LUA_COMPONENT(2);
+    REGISTER_LUA_COMPONENT(3);
+    REGISTER_LUA_COMPONENT(4);
+    REGISTER_LUA_COMPONENT(5);
+    REGISTER_LUA_COMPONENT(6);
+    REGISTER_LUA_COMPONENT(7);
+    REGISTER_LUA_COMPONENT(8);
+    REGISTER_LUA_COMPONENT(9);
+    REGISTER_LUA_COMPONENT(10);
+    REGISTER_LUA_COMPONENT(11);
+    REGISTER_LUA_COMPONENT(12);
+    REGISTER_LUA_COMPONENT(13);
+    REGISTER_LUA_COMPONENT(14);
+    REGISTER_LUA_COMPONENT(15);
+    REGISTER_LUA_COMPONENT(16);
+#undef REGISTER_LUA_COMPONENT
 
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
@@ -482,7 +537,17 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
-            case entt::type_info<component::Traits>::id(): return sol::make_object(s, &m_registry.get<component::Traits>(e));
+            case entt::type_info<component::Traits>::id():
+                if (m_registry.try_get<component::Traits>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Traits>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             case entt::type_info<component::Name>::id():
                 if (m_registry.try_get<component::Name>(e))
                 {
@@ -562,10 +627,58 @@ void ScenarioScene::bind_scenario_lua_functions()
                              return sol::nil;
                          });
 
+    cultsim.set_function("get_acquired_traits", [this](sol::this_state s, entt::entity e) -> sol::object {
+        if (auto trait = m_registry.try_get<component::Traits>(e); trait)
+        {
+            return sol::make_object(s, &trait->acquired_traits);
+        }
+        return sol::nil;
+    });
+
+    cultsim.set_function("add_acquired_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+        if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
+        {
+            const auto& trait = detail::get_trait(sol_trait);
+            const auto it     = std::find(trait_c->acquired_traits.begin(), trait_c->acquired_traits.end(), trait);
+            if (it == trait_c->acquired_traits.end())
+            {
+                trait_c->acquired_traits.push_back(trait);
+                return;
+            }
+            spdlog::get("lua")->info("add_acquired_trait: the given trait is already acquired");
+            return;
+        }
+        spdlog::get("lua")->warn("add_acquired_trait: the entity argument does not have the trait component");
+    });
+
+    cultsim.set_function("get_attainable_traits", [this](sol::this_state s, entt::entity e) -> sol::object {
+        if (auto trait = m_registry.try_get<component::Traits>(e); trait)
+        {
+            return sol::make_object(s, &trait->attainable_traits);
+        }
+        return sol::nil;
+    });
+
+    cultsim.set_function("add_attainable_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+        if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
+        {
+            const auto& trait = detail::get_trait(sol_trait);
+            const auto it     = std::find(trait_c->attainable_traits.begin(), trait_c->attainable_traits.end(), trait);
+            if (it == trait_c->attainable_traits.end())
+            {
+                trait_c->attainable_traits.push_back(trait);
+                return;
+            }
+            spdlog::get("lua")->info("add_attainable_trait: the given trait is already attainable");
+            return;
+        }
+        spdlog::get("lua")->warn("add_attainable_trait: the entity argument does not have the trait component");
+    });
+
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
-            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e);
+            case entt::type_info<component::Position>::id(): m_registry.remove_if_exists<component::Position>(e); break;
             case entt::type_info<component::Movement>::id(): m_registry.remove_if_exists<component::Movement>(e); break;
             case entt::type_info<component::Sprite>::id(): m_registry.remove_if_exists<component::Sprite>(e); break;
             case entt::type_info<component::Vision>::id(): m_registry.remove_if_exists<component::Vision>(e); break;
@@ -583,6 +696,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                     effect::unaffect_traits(e, *per);
                 };
                 m_registry.remove_if_exists<component::Traits>(e);
+                break;
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
         }
@@ -831,6 +945,12 @@ void ScenarioScene::bind_scenario_lua_functions()
     cultsim.set_function("generate_name", [this](const std::string& ethnicity, bool is_male) {
         return m_name_generator.generate(ethnicity, is_male, m_rng);
     });
+
+    /** Allow Lua to use Views */
+    cultsim.set_function("view", [this](sol::object types) {
+        auto vec = types.as<std::vector<uint32_t>>();
+        return m_registry.runtime_view(vec.begin(), vec.end());
+    });
 }
 
 void ScenarioScene::setup_docking_ui()
@@ -981,7 +1101,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits] =
+
+    const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
         m_registry.try_get<component::Need,
                            component::Goal,
                            component::Action,
@@ -992,7 +1113,8 @@ void ScenarioScene::draw_selected_entity_information_ui()
                            component::Tags,
                            component::Memory,
                            component::Pregnancy,
-                           component::Traits>(selection_info.selected_entity);
+                           component::Traits,
+                           component::Relationship>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -1145,13 +1267,13 @@ void ScenarioScene::draw_selected_entity_information_ui()
         }
     }
 
-    if (traits)
+    if (traits && !traits->acquired_traits.empty())
     {
         if (ImGui::BeginTable("Traits", 1))
         {
             ImGui::TableSetupColumn("Traits:");
             cs_auto_table_headers();
-            for (auto&& i : traits->traits)
+            for (auto&& i : traits->acquired_traits)
             {
                 ImGui::TableNextCell();
                 ImGui::Text("%s", fmt::format("{}", i.name).c_str());
@@ -1173,6 +1295,36 @@ void ScenarioScene::draw_selected_entity_information_ui()
     {
         ImGui::Text("Timer: %d cycles left", timer->number_of_loops);
         ImGui::ProgressBar(timer->time_spent / timer->time_to_complete, ImVec2{-1, 0}, "Progress");
+    }
+
+    if (relship)
+    {
+        system::Relationship* test;
+        for (auto&& system : m_active_systems)
+        {
+            const auto rel = dynamic_cast<system::Relationship*>(system.get());
+            if (rel)
+            {
+                const auto parents = rel->get_parent(selection_info.selected_entity);
+                if (parents.mom.ids.relationship_registry_id != entt::null)
+                {
+                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
+                }
+                else
+                {
+                    ImGui::Text("My Mom is the Simulation");
+                }
+                if (parents.dad.ids.relationship_registry_id != entt::null)
+                {
+                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
+                }
+
+                else
+                {
+                    ImGui::Text("My Dad is the Simulation");
+                }
+            }
+        }
     }
 
     ImGui::End();

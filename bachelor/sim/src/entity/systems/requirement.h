@@ -11,7 +11,7 @@ namespace cs::system
  *
  * The Requirement system checks for entities that have an associated requirement component
  * Based on the components tags, it then begins to work to fullfill said requirement, removing the component once it is done
- * The types of requirements currently supportet are:
+ * The types of requirements currently supported are:
  * Location requirements, which make the entity move to a certain position
  * Vision requirements, which require the entity to see another entity with certain tags
  * Find requirements, which make the entity search for an entity with certain tags, wandering randomly until they find one

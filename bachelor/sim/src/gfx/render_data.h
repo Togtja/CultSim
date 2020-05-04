@@ -5,6 +5,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 
 namespace cs::gfx
 {
@@ -93,6 +94,26 @@ struct DebugInstanceVertex
     glm::vec3 offset{};
     glm::vec3 scale{};
     glm::vec3 color{};
+};
+
+struct MatrixData
+{
+    glm::mat4 view_matrix;
+    glm::mat4 projection_matrix;
+};
+
+/** Program information that the shader might enjoy looking at */
+struct ProgramInformation
+{
+    glm::vec2 resolution{};
+    glm::vec2 cursor_position{};
+    float runtime{};
+    float _pad1;
+};
+
+struct SphereShape
+{
+    glm::vec4 position;
 };
 
 } // namespace cs::gfx

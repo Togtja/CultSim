@@ -3,10 +3,18 @@
 #include "camera.h"
 #include "debug_renderer.h"
 #include "sprite_renderer.h"
+#include "raymarching_renderer.h"
 #include "uniform_buffer.h"
+#include "render_data.h"
 
 namespace cs::gfx
 {
+enum class ERenderingMode
+{
+    Render_2D,
+    Render_3D
+};
+
 class Renderer
 {
 private:
@@ -16,7 +24,16 @@ private:
 
     SpriteRenderer m_sprite_renderer;
 
-    UniformBuffer<glm::mat4> m_matrix_ubo{};
+    RaymarchingRenderer m_raymarch_renderer;
+
+    UniformBuffer<MatrixData> m_matrix_ubo{};
+
+    UniformBuffer<ProgramInformation> m_programinfo_ubo{};
+
+    /** Sunlight environment UBO */
+    UniformBuffer<Environment> m_env_ubo{};
+
+    ERenderingMode m_mode = ERenderingMode::Render_2D;
 
 public:
     friend Renderer& get_renderer();
@@ -54,6 +71,16 @@ public:
     SpriteRenderer& sprite();
     [[nodiscard]] const SpriteRenderer& sprite() const;
 
+    /**
+     * Get a handle to the 3d renderer
+     *
+     * @return
+     */
+    RaymarchingRenderer& raymarch();
+    [[nodiscard]] const RaymarchingRenderer& raymarch() const;
+
+    void set_render_mode(ERenderingMode mode);
+
     void set_camera_position(const glm::vec3& pos);
 
     void move_camera(glm::vec3 delta);
@@ -62,6 +89,12 @@ public:
     glm::vec2 get_camera_position2d();
 
     void set_camera_bounds(glm::vec2 bounds);
+
+    void update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution);
+
+    void set_sun_direction(glm::vec3 dir);
+
+    void set_sun_color(glm::vec4 col);
 
     /**
      * Convert a screen coordinate to a world position

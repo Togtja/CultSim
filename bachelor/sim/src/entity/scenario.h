@@ -19,7 +19,7 @@ struct Scenario
     glm::vec2 bounds{};
 
     /** Initially active systems */
-    std::vector<std::string> systems{};
+    std::vector<sol::object> systems{};
 
     /** How often this scenario should sample data */
     float sampling_rate = 1.f;

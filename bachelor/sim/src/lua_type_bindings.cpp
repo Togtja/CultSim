@@ -1,11 +1,12 @@
 #include "lua_type_bindings.h"
+#include "debug/native_collectors.h"
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
 #include "entity/components/tags.h"
 #include "entity/name_generator.h"
 #include "entity/scenario.h"
-#include "entity/systems/system.h"
+#include "entity/systems/lua_system.h"
 #include "input/input_handler.h"
 #include "preferences.h"
 #include "random_engine.h"
@@ -226,17 +227,59 @@ void bind_components(sol::state_view lua)
                                       "name",
                                       &component::Name::name);
 
+
     lua.new_usertype<component::Action>("ActionComponent", "actions", &component::Action::actions);
 
     lua.new_usertype<component::Goal>("GoalComponent", "goals", &component::Goal::goals);
 
+    lua.new_usertype<component::detail::Trait>("Trait",
+                                               "name",
+                                               &component::detail::Trait::name,
+                                               "desc",
+                                               &component::detail::Trait::desc,
+                                               "can_inherit",
+                                               &component::detail::Trait::can_inherit,
+                                               "inherit_chance",
+                                               &component::detail::Trait::inherit_chance,
+                                               "can_mutate",
+                                               &component::detail::Trait::can_mutate,
+                                               "mutation_chance",
+                                               &component::detail::Trait::mutation_chance,
+                                               "attain",
+                                               &component::detail::Trait::attain,
+                                               "lose",
+                                               &component::detail::Trait::lose,
+                                               "affect",
+                                               &component::detail::Trait::affect,
+                                               "unaffect",
+                                               &component::detail::Trait::remove_affect);
+
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
+
+    /** Bind View */
+    lua.new_usertype<entt::runtime_view>("View",
+                                         sol::no_constructor,
+                                         "empty",
+                                         &entt::runtime_view::empty,
+                                         "size",
+                                         &entt::runtime_view::size,
+                                         "each",
+                                         &entt::runtime_view::each<sol::function>,
+                                         "contains",
+                                         &entt::runtime_view::contains);
 }
 
 void bind_systems(sol::state_view lua)
 {
-    lua.new_usertype<system::ISystem>("ISystem", "update", &system::ISystem::update);
+    lua.new_usertype<system::LuaSystem>("System",
+                                        sol::no_constructor,
+                                        "initialize",
+                                        &system::LuaSystem::initialize,
+                                        "deinitialize",
+                                        &system::LuaSystem::deinitialize,
+                                        "update",
+                                        &system::LuaSystem::update);
 
     lua.new_usertype<Scenario>("Scenario",
                                "name",
@@ -269,6 +312,7 @@ void bind_input(sol::state_view lua)
                                       {"PauseMenu", input::EKeyContext::PauseMenu},
                                       {"PreferenceScene", input::EKeyContext::PreferenceScene},
                                       {"EditorScene", input::EKeyContext::EditorScene},
+                                      {"RenderingSystem", input::EKeyContext::RenderingSystem},
                                       {"LoadScenario", input::EKeyContext::LoadScenario}});
 
     lua.new_enum<input::EAction>("EAction",
@@ -284,7 +328,10 @@ void bind_input(sol::state_view lua)
                                   {"SpeedUp", input::EAction::SpeedUp},
                                   {"SpeedDown", input::EAction::SpeedDown},
                                   {"Pause", input::EAction::Pause},
+                                  {"ReloadShaders", input::EAction::ReloadShaders},
                                   {"Quit", input::EAction::Quit},
+                                  {"SetMode2D", input::EAction::SetMode2D},
+                                  {"SetMode3D", input::EAction::SetMode3D},
                                   {"EscapeScene", input::EAction::EscapeScene}});
 
     lua.new_enum<input::EMouse>("EMouse",
@@ -335,6 +382,10 @@ void bind_utils(sol::state_view lua)
                                         &PreferenceManager::get_fullscreen,
                                         "set_fullscreen",
                                         &PreferenceManager::set_fullscreen);
+
+    /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
+     * float. */
+    lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)

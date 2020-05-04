@@ -51,11 +51,10 @@ private:
     /** Materials */
     std::unique_ptr<UniformBuffer<Material, 8>> m_material_ubo{};
 
-    /** Sunlight environment UBO */
-    UniformBuffer<Environment> m_env_ubo{};
-
 public:
     explicit SpriteRenderer(Camera& camera);
+
+    ~SpriteRenderer() noexcept;
 
     /**
      * Clear all cached sprites to allow for re-submission

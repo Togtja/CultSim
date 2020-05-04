@@ -27,6 +27,17 @@ SpriteRenderer::SpriteRenderer(Camera& camera) : m_camera(camera)
     m_camera.init(glm::vec3(0.f, 0.f, 27.f));
 }
 
+SpriteRenderer::~SpriteRenderer() noexcept
+{
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteBuffers(1, &m_ivbo);
+    glDeleteProgram(m_shader);
+
+    glDeleteTextures(m_color_texture_handles.size(), m_color_texture_handles.data());
+    glDeleteTextures(m_normal_texture_handles.size(), m_normal_texture_handles.data());
+}
+
 void SpriteRenderer::clear()
 {
     m_nsprites = 0u;
@@ -232,8 +243,6 @@ void SpriteRenderer::init_ubos()
 
     m_material_ubo->bind(1);
     m_material_ubo->flush();
-    m_env_ubo.bind(5);
-    m_env_ubo.flush();
 }
 
 } // namespace cs::gfx

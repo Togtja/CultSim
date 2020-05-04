@@ -36,10 +36,9 @@ void Application::run(const std::vector<char*>& args)
     /** Add default scene */
     m_scene_manager.push<MainMenuScene>();
 
-    /** Temporary replacement of DT until we figure out frame rate issues! */
+    /** Fixed timestep set-up */
     DeltaClock dt_clock{};
     constexpr auto timestep            = DeltaClock::TimeUnit{1.f / 60.f};
-    bool meta_window_visible           = false;
     auto time_since_tick               = timestep;
     std::array<float, 144> average_fps = {};
     int next_fps                       = 0;
@@ -52,6 +51,8 @@ void Application::run(const std::vector<char*>& args)
         auto frame_time                 = dt_clock.restart_time_unit();
         average_fps[(++next_fps) % 144] = frame_time.count();
         time_since_tick += frame_time;
+
+        /** Update until we caught up, or only when needed otherwise */
         while (time_since_tick >= timestep)
         {
             CS_AUTOTIMER(Update Time);
@@ -98,10 +99,12 @@ void Application::update(float dt)
     ImGui::Text("Lua memory: %.2f Kb", m_lua.memory_used() / 1024.f);
     m_scene_manager.update(dt);
     m_preferences.show_debug_ui();
+    AutoTimer::show_debug_ui();
 }
 
 void Application::draw()
 {
+    gfx::get_renderer().raymarch().clear();
     gfx::get_renderer().sprite().clear();
 
     m_scene_manager.draw();
@@ -152,7 +155,7 @@ bool Application::init_input()
 bool Application::init_lua()
 {
     /* Load necessary libraries for Lua */
-    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string);
+    m_lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::string, sol::lib::table);
     m_lua.set_exception_handler(&lua::exception_handler);
 
     /* Bind IO Functions (globally) */

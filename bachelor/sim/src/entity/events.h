@@ -100,4 +100,9 @@ struct PickedUpEntity
 
     ETag tags{};
 };
+
+struct BornEntity
+{
+    entt::entity new_born{};
+};
 } // namespace cs::event

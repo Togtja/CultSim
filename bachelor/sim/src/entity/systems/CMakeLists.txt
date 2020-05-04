@@ -13,6 +13,9 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/memory.cpp
         ${CMAKE_CURRENT_LIST_DIR}/memory.h
+        
+        ${CMAKE_CURRENT_LIST_DIR}/lua_system.h
+        ${CMAKE_CURRENT_LIST_DIR}/lua_system.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/mitigation_test.cpp
         ${CMAKE_CURRENT_LIST_DIR}/mitigation.cpp
@@ -24,6 +27,9 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/need_test.cpp
         ${CMAKE_CURRENT_LIST_DIR}/need.cpp
         ${CMAKE_CURRENT_LIST_DIR}/need.h
+
+        ${CMAKE_CURRENT_LIST_DIR}/relationship.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/relationship.h
 
         ${CMAKE_CURRENT_LIST_DIR}/rendering.cpp
         ${CMAKE_CURRENT_LIST_DIR}/rendering.h
@@ -40,19 +46,19 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/system.h
 
         ${CMAKE_CURRENT_LIST_DIR}/timer.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/timer.h
-              
+        ${CMAKE_CURRENT_LIST_DIR}/timer.h         
         
         ${CMAKE_CURRENT_LIST_DIR}/goal.cpp
         ${CMAKE_CURRENT_LIST_DIR}/goal.h
         
         ${CMAKE_CURRENT_LIST_DIR}/gob.cpp
         ${CMAKE_CURRENT_LIST_DIR}/gob.h
-
                 
         ${CMAKE_CURRENT_LIST_DIR}/gobbas.cpp
         ${CMAKE_CURRENT_LIST_DIR}/gobbas.h
-
+        
+        ${CMAKE_CURRENT_LIST_DIR}/traits.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/traits.h
 
         ${CMAKE_CURRENT_LIST_DIR}/deletion.cpp
         ${CMAKE_CURRENT_LIST_DIR}/deletion.h
