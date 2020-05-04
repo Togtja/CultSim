@@ -2,14 +2,10 @@
 #include "constants.h"
 #include "robin_hood.h"
 
-#include <queue>
-#include <random>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/hash.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
+/** TODO: Needs documentation */
 namespace cs::ai
 {
 std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& bounds, const int grid_size);
@@ -29,7 +25,7 @@ void reconstruct_path(const glm::ivec2& start,
 
 bool find_path_astar(const glm::vec2& start_vec,
                      const glm::vec2& goal_vec,
-                     std::vector<glm::vec3>& poss,
+                     std::vector<glm::vec3>& pos,
                      const glm::vec2& bounds,
                      const int accuracy = SIM_GRID_SIZE);
 } // namespace cs::ai

@@ -1,45 +1,44 @@
 #include "path_finding.h"
 
 #include <cmath>
+#include <queue>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 #include <spdlog/spdlog.h>
 
 namespace cs::ai
 {
+
 std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& bounds, const int grid_size)
 {
-    std::vector<glm::vec2> ret;
 
     glm::vec2 alt_xpos{pos};
     if (pos.x < 0)
     {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5
+        /** If bonds min/max is (-3,-3)(3,3) and goal is (-2, y), then alt goal is (3*2+1 + -2) = 5 */
         alt_xpos.x = (bounds.x * 2 + grid_size) + pos.x;
     }
     else if (pos.x > 0)
     {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5
+        /** If bonds min/max is (-3,-3)(3,3) and goal is (2, y), then alt goal is (-(3*2+1) + 2) = -5 */
         alt_xpos.x = -(bounds.x * 2 + grid_size) + pos.x;
     }
 
     glm::vec2 alt_ypos{pos};
-    // Cheking vertical
+    /** Cheking vertical */
     if (pos.y < 0)
     {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4
+        /** If bonds min/max is (-3,-3)(3,3) and goal is (x, -3), then alt goal is (3*2+1 + -3) = 4 */
         alt_ypos.y = (bounds.y * 2 + grid_size) + pos.y;
     }
     else if (pos.y > 0)
     {
-        // If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4
+        /** If bonds min/max is (-3,-3)(3,3) and goal is (x, 3), then alt goal is (-(3*2+1) + 3) = -4 */
         alt_ypos.y = -(bounds.y * 2 + grid_size) + pos.y;
     }
 
-    ret.emplace_back(alt_xpos);
-    ret.emplace_back(alt_ypos);
-    ret.emplace_back(glm::vec2(alt_xpos.x, alt_ypos.y));
-    ret.emplace_back(pos);
-
-    return ret;
+    return {alt_xpos,alt_ypos, glm::vec2(alt_xpos.x, alt_ypos.y), pos};
 }
 
 glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid)
@@ -105,7 +104,7 @@ bool find_path_astar(const glm::vec2& start_vec,
     }
 
     goal_grid = open.top().second;
-    // Priority_queue does not have a clear function
+    /** Priority_queue does not have a clear function */
     while (!open.empty())
     {
         open.pop();
