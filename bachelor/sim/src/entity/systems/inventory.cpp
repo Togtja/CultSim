@@ -10,20 +10,15 @@ void Inventory::update(float dt)
 {
     CS_AUTOTIMER(Inventory System);
 
-    auto& registry = *m_context.registry;
-    auto view      = registry.view<component::Inventory, component::Tags, component::Position>();
+    auto view = m_context.registry->view<component::Inventory, component::Tags, component::Position>();
 
-    view.each([this, dt, &registry](entt::entity e,
-                                    component::Inventory& inventory,
-                                    component::Tags& tags,
-                                    const component::Position& pos) {
-
-        /**Make sure that entities can see that other entities have an inventory with items in it */
+    view.each([this, dt](entt::entity e, component::Inventory& inventory, component::Tags& tags, const component::Position& pos) {
+        /** Make sure that entities can see that other entities have an inventory with items in it */
         if (inventory.size != 0 && !(tags.tags & TAG_Inventory))
         {
             tags.tags = ETag(tags.tags | TAG_Inventory);
         }
-        if (inventory.size == 0 && (tags.tags & TAG_Inventory)) 
+        if (inventory.size == 0 && (tags.tags & TAG_Inventory))
         {
             tags.tags = ETag(tags.tags & ~TAG_Inventory);
         }
@@ -32,9 +27,9 @@ void Inventory::update(float dt)
         {
             inventory.size = inventory.contents.size();
             ETag tags{};
-            for (entt::entity component : inventory.contents)
+            for (const entt::entity component : inventory.contents)
             {
-                if (auto component_tags = registry.try_get<component::Tags>(component); component_tags)
+                if (auto component_tags = m_context.registry->try_get<component::Tags>(component); component_tags)
                 {
                     tags = ETag(tags | component_tags->tags);
                     tags = ETag(tags & ~TAG_Inventory);
@@ -48,7 +43,7 @@ void Inventory::update(float dt)
         }
         if (tags.tags & TAG_Delete)
         {
-            for (entt::entity component : inventory.contents)
+            for (const entt::entity component : inventory.contents)
             {
                 glm::vec3 new_pos{pos.position.x + m_context.rng->uniform(-10.f, 10.f),
                                   pos.position.y + m_context.rng->uniform(-10.f, 10.f),

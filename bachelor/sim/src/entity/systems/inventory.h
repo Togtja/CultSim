@@ -5,6 +5,7 @@
 
 namespace cs::system
 {
+/** TODO: Documentation */
 class Inventory : public ISystem
 {
 public:
