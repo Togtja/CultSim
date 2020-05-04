@@ -11,8 +11,11 @@
 namespace cs::gob
 {
 /** TODO: Fix naming of variables*/
+/** TODO: More Documentation*/
 struct Action
 {
+    using ADurationFunction = std::variant<sol::function, std::function<float(const Action& action, entt::entity e)>>;
+
     std::string name{};
     ETag tags{};
 
@@ -25,10 +28,9 @@ struct Action
 
     sol::function m_get_goal_change{};
 
-    std::variant<sol::function, std::function<float(const Action& action, entt::entity e)>> m_get_duration =
-        [this](const Action& action, entt::entity e) {
-            return action.m_required_time;
-        };
+    ADurationFunction m_get_duration = [this](const Action& action, entt::entity e) {
+        return action.m_required_time;
+    };
 };
 
 inline bool operator==(const Action& lhs, const Action& rhs)
