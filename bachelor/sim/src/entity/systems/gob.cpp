@@ -54,7 +54,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<float(const gob::ActionSequence&, const gob::Goal&)>>(
+            value += std::get<std::function<const float(const gob::ActionSequence&, const gob::Goal&)>>(
                 action.m_get_goal_change)(action, goal);
         }
 
@@ -66,7 +66,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         else
         {
             time_value +=
-                std::get<std::function<float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
+                std::get<std::function<const float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
         }
 
         if (goal.m_change_over_time.index() == 0)
@@ -75,7 +75,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<float(const float)>>(goal.m_change_over_time)(time_value);
+            value += std::get<std::function<const float(const float)>>(goal.m_change_over_time)(time_value);
         }
 
         if (goal.m_get_discontentment.index() == 0)
@@ -84,7 +84,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            discontentment += std::get<std::function<float(const float)>>(goal.m_get_discontentment)(value);
+            discontentment += std::get<std::function<const float(const float)>>(goal.m_get_discontentment)(value);
         }
     }
     return discontentment;

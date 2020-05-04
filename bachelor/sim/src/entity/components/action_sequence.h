@@ -18,8 +18,8 @@ namespace cs::gob
 struct ActionSequence
 {
     using RunActionsFunction = std::variant<sol::function, std::function<bool(ActionSequence&, entt::entity, std::string*)>>;
-    using GoalChangeFunction = std::variant<sol::function, std::function<float(const ActionSequence&, const Goal&)>>;
-    using DurationFunction   = std::variant<sol::function, std::function<float(const ActionSequence&, entt::entity e)>>;
+    using GoalChangeFunction = std::variant<sol::function, std::function<const float(const ActionSequence&, const Goal&)>>;
+    using DurationFunction   = std::variant<sol::function, std::function<const float(const ActionSequence&, entt::entity e)>>;
 
 public:
     std::string m_name{};
