@@ -4,7 +4,7 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/strategy.h"
-#include "entt/entt.hpp"
+#include "entt/entity/registry.hpp"
 
 #include <spdlog/spdlog.h>
 
@@ -23,17 +23,16 @@ void Mitigation::update(float dt)
 {
     CS_AUTOTIMER(Mitigation System);
 
-    auto& registry = *m_context.registry;
-
-    auto view = registry.view<component::Need, component::Strategy, component::Tags>();
+    auto view = m_context.registry->view<component::Need, component::Strategy, component::Tags>();
     view.each([this](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
-            auto temp = needs.vital_needs.front();
-            // Put the most pressing needs to the front
+            const auto& temp = needs.vital_needs.front();
+
+            /** Put the most pressing needs to the front*/
             std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());
 
-            // If the most pressing need has changed
+            /** If the most pressing need has changed */
             if (temp != needs.vital_needs.front())
             {
                 strategies.staged_strategies.clear();
@@ -84,27 +83,25 @@ bool Mitigation::add_strategies(component::Strategy& strategies, const ai::Need&
 {
     ai::Strategy temp{};
 
-    // Find actions with tags that match any tag of the need
-    for (auto strategy : strategies.strategies)
+    /** Find actions with tags that match any tag of the need */
+    for (const auto& strategy : strategies.strategies)
     {
-        // Bitwise operation have very low costs so we check everything we can bitwise before going into the "slightly" more
-        // costly count_set_bits function
+        /** Bitwise operation have very low costs so we check everything we can bitwise before going into the "slightly" more
+         costly count_set_bits function */
 
-        // Check if the entities tags match the requirements of the strategy
+        /** Check if the entities tags match the requirements of the strategy */
         if ((strategy.prerequisites & tags.tags) == strategy.prerequisites)
         {
-            // Check if ANY of the strategies tags matches the needs tags
+            /** Check if ANY of the strategies tags matches the needs tags */
             if ((strategy.tags & need.tags) != 0)
             {
-                auto matching_tags = count_set_bits(strategy.tags & need.tags);
-                temp               = strategy;
+                const auto matching_tags = count_set_bits(strategy.tags & need.tags);
+                temp                     = strategy;
                 temp.desirability += matching_tags;
                 strategies.staged_strategies.push_back(temp);
             }
         }
     }
-
-    // TODO: Add checks for agents traits and personal history to further increase / decrease strategy desirability
 
     if (!strategies.staged_strategies.empty())
     {
