@@ -46,9 +46,9 @@ void Health::update(float dt)
 
         if (m_timer > 1.f)
         {
-            m_timer           = 0.f;
-            auto death_chance = pow(sigmoid(pow(age.current_age, 2) / pow(age.average_life_expectancy, 2)), 20);
-            auto death_roll   = m_context.rng->trigger(death_chance);
+            m_timer                 = 0.f;
+            const auto death_chance = pow(sigmoid(pow(age.current_age, 2) / pow(age.average_life_expectancy, 2)), 20);
+            const auto death_roll   = m_context.rng->trigger(death_chance);
             if (death_roll && dt != 0)
             {
                 spdlog::get("agent")->warn(
