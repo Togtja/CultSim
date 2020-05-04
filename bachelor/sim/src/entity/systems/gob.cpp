@@ -45,7 +45,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<float()>>(goal.m_weight_function)();
+            value += std::get<std::function<const float()>>(goal.m_weight_function)();
         }
 
         if (action.m_get_goal_change.index() == 0)

@@ -84,6 +84,7 @@ struct Hearing
 
 struct Timer
 {
+    /** TODO: Add typedefs for std::functions */
     using OnCompleteFunction = std::variant<std::function<void(entt::entity, entt::registry&)>, sol::function>;
 
     float time_to_complete{};

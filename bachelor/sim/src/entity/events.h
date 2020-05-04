@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <entt/fwd.hpp>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 namespace cs::event

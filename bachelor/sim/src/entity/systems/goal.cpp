@@ -27,7 +27,7 @@ void Goal::update(float dt)
             }
             else
             {
-                lhs_v = std::get<std::function<float()>>(lhs.m_weight_function)();
+                lhs_v = std::get<std::function<const float()>>(lhs.m_weight_function)();
             }
 
             if (rhs.m_weight_function.index() == 0)
@@ -36,7 +36,7 @@ void Goal::update(float dt)
             }
             else
             {
-                rhs_v = std::get<std::function<float()>>(rhs.m_weight_function)();
+                rhs_v = std::get<std::function<const float()>>(rhs.m_weight_function)();
             }
 
             return lhs_v < rhs_v;

@@ -1,4 +1,5 @@
 #include "health.h"
+#include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/events.h"
@@ -35,8 +36,7 @@ void Health::update(float dt)
             return;
         }
 
-            health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
-
+        health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
     });
 
     auto age_view = m_context.registry->view<component::Age>();
