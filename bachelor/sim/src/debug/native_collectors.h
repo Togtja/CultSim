@@ -3,15 +3,15 @@
 #include "data_collector.h"
 
 #include <entt/fwd.hpp>
-
 #include <sol/table.hpp>
 
 namespace cs::debug
 {
+/** TODO: Document these two as well */
+
 class CollectorLivingEntities : public DataCollector::Command
 {
 private:
-    /** Registry */
     entt::registry* m_registry = nullptr;
 
 public:
@@ -24,7 +24,6 @@ public:
 class CollectorAverageHealth : public DataCollector::Command
 {
 private:
-    /** Registry */
     entt::registry* m_registry = nullptr;
 
 public:
@@ -40,7 +39,6 @@ public:
 class CollectorNeed : public DataCollector::Command
 {
 private:
-    /** Registry */
     entt::registry* m_registry = nullptr;
 
     /** Need to collect */
