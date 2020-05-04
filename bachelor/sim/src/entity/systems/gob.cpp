@@ -32,7 +32,7 @@ void GOB::update(float dt)
     });
 }
 
-float GOB::calculate_discontentment(entt::entity e, const gob::Action_Sequence& action, const std::vector<gob::Goal>& goals)
+float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& action, const std::vector<gob::Goal>& goals)
 {
     auto discontentment = 0.f;
 
@@ -54,7 +54,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::Action_Sequence& 
         }
         else
         {
-            value += std::get<std::function<float(const gob::Action_Sequence&, const gob::Goal&)>>(
+            value += std::get<std::function<float(const gob::ActionSequence&, const gob::Goal&)>>(
                 action.m_get_goal_change)(action, goal);
         }
 
@@ -66,7 +66,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::Action_Sequence& 
         else
         {
             time_value +=
-                std::get<std::function<float(const gob::Action_Sequence&, entt::entity)>>(action.m_get_duration)(action, e);
+                std::get<std::function<float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
         }
 
         if (goal.m_change_over_time.index() == 0)

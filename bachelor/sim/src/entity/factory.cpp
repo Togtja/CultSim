@@ -125,11 +125,11 @@ bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
 
 bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& actions                       = reg.assign_or_replace<component::Action>(e);
+    auto& actions                      = reg.assign_or_replace<component::Action>(e);
     const auto& action_sequence_tables = table["actions"].get_or<std::vector<sol::table>>({});
     for (const auto& action_sequence_table : action_sequence_tables)
     {
-        auto action_sequence = gob::Action_Sequence{
+        auto action_sequence = gob::ActionSequence{
             action_sequence_table["name"].get<std::string>(),
             action_sequence_table["tags"].get<ETag>(),
         };
@@ -174,7 +174,7 @@ bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table tabl
 
 bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& goal_comp    = reg.assign_or_replace<component::Goal>(e);
+    auto& goal_comp   = reg.assign_or_replace<component::Goal>(e);
     const auto& goals = table["goals"].get_or<std::vector<sol::table>>({});
     for (const auto& goal_table : goals)
     {

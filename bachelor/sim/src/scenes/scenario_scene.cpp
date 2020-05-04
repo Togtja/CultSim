@@ -12,12 +12,12 @@
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
 #include "entity/systems/health.h"
+#include "entity/systems/lua_system.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/relationship.h"
 #include "entity/systems/rendering.h"
-#include "entity/systems/lua_system.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
@@ -856,15 +856,12 @@ void ScenarioScene::bind_scenario_lua_functions()
             spdlog::get("default")->error("The entity does not have a tag component.");
             return false;
         }
-             t_comp->tags = ETag(t_comp->tags | tags);
+        t_comp->tags = ETag(t_comp->tags | tags);
     });
     cultsim.set_function("has_set_flags",
                          [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
 
-    cultsim.set_function("set_flags", [this](gob::Action& action, uint32_t flags) {
-        
-        action.m_flags |= flags;
-    });
+    cultsim.set_function("set_flags", [this](gob::Action& action, uint32_t flags) { action.m_flags |= flags; });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -1101,7 +1098,6 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-
     const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
         m_registry.try_get<component::Need,
                            component::Goal,
@@ -1249,7 +1245,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
         if (action->current_action_sequence.m_name != "")
         {
             ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
-            if (action->current_action_sequence.current_action.m_name != "")
+            if (action->current_action_sequence.current_action.name != "")
             {
                 int action_index = 0;
                 for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
@@ -1260,7 +1256,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                     }
                 }
                 ImGui::Text("Current Action: %s (Action %d out of %d)",
-                            action->current_action_sequence.current_action.m_name.c_str(),
+                            action->current_action_sequence.current_action.name.c_str(),
                             action_index + 1,
                             action->current_action_sequence.m_actions.size());
             }

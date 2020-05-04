@@ -4,7 +4,6 @@
 #include <functional>
 #include <string>
 #include <variant>
-#include <vector>
 
 namespace cs::ai
 {

@@ -106,27 +106,27 @@ void bind_components(sol::state_view lua)
                                 "get_discontentment",
                                 &gob::Goal::m_get_discontentment);
 
-    lua.new_usertype<gob::Action_Sequence>("Action_Sequence",
-                                           "name",
-                                           &gob::Action_Sequence::m_name,
-                                           "tags",
-                                           &gob::Action_Sequence::m_tags,
-                                           "current_action",
-                                           &gob::Action_Sequence::current_action,
-                                           "actions",
-                                           &gob::Action_Sequence::m_actions,
-                                           "run_actions",
-                                           &gob::Action_Sequence::m_run_actions,
-                                           "get_duration",
-                                           &gob::Action_Sequence::m_get_duration,
-                                           "get_goal_change",
-                                           &gob::Action_Sequence::m_get_goal_change);
+    lua.new_usertype<gob::ActionSequence>("ActionSequence",
+                                          "name",
+                                          &gob::ActionSequence::m_name,
+                                          "tags",
+                                          &gob::ActionSequence::m_tags,
+                                          "current_action",
+                                          &gob::ActionSequence::current_action,
+                                          "actions",
+                                          &gob::ActionSequence::m_actions,
+                                          "run_actions",
+                                          &gob::ActionSequence::m_run_actions,
+                                          "get_duration",
+                                          &gob::ActionSequence::m_get_duration,
+                                          "get_goal_change",
+                                          &gob::ActionSequence::m_get_goal_change);
 
     lua.new_usertype<gob::Action>("GOB_Action",
                                   "name",
-                                  &gob::Action::m_name,
+                                  &gob::Action::name,
                                   "tags",
-                                  &gob::Action::m_tags,
+                                  &gob::Action::tags,
                                   "required_time",
                                   &gob::Action::m_required_time,
                                   "success_chance",
@@ -226,7 +226,6 @@ void bind_components(sol::state_view lua)
                                       &component::Name::entity_type,
                                       "name",
                                       &component::Name::name);
-
 
     lua.new_usertype<component::Action>("ActionComponent", "actions", &component::Action::actions);
 
