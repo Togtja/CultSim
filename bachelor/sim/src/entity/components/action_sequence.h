@@ -1,10 +1,11 @@
 #pragma once
 #include "action.h"
+#include "goal.h"
 #include "tags.h"
 
-#include <string>
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <entt/entt.hpp>
@@ -12,8 +13,14 @@
 
 namespace cs::gob
 {
-class Action_Sequence
+/** TODO: Change variable names*/
+/** TODO: More documentation*/
+struct ActionSequence
 {
+    using RunActionsFunction = std::variant<sol::function, std::function<bool(ActionSequence&, entt::entity, std::string*)>>;
+    using GoalChangeFunction = std::variant<sol::function, std::function<float(const ActionSequence&, const Goal&)>>;
+    using DurationFunction   = std::variant<sol::function, std::function<float(const ActionSequence&, entt::entity e)>>;
+
 public:
     std::string m_name{};
     ETag m_tags{};
@@ -22,10 +29,9 @@ public:
 
     std::vector<Action> m_actions{};
 
-    std::variant<sol::function, std::function<bool(Action_Sequence&, entt::entity, std::string*)>> m_run_actions =
-        [this](Action_Sequence& self, const entt::entity e, std::string* error) -> bool {
+    RunActionsFunction m_run_actions = [this](ActionSequence& self, const entt::entity e, std::string* error) -> bool {
         /**As long as we have not completed our action, keep working on it*/
-        auto finished = self.current_action.m_action(self.current_action, e, error);
+        const auto finished = self.current_action.m_action(self.current_action, e, error);
 
         /**We cannot complete the action*/
         if (!error->empty())
@@ -47,6 +53,7 @@ public:
                 error->clear();
             }
         }
+
         /**We have completed the action*/
         else if (finished)
         {
@@ -54,49 +61,36 @@ public:
             {
                 return true;
             }
-            else
-            {
-                for (int i = self.m_actions.size() - 1; i >= 0; i--)
-                {
-                    if (self.current_action == self.m_actions[i])
-                    {
-                        self.current_action = self.m_actions[i - 1];
-                        break;
-                    }
-                }
-                return false;
-            }
+            const auto itr      = std::find(self.m_actions.rbegin(), self.m_actions.rend(), self.current_action);
+            self.current_action = *(itr + 1);
         }
         return false;
     };
 
-    std::variant<sol::function, std::function<float(const Action_Sequence&, const Goal&)>> m_get_goal_change =
-        [this](const Action_Sequence& action_sequence, const Goal& goal) {
-            /**-1 for undefined */
-            float result = 0;
-            for (auto& action : action_sequence.m_actions)
-            {
-                result += action.m_get_goal_change(goal).get<float>();
-            }
-            return result;
-        };
+    GoalChangeFunction m_get_goal_change = [this](const ActionSequence& action_sequence, const Goal& goal) {
+        float result = 0;
+        for (const auto& action : action_sequence.m_actions)
+        {
+            result += action.m_get_goal_change(goal).get<float>();
+        }
+        return result;
+    };
 
-    std::variant<sol::function, std::function<float(const Action_Sequence&, entt::entity e)>> m_get_duration =
-        [this](const Action_Sequence& action_sequence, entt::entity e) {
-            float result = 0.0;
-            for (auto& action : action_sequence.m_actions)
+    DurationFunction m_get_duration = [this](const ActionSequence& action_sequence, const entt::entity e) {
+        float result = 0.0;
+        for (const auto& action : action_sequence.m_actions)
+        {
+            if (action.m_get_duration.index() == 0)
             {
-                if (action.m_get_duration.index() == 0)
-                {
-                    result += std::get<sol::function>(action.m_get_duration)(action, e).get<float>();
-                }
-                else
-                {
-                    result += std::get<std::function<float(const Action&, entt::entity)>>(action.m_get_duration)(action, e);
-                }
+                result += std::get<sol::function>(action.m_get_duration)(action, e).get<float>();
             }
-            return result;
-        };
+            else
+            {
+                result += std::get<std::function<float(const Action&, entt::entity)>>(action.m_get_duration)(action, e);
+            }
+        }
+        return result;
+    };
 };
 
 } // namespace cs::gob
