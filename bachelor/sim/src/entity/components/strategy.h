@@ -8,13 +8,14 @@
 
 namespace cs::ai
 {
+/** TODO: Add Documentation */
 struct Strategy
 {
-    std::string name;
+    std::string name{};
 
     float desirability{};
 
-    int working_on_action = 0;
+    int working_on_action{0};
 
     ETag tags{};
 
