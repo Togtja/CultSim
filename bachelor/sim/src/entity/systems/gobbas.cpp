@@ -11,7 +11,7 @@ void GOBBAS::update(float dt)
     auto& registry = *m_context.registry;
 
     auto view = registry.view<component::Action>();
-    view.each([this, dt](entt::entity e, component::Action& action) {
+    view.each([](entt::entity e, component::Action& action) {
         bool finished{};
         std::string error{};
 
@@ -22,8 +22,8 @@ void GOBBAS::update(float dt)
         }
         else
         {
-            finished =
-                std::get<std::function<bool(gob::Action_Sequence&, entt::entity, std::string&)>>(action.current_action_sequence.m_run_actions)(action.current_action_sequence,e, error);
+            finished = std::get<std::function<bool(gob::Action_Sequence&, entt::entity, std::string*)>>(
+                action.current_action_sequence.m_run_actions)(action.current_action_sequence, e, &error);
         }
 
         /**If we get an error or finish, clear our current action sequence*/
