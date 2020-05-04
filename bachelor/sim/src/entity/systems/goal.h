@@ -3,6 +3,7 @@
 
 namespace cs::system
 {
+/** TODO: Documentation */
 class Goal : public ISystem
 {
 public:

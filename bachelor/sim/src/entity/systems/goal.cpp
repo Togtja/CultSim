@@ -8,15 +8,14 @@ void Goal::update(float dt)
 {
     CS_AUTOTIMER(Goal System);
 
-    auto& registry = *m_context.registry;
-
-    auto view = registry.view<component::Goal>();
+    auto view = m_context.registry->view<component::Goal>();
     view.each([this, dt](entt::entity e, component::Goal& goal) {
         for (auto& current_goal : goal.goals)
         {
             current_goal.m_age += dt;
         }
-        // Puts the most pressing goal in the back
+
+        /** Puts the most pressing goal in the back */
         std::sort(goal.goals.begin(), goal.goals.end(), [](const gob::Goal& lhs, const gob::Goal& rhs) {
             float lhs_v = 0;
             float rhs_v = 0;
