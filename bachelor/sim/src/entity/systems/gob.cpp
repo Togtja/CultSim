@@ -8,9 +8,7 @@ void GOB::update(float dt)
 {
     CS_AUTOTIMER(Goal System);
 
-    auto& registry = *m_context.registry;
-
-    auto view = registry.view<component::Goal, component::Action>();
+    auto view = m_context.registry->view<component::Goal, component::Action>();
     view.each([this, dt](entt::entity e, const component::Goal& goal, component::Action& action) {
         if (action.current_action_sequence.m_name.empty())
         {
@@ -30,6 +28,11 @@ void GOB::update(float dt)
             action.current_action_sequence.current_action = action.current_action_sequence.m_actions.back();
         }
     });
+}
+
+ISystem* GOB::clone()
+{
+    return new GOB(m_context);
 }
 
 float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& action, const std::vector<gob::Goal>& goals)
@@ -88,9 +91,5 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
     }
     return discontentment;
-}
-ISystem* GOB::clone()
-{
-    return new GOB(m_context);
 }
 } // namespace cs::system
