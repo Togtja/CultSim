@@ -19,13 +19,13 @@ struct Action
     ETag requirements{};
 
     float time_to_complete{};
-    float success_chance = 1.f;
+    float success_chance{1.f};
 
     sol::function success{};
     sol::function failure{};
     sol::function abort{};
 
-    float time_spent = 0.f;
+    float time_spent{0.f};
 
     entt::entity target = entt::null;
 };

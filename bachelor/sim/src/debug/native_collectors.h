@@ -12,7 +12,7 @@ namespace cs::debug
 class CollectorLivingEntities : public DataCollector::Command
 {
 private:
-    entt::registry* m_registry = nullptr;
+    entt::registry* m_registry{nullptr};
 
 public:
     CollectorLivingEntities(entt::registry& registry);
@@ -39,7 +39,7 @@ public:
 class CollectorNeed : public DataCollector::Command
 {
 private:
-    entt::registry* m_registry = nullptr;
+    entt::registry* m_registry{nullptr};
 
     /** Need to collect */
     std::string m_need_name{};
@@ -57,7 +57,7 @@ public:
 class CollectorMouse : public DataCollector::Command
 {
 private:
-    bool m_x_axis = false;
+    bool m_x_axis{false};
 
     glm::ivec2 m_resolution{};
 
