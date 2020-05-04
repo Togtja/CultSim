@@ -4,7 +4,6 @@
 
 #include <robin_hood.h>
 #include <spdlog/spdlog.h>
-#include <robin_hood.h>
 
 namespace cs
 {
@@ -20,6 +19,7 @@ namespace cs
  */
 class AutoTimer
 {
+private:
     using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
     using TimeUnit  = std::chrono::duration<double, std::milli>;
 
@@ -29,8 +29,9 @@ class AutoTimer
         double time_ms{};
     };
 
-private:
+    /** TODO: Add comments for the following two variables*/
     TimePoint m_start_time = std::chrono::steady_clock::now();
+
     std::string_view m_name{};
 
     /** AutoTimer Results */
@@ -48,7 +49,7 @@ public:
 
     ~AutoTimer() noexcept
     {
-        TimeUnit timed = std::chrono::steady_clock::now() - m_start_time;
+        const TimeUnit timed = std::chrono::steady_clock::now() - m_start_time;
 
         auto itr = std::find_if(s_results.begin(), s_results.end(), [this](const auto& r) { return r.name == m_name; });
 
@@ -80,9 +81,9 @@ public:
 template<typename Callable, typename... Args, typename = std::enable_if_t<std::is_invocable_v<Callable, Args...>>>
 double measure_callable(Callable&& func, Args&&... args)
 {
-    auto before = std::chrono::steady_clock::now();
+    const auto before = std::chrono::steady_clock::now();
     std::invoke(func, std::forward<Args>(args)...);
-    auto after = std::chrono::steady_clock::now();
+    const auto after = std::chrono::steady_clock::now();
     return std::chrono::duration<double, std::milli>(after - before).count();
 }
 } // namespace cs
