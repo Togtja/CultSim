@@ -9,10 +9,8 @@
 
 namespace cs::ai
 {
-
 std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& bounds, const int grid_size)
 {
-
     glm::vec2 alt_xpos{pos};
     if (pos.x < 0)
     {
@@ -38,7 +36,7 @@ std::vector<glm::vec2> pos_to_wrap_grid(const glm::vec2& pos, const glm::vec2& b
         alt_ypos.y = -(bounds.y * 2 + grid_size) + pos.y;
     }
 
-    return {alt_xpos,alt_ypos, glm::vec2(alt_xpos.x, alt_ypos.y), pos};
+    return {alt_xpos, alt_ypos, glm::vec2(alt_xpos.x, alt_ypos.y), pos};
 }
 
 glm::ivec2 world_to_grid(const glm::vec2& pos, const int grid)
@@ -106,7 +104,7 @@ bool find_path_astar(const glm::vec2& start_vec,
     }
 
     goal_grid = open.top().second;
-    
+
     /** Priority_queue does not have a clear function */
     while (!open.empty())
     {
@@ -141,12 +139,13 @@ bool find_path_astar(const glm::vec2& start_vec,
                 {
                     continue;
                 }
-                int new_cost = a_star_cost[curr] + 1; // + cost of graph node needs to be computed
+
+                const int new_cost = a_star_cost[curr] + 1; // + cost of graph node needs to be computed
                 if (a_star_cost.find(next) == a_star_cost.end() || new_cost < a_star_cost[next])
                 {
-                    a_star_cost[next] = new_cost;
-                    a_star_grid[next] = curr;
-                    int priority      = new_cost + path_heuristic(next, goal_grid);
+                    a_star_cost[next]  = new_cost;
+                    a_star_grid[next]  = curr;
+                    const int priority = new_cost + path_heuristic(next, goal_grid);
 
                     open.emplace(priority, next);
                 }
