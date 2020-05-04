@@ -19,6 +19,7 @@ void Memory::deinitialize()
     m_context.dispatcher->sink<event::CreatedMemory>().disconnect<&Memory::update_memories>(*this);
 }
 
+/** TODO: Move stuff into functions */
 void Memory::update(float dt)
 {
     CS_AUTOTIMER(Memory System);
@@ -26,7 +27,8 @@ void Memory::update(float dt)
     m_timer += dt;
     auto& registry = m_context.registry;
 
-    if (m_timer > 0.4f && m_timer < 0.6f)
+    /** Makes memories while we are moving around */
+    if (m_timer > 0.468f && m_timer < 0.532f)
     {
         auto view = registry->view<component::Memory, component::Vision>();
         view.each([registry](entt::entity e, component::Memory& memory, const component::Vision& vision) {
@@ -66,10 +68,8 @@ void Memory::update(float dt)
         });
     }
 
-    if (m_timer >= 1)
+    if (m_timer >= 1.f)
     {
-        m_timer = 0.f;
-
         auto view = registry->view<component::Memory>();
 
         tf::Taskflow taskflow{};
@@ -81,7 +81,7 @@ void Memory::update(float dt)
             {
                 for (auto& memory : memory_container.memory_storage)
                 {
-                    memory->update(1.f);
+                    memory->update(m_timer);
                 }
 
                 if (memory_container.memory_storage.size() != 0)
@@ -127,7 +127,7 @@ void Memory::update(float dt)
 
                                       if (res_rhs->m_number_of_entities == 0)
                                       {
-                                          cost_rhs += 100.f;
+                                          cost_rhs += 1000.f;
                                       }
 
                                       return cost_lhs < cost_rhs;
@@ -145,6 +145,7 @@ void Memory::update(float dt)
         });
 
         m_context.executor->run(taskflow).get();
+        m_timer = 0.f;
     }
 }
 
@@ -159,10 +160,10 @@ void Memory::update_memories(const event::CreatedMemory& event)
 
     if (memories)
     {
-        // Adds the new memory / Updates memories where applicable
+        /** Adds the new memory / Updates memories where applicable */
         for (auto& memory_container : memories->memory_container)
         {
-            // Memory creation / Updating
+            /** Memory creation / Updating */
             if ((memory_container.memory_tags & event.memory->m_tags) == event.memory->m_tags)
             {
                 auto duplicate = false;
@@ -177,13 +178,13 @@ void Memory::update_memories(const event::CreatedMemory& event)
                         duplicate                  = true;
                     }
                 }
-                // Create a new memory
+                /** Create a new memory */
                 if (!duplicate)
                 {
                     memory_container.memory_storage.emplace_back(event.memory->clone());
                 }
 
-                // Re-sort the memories
+                /** Re-sort the memories */
                 if (event.memory->m_tags & TAG_Location)
                 {
                     auto pos = m_context.registry->try_get<component::Position>(event.entity);
@@ -208,8 +209,7 @@ void Memory::update_memories(const event::CreatedMemory& event)
                                       cost_lhs += res_lhs->m_time_since_creation;
                                       cost_rhs += res_rhs->m_time_since_creation;
 
-                                      // Make sure that memories that have aged past retention_time are moved to the back of the
-                                      // list
+                                      /** Make sure memories that are past retention_time are moved to the back of the list */
                                       if (res_lhs->m_time_since_creation > memories->max_retention_time)
                                       {
                                           cost_lhs += 1000.f;
@@ -225,7 +225,7 @@ void Memory::update_memories(const event::CreatedMemory& event)
                     }
                 }
 
-                // Delete the most useless memories
+                /** Delete the most useless memories */
                 while (memory_container.memory_storage.size() > memories->max_memories ||
                        memory_container.memory_storage.back()->m_time_since_creation > memories->max_retention_time)
                 {
