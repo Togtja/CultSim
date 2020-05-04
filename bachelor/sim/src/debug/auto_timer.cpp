@@ -10,6 +10,7 @@
 
 namespace cs
 {
+/** TODO: Better variable name */
 static constexpr std::array<glm::vec4, 2> s_ms_col{glm::vec4{0.2f, 1.f, 0.66f, 1.f}, glm::vec4{1.f, 0.4f, 0.2f, 1.f}};
 
 void AutoTimer::show_debug_ui()
@@ -20,7 +21,7 @@ void AutoTimer::show_debug_ui()
         ImGui::TableSetupColumn("Time (ms)");
         cs_auto_table_headers();
 
-        std::sort(s_results.begin(), s_results.end(), [](auto&& a, auto&& b) { return a.time_ms > b.time_ms; });
+        std::sort(s_results.begin(), s_results.end(), [](const auto& a, const auto& b) { return a.time_ms > b.time_ms; });
         for (const auto& k : s_results)
         {
             ImGui::TableNextCell();
