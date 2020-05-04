@@ -2,13 +2,13 @@
 
 #include "entity/components/tags.h"
 
-#include <functional>
 #include <string>
-#include <utility>
-#include <vector>
 
-#include <entt/entt.hpp>
-#include <sol/sol.hpp>
+#include <entt/entity/entity.hpp>
+#include <sol/function.hpp>
+
+/** TODO: Potentially merge with components/actions.h */
+/** TODO: Add documentation */
 
 namespace cs::action
 {
