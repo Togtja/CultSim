@@ -1,22 +1,20 @@
 #pragma once
-#include "goal.h"
 #include "tags.h"
 
 #include <functional>
 #include <string>
 #include <variant>
 
-#include <entt/entt.hpp>
-#include <sol/sol.hpp>
-#include <spdlog/spdlog.h>
+#include <entt/entity/registry.hpp>
+#include <sol/function.hpp>
 
 namespace cs::gob
 {
-class Action
+/** TODO: Fix naming of variables*/
+struct Action
 {
-public:
-    std::string m_name{};
-    ETag m_tags{};
+    std::string name{};
+    ETag tags{};
 
     float m_required_time{};
     float m_success_chance{};
@@ -27,14 +25,15 @@ public:
 
     sol::function m_get_goal_change{};
 
-    std::variant<sol::function, std::function<float(const Action& action, entt::entity e)>> m_get_duration = [this](const Action& action,entt::entity e) {
-        return action.m_required_time;
-    };
+    std::variant<sol::function, std::function<float(const Action& action, entt::entity e)>> m_get_duration =
+        [this](const Action& action, entt::entity e) {
+            return action.m_required_time;
+        };
 };
 
 inline bool operator==(const Action& lhs, const Action& rhs)
 {
-    if (lhs.m_name != rhs.m_name)
+    if (lhs.name != rhs.name)
     {
         return false;
     }
@@ -46,7 +45,7 @@ inline bool operator==(const Action& lhs, const Action& rhs)
     {
         return false;
     }
-    if (lhs.m_tags != rhs.m_tags)
+    if (lhs.tags != rhs.tags)
     {
         return false;
     }
