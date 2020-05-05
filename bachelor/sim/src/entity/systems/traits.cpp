@@ -31,7 +31,7 @@ void Traits::update(float dt)
         {
             if (trait.lose(e))
             {
-                trait.remove_affect(e);
+                trait.unaffect(e);
                 to_delete.push_back(trait);
             }
         }

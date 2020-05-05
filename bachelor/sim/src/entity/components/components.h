@@ -276,7 +276,7 @@ struct Trait
     sol::function lose;
 
     sol::function affect;
-    sol::function remove_affect;
+    sol::function unaffect;
 
     bool operator==(Trait trait)
     {

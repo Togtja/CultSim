@@ -251,7 +251,7 @@ void bind_components(sol::state_view lua)
                                                "affect",
                                                &component::detail::Trait::affect,
                                                "unaffect",
-                                               &component::detail::Trait::remove_affect);
+                                               &component::detail::Trait::unaffect);
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);

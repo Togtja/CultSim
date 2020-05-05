@@ -378,10 +378,10 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
 component::detail::Trait get_trait(sol::table traits)
 {
     component::detail::Trait trait;
-    trait.name          = traits["name"];
-    trait.desc          = traits["desc"];
-    trait.affect        = traits["affect"];
-    trait.remove_affect = traits["unaffect"];
+    trait.name     = traits["name"];
+    trait.desc     = traits["desc"];
+    trait.affect   = traits["affect"];
+    trait.unaffect = traits["unaffect"];
 
     if (traits["can_inherit"].get_type() == sol::type::boolean)
     {
