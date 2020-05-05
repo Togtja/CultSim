@@ -6,7 +6,7 @@
 
 namespace cs::gfx
 {
-/** TODO: Documention (set/get & class) */
+/** TODO: Documentation (set/get & class) */
 class Camera
 {
 private:
