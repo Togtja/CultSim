@@ -66,6 +66,7 @@ void DebugRenderer::display()
     glDrawElementsInstanced(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, nullptr, m_nrects);
 }
 
+/** TODO: use fcompile & fcreateprogram from glutil */
 void DebugRenderer::init()
 {
     m_vao = VaoBuilder()
