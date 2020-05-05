@@ -1,5 +1,4 @@
 #include "editor_scene.h"
-#include "common_helpers.h"
 #include "input/input_handler.h"
 
 namespace cs
