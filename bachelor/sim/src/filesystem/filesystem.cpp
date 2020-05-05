@@ -47,15 +47,15 @@ std::vector<uint8_t> read_byte_file(std::string_view rpath)
         return {};
     }
 
-    auto file = PHYSFS_openRead(rpath.data());
+    const auto file = PHYSFS_openRead(rpath.data());
     if (file == nullptr)
     {
         spdlog::get("filesystem")->error("could not open '{}' due to {}", rpath.data(), get_errorstring());
         return {};
     }
 
-    auto ret        = std::vector<uint8_t>(PHYSFS_fileLength(file));
-    auto read_bytes = PHYSFS_readBytes(file, ret.data(), ret.size());
+    auto ret              = std::vector<uint8_t>(PHYSFS_fileLength(file));
+    const auto read_bytes = PHYSFS_readBytes(file, ret.data(), ret.size());
 
     if (read_bytes == 0)
     {
@@ -90,8 +90,7 @@ uint64_t write_file(std::string_view rpath, const std::string& data)
         return -1;
     }
 
-    /** Note is a u64bit int, where the 64bit is failure */
-    auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
+    const auto write_bytes = PHYSFS_writeBytes(file, data.data(), data.length());
     if (write_bytes == static_cast<PHYSFS_sint64>(data.length()))
     {
         spdlog::get("filesystem")->info("wrote file '{}'", rpath);
@@ -198,6 +197,7 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
     }
     /** At this point a new file should have failed to be created,
      * if it has been created we delete to restore fs state */
+    /** TODO: Fix override permissions / restore file system */
     if (exists(rpath_new))
     {
         if (!delete_file(rpath_new))
@@ -225,7 +225,7 @@ std::vector<std::string> list_directory(std::string_view rpath)
         return {};
     }
     std::vector<std::string> files;
-    auto* files_raw = PHYSFS_enumerateFiles(rpath.data());
+    const auto files_raw = PHYSFS_enumerateFiles(rpath.data());
     for (char** file = files_raw; *file != nullptr; ++file)
     {
         files.emplace_back(*file);
