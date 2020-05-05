@@ -1,33 +1,34 @@
 #pragma once
 
 #include "entity/events.h"
-#include "entt/entity/registry.hpp"
-#include "robin_hood.h"
 #include "system.h"
 
+#include <entt/entity/registry.hpp>
 #include <entt/signal/dispatcher.hpp>
+#include <robin_hood.h>
 
 namespace cs::system
 {
 /**
- * ParentEntityIds keeps track on their ids in the diffrent registry
+ * Keeps track of their ids in the diffrent registry
  */
 struct ParentEntityIds
 {
-    /** global_registry_id for the m_context.registry id */
-    entt::entity global_registry_id = entt::null;
+    /** Entity id from the scenario scene registry */
+    entt::entity global_registry_id{entt::null};
 
-    /** relationship_registry_id for the local m_parents_reg */
-    entt::entity relationship_registry_id = entt::null;
+    /** Entity id from the Relationship registry */
+    entt::entity relationship_registry_id{entt::null};
 };
 
 /**
- * ParentName keeps the parent's name (if any), and it's set of IDs
+ * Keeps the parent's name (if any), and it's set of IDs
  */
 struct ParentName
 {
     /** ids for the global and relationship registry ids */
     ParentEntityIds ids{};
+
     /** name for it's name, if no name it will default to the name components type */
     std::string name{};
 };
@@ -40,14 +41,15 @@ struct BothParentName
     ParentName mom{};
     ParentName dad{};
 };
+
 class Relationship : public ISystem
 {
 private:
-    /** A Table of relationship (To consider, make it a std::pair of uint8) */
-    robin_hood::unordered_map<entt::entity, robin_hood::unordered_map<entt::entity, uint16_t>> m_rel_table;
+    /** A Table of relationships (To consider, make it a std::pair of uint8) */
+    robin_hood::unordered_map<entt::entity, robin_hood::unordered_map<entt::entity, uint16_t>> m_rel_table{};
 
     /** A new registry of every spawned agent */
-    entt::registry m_parents_reg;
+    entt::registry m_parents_reg{};
 
 public:
     using ISystem::ISystem;
@@ -74,7 +76,7 @@ public:
     entt::entity add_to_reg(const entt::entity e);
 
     /**
-     * Adds the new entity to local registry, along with information of who its parents was.
+     * Adds the new entity to local registry, along with information of who its parents was
      *
      * This function triggers every time a new entity is born (made during runtime between two entities)
      *
@@ -93,11 +95,12 @@ public:
      */
     void delete_father(const event::DeleteEntity& event);
 
-    /** Adds a relationship table to the specified entity
+    /**
+     * Adds a relationship table to the specified entity
      *
      * @note the table stores values in a 2 dimensional table where you can index it with uint16_t values
-     * The first 8 bits represent firendship, the last 6 bits romatic intrest. However they do not _need_
-     * to represent this, the uses themself can decied what it should represent
+     * The first 8 bits represent friendship, the last 8 bits romantic intrest. However they do not <i>need</i>
+     * to represent this, the users themself can decide what it should represent
      *
      * @param e entity you want to add a relationship table to
      */
@@ -123,16 +126,16 @@ public:
     void add_friendship(entt::entity e, entt::entity other, uint8_t amount);
 
     /**
-     * Get the romatic value between e to other that goes from 0 to 255
+     * Get the romantic value between e to other that goes from 0 to 255
      *
      * @param e Who's entity table you want to check for
      * @param other The other entity you want to index in the table
-     * @return The value of e's romatic instrest to other
+     * @return The value of e's romantic instrest to other
      */
     uint8_t get_romance(entt::entity e, entt::entity other);
 
     /**
-     * Add amount to the romatic value that is there
+     * Add amount to the romantic value that is there
      *
      * @note To remove just "add" a negative number
      * @param e Who's entity table you want to add for
