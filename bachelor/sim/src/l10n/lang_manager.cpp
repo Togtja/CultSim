@@ -4,6 +4,7 @@
 
 namespace cs
 {
+/** TODO: Use this */
 Locale::Locale(sol::state_view lua) : m_lua(std::move(lua))
 {
 }
