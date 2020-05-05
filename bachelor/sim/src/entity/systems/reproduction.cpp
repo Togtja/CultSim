@@ -115,7 +115,7 @@ void Reproduction::update(float dt)
             m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
             return;
         }
-        m_context.dispatcher->enqueue<event::BornEntity>(event::BornEntity{child_e});
+        m_context.dispatcher->enqueue<event::EntityBorn>(event::EntityBorn{child_e});
 
         if (auto traits = m_context.registry->try_get<component::Traits>(child_e); traits)
         {

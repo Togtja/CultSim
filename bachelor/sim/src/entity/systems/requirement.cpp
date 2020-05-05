@@ -12,12 +12,12 @@ namespace cs::system
 {
 void Requirement::initialize()
 {
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Requirement::remove_requirements>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Requirement::remove_requirements>(*this);
 }
 
 void Requirement::deinitialize()
 {
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Requirement::remove_requirements>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Requirement::remove_requirements>(*this);
 }
 
 /** TODO: Make requirements into their own functions */
@@ -230,7 +230,7 @@ ISystem* Requirement::clone()
     return new Requirement(m_context);
 }
 
-void Requirement::remove_requirements(const event::DeleteEntity& event)
+void Requirement::remove_requirements(const event::EntityDeleted& event)
 {
     m_context.registry->remove_if_exists<component::FindRequirement,
                                          component::LocationRequirement,

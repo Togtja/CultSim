@@ -25,8 +25,8 @@ Relationship& Relationship::operator=(const Relationship& other)
 
 void Relationship::initialize()
 {
-    m_context.dispatcher->sink<event::BornEntity>().connect<&Relationship::new_child_to_reg>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Relationship::delete_father>(*this);
+    m_context.dispatcher->sink<event::EntityBorn>().connect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Relationship::delete_father>(*this);
 
     sol::table cultsim = (*m_context.lua_state)["cultsim"];
     cultsim.set_function("get_friendship",
@@ -42,8 +42,8 @@ void Relationship::initialize()
 
 void Relationship::deinitialize()
 {
-    m_context.dispatcher->sink<event::BornEntity>().disconnect<&Relationship::new_child_to_reg>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Relationship::delete_father>(*this);
+    m_context.dispatcher->sink<event::EntityBorn>().disconnect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Relationship::delete_father>(*this);
 }
 
 entt::entity Relationship::add_to_reg(const entt::entity e)
@@ -58,7 +58,7 @@ entt::entity Relationship::add_to_reg(const entt::entity e)
     return new_e;
 }
 
-void Relationship::new_child_to_reg(const event::BornEntity& event)
+void Relationship::new_child_to_reg(const event::EntityBorn& event)
 {
     auto new_entt = m_parents_reg.create();
 
@@ -104,7 +104,7 @@ void Relationship::new_child_to_reg(const event::BornEntity& event)
     }
 }
 
-void Relationship::delete_father(const event::DeleteEntity& event)
+void Relationship::delete_father(const event::EntityDeleted& event)
 {
     auto view = m_context.registry->view<component::Pregnancy, component::Name, component::Relationship>();
     view.each(

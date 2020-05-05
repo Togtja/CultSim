@@ -82,7 +82,7 @@ public:
      *
      * @param event The event information that the function is subscribed to
      */
-    void new_child_to_reg(const event::BornEntity& event);
+    void new_child_to_reg(const event::EntityBorn& event);
 
     /**
      * Handles deletion of the father, during the moms pregnancy
@@ -93,7 +93,7 @@ public:
      *
      * @param event The event information that the function is subscribed to
      */
-    void delete_father(const event::DeleteEntity& event);
+    void delete_father(const event::EntityDeleted& event);
 
     /**
      * Adds a relationship table to the specified entity

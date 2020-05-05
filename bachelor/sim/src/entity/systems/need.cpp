@@ -50,8 +50,8 @@ void Need::update(float dt)
                         m_context.dispatcher->enqueue<event::SwitchNeedContext>(event::SwitchNeedContext{e});
                     }
                     needs.vital_needs.push_back(need);
-                    m_context.dispatcher->enqueue<event::NeedCritical>(
-                        event::NeedCritical{e, need.tags, need.status, need.weight});
+                    m_context.dispatcher->enqueue<event::NeedBecameCritical>(
+                        event::NeedBecameCritical{e, need.tags, need.status, need.weight});
                 }
             }
         }

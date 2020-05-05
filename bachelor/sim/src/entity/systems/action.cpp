@@ -11,15 +11,15 @@ namespace cs::system
 void Action::initialize()
 {
     m_context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(*this);
-    m_context.dispatcher->sink<event::PickedUpEntity>().connect<&Action::picked_up_entity>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Action::delete_target>(*this);
+    m_context.dispatcher->sink<event::EntityPickedUp>().connect<&Action::picked_up_entity>(*this);
 }
 
 void Action::deinitialize()
 {
     m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Action::delete_target>(*this);
-    m_context.dispatcher->sink<event::PickedUpEntity>().disconnect<&Action::picked_up_entity>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Action::delete_target>(*this);
+    m_context.dispatcher->sink<event::EntityPickedUp>().disconnect<&Action::picked_up_entity>(*this);
 }
 
 void Action::update(float dt)
@@ -165,7 +165,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
     }
 }
 
-void Action::delete_target(const event::DeleteEntity& event)
+void Action::delete_target(const event::EntityDeleted& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {
@@ -188,7 +188,7 @@ void Action::delete_target(const event::DeleteEntity& event)
     });
 }
 
-void Action::picked_up_entity(const event::PickedUpEntity& event)
+void Action::picked_up_entity(const event::EntityPickedUp& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {

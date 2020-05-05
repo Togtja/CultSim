@@ -31,9 +31,9 @@ public:
 private:
     void abort_strategy(const event::RequirementFailure& event);
 
-    void delete_target(const event::DeleteEntity& event);
+    void delete_target(const event::EntityDeleted& event);
 
-    void picked_up_entity(const event::PickedUpEntity& event);
+    void picked_up_entity(const event::EntityPickedUp& event);
 };
 
 } // namespace cs::system

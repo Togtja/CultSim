@@ -30,6 +30,6 @@ public:
 
     ISystem* clone() override;
 
-    void remove_requirements(const event::DeleteEntity& event);
+    void remove_requirements(const event::EntityDeleted& event);
 };
 } // namespace cs::system

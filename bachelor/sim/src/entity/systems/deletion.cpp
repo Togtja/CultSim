@@ -10,7 +10,7 @@ void Deletion::update(float dt)
 
     auto view = m_context.registry->view<component::Delete>();
     view.less([this](entt::entity e) {
-        m_context.dispatcher->trigger<event::DeleteEntity>({e});
+        m_context.dispatcher->trigger<event::EntityDeleted>({e});
         m_context.registry->destroy(e);
     });
 }
