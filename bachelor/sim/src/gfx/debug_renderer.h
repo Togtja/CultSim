@@ -11,6 +11,7 @@ namespace cs::gfx
 /**
  * Renderer to aid development that allow developers to draw helper shapes like circles, rectangles and lines
  */
+/** TODO: More documentation */
 class DebugRenderer
 {
 private:
@@ -26,7 +27,7 @@ private:
     uint32_t m_nrects{};
     uint32_t m_rect_buffer_offset{};
 
-    /** Rectangles */
+    /** Circles */
     uint32_t m_circlevbo{};
     DebugInstanceVertex* m_circle_data{nullptr};
     uint32_t m_ncircles{};
