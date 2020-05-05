@@ -2,10 +2,10 @@
 
 #include "camera.h"
 #include "debug_renderer.h"
-#include "sprite_renderer.h"
 #include "raymarching_renderer.h"
-#include "uniform_buffer.h"
 #include "render_data.h"
+#include "sprite_renderer.h"
+#include "uniform_buffer.h"
 
 namespace cs::gfx
 {
@@ -15,6 +15,7 @@ enum class ERenderingMode
     Render_3D
 };
 
+/** TODO: Documentation */
 class Renderer
 {
 private:
@@ -60,7 +61,7 @@ public:
      *
      * @return
      */
-    DebugRenderer& debug();
+    [[nodiscard]] DebugRenderer& debug();
     [[nodiscard]] const DebugRenderer& debug() const;
 
     /**
@@ -68,7 +69,7 @@ public:
      *
      * @return
      */
-    SpriteRenderer& sprite();
+    [[nodiscard]] SpriteRenderer& sprite();
     [[nodiscard]] const SpriteRenderer& sprite() const;
 
     /**
@@ -76,7 +77,7 @@ public:
      *
      * @return
      */
-    RaymarchingRenderer& raymarch();
+    [[nodiscard]] RaymarchingRenderer& raymarch();
     [[nodiscard]] const RaymarchingRenderer& raymarch() const;
 
     void set_render_mode(ERenderingMode mode);
