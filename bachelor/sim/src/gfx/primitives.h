@@ -2,8 +2,8 @@
 
 #include "render_data.h"
 
-#include <vector>
 #include <tuple>
+#include <vector>
 
 #include <glm/vec3.hpp>
 
@@ -36,8 +36,8 @@ public:
 class PrimitiveCircle : public IPrimitive
 {
 private:
-    float m_radius = 10.f;
-    int m_detail   = 32;
+    float m_radius{10.f};
+    int m_detail{32};
 
 public:
     PrimitiveCircle() = default;
@@ -47,11 +47,12 @@ public:
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
 
+/** TODO: Documentation */
 class PrimitiveQuad : public IPrimitive
 {
 private:
-    float m_side_length = 1.f;
-    float m_ratio       = 1.f;
+    float m_side_length{1.f};
+    float m_ratio{1.f};
 
 public:
     explicit PrimitiveQuad(float side_length, float m_ratio = 1.f);
@@ -60,4 +61,4 @@ public:
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
 
-} // namespace cs
+} // namespace cs::gfx
