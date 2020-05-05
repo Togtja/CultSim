@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gfx/camera.h"
 #include "gfx/render_data.h"
 #include "system.h"
 
