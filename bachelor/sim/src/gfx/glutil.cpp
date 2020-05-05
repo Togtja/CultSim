@@ -4,7 +4,7 @@
 #include <chrono>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <gfx/stb_image.h>
 #include <spdlog/spdlog.h>
 
 namespace cs::gfx
@@ -19,10 +19,11 @@ GLuint compile_shader(std::string_view source, GLenum type)
     glCompileShader(shader);
 
     /* Check for erros */
-    int err, len;
+    int err;
+    int len;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &err);
 
-    if (!err)
+    if (err != 0)
     {
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
         auto log = std::string(len, '\0');
@@ -40,7 +41,7 @@ GLuint compile_shader(std::string_view source, GLenum type)
 GLuint fcompile_shader(std::string_view rpath, GLenum type)
 {
     /* Read the file contents */
-    auto source = fs::read_file(rpath);
+    const auto source = fs::read_file(rpath);
 
     /* Use other function to compile the extracted source, then clean up and return */
     GLuint shader = compile_shader(source.c_str(), type);
@@ -54,7 +55,7 @@ GLuint create_program(const std::vector<GLuint>& shaders)
     GLuint program = glCreateProgram();
 
     /* Attach all shaders that should be part of the program */
-    for (auto shader : shaders)
+    for (const auto shader : shaders)
     {
         glAttachShader(program, shader);
     }
@@ -63,10 +64,12 @@ GLuint create_program(const std::vector<GLuint>& shaders)
     glLinkProgram(program);
 
     /* Check for errors */
-    int err, len;
+    int err;
+    int len;
+
     glGetProgramiv(program, GL_LINK_STATUS, &err);
 
-    if (!err)
+    if (err != 0)
     {
         /* Get log length */
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
@@ -95,7 +98,7 @@ GLuint fcreate_program(const std::vector<ShaderFile>& shaders)
 
     /** Link program and clean up shaders */
     GLuint program = create_program(compiled_shaders);
-    for (auto shader : compiled_shaders)
+    for (const auto shader : compiled_shaders)
     {
         glDeleteShader(shader);
     }
@@ -130,7 +133,7 @@ LoadedTexture load_texture(std::string_view rpath, bool flip_y)
     auto out         = LoadedTexture{};
     const auto bytes = fs::read_byte_file(rpath);
     stbi_set_flip_vertically_on_load(flip_y);
-    auto pixels = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
+    const auto pixels = stbi_load_from_memory(bytes.data(), size_bytes(bytes), &out.width, &out.height, &c, STBI_rgb_alpha);
 
     /** Copy pixels into output */
     out.pixels.resize(out.width * out.height * STBI_rgb_alpha);
