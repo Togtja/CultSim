@@ -294,6 +294,7 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
         strategy.name        = strategy_table["name"].get<std::string>();
         strategy.tags        = strategy_table["tags"].get<ETag>();
         strategy.target_tags = strategy_table["target_tags"].get<ETag>();
+
         /** Get the actions for this strategy */
         const auto& actions = strategy_table["actions"].get_or<std::vector<sol::table>>({});
         for (const auto& action_table : actions)
@@ -407,8 +408,8 @@ component::detail::Trait get_trait(sol::table traits)
     }
     else
     {
-        // Give a default function/bool
-        spdlog::warn("No attain condition");
+        /** TODO: Create default function */
+        spdlog::get("lua")->warn("No attain condition");
     }
 
     if (traits["lose_condition"].get_type() == sol::type::function)
@@ -417,8 +418,8 @@ component::detail::Trait get_trait(sol::table traits)
     }
     else
     {
-        // Give a default function/bool
-        spdlog::warn("No lose condition");
+        /** TODO: Create default function */
+        spdlog::get("lua")->warn("No lose condition");
     }
     return trait;
 }
@@ -426,7 +427,7 @@ component::detail::Trait get_trait(sol::table traits)
 bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
-    // TODO: Assign the traits that the component has as default
+    /** TODO: Assign the traits that the component has as default */
     const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_default)
     {
@@ -459,6 +460,7 @@ bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::tabl
 }
 
 } // namespace detail
+
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)
 {
     auto out = spawn_entity(reg, lua, entity);
