@@ -871,6 +871,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         spdlog::get("default")->error("The entity does not have a tag component.");
         return false;
     });
+
     cultsim.set_function("has_set_flags",
                          [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
 
@@ -890,15 +891,16 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             if (!m_rng.trigger(rc_m->fertility) || !m_rng.trigger(rc_f->fertility))
             {
-                // N0 pregnancy
+                /** No pregnancy */
                 return;
             }
             if (auto* again = m_registry.try_get<component::Pregnancy>(mother); again)
             {
-                // Can't get pregnant twice
+                /** Can't get pregnant twice */
                 return;
             }
             cs::component::Pregnancy* preg;
+            /** TODO: Make function */
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
                 preg = &m_registry.assign<component::Pregnancy>(mother);
@@ -940,10 +942,11 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_f->average_gestation_period;
                 }
-                // Here the incubator is the dad
+                /** Here the incubator is the dad */
                 preg->parents.second = mother;
                 preg->parents.first  = father;
             }
+
             if (preg->children_in_pregnancy < 1)
             {
                 preg->children_in_pregnancy = 1;
@@ -1003,7 +1006,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::TextColored({0.0, 0.749, 1., 1.}, "FPS: %5.1f", ImGui::GetIO().Framerate);
     ImGui::SameLine();
-    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
+    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.size()));
     ImGui::SameLine();
     if (m_paused)
     {
@@ -1111,8 +1114,9 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
-        m_registry.try_get<component::Need,
+    const auto& [name, needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
+        m_registry.try_get<component::Name,
+                           component::Need,
                            component::Goal,
                            component::Action,
                            component::Health,
@@ -1129,8 +1133,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    auto name = m_registry.try_get<component::Name>(selection_info.selected_entity);
-    if (name && name->name != "")
+    if (name && !name->name.empty())
     {
         auto text = fmt::format("{} [ID: {}]", name->name, static_cast<int64_t>(selection_info.selected_entity));
         ImGui::Text("%s", text.c_str());
@@ -1155,22 +1158,16 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (reproduction)
     {
-        if (preg && preg->is_egg)
-        {
-            ImGui::Text("I am hatching an egg");
-        }
-        else
-        {
-            ImGui::Text("I am a %s, and I have %d children.",
-                        (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
-                        reproduction->number_of_children);
-        }
+        ImGui::Text("I am a %s, and I have %d children.",
+                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                    reproduction->number_of_children);
     }
 
     if (preg)
     {
         if (preg->is_egg)
         {
+            ImGui::Text("I am an egg");
             ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Hatching");
         }
         else
@@ -1211,7 +1208,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
             ImGui::TableSetupColumn("Needs:");
             ImGui::TableSetupColumn("Status:");
 
-            // Non-clickable headers
+            /** Non-clickable headers */
             cs_auto_table_headers();
 
             for (const auto& need : needs->needs)
@@ -1232,7 +1229,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
             ImGui::TableSetupColumn("Goals:");
             ImGui::TableSetupColumn("Weight:");
 
-            // Non-clickable headers
+            /** Non-clickable headers */
             cs_auto_table_headers();
 
             for (const auto& goal_t : goal->goals)
@@ -1255,10 +1252,10 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (action)
     {
-        if (action->current_action_sequence.m_name != "")
+        if (action->current_action_sequence.m_name.empty())
         {
             ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
-            if (action->current_action_sequence.current_action.name != "")
+            if (action->current_action_sequence.current_action.name.empty())
             {
                 int action_index = 0;
                 for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
@@ -1308,31 +1305,26 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (relship)
     {
-        system::Relationship* test;
-        for (auto&& system : m_active_systems)
-        {
-            const auto rel = dynamic_cast<system::Relationship*>(system.get());
-            if (rel)
-            {
-                const auto parents = rel->get_parent(selection_info.selected_entity);
-                if (parents.mom.ids.relationship_registry_id != entt::null)
-                {
-                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
-                }
-                else
-                {
-                    ImGui::Text("My Mom is the Simulation");
-                }
-                if (parents.dad.ids.relationship_registry_id != entt::null)
-                {
-                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
-                }
+        const auto parents =
+            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::BothParentName>();
 
-                else
-                {
-                    ImGui::Text("My Dad is the Simulation");
-                }
-            }
+        if (parents.mom.ids.relationship_registry_id != entt::null)
+        {
+            ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
+        }
+        else
+        {
+            ImGui::Text("My Mom is the Simulation");
+        }
+
+        if (parents.dad.ids.relationship_registry_id != entt::null)
+        {
+            ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
+        }
+
+        else
+        {
+            ImGui::Text("My Dad is the Simulation");
         }
     }
 
