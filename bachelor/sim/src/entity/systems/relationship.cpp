@@ -195,8 +195,8 @@ BothParentName Relationship::get_parents(entt::entity e, bool is_local_ids)
     if (is_local_ids)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(e);
-        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
-        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
+        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship);
+        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship);
         ret.mom.name    = par1_name.name;
         ret.dad.name    = par2_name.name;
         ret.mom.ids     = rel.mom;
@@ -210,8 +210,8 @@ BothParentName Relationship::get_parents(entt::entity e, bool is_local_ids)
         const auto& rel = m_parents_reg.get<component::Relationship>(ent);
         if (rel.old_id == e)
         {
-            auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
-            auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
+            auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship);
+            auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship);
 
             if (par1_name.name.empty())
             {
