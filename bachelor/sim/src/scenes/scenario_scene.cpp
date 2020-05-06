@@ -1366,12 +1366,6 @@ void ScenarioScene::update_entity_hover()
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
     }
-
-    ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
-    ImGui::Text("World: %.2f | %.2f | %.2f", world_pos.x, world_pos.y, world_pos.z);
-    ImGui::Text("Hovering: %u | Selected: %u",
-                static_cast<uint32_t>(selection_helper.hovered_entity),
-                static_cast<uint32_t>(selection_helper.selected_entity));
 }
 
 void ScenarioScene::handle_preference_changed(const Preference& before, const Preference& after)
