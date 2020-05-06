@@ -1,10 +1,10 @@
 #pragma once
 #include "common_helpers.h"
 #include "debug/data_collector.h"
+#include "entity/name_generator.h"
 #include "entity/scenario.h"
 #include "entity/systems/system.h"
 #include "random_engine.h"
-#include "entity/name_generator.h"
 #include "scene.h"
 
 #include <string_view>
@@ -78,13 +78,13 @@ private:
     glm::vec2 m_resolution{};
 
     /** Time sim has been running */
-    float m_simtime = 0.f;
+    double m_simtime{0.0};
 
     /** Current time scale of simulation */
-    int m_timescale = 1;
+    int m_timescale{1};
 
     /** If we are currently paused or not*/
-    bool m_paused = false;
+    bool m_paused{false};
 
 public:
     explicit ScenarioScene(std::string_view scenario, uint32_t random_seed);
@@ -111,6 +111,7 @@ public:
     void reset_simulation();
 
 private:
+    /** TODO: Documentation */
     void bind_actions_for_scene();
 
     void bind_available_lua_events();

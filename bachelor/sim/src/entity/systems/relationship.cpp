@@ -36,8 +36,11 @@ void Relationship::initialize()
     cultsim.set_function("add_friendship", [this](entt::entity e, entt::entity other, uint8_t amount) -> void {
         add_friendship(e, other, amount);
     });
+
     cultsim.set_function("add_romance",
                          [this](entt::entity e, entt::entity other, uint8_t amount) -> void { add_romance(e, other, amount); });
+
+    cultsim.set_function("get_parents", [this](entt::entity e) { return get_parents(e); });
 };
 
 void Relationship::deinitialize()
@@ -186,7 +189,7 @@ void Relationship::add_romance(entt::entity e, entt::entity other, uint8_t amoun
     }
 }
 
-BothParentName Relationship::get_parent(entt::entity e, bool is_local_ids)
+BothParentName Relationship::get_parents(entt::entity e, bool is_local_ids)
 {
     BothParentName ret;
     if (is_local_ids)

@@ -62,18 +62,6 @@ void ScenarioScene::initialize_simulation()
     m_registry.set<EntitySelectionHelper>();
     m_registry.set<RandomEngine*>(&m_rng);
 
-    /** If there are any default Traits, run their affects and add them*/
-    auto per_view = m_registry.view<component::Traits>();
-    per_view.each([](entt::entity e, component::Traits& per) {
-        // Add default traits to acquired traits
-        for (auto&& i : per.start_traits)
-        {
-            per.acquired_traits.push_back(i);
-        }
-        // Run their affects
-        effect::affect_traits(e, per);
-    });
-
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
@@ -115,6 +103,20 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** If there are any default Traits, run their affects and add them */
+    auto per_view = m_registry.view<component::Traits>();
+    per_view.each([](entt::entity e, component::Traits& traits) {
+        /** Add default traits to acquired traits */
+        for (const auto& trait : traits.start_traits)
+        {
+            traits.acquired_traits.push_back(trait);
+        }
+
+        /** Run their effects */
+        effect::affect_traits(e, traits);
+    });
+
+    /** TODO: Make rendering optional */
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
         new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
@@ -129,8 +131,8 @@ void ScenarioScene::clean_simulation()
     m_data_collector.save_to_file(m_scenario.name + "_data", true);
 
     m_registry.clear();
-    m_simtime   = 0.f;
-    m_timescale = 1.f;
+    m_simtime   = 0.0;
+    m_timescale = 1;
     m_data_collector.clear();
     m_notifications.clear();
 
@@ -186,6 +188,7 @@ bool ScenarioScene::update(float dt)
     b_tex.scale        = 100;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
 
+    /** TODO: Make this work */
     /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
     {
@@ -195,7 +198,6 @@ bool ScenarioScene::update(float dt)
         }
     }
 
-    // TODO : Move to input action response
     update_entity_hover();
 
     setup_docking_ui();
@@ -226,9 +228,9 @@ bool ScenarioScene::update(float dt)
         }
 
         /** Deal with long running tasks, then events */
+        m_scenario.update(dt);
         m_scheduler.update(dt);
         m_dispatcher.update();
-        m_scenario.update(dt);
     }
 
     /** Deal with ImGui updates once per tick */
@@ -241,7 +243,7 @@ bool ScenarioScene::update(float dt)
         system->update_imgui();
     }
 
-    /** It's supposed to be three of these here, do not change - not a bug */
+    /** It's supposed to be three (two?) of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
 
@@ -304,7 +306,6 @@ void ScenarioScene::bind_actions_for_scene()
         }
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
-        // TODO: Steal UE4 FInterpretTo
         const auto pos =
             glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 10.f * dt);
 
@@ -346,6 +347,7 @@ void ScenarioScene::bind_actions_for_scene()
     });
 }
 
+/** TODO: Add all events that should be accessible through Lua */
 void ScenarioScene::bind_available_lua_events()
 {
     m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
@@ -376,6 +378,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["action"]       = entt::type_info<component::Action>::id();
     component["goal"]         = entt::type_info<component::Goal>::id();
 
+/** TODO: Think about making this a loop or something */
 #define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
     REGISTER_LUA_COMPONENT(1);
     REGISTER_LUA_COMPONENT(2);
@@ -395,6 +398,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     REGISTER_LUA_COMPONENT(16);
 #undef REGISTER_LUA_COMPONENT
 
+    /** TODO: Move these functions into their own file */
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
     cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
@@ -675,6 +679,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         spdlog::get("lua")->warn("add_attainable_trait: the entity argument does not have the trait component");
     });
 
+    /** TODO: Add all components to all functions */
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
@@ -691,11 +696,11 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Action>::id(): m_registry.remove_if_exists<component::Action>(e); break;
             case entt::type_info<component::Goal>::id(): m_registry.remove_if_exists<component::Goal>(e); break;
             case entt::type_info<component::Traits>::id():
-                if (auto per = m_registry.try_get<component::Traits>(e); per)
+                if (auto traits = m_registry.try_get<component::Traits>(e); traits)
                 {
-                    effect::unaffect_traits(e, *per);
+                    effect::unaffect_traits(e, *traits);
+                    m_registry.remove<component::Traits>(e);
                 };
-                m_registry.remove_if_exists<component::Traits>(e);
                 break;
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
@@ -811,14 +816,14 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Destroy entity */
     cultsim.set_function("kill", [this](entt::entity e) {
-        if (e == entt::null)
+        if (!m_registry.valid(e))
         {
-            spdlog::get("agent")->critical("trying to kill a null agent");
+            spdlog::get("agent")->critical("trying to kill an invalid agent");
             return;
         }
+
         m_registry.assign<component::Delete>(e);
-        auto tags = m_registry.try_get<component::Tags>(e);
-        if (tags)
+        if (auto tags = m_registry.try_get<component::Tags>(e); tags)
         {
             tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
         }
@@ -826,8 +831,7 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Move to position */
     cultsim.set_function("move_to", [this](entt::entity e, glm::vec3 goal) {
-        auto* movement = m_registry.try_get<component::Movement>(e);
-        auto* position = m_registry.try_get<component::Position>(e);
+        auto&& [movement, position] = m_registry.try_get<component::Movement, component::Position>(e);
         if (movement && position)
         {
             if (!ai::find_path_astar(position->position, goal, movement->desired_position, m_scenario.bounds))
@@ -839,24 +843,33 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
 
-    cultsim.set_function("has_tags", [this](entt::entity e, ETag tags) {
-        auto t_comp = m_registry.try_get<component::Tags>(e);
-        if (!t_comp)
+    cultsim.set_function("entity_distance", [this](sol::this_state s, entt::entity a, entt::entity b) -> sol::object {
+        const auto pos_a = m_registry.try_get<component::Position>(a);
+        const auto pos_b = m_registry.try_get<component::Position>(b);
+        if (pos_a && pos_b)
         {
-            spdlog::get("default")->error("The entity does not have a tag component.");
-            return false;
+            return sol::make_object(s, glm::distance(pos_a->position, pos_b->position));
         }
-        return (t_comp->tags & tags) == tags;
+        return sol::nil;
+    });
+
+    cultsim.set_function("has_tags", [this](entt::entity e, ETag tags) {
+        if (auto t_comp = m_registry.try_get<component::Tags>(e); t_comp)
+        {
+            return (t_comp->tags & tags) == tags;
+        }
+
+        spdlog::get("default")->error("The entity does not have a tag component.");
+        return false;
     });
 
     cultsim.set_function("set_tags", [this](entt::entity e, ETag tags) {
-        auto t_comp = m_registry.try_get<component::Tags>(e);
-        if (!t_comp)
+        if (auto t_comp = m_registry.try_get<component::Tags>(e); t_comp)
         {
-            spdlog::get("default")->error("The entity does not have a tag component.");
-            return false;
+            t_comp->tags = ETag(t_comp->tags | tags);
         }
-        t_comp->tags = ETag(t_comp->tags | tags);
+        spdlog::get("default")->error("The entity does not have a tag component.");
+        return false;
     });
     cultsim.set_function("has_set_flags",
                          [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
