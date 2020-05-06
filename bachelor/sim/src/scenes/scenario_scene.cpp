@@ -639,7 +639,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_acquired_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_acquired_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -663,7 +663,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_attainable_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_attainable_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -1264,7 +1264,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                         action_index = i;
                     }
                 }
-                ImGui::Text("Current Action: %s (Action %d out of %u)",
+                ImGui::Text("Current Action: %s (Action %d out of %zu)",
                             action->current_action_sequence.current_action.name.c_str(),
                             action_index + 1,
                             action->current_action_sequence.m_actions.size());
