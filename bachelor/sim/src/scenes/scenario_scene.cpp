@@ -1315,17 +1315,17 @@ void ScenarioScene::draw_selected_entity_information_ui()
             if (rel)
             {
                 const auto parents = rel->get_parent(selection_info.selected_entity);
-                if (parents.mom.ids.relationship_registry_id != entt::null)
+                if (parents.mom.ids.relationship != entt::null)
                 {
-                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
+                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global);
                 }
                 else
                 {
                     ImGui::Text("My Mom is the Simulation");
                 }
-                if (parents.dad.ids.relationship_registry_id != entt::null)
+                if (parents.dad.ids.relationship != entt::null)
                 {
-                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
+                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global);
                 }
 
                 else

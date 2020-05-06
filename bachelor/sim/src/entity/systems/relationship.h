@@ -15,10 +15,10 @@ namespace cs::system
 struct ParentEntityIds
 {
     /** Entity id from the scenario scene registry */
-    entt::entity global_registry_id{entt::null};
+    entt::entity global{entt::null};
 
     /** Entity id from the Relationship registry */
-    entt::entity relationship_registry_id{entt::null};
+    entt::entity relationship{entt::null};
 };
 
 /**

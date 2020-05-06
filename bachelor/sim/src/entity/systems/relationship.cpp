@@ -69,39 +69,39 @@ void Relationship::new_child_to_reg(const event::EntityBorn& event)
     m_parents_reg.assign<component::Name>(new_entt, name_c.entity_type, name_c.name);
 
     auto relship_comp = m_context.registry->get<component::Relationship>(event.new_born);
-    if (relship_comp.mom.global_registry_id != entt::null && relship_comp.dad.global_registry_id != entt::null)
+    if (relship_comp.mom.global != entt::null && relship_comp.dad.global != entt::null)
     {
         component::Relationship fam{};
-        fam.old_id                 = event.new_born;
-        fam.mom.global_registry_id = relship_comp.mom.global_registry_id;
-        fam.dad.global_registry_id = relship_comp.dad.global_registry_id;
+        fam.old_id     = event.new_born;
+        fam.mom.global = relship_comp.mom.global;
+        fam.dad.global = relship_comp.dad.global;
 
         auto view = m_parents_reg.view<component::Relationship>();
         view.each([&fam](entt::entity e, const component::Relationship& relship_comp_parent) {
-            if (relship_comp_parent.old_id == fam.mom.global_registry_id)
+            if (relship_comp_parent.old_id == fam.mom.global)
             {
                 /** Set my relationship component to have my parents relationship registry ID/entt */
-                fam.mom.relationship_registry_id = e;
+                fam.mom.relationship = e;
             }
-            if (relship_comp_parent.old_id == fam.dad.global_registry_id)
+            if (relship_comp_parent.old_id == fam.dad.global)
             {
-                fam.dad.relationship_registry_id = e;
+                fam.dad.relationship = e;
             }
         });
 
-        if (fam.mom.relationship_registry_id == entt::null)
+        if (fam.mom.relationship == entt::null)
         {
             /** Mom is a first gen */
-            auto mom_entt                    = add_to_reg(fam.mom.global_registry_id);
-            fam.mom.relationship_registry_id = mom_entt;
+            auto mom_entt        = add_to_reg(fam.mom.global);
+            fam.mom.relationship = mom_entt;
         }
 
         /** Make sure dad is still valid, could have died during pregnancy */
-        if (fam.dad.relationship_registry_id == entt::null && m_context.registry->valid(fam.dad.global_registry_id))
+        if (fam.dad.relationship == entt::null && m_context.registry->valid(fam.dad.global))
         {
             /** Dad is a first gen */
-            auto dad_entt                    = add_to_reg(fam.dad.global_registry_id);
-            fam.dad.relationship_registry_id = dad_entt;
+            auto dad_entt        = add_to_reg(fam.dad.global);
+            fam.dad.relationship = dad_entt;
         }
         m_parents_reg.assign<component::Relationship>(new_entt, fam);
     }
