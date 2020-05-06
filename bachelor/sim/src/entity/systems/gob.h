@@ -7,7 +7,6 @@
 
 namespace cs::system
 {
-/** TODO: Documentation */
 /**
  * The Goal Oriented Behaviour System takes a list of goals and uses predefined functions to choose the most favorable action.
  *
@@ -27,6 +26,15 @@ class GOB : public ISystem
     ISystem* clone() override;
 
 private:
+    /**
+     * Calculates how dissatisfactory the world state is affter we run a sequence of actions
+     *
+     * @param e The entity who is running the action
+     * @param action The Sequence of actions to be taken
+     * @param goals A collection of all goals that the entity has
+     *
+     * @return The total negative impact from the weight of our goals after we run the action
+     */
     float calculate_discontentment(entt::entity e, const gob::ActionSequence& action, const std::vector<gob::Goal>& goals);
 };
 } // namespace cs::system
