@@ -2,10 +2,9 @@
 
 #include "scene.h"
 
-#include <string>
-
 namespace cs
 {
+/** TODO: Documentation */
 class LoadScenarioScene : public IScene
 {
 private:
