@@ -841,7 +841,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         }
     });
 
-    cultsim.set_function("distance", [this](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
+    cultsim.set_function("distance", [](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
 
     cultsim.set_function("entity_distance", [this](sol::this_state s, entt::entity a, entt::entity b) -> sol::object {
         const auto pos_a = m_registry.try_get<component::Position>(a);
@@ -872,10 +872,9 @@ void ScenarioScene::bind_scenario_lua_functions()
         return false;
     });
 
-    cultsim.set_function("has_set_flags",
-                         [this](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
+    cultsim.set_function("has_set_flags", [](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
 
-    cultsim.set_function("set_flags", [this](gob::Action& action, uint32_t flags) { action.m_flags |= flags; });
+    cultsim.set_function("set_flags", [](gob::Action& action, uint32_t flags) { action.m_flags |= flags; });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -1265,7 +1264,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                         action_index = i;
                     }
                 }
-                ImGui::Text("Current Action: %s (Action %d out of %d)",
+                ImGui::Text("Current Action: %s (Action %d out of %u)",
                             action->current_action_sequence.current_action.name.c_str(),
                             action_index + 1,
                             action->current_action_sequence.m_actions.size());
@@ -1310,7 +1309,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
         if (parents.mom.ids.relationship != entt::null)
         {
-            ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global);
+            ImGui::Text("My Mom is %s (%u)", parents.mom.name.c_str(), static_cast<uint32_t>(parents.mom.ids.global));
         }
         else
         {
@@ -1319,7 +1318,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
         if (parents.dad.ids.relationship != entt::null)
         {
-            ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global);
+            ImGui::Text("My Dad is %s (%u)", parents.dad.name.c_str(), static_cast<uint32_t>(parents.dad.ids.global));
         }
 
         else
