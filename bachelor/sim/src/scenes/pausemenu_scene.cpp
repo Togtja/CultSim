@@ -44,6 +44,7 @@ bool PauseMenuScene::update(float dt)
         {
             m_context->scene_manager->push<PreferenceScene>();
         }
+
         if (ImGui::Button("Exit", {150, 25}))
         {
             m_context->scene_manager->clear();
