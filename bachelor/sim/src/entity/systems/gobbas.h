@@ -13,7 +13,9 @@ namespace cs::system
  * action sequence from the current_action_sequence, and inform the user that an error has occured, alongside the error that
  * occured.
  *
- * @note this system runs a lot of custom functions every frame. This
+ * @note this system runs a lot of custom functions every frame. This can have heavy implications on the run time of the system.
+ * However it is more customizable and reliable than the other action system provided. Users are encouraged to see for themselves
+ * if the tradeoff is worth it.
  */
 class GOBBAS : public ISystem
 {
