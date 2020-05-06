@@ -23,7 +23,7 @@ GLuint compile_shader(std::string_view source, GLenum type)
     int len;
     glGetShaderiv(shader, GL_COMPILE_STATUS, &err);
 
-    if (err != 0)
+    if (err == 0)
     {
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
         auto log = std::string(len, '\0');
@@ -69,7 +69,7 @@ GLuint create_program(const std::vector<GLuint>& shaders)
 
     glGetProgramiv(program, GL_LINK_STATUS, &err);
 
-    if (err != 0)
+    if (err == 0)
     {
         /* Get log length */
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
