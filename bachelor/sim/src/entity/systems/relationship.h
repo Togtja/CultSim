@@ -151,7 +151,7 @@ public:
      * @param is_local_ids True if the entity is from the local registry. False if it is from the global registry
      * @return The struct BothParentName that include the name, local- and global entity ids
      */
-    BothParentName get_parent(entt::entity e, bool is_local_ids = false);
+    BothParentName get_parents(entt::entity e, bool is_local_ids = false);
 
     void update(float dt) override;
 
