@@ -166,8 +166,8 @@ void Reproduction::update(float dt)
 
         if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
         {
-            rel_c->mom.global_registry_id = child.parents.first;
-            rel_c->dad.global_registry_id = child.parents.second;
+            rel_c->mom.global = child.parents.first;
+            rel_c->dad.global = child.parents.second;
         }
     }
 }

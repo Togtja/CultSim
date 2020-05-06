@@ -67,6 +67,16 @@ void bind_dataonly(sol::state_view lua)
                                           &NameGenerator::Name::first,
                                           "last",
                                           &NameGenerator::Name::last);
+
+    lua.new_usertype<system::BothParentName>("Parents", "mom", &system::BothParentName::mom, "dad", &system::BothParentName::dad);
+
+    lua.new_usertype<system::ParentName>("Parent", "name", &system::ParentName::name, "ids", &system::ParentName::ids);
+
+    lua.new_usertype<system::ParentEntityIds>("ParentIds",
+                                              "global",
+                                              &system::ParentEntityIds::global,
+                                              "relationship",
+                                              &system::ParentEntityIds::relationship);
 }
 
 void bind_components(sol::state_view lua)
@@ -122,7 +132,7 @@ void bind_components(sol::state_view lua)
                                           "get_goal_change",
                                           &gob::ActionSequence::m_get_goal_change);
 
-    lua.new_usertype<gob::Action>("GOB_Action",
+    lua.new_usertype<gob::Action>("GobAction",
                                   "name",
                                   &gob::Action::name,
                                   "tags",
@@ -252,21 +262,6 @@ void bind_components(sol::state_view lua)
                                                &component::detail::Trait::affect,
                                                "unaffect",
                                                &component::detail::Trait::unaffect);
-
-    /** Entity registry, we only expose a limited number of functions here */
-    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
-
-    /** Bind View */
-    lua.new_usertype<entt::runtime_view>("View",
-                                         sol::no_constructor,
-                                         "empty",
-                                         &entt::runtime_view::empty,
-                                         "size",
-                                         &entt::runtime_view::size,
-                                         "each",
-                                         &entt::runtime_view::each<sol::function>,
-                                         "contains",
-                                         &entt::runtime_view::contains);
 }
 
 void bind_systems(sol::state_view lua)
@@ -385,6 +380,21 @@ void bind_utils(sol::state_view lua)
     /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
      * float. */
     lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
+
+    /** Entity registry, we only expose a limited number of functions here */
+    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
+
+    /** Bind View */
+    lua.new_usertype<entt::runtime_view>("View",
+                                         sol::no_constructor,
+                                         "empty",
+                                         &entt::runtime_view::empty,
+                                         "size",
+                                         &entt::runtime_view::size,
+                                         "each",
+                                         &entt::runtime_view::each<sol::function>,
+                                         "contains",
+                                         &entt::runtime_view::contains);
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
@@ -393,12 +403,11 @@ int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_e
     if (maybe_exception)
     {
         const auto& ex = *maybe_exception;
-        logger->critical("Lua exception thrown: [[[{}]]]", ex.what());
+        logger->critical("Lua exception thrown: {}", ex.what());
     }
     else
     {
-        logger->critical("Lua error thrown: [[[{}]]]", std::string_view(description.data(), description.size()));
-        std::cout << std::endl;
+        logger->critical("Lua error thrown: {}", std::string_view(description.data(), description.size()));
     }
 
     return sol::stack::push(L, description);

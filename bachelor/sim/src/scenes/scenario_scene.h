@@ -72,7 +72,7 @@ private:
     debug::DataCollector m_data_collector{};
 
     /** Name generator used for scenario */
-    NameGenerator m_name_generator;
+    NameGenerator m_name_generator{};
 
     /** Keep track of screen resolution */
     glm::vec2 m_resolution{};

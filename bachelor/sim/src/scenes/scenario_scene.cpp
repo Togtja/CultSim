@@ -1308,18 +1308,18 @@ void ScenarioScene::draw_selected_entity_information_ui()
         const auto parents =
             m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::BothParentName>();
 
-        if (parents.mom.ids.relationship_registry_id != entt::null)
+        if (parents.mom.ids.relationship != entt::null)
         {
-            ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
+            ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global);
         }
         else
         {
             ImGui::Text("My Mom is the Simulation");
         }
 
-        if (parents.dad.ids.relationship_registry_id != entt::null)
+        if (parents.dad.ids.relationship != entt::null)
         {
-            ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
+            ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global);
         }
 
         else
@@ -1358,12 +1358,6 @@ void ScenarioScene::update_entity_hover()
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
     }
-
-    ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
-    ImGui::Text("World: %.2f | %.2f | %.2f", world_pos.x, world_pos.y, world_pos.z);
-    ImGui::Text("Hovering: %u | Selected: %u",
-                static_cast<uint32_t>(selection_helper.hovered_entity),
-                static_cast<uint32_t>(selection_helper.selected_entity));
 }
 
 void ScenarioScene::handle_preference_changed(const Preference& before, const Preference& after)

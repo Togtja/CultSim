@@ -2,6 +2,7 @@
 
 #include "scene.h"
 
+/** TODO: Rename loadsenario_scene.h to loadscenario_scene.h */
 namespace cs
 {
 /** TODO: Documentation */
