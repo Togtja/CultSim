@@ -73,7 +73,7 @@ public:
     explicit PreferenceManager(Window& window, sol::state_view lua_state);
     explicit PreferenceManager(Window& window, sol::state_view lua_state, std::string_view from_file);
 
-    void show_debug_ui();
+    void show_ui();
 
     /**
      * Initialize and load preferences

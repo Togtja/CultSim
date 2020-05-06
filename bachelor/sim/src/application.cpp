@@ -98,7 +98,7 @@ void Application::update(float dt)
     input::get_input().handle_live_input(dt);
     ImGui::Text("Lua memory: %.2f Kb", m_lua.memory_used() / 1024.f);
     m_scene_manager.update(dt);
-    m_preferences.show_debug_ui();
+    m_preferences.show_ui();
     AutoTimer::show_debug_ui();
 }
 
