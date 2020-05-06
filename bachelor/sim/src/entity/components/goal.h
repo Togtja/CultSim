@@ -13,8 +13,8 @@ namespace cs::gob
 /** TODO: Rename all names*/
 struct Goal
 {
-    using WeightFunction = std::variant<sol::function, std::function<const float()>>;
-    using GoalFunction   = std::variant<sol::function, std::function<const float(const float)>>;
+    using WeightFunction = std::variant<sol::function, std::function<float()>>;
+    using GoalFunction   = std::variant<sol::function, std::function<float(const float)>>;
 
     std::string m_name{};
     ETag m_tags{};

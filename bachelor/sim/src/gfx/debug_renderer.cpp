@@ -66,7 +66,6 @@ void DebugRenderer::display()
     glDrawElementsInstanced(GL_LINE_STRIP, 5, GL_UNSIGNED_INT, nullptr, m_nrects);
 }
 
-/** TODO: use fcompile & fcreateprogram from glutil */
 void DebugRenderer::init()
 {
     m_vao = VaoBuilder()
@@ -82,11 +81,7 @@ void DebugRenderer::init()
     init_circles();
     init_rects();
 
-    const auto vs = fcompile_shader("shader/debug.vert", GL_VERTEX_SHADER);
-    const auto fs = fcompile_shader("shader/debug.frag", GL_FRAGMENT_SHADER);
-    m_shader      = create_program({vs, fs});
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    m_shader = fcreate_program({{"shader/debug.vert", GL_VERTEX_SHADER}, {"shader/debug.frag", GL_FRAGMENT_SHADER}});
 }
 
 void DebugRenderer::init_lines()

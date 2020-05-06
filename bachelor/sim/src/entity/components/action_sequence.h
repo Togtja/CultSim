@@ -17,9 +17,9 @@ namespace cs::gob
 /** TODO: More documentation*/
 struct ActionSequence
 {
-    using RunActionsFunction = std::variant<sol::function, std::function<bool(ActionSequence&, entt::entity, std::string*)>>;
-    using GoalChangeFunction = std::variant<sol::function, std::function<const float(const ActionSequence&, const Goal&)>>;
-    using DurationFunction   = std::variant<sol::function, std::function<const float(const ActionSequence&, entt::entity e)>>;
+    using RunActionsFunction = std::variant<sol::function, std::function<bool(ActionSequence*, entt::entity, std::string*)>>;
+    using GoalChangeFunction = std::variant<sol::function, std::function<float(const ActionSequence&, const Goal&)>>;
+    using DurationFunction   = std::variant<sol::function, std::function<float(const ActionSequence&, entt::entity e)>>;
 
 public:
     std::string m_name{};
@@ -29,7 +29,9 @@ public:
 
     std::vector<Action> m_actions{};
 
-    RunActionsFunction m_run_actions = [this](ActionSequence& self, const entt::entity e, std::string* error) -> bool {
+    RunActionsFunction m_run_actions = [](ActionSequence* pself, const entt::entity e, std::string* error) -> bool {
+        auto& self = *pself;
+
         /**As long as we have not completed our action, keep working on it*/
         const auto finished = self.current_action.m_action(self.current_action, e, error);
 
@@ -67,7 +69,7 @@ public:
         return false;
     };
 
-    GoalChangeFunction m_get_goal_change = [this](const ActionSequence& action_sequence, const Goal& goal) {
+    GoalChangeFunction m_get_goal_change = [](const ActionSequence& action_sequence, const Goal& goal) {
         float result = 0;
         for (const auto& action : action_sequence.m_actions)
         {
@@ -76,7 +78,7 @@ public:
         return result;
     };
 
-    DurationFunction m_get_duration = [this](const ActionSequence& action_sequence, const entt::entity e) {
+    DurationFunction m_get_duration = [](const ActionSequence& action_sequence, const entt::entity e) {
         float result = 0.0;
         for (const auto& action : action_sequence.m_actions)
         {
