@@ -6,7 +6,7 @@ namespace cs::system
 {
 void GOB::update(float dt)
 {
-    CS_AUTOTIMER(Goal System);
+    CS_AUTOTIMER(Goal Oriented Behaviour System);
 
     auto view = m_context.registry->view<component::Goal, component::Action>();
     view.each([this, dt](entt::entity e, const component::Goal& goal, component::Action& action) {
