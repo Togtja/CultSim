@@ -125,8 +125,8 @@ void bind_components(sol::state_view lua)
                                           &gob::ActionSequence::current_action,
                                           "actions",
                                           &gob::ActionSequence::m_actions,
-                                          "run_actions",
-                                          &gob::ActionSequence::m_run_actions,
+                                          /*"run_actions",
+                                          &gob::ActionSequence::m_run_actions,*/
                                           "get_duration",
                                           &gob::ActionSequence::m_get_duration,
                                           "get_goal_change",
