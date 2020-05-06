@@ -1243,7 +1243,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 }
                 else
                 {
-                    ImGui::Text("%3.1f", std::get<std::function<const float()>>(goal_t.m_weight_function)());
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.m_weight_function)());
                 }
             }
             ImGui::EndTable();

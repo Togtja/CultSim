@@ -9,7 +9,7 @@ void Goal::update(float dt)
     CS_AUTOTIMER(Goal System);
 
     auto view = m_context.registry->view<component::Goal>();
-    view.each([this, dt](entt::entity e, component::Goal& goal) {
+    view.each([dt](component::Goal& goal) {
         for (auto& current_goal : goal.goals)
         {
             current_goal.m_age += dt;
@@ -26,7 +26,7 @@ void Goal::update(float dt)
             }
             else
             {
-                lhs_v = std::get<std::function<const float()>>(lhs.m_weight_function)();
+                lhs_v = std::get<std::function<float()>>(lhs.m_weight_function)();
             }
 
             if (rhs.m_weight_function.index() == 0)
@@ -35,7 +35,7 @@ void Goal::update(float dt)
             }
             else
             {
-                rhs_v = std::get<std::function<const float()>>(rhs.m_weight_function)();
+                rhs_v = std::get<std::function<float()>>(rhs.m_weight_function)();
             }
 
             return lhs_v < rhs_v;

@@ -9,7 +9,7 @@ void GOB::update(float dt)
     CS_AUTOTIMER(Goal Oriented Behaviour System);
 
     auto view = m_context.registry->view<component::Goal, component::Action>();
-    view.each([this, dt](entt::entity e, const component::Goal& goal, component::Action& action) {
+    view.each([this](entt::entity e, const component::Goal& goal, component::Action& action) {
         if (action.current_action_sequence.m_name.empty())
         {
             auto best_action = action.actions[0];
@@ -48,7 +48,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<const float()>>(goal.m_weight_function)();
+            value += std::get<std::function<float()>>(goal.m_weight_function)();
         }
 
         if (action.m_get_goal_change.index() == 0)
@@ -57,7 +57,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<const float(const gob::ActionSequence&, const gob::Goal&)>>(
+            value += std::get<std::function<float(const gob::ActionSequence&, const gob::Goal&)>>(
                 action.m_get_goal_change)(action, goal);
         }
 
@@ -69,7 +69,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         else
         {
             time_value +=
-                std::get<std::function<const float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
+                std::get<std::function<float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
         }
 
         if (goal.m_change_over_time.index() == 0)
@@ -78,7 +78,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            value += std::get<std::function<const float(const float)>>(goal.m_change_over_time)(time_value);
+            value += std::get<std::function<float(const float)>>(goal.m_change_over_time)(time_value);
         }
 
         if (goal.m_get_discontentment.index() == 0)
@@ -87,7 +87,7 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
         }
         else
         {
-            discontentment += std::get<std::function<const float(const float)>>(goal.m_get_discontentment)(value);
+            discontentment += std::get<std::function<float(const float)>>(goal.m_get_discontentment)(value);
         }
     }
     return discontentment;
