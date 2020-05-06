@@ -33,7 +33,7 @@ public:
         auto& self = *pself;
 
         /**As long as we have not completed our action, keep working on it*/
-        const auto finished = self.current_action.m_action(self.current_action, e, error);
+        const auto finished = self.current_action.m_action(self.current_action, e, *error);
 
         /**We cannot complete the action*/
         if (!error->empty())
