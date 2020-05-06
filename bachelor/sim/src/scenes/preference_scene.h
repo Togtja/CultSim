@@ -9,18 +9,19 @@
 
 namespace cs
 {
+/** TODO: Documentation */
 class PreferenceScene : public IScene
 {
 private:
-    robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map;
+    robin_hood::unordered_map<input::EKeyContext, input::detail::ActionHandler> m_key_map{};
 
-    /** Brief To keep things looking consistent in the main menu ther is a display map */
-    robin_hood::unordered_map<input::EKeyContext, std::vector<std::pair<std::string, input::EAction>>> m_display_map;
+    /** Brief To keep things looking consistent in the main menu there is a display map */
+    robin_hood::unordered_map<input::EKeyContext, std::vector<std::pair<std::string, input::EAction>>> m_display_map{};
 
-    int m_bind_index             = -1;
-    input::EAction m_bind_action = input::EAction::None;
+    int m_bind_index{-1};
+    input::EAction m_bind_action{input::EAction::None};
 
-    bool m_unsaved_changes = false;
+    bool m_unsaved_changes{false};
 
 public:
     PreferenceScene();
@@ -33,7 +34,7 @@ public:
 
     bool draw() override;
 
-    void key_binding();
+    void show_keybinding_ui();
 
     void quit_btn();
 };
