@@ -4,7 +4,7 @@
 
 namespace cs
 {
-/** Scene that let users take organizational actions such as quitting during a simulation */
+/** Scene that let users take organizational actions such as quitting Kduring a simulation */
 class PauseMenuScene : public IScene
 {
 public:
