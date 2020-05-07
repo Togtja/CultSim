@@ -102,9 +102,9 @@ public:
      * The first 8 bits represent friendship, the last 8 bits romantic intrest. However they do not <i>need</i>
      * to represent this, the users themself can decide what it should represent
      *
-     * @param e entity you want to add a relationship table to
+     * @param event The spawn event that triggers when a new entity is spawned
      */
-    void add_relationship_table(entt::entity e);
+    void add_relationship_table(const event::EntitySpawned& event);
 
     /**
      * Get the friendship value between e to other that goes from 0 to 255

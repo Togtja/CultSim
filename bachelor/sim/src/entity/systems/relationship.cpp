@@ -26,6 +26,8 @@ Relationship& Relationship::operator=(const Relationship& other)
 void Relationship::initialize()
 {
     m_context.dispatcher->sink<event::EntityBorn>().connect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntitySpawned>().connect<&Relationship::add_relationship_table>(*this);
+
     m_context.dispatcher->sink<event::EntityDeleted>().connect<&Relationship::delete_father>(*this);
 
     sol::table cultsim = (*m_context.lua_state)["cultsim"];
@@ -46,6 +48,7 @@ void Relationship::initialize()
 void Relationship::deinitialize()
 {
     m_context.dispatcher->sink<event::EntityBorn>().disconnect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntitySpawned>().disconnect<&Relationship::add_relationship_table>(*this);
     m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Relationship::delete_father>(*this);
 }
 
@@ -120,29 +123,31 @@ void Relationship::delete_father(const event::EntityDeleted& event)
         });
 }
 
-void Relationship::add_relationship_table(entt::entity e)
+void Relationship::add_relationship_table(const event::EntitySpawned& event)
 {
+    spdlog::critical("I have spawned!");
+
     auto view = m_context.registry->view<component::Relationship>();
+    if (auto relship_c = m_context.registry->try_get<component::Relationship>(event.entity); relship_c)
+    {
+        view.each([this, event, relship_c](entt::entity e2, const component::Relationship& relationship) {
+            if (event.entity == e2)
+            {
+                /** First 8 bits is friendship, last 8 bits is romance */
+                add_friendship(event.entity, e2, relationship.self_friend);
+                add_romance(event.entity, e2, relationship.self_romance);
+                return;
+            }
+            /** TODO: for family add better relationship */
+            /** What I feel for others */
+            add_friendship(event.entity, e2, relship_c->default_friend);
+            add_romance(event.entity, e2, relship_c->default_romance);
 
-    auto relship_c = m_context.registry->get<component::Relationship>(e);
-
-    view.each([this, e, relship_c](entt::entity e2, const component::Relationship& relationship) {
-        if (e == e2)
-        {
-            /** First 8 bits is friendship, last 8 bits is romance */
-            add_friendship(e, e2, relationship.self_friend);
-            add_romance(e, e2, relationship.self_romance);
-            return;
-        }
-        /** TODO: for family add better relationship */
-        /** What I feel for others */
-        add_friendship(e, e2, relship_c.default_friend);
-        add_romance(e, e2, relship_c.default_romance);
-
-        /** What others feel for me */
-        add_friendship(e2, e, relationship.default_friend);
-        add_romance(e2, e, relationship.default_romance);
-    });
+            /** What others feel for me */
+            add_friendship(e2, event.entity, relationship.default_friend);
+            add_romance(e2, event.entity, relationship.default_romance);
+        });
+    }
 }
 
 uint8_t Relationship::get_friendship(entt::entity e, entt::entity other)
@@ -232,18 +237,8 @@ BothParentName Relationship::get_parents(entt::entity e, bool is_local_ids)
     return ret;
 }
 
-/** TODO: Replace with registry on construct event to remove need for per frame runs*/
 void Relationship::update(float dt)
 {
-    CS_AUTOTIMER(Relationship System);
-    auto view = m_context.registry->view<component::Relationship>();
-    view.each([this, &view](entt::entity e, component::Relationship& relationship) {
-        if (relationship.new_create)
-        {
-            add_relationship_table(e);
-            relationship.new_create = false;
-        }
-    });
 }
 
 ISystem* Relationship::clone()
