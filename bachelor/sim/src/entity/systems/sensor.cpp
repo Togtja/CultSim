@@ -195,10 +195,4 @@ ISystem* Sensor::clone()
     return new Sensor(m_context);
 }
 
-bool Sensor::close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
-{
-    const glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
-    return boolvec.x && boolvec.y;
-}
-
 } // namespace cs::system
