@@ -9,21 +9,40 @@ namespace cs::ai
 {
 /** TODO: Add documentation */
 
+/**
+ * A need represents the desire of an entity to do something, or more precisely, to fullfill a craving
+ *
+ * The needs are used by the need and mitigation system to influence an entities decision making, by telling it what it needs to
+ * fix and how badly it needs fixing. To this end, needs typically grow more pressing the older they become, with different needs
+ * growing exponentially more pressing over their lifespan.
+ */
 struct Need
 {
     using WeightFunction = std::variant<sol::function, std::function<float(const Need&)>>;
+
     std::string name{};
 
+    /** How important fixing a need right now is. Usually determined via a weight function */
     float weight{};
 
+    /** What the current status of the need is ranging from 1 (fullfilled) to 0 (unfullfilled) */
     float status{};
 
+    /** How much fullfillment a need looses every second */
     float decay_rate{};
 
+    /** How much a need impacts the health of an agent when reaching 0 */
     float vitality{};
 
     ETag tags{};
 
+    /**
+     * weight_func is a user implementable function that determines the importance of the need.
+     *
+     * @param local A reference to the Need in question necessary due to Lua instantialization
+     *
+     * @return the importance of fullfilling the need. default is the deficit in status multiplied by the weight and multiplier
+     */
     WeightFunction weight_func = [](const ai::Need& local) {
         return (100 / (local.status + 1)) * local.weight * local.weight_multi;
     };
