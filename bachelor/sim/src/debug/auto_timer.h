@@ -23,15 +23,22 @@ private:
     using TimePoint = std::chrono::time_point<std::chrono::steady_clock>;
     using TimeUnit  = std::chrono::duration<double, std::milli>;
 
+    /**
+     * A single record in the AutoTimer results
+     */
     struct Record
     {
+        /** Identifier of timer that produced the record */
         std::string_view name{};
+
+        /** Time in ms the timer was active */
         double time_ms{};
     };
 
-    /** TODO: Add comments for the following two variables*/
+    /** When the timer was created */
     TimePoint m_start_time = std::chrono::steady_clock::now();
 
+    /** The human readable identifier for the timer */
     std::string_view m_name{};
 
     /** AutoTimer Results */
