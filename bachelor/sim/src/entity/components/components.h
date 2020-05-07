@@ -298,13 +298,14 @@ struct Traits
     std::vector<detail::Trait> acquired_traits;
 };
 
+/** Used to add a new entry in the relationship table */
 struct Relationship
 {
-    /** Used to add a new entry in the relatip table */
-    bool new_create{true};
+    /** Default values for friends and romance for strangers */
     uint8_t default_friend{0};
     uint8_t default_romance{0};
 
+    /** Default values for them self */
     uint8_t self_friend{0};
     uint8_t self_romance{0};
 
@@ -315,6 +316,9 @@ struct Relationship
 
     /** Father Ids for Global and Relationship Ids */
     system::EntityIds dad{entt::null, entt::null};
+
+    /** My Children Ids for Global and Relationship Ids */
+    std::vector<system::EntityIds> children{};
 
     /** old_id is entt id for context registry */
     entt::entity old_id{entt::null};
