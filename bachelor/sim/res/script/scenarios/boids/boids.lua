@@ -25,7 +25,7 @@ scenario.sampling_rate = 5.0;
 scenario.init = function()
     -- Spawn Boids
     for i=1,10 do
-        local deer = cultsim.spawn("boid")        
+        local boid = cultsim.spawn("boid")        
     end
 end
 
