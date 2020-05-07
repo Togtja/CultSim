@@ -27,7 +27,7 @@ void Mitigation::update(float dt)
     view.each([this](entt::entity e, component::Need& needs, component::Strategy& strategies, const component::Tags& tags) {
         if (!needs.vital_needs.empty())
         {
-            const auto& temp = needs.vital_needs.front();
+            const auto temp = needs.vital_needs.front();
 
             /** Put the most pressing needs to the front*/
             std::sort(needs.vital_needs.begin(), needs.vital_needs.end(), std::greater<ai::Need>());

@@ -223,7 +223,7 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
 
     cs::ai::Need need2 = {static_cast<std::string>("thirst"), 8.f, 100.f, 1.f, 1.f, static_cast<cs::ETag>(cs::TAG_Drink)};
 
-    cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
+    cs::action::Action action{static_cast<std::string>("consume"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),
                                  0,
@@ -232,16 +232,16 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
                                  cs::TAG_Food,
                                  {},
                                  {},
-                                 std::vector<cs::action::Action>{std::move(action)}};
+                                 std::vector<cs::action::Action>{action}};
 
     cs::ai::Strategy strategy2 = {static_cast<std::string>("drink water"),
                                   0,
                                   {},
-                                  static_cast<cs::ETag>(cs::TAG_Drink),
-                                  static_cast<cs::ETag>(cs::TAG_Drink),
+                                  cs::TAG_Drink,
+                                  cs::TAG_Drink,
                                   {},
                                   {},
-                                  std::vector<cs::action::Action>{std::move(action)}};
+                                  std::vector<cs::action::Action>{action}};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need, need2}), std::vector<cs::ai::Need>({}));
     test_registry.assign<cs::component::Strategy>(agent,
@@ -257,17 +257,26 @@ TEST_CASE("Test case that strategies change based on pressing_needs")
     need_system->update(1.f);
     mitigation_system->update(1.f);
     auto view = test_registry.view<cs::component::Need, cs::component::Strategy, cs::component::Tags>();
-    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-        REQUIRE(needs.vital_needs.size() == 1);
-        REQUIRE(strategies.staged_strategies.size() == 1);
-        REQUIRE(strategies.staged_strategies.back() == strategy);
-    });
+    float numb;
+    view.each(
+        [strategy, strategy2, &numb](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+            numb = std::get<std::function<float(const cs::ai::Need&)>>(needs.vital_needs.back().weight_func)(
+                needs.vital_needs.back());
+            REQUIRE(needs.vital_needs.size() == 1);
+            REQUIRE(strategies.staged_strategies.size() == 1);
+            REQUIRE(strategies.staged_strategies.back().name == strategy.name);
+        });
 
     need_system->update(50.f);
     mitigation_system->update(1.f);
-    view.each([strategy, strategy2](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
-        REQUIRE(needs.vital_needs.size() == 2);
-        REQUIRE(strategies.staged_strategies.size() == 1);
-        REQUIRE(strategies.staged_strategies.back() == strategy2);
-    });
+    view.each(
+        [strategy, strategy2, numb](cs::component::Need& needs, cs::component::Strategy& strategies, cs::component::Tags& tags) {
+            REQUIRE(std::get<std::function<float(const cs::ai::Need&)>>(needs.vital_needs.back().weight_func)(
+                        needs.vital_needs.back()) == numb);
+            REQUIRE(std::get<std::function<float(const cs::ai::Need&)>>(needs.vital_needs.front().weight_func)(
+                        needs.vital_needs.front()) > numb);
+            REQUIRE(needs.vital_needs.size() == 2);
+            REQUIRE(strategies.staged_strategies.size() == 1);
+            REQUIRE(strategies.staged_strategies.back().name == strategy2.name);
+        });
 }
