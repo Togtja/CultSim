@@ -37,7 +37,7 @@ void PreferenceScene::on_exit()
 bool PreferenceScene::update(float dt)
 {
     show_keybinding_ui();
-    quit_btn();
+    go_back();
     return false;
 }
 
@@ -283,7 +283,7 @@ void PreferenceScene::show_keybinding_ui()
 
     ImGui::End();
 }
-void PreferenceScene::quit_btn()
+void PreferenceScene::go_back()
 {
     auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     ImGui::SetNextWindowPos(glm::vec2(res.x / 2, res.y / 1.2f), 0, {.5f, .5f});
