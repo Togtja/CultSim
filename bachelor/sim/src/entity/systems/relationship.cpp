@@ -6,7 +6,7 @@
 
 namespace cs::system
 {
-Relationship::Relationship(const Relationship& other) : m_rel_table(other.m_rel_table), ISystem(other)
+Relationship::Relationship(const Relationship& other) : ISystem(other), m_rel_table(other.m_rel_table)
 {
     m_parents_reg = other.m_parents_reg.clone();
 }
