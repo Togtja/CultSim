@@ -27,6 +27,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"InventoryComponent", spawn_inventory_component},
                           {"TraitComponent", spawn_trait_component},
                           {"NameComponent", spawn_name_component},
+                          {"LuaComponent", spawn_lua_component},
                           {"ActionComponent", spawn_action_component},
                           {"GoalComponent", spawn_goal_component},
                           {"RelationshipComponent", spawn_relationship_component}};
@@ -454,7 +455,32 @@ bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table
 
 bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::table table)
 {
-    auto& rel_comp = reg.assign_or_replace<component::Relationship>(e);
+    reg.assign_or_replace<component::Relationship>(e);
+    return true;
+}
+
+bool spawn_lua_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    switch (table["lua_id"].get<int>())
+    {
+        case 1: reg.assign_or_replace<component::LuaComponent<1>>(e, table); break;
+        case 2: reg.assign_or_replace<component::LuaComponent<2>>(e, table); break;
+        case 3: reg.assign_or_replace<component::LuaComponent<3>>(e, table); break;
+        case 4: reg.assign_or_replace<component::LuaComponent<4>>(e, table); break;
+        case 5: reg.assign_or_replace<component::LuaComponent<5>>(e, table); break;
+        case 6: reg.assign_or_replace<component::LuaComponent<6>>(e, table); break;
+        case 7: reg.assign_or_replace<component::LuaComponent<7>>(e, table); break;
+        case 8: reg.assign_or_replace<component::LuaComponent<8>>(e, table); break;
+        case 9: reg.assign_or_replace<component::LuaComponent<9>>(e, table); break;
+        case 10: reg.assign_or_replace<component::LuaComponent<10>>(e, table); break;
+        case 11: reg.assign_or_replace<component::LuaComponent<11>>(e, table); break;
+        case 12: reg.assign_or_replace<component::LuaComponent<12>>(e, table); break;
+        case 13: reg.assign_or_replace<component::LuaComponent<13>>(e, table); break;
+        case 14: reg.assign_or_replace<component::LuaComponent<14>>(e, table); break;
+        case 15: reg.assign_or_replace<component::LuaComponent<15>>(e, table); break;
+        case 16: reg.assign_or_replace<component::LuaComponent<16>>(e, table); break;
+        default: return false; break;
+    }
 
     return true;
 }
