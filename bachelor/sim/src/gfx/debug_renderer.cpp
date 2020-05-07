@@ -25,8 +25,8 @@ void DebugRenderer::clear()
 
 void DebugRenderer::draw_line(glm::vec3 from, glm::vec3 to, glm::vec3 color)
 {
-    m_line_data[m_nlines++] = {{from.x, from.y, from.z}, {color.r, color.g, color.b}};
-    m_line_data[m_nlines++] = {{to.x, to.y, to.z}, {color.r, color.g, color.b}};
+    m_line_data[m_nlines++] = {from, color};
+    m_line_data[m_nlines++] = {to, color};
 }
 
 void DebugRenderer::draw_rect(glm::vec3 pos, const glm::vec2& size, const glm::vec3& color, const glm::vec2& pivot)
@@ -81,33 +81,32 @@ void DebugRenderer::init()
     init_circles();
     init_rects();
 
-    auto vs  = fcompile_shader("shader/debug.vert", GL_VERTEX_SHADER);
-    auto fs  = fcompile_shader("shader/debug.frag", GL_FRAGMENT_SHADER);
-    m_shader = create_program({vs, fs});
-    glDeleteShader(vs);
-    glDeleteShader(fs);
+    m_shader = fcreate_program({{"shader/debug.vert", GL_VERTEX_SHADER}, {"shader/debug.frag", GL_FRAGMENT_SHADER}});
 }
 
 void DebugRenderer::init_lines()
 {
     glCreateBuffers(1, &m_linevbo);
-    glNamedBufferStorage(m_linevbo, sizeof(PrimitiveVertex) * DEBUG_MAX_LINES, nullptr, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
+    glNamedBufferStorage(m_linevbo,
+                         sizeof(PrimitiveVertex) * DEBUG_MAX_SHAPES,
+                         nullptr,
+                         GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
 
     m_line_data = static_cast<PrimitiveVertex*>(
         glMapNamedBufferRange(m_linevbo,
                               0u,
-                              sizeof(PrimitiveVertex) * DEBUG_MAX_LINES,
+                              sizeof(PrimitiveVertex) * DEBUG_MAX_SHAPES,
                               GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 }
 
 void DebugRenderer::init_circles()
 {
-    auto [verts, inds]     = PrimitiveCircle(0.5f, 12).generate_outline();
-    m_circle_buffer_offset = size_bytes(verts) + size_bytes(inds);
+    const auto [verts, inds] = PrimitiveCircle(0.5f, 12).generate_outline();
+    m_circle_buffer_offset   = size_bytes(verts) + size_bytes(inds);
 
     glCreateBuffers(1, &m_circlevbo);
     glNamedBufferStorage(m_circlevbo,
-                         m_circle_buffer_offset + sizeof(DebugInstanceVertex) * DEBUG_MAX_LINES,
+                         m_circle_buffer_offset + sizeof(DebugInstanceVertex) * DEBUG_MAX_SHAPES,
                          nullptr,
                          GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
 
@@ -115,7 +114,7 @@ void DebugRenderer::init_circles()
     m_circle_data = static_cast<DebugInstanceVertex*>(
         glMapNamedBufferRange(m_circlevbo, 0u, m_circle_buffer_offset, GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 
-    auto combined_data = combine_buffers(inds, verts);
+    const auto combined_data = combine_buffers(inds, verts);
     memcpy(m_circle_data, combined_data.data(), m_circle_buffer_offset);
     glFlushMappedNamedBufferRange(m_circlevbo, 0u, m_circle_buffer_offset);
     glUnmapNamedBuffer(m_circlevbo);
@@ -126,18 +125,18 @@ void DebugRenderer::init_circles()
     m_circle_data = static_cast<DebugInstanceVertex*>(
         glMapNamedBufferRange(m_circlevbo,
                               m_circle_buffer_offset,
-                              sizeof(DebugInstanceVertex) * DEBUG_MAX_LINES,
+                              sizeof(DebugInstanceVertex) * DEBUG_MAX_SHAPES,
                               GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 }
 
 void DebugRenderer::init_rects()
 {
-    auto [verts, inds]   = PrimitiveQuad(1.f, 1.f).generate_outline();
-    m_rect_buffer_offset = size_bytes(verts) + size_bytes(inds);
+    const auto [verts, inds] = PrimitiveQuad(1.f, 1.f).generate_outline();
+    m_rect_buffer_offset     = size_bytes(verts) + size_bytes(inds);
 
     glCreateBuffers(1, &m_rectvbo);
     glNamedBufferStorage(m_rectvbo,
-                         m_rect_buffer_offset + sizeof(DebugInstanceVertex) * DEBUG_MAX_LINES,
+                         m_rect_buffer_offset + sizeof(DebugInstanceVertex) * DEBUG_MAX_SHAPES,
                          nullptr,
                          GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT);
 
@@ -148,7 +147,7 @@ void DebugRenderer::init_rects()
                               m_rect_buffer_offset,
                               GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 
-    auto combined_data = combine_buffers(inds, verts);
+    const auto combined_data = combine_buffers(inds, verts);
     memcpy(m_rect_data, combined_data.data(), m_rect_buffer_offset);
     glFlushMappedNamedBufferRange(m_rectvbo, 0u, m_rect_buffer_offset);
     glUnmapNamedBuffer(m_rectvbo);
@@ -159,7 +158,7 @@ void DebugRenderer::init_rects()
     m_rect_data = static_cast<DebugInstanceVertex*>(
         glMapNamedBufferRange(m_rectvbo,
                               m_rect_buffer_offset,
-                              sizeof(DebugInstanceVertex) * DEBUG_MAX_LINES,
+                              sizeof(DebugInstanceVertex) * DEBUG_MAX_SHAPES,
                               GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_FLUSH_EXPLICIT_BIT));
 }
 

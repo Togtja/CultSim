@@ -5,10 +5,11 @@
 
 namespace cs
 {
+/** TODO: Documentation */
 class EditorScene : public IScene
 {
 private:
-    LocaleEditor m_locale_editor;
+    LocaleEditor m_locale_editor{};
 
 public:
     void on_enter() override;

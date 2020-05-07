@@ -1,8 +1,8 @@
 #pragma once
 
-#include "uniform_buffer.h"
-#include "render_data.h"
 #include "camera.h"
+#include "render_data.h"
+#include "uniform_buffer.h"
 
 #include <memory>
 #include <string_view>
@@ -12,11 +12,12 @@
 
 namespace cs::gfx
 {
+/** TODO: Documentation */
 class SpriteRenderer
 {
 private:
-    inline static constexpr int TEXTURE_WIDTH  = 64;
-    inline static constexpr int TEXTURE_HEIGHT = 64;
+    inline static constexpr int TEXTURE_WIDTH{64};
+    inline static constexpr int TEXTURE_HEIGHT{64};
 
     Camera& m_camera;
 
@@ -40,7 +41,7 @@ private:
     std::vector<uint32_t> m_normal_texture_handles{};
 
     /** Current number of sprites about to be drawn */
-    uint32_t m_nsprites = 0u;
+    uint32_t m_nsprites{0u};
 
     /** Next available texture ID for sprites */
     SpriteTextureID m_next_texture_id{};

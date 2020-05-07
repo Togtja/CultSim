@@ -1,11 +1,12 @@
 #pragma once
 
+#include "gfx/camera.h"
 #include "gfx/render_data.h"
-#include "gfx/raymarching_renderer.h"
 #include "system.h"
 
 namespace cs::system
 {
+/** TODO: Documentation */
 class Rendering : public ISystem
 {
 private:
@@ -14,7 +15,7 @@ private:
     gfx::Camera m_camera{};
 
 public:
-    Rendering(SystemContext context);
+    using ISystem::ISystem;
 
     void initialize() override;
 

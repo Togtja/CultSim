@@ -3,9 +3,9 @@
 #include <functional>
 #include <vector>
 
-#include "robin_hood.h"
 #include <SDL_events.h>
 #include <glm/vec2.hpp>
+#include <robin_hood.h>
 #include <sol/sol.hpp>
 
 namespace cs::input
@@ -219,16 +219,17 @@ class ActionHandler
 {
 private:
     EKeyContext m_context_type;
-    // Action to function bindings
-    robin_hood::unordered_map<EAction, std::function<void()>> m_action_binding;
-    robin_hood::unordered_map<EAction, std::function<void(float)>> m_live_action_binding;
 
-    // Key to Action Binding
-    robin_hood::unordered_map<SDL_Scancode, EAction> m_key_binding;
-    robin_hood::unordered_map<EMouse, EAction> m_mouse_binding;
+    /** Action to function bindings */
+    robin_hood::unordered_map<EAction, std::function<void()>> m_action_binding{};
+    robin_hood::unordered_map<EAction, std::function<void(float)>> m_live_action_binding{};
 
-    // If blocking it will not go further down the context stack for keys
-    bool m_blocking = false;
+    /** Key to Action Binding */
+    robin_hood::unordered_map<SDL_Scancode, EAction> m_key_binding{};
+    robin_hood::unordered_map<EMouse, EAction> m_mouse_binding{};
+
+    /** If blocking it will not go further down the context stack for keys */
+    bool m_blocking{false};
 
 public:
     /**
@@ -241,30 +242,30 @@ public:
     /**
      * Get the Action handler's key binding
      *
-     * @return the key binding unsorted map
+     * @return The key binding unsorted map
      */
     const robin_hood::unordered_map<SDL_Scancode, EAction>& get_key_binding() const;
 
     /**
      * Get the Action handler's mouse binding
      *
-     * @return the mouse binding unsorted map
+     * @return The mouse binding unsorted map
      */
     const robin_hood::unordered_map<EMouse, EAction>& get_mouse_binding() const;
 
     /**
-     * set if the ActionHandler should block the stack search for keybindings
+     * Set if the ActionHandler should block the stack search for keybindings
      *
-     * @note default is non-blocking
+     * @note Default is initialized to non-blocking
      *
-     * @param blocking true if you want the ActionHandler to be blocking
+     * @param blocking True if you want the ActionHandler to be blocking
      */
     void set_blocking(const bool blocking);
 
     /**
      * Given an Action and a function binds that Action to that function
      *
-     * @note many to 1 binding (ie. actions can do the same functions)
+     * @note Many to 1 binding (ie. actions can do the same functions)
      *
      * @param action The Action enum you want to bind
      * @param function The function you want to trigger when the action gets triggered
@@ -274,7 +275,7 @@ public:
     /**
      * Given an Action and a function binds that Action to that function
      *
-     *  @note many to 1 binding (ie. actions can do the same functions)
+     * @note Many to 1 binding (ie. actions can do the same functions)
      * @note Lambda function takes in a float that is delta time
      *
      * @param action The Action enum you want to bind
@@ -285,27 +286,27 @@ public:
     /**
      * Given an key (scancode) and an action, bind them together
      *
-     * @note many to 1 binding
+     * @note Many to 1 binding
      *
-     * @param scancode the SDL scancode of the key you want to trigger an action with
-     * @param action the Action you want to trigger with the given scancode
+     * @param scancode The SDL scancode of the key you want to trigger an action with
+     * @param action The Action you want to trigger with the given scancode
      */
     void bind_key(const SDL_Scancode scancode, const EAction action);
 
     /**
      * Given an Mouse button and an action, bind them together
      *
-     * @note many to 1 binding
+     * @note Many to 1 binding
      *
-     * @param button the Mouse button from the Mouse enum you want to trigger an action with
-     * @param action the Action you want to trigger with the given button
+     * @param button The Mouse button from the Mouse enum you want to trigger an action with
+     * @param action The Action you want to trigger with the given button
      */
     void bind_btn(const EMouse button, const EAction action);
 
     /**
      * Unbinds an action from the function
      *
-     * @note unbind both
+     * @note Unbind both
      *
      * @param action The action you want to unbind
      */
@@ -326,30 +327,27 @@ public:
     void unbind_btn(const EMouse button);
 
     /**
-     * Given a scancode (key), triggers the action it's binded to
-     * Then the action triggers the function
+     * Given a scancode (key), triggers the action it's bound to, then the action triggers the function
      *
-     * @param scancode the key even you want to trigger
+     * @param scancode The key even you want to trigger
      *
-     * @return true if we don't need to go further down the context stack
+     * @return True if we don't need to go further down the context stack
      */
     bool handle_input(const SDL_Scancode scancode);
 
     /**
-     * Given a Mouse button, triggers the action it's binded to
-     * Then the action triggers the function
+     * Given a Mouse button, triggers the action it's bound to, then the action triggers the function
      *
-     * @param scancode the key even you want to trigger
+     * @param scancode The key even you want to trigger
      *
-     * @return true if we don't need to go further down the context stack
+     * @return True if we don't need to go further down the context stack
      */
     bool handle_input(const EMouse button);
 
     /**
-     * Every frame checks the keys connected to a live action
-     * And runs that function with delta time as parameter
+     * Every frame checks the keys connected to a live action, and runs that function with delta time as parameter
      *
-     * @param dt the delta time (time between frames)
+     * @param dt The delta time (time between frames)
      */
     bool handle_live_input(const float dt);
 
@@ -358,7 +356,7 @@ public:
      *
      * @param scancode The scancode you want to check
      *
-     * @return true if the scancode is in the context else false
+     * @return True if the scancode is in the context else false
      */
     bool has_event(const SDL_Scancode scancode);
 
@@ -367,7 +365,7 @@ public:
      *
      * @param button The mousebutton you want to check
      *
-     * @return true if the mousebutton is in the context else false
+     * @return True if the mousebutton is in the context else false
      */
     bool has_event(const EMouse button);
 
@@ -376,7 +374,7 @@ public:
      *
      * @param action The action you want to check
      *
-     * @return true if the action is in the context else false
+     * @return True if the action is in the context else false
      */
     bool has_action(const EAction action);
     /**
@@ -384,7 +382,7 @@ public:
      *
      * @param action The live action you want to check
      *
-     * @return true if the live action is in the context else false
+     * @return True if the live action is in the context else false
      */
     bool has_live_action(const EAction action);
 
@@ -422,8 +420,8 @@ public:
     void operator=(ContextHandler const&) = delete;
 
     /**
-     * Adds a new context and create an action handler for it
-     * if it does not already exist, and add it to the top of the context stack
+     * Add a new context and create an action handler for it, if it does not already exist, and add it to the top of the context
+     * stack
      *
      * @param context The context you want to create an input handler for
      */
@@ -446,10 +444,10 @@ public:
      *
      * @note Only use for first time binding
      *
-     * @param context the context you want it all to be binded to
-     * @param scancode the SDL scancode to bind to the action
-     * @param action the Action to bind to the function
-     * @param function the function you want to run when the scancode is pressed
+     * @param context The context you want it all to be bound to
+     * @param scancode The SDL scancode to bind to the action
+     * @param action The Action to bind to the function
+     * @param function The function you want to run when the scancode is pressed
      */
     void fast_bind_key(const EKeyContext context,
                        const SDL_Scancode scancode,
@@ -461,10 +459,10 @@ public:
      *
      * @note Only use for first time binding
      *
-     * @param context the context you want it all to be binded to
-     * @param button the mousebutton to bind to the action
-     * @param action the Action to bind to the function
-     * @param function the function you want to run when the scancode is pressed
+     * @param context The context you want it all to be bound to
+     * @param button The mousebutton to bind to the action
+     * @param action The Action to bind to the function
+     * @param function The function you want to run when the scancode is pressed
      */
     void
     fast_bind_btn(const EKeyContext context, const EMouse button, const EAction action, const std::function<void()>& function);
@@ -481,7 +479,7 @@ public:
     /**
      * Bind context to an action-function
      *
-     * @note function takes a float (dt) parameter
+     * @note Function takes a float (dt) parameter
      *
      * @param context The context you want to bind an action-function to
      * @param action The action you want to bind to the context
@@ -539,8 +537,8 @@ public:
     void handle_input(const SDL_Event& event);
 
     /**
-     * Handle's input every frame, goes through the context stack and runs the first match
-     * matching is based on what key you are holding down
+     * Handle's input every frame, goes through the context stack and runs the first match, matching is based on what key you are
+     * holding down
      *
      * @param event The event you want to run
      */
@@ -549,9 +547,9 @@ public:
     /**
      * Checks if the context have a mapping to an InputHandler
      *
-     * @param KeyContext to check if exist in the mapping
+     * @param context To check if exist in the mapping
      *
-     * @return true if the context exist in the map, else false
+     * @return True if the context exist in the map, else false
      */
     bool has_context(const EKeyContext context);
 
@@ -598,7 +596,7 @@ public:
     /**
      * Get the mouse position within the program
      *
-     * @note if mouse is outside of program it will find where it was last found
+     * @note If mouse is outside of program it will find where it was last found
      *
      * @return Position of the mouse
      */
@@ -607,7 +605,7 @@ public:
     /**
      * Load the key binding from the lua file
      *
-     * @param
+     * @param lua The state of lua
      */
     void load_binding_from_file(sol::state_view lua);
     void save_binding_to_file();

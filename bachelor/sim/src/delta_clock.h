@@ -10,6 +10,7 @@ namespace cs
 class DeltaClock
 {
 private:
+    /** Keeps track of the last time we reset this DeltaClock instance */
     std::chrono::steady_clock::time_point m_last_reset;
 
 public:

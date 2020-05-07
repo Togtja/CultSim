@@ -29,7 +29,12 @@ float CollectorAverageHealth::execute()
     float avg        = 0.f;
     auto health_view = m_registry->view<component::Health>();
     health_view.each([&avg](const component::Health& health) { avg += health.health; });
-    return avg / (health_view.empty() ? 1u : health_view.size());
+    if (health_view.empty())
+    {
+        return avg;
+    }
+
+    return avg / health_view.size();
 }
 
 std::string_view CollectorAverageHealth::get_name()
@@ -54,7 +59,12 @@ float CollectorNeed::execute()
                })->status;
     });
 
-    return avg / (need_view.size() ? need_view.size() : 1u);
+    if (need_view.empty())
+    {
+        return avg;
+    }
+
+    return avg / need_view.size();
 }
 
 std::string_view CollectorNeed::get_name()
@@ -62,9 +72,17 @@ std::string_view CollectorNeed::get_name()
     return m_need_name;
 }
 
+/** TODO: Add Locales*/
 CollectorMouse::CollectorMouse(bool x_axis, glm::ivec2 resolution) : m_x_axis(x_axis), m_resolution(resolution)
 {
-    m_name = "Mouse " + std::string(x_axis ? "X" : "Y");
+    if (x_axis)
+    {
+        m_name = "Mouse X";
+    }
+    else
+    {
+        m_name = "Mouse Y";
+    }
 }
 
 float CollectorMouse::execute()

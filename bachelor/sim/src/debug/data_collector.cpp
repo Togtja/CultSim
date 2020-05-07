@@ -67,12 +67,13 @@ void DataCollector::show_ui()
             int offset = 0;
             int count  = m_samples[i].size();
 
-            // Set offset based on slider
+            /** Set offset based on slider */
             if (m_samples[i].size() >= data_offset)
             {
                 offset = m_samples[i].size() - data_offset;
                 count  = data_offset;
             }
+
             conf.values.offset = offset;
             conf.values.ys     = m_samples[i].data();
             conf.values.count  = count;
@@ -96,6 +97,7 @@ void DataCollector::show_ui()
     }
 }
 
+/** TODO: Change from row to column based output */
 void DataCollector::save_to_file(std::string_view rpath, bool timestamp)
 {
     std::ostringstream stream{};

@@ -36,6 +36,7 @@ public:
      *
      * @param min The minimum value, inclusive
      * @param max The maximum value, inclusive
+     * @return A random value between min and max
      */
     template<typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
     std::decay_t<T> uniform(T min, T max)
@@ -57,6 +58,7 @@ public:
      *
      * @param mean The mean value
      * @param deviation The standard deviation around the mean
+     * @return A random value from the mean, given the deviation
      */
     double normal(double mean, double deviation = 5.0);
 
@@ -64,6 +66,7 @@ public:
      * Return true or false with given probability
      *
      * @param probability The chance of returning true in range 0 - 1
+     * @return True if the probabilty trigger, else false
      */
     bool trigger(double probability);
 
@@ -80,6 +83,7 @@ public:
      * Pick a random element from the given container that support subscripting
      *
      * @param container The container to pick from
+     * @return A random element for the given container
      */
     template<typename T>
     decltype(auto) pick(T& container)
@@ -91,6 +95,7 @@ public:
      * Pick a random element from the given container that support subscripting
      *
      * @param container The container to pick from
+     * @return A random element for the given container
      */
     template<typename T>
     decltype(auto) pick(const T& container) const

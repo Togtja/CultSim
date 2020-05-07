@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <sol/state_view.hpp>
 #include <robin_hood.h>
+#include <sol/state_view.hpp>
 
 namespace cs
 {
@@ -33,6 +33,7 @@ public:
      */
     void initialize(sol::table name_table);
 
+    /** TODO: Use in name component */
     /** A generated name */
     struct Name
     {

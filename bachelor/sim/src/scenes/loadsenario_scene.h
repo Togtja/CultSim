@@ -2,10 +2,10 @@
 
 #include "scene.h"
 
-#include <string>
-
+/** TODO: Rename loadsenario_scene.h to loadscenario_scene.h */
 namespace cs
 {
+/** TODO: Documentation */
 class LoadScenarioScene : public IScene
 {
 private:

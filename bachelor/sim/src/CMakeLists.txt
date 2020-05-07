@@ -23,6 +23,7 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/lua_type_bindings.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/common_helpers.h
+        ${CMAKE_CURRENT_LIST_DIR}/common_helpers.cpp
 )
 
 # Configure file with CMake Variables

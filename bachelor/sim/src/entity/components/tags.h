@@ -39,7 +39,7 @@ inline std::string tag_to_string(ETag tag)
     std::vector<std::string> tag_names{"None",   "Food",   "Drink",     "Sleep",     "Joy",       "Location",
                                        "Find",   "Vision", "Avoidable", "Reproduce", "Creature",  "Tag",
                                        "Gather", "Delete", "Reserved",  "Carnivore", "Herbivore", "Omnivore",
-                                       "Meat",   "Veggie", "Inventory", "Consume"};
+                                       "Meat",   "Veggie", "Inventory", "Consume",   "Crime",     "Hostile"};
 
     for (uint64_t i = 0ULL; i < tag_names.size(); i++)
     {

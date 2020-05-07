@@ -33,18 +33,19 @@ private:
     struct Command
     {
         /** Used when Command is Push, otherwise nullptr */
-        std::unique_ptr<IScene> new_scene = nullptr;
+        std::unique_ptr<IScene> new_scene{nullptr};
 
-        ECommandType command_type = ECommandType::Nothing;
+        ECommandType command_type{ECommandType::Nothing};
 
         Command(std::unique_ptr<IScene> scene, ECommandType type) : new_scene(std::move(scene)), command_type(type){};
     };
 
-    std::vector<std::unique_ptr<IScene>> m_scenestack = {};
+    /** TODO: Document member variables */
+    std::vector<std::unique_ptr<IScene>> m_scenestack{};
 
-    std::vector<Command> m_pending_commands = {};
+    std::vector<Command> m_pending_commands{};
 
-    ApplicationContext* m_context = nullptr;
+    ApplicationContext* m_context{nullptr};
 
 public:
     /**
@@ -62,12 +63,14 @@ public:
     }
 
     /**
-     * Checks if stack is empty
+     * Check if there are no active scenes
+     *
+     * @return True if empty, otherwise false
      */
     [[nodiscard]] bool empty() const;
 
     /**
-     * Clears the stack of scenes
+     * Clear the stack of scenes
      */
     void clear();
 

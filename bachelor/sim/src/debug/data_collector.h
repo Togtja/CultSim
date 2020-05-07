@@ -1,9 +1,9 @@
 #pragma once
 
-#include <vector>
 #include <memory>
-#include <variant>
 #include <string_view>
+#include <variant>
+#include <vector>
 
 #include <glm/vec2.hpp>
 
@@ -30,10 +30,10 @@ private:
     std::vector<std::vector<float>> m_samples{};
 
     /** Time since sample */
-    float m_time_since_sample = 0.f;
+    float m_time_since_sample{0.f};
 
     /** How often we sample */
-    float m_sampling_rate = 0.f;
+    float m_sampling_rate = {0.f};
 
 public:
     DataCollector() = default;

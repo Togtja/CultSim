@@ -22,7 +22,7 @@ PreferenceManager::PreferenceManager(Window& window, sol::state_view lua_state, 
 {
 }
 
-void PreferenceManager::show_debug_ui()
+void PreferenceManager::show_ui()
 {
     static bool fs = std::get<bool>(m_fullscreen.value);
 

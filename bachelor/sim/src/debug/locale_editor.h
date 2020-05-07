@@ -7,12 +7,16 @@
 
 namespace cs
 {
+/** TODO: Add documentation */
+/** TODO: Actually use this*/
+
 class LocaleEditor
 {
 private:
-    inline static constexpr int MAX_STR_LEN = 128;
+    inline static constexpr int MAX_STR_LEN{128};
 
     std::vector<std::string> m_locales{};
+
     robin_hood::unordered_map<std::string, std::vector<std::string>> m_translations{};
 
 public:

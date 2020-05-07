@@ -1,7 +1,6 @@
 #pragma once
 
 #include "entity/events.h"
-#include "random_engine.h"
 #include "system.h"
 
 namespace cs::system
@@ -16,6 +15,7 @@ namespace cs::system
  * Vision requirements, which require the entity to see another entity with certain tags
  * Find requirements, which make the entity search for an entity with certain tags, wandering randomly until they find one
  * Tag requirements, which add a new tag to the entity
+ * Inventory requirement, which checks to see if we have an entity with a specific tag in our inventory
  */
 class Requirement : public ISystem
 {
@@ -30,6 +30,6 @@ public:
 
     ISystem* clone() override;
 
-    void remove_requirements(const event::DeleteEntity& event);
+    void remove_requirements(const event::EntityDeleted& event);
 };
 } // namespace cs::system

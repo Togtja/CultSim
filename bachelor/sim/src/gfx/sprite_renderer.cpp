@@ -62,7 +62,7 @@ void SpriteRenderer::display()
 SpriteTextureID SpriteRenderer::get_texture(const std::string& rpath, const std::string& nrpath)
 {
     /** If we alreadly loaded this texture, then give it back */
-    if (auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
+    if (const auto itr = m_texture_cache.find(rpath); itr != m_texture_cache.end())
     {
         spdlog::get("graphics")->trace("used cached texture for {}", rpath);
         return itr->second;
@@ -128,6 +128,7 @@ bool SpriteRenderer::increment_next_texture_id()
     return true;
 }
 
+/** TODO: Use combine_buffers */
 void SpriteRenderer::init_vbo_and_vao()
 {
     glCreateBuffers(1, &m_vbo);
@@ -175,12 +176,13 @@ void SpriteRenderer::init_vbo_and_vao()
                 .build();
 }
 
+/** TODO: change to fcreate_program */
 void SpriteRenderer::init_shader()
 {
     /** Init Shader */
-    auto vertex_shader = fcompile_shader("shader/sprite.vert", GL_VERTEX_SHADER);
-    auto frag_shader   = fcompile_shader("shader/sprite.frag", GL_FRAGMENT_SHADER);
-    m_shader           = create_program({vertex_shader, frag_shader});
+    const auto vertex_shader = fcompile_shader("shader/sprite.vert", GL_VERTEX_SHADER);
+    const auto frag_shader   = fcompile_shader("shader/sprite.frag", GL_FRAGMENT_SHADER);
+    m_shader                 = create_program({vertex_shader, frag_shader});
     glDeleteShader(vertex_shader);
     glDeleteShader(frag_shader);
     glUseProgram(m_shader);
