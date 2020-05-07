@@ -9,11 +9,18 @@
 
 namespace cs::lua
 {
-/** TODO: Add some documentation about the struct */
+/**
+ * Contains information about a single scenario and the data it needs to run as intended by the developer
+ */
 struct Scenario
 {
+    /** Scenario name */
     std::string name{};
+
+    /** A small description of the scenario, shown during sim */
     std::string description{};
+
+    /** The path to the folder used to load the scenario */
     std::string script_path{};
 
     /** Scenario Bounds */
