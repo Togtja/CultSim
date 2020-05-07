@@ -10,9 +10,9 @@
 namespace cs::system
 {
 /**
- * Keeps track of their ids in the diffrent registry
+ * Keeps track of the entity ids in the diffrent registry
  */
-struct ParentEntityIds
+struct EntityIds
 {
     /** Entity id from the scenario scene registry */
     entt::entity global{entt::null};
@@ -22,12 +22,12 @@ struct ParentEntityIds
 };
 
 /**
- * Keeps the parent's name (if any), and it's set of IDs
+ * Keeps the entity's name (if any), and it's set of IDs
  */
-struct ParentName
+struct EntityNameAndIds
 {
     /** ids for the global and relationship registry ids */
-    ParentEntityIds ids{};
+    EntityIds ids{};
 
     /** name for it's name, if no name it will default to the name components type */
     std::string name{};
@@ -36,10 +36,10 @@ struct ParentName
 /**
  * Just a pair of the mom and dad (Both Parents), to keep both name and their Ids
  */
-struct BothParentName
+struct ParentsName
 {
-    ParentName mom{};
-    ParentName dad{};
+    EntityNameAndIds mom{};
+    EntityNameAndIds dad{};
 };
 
 class Relationship : public ISystem
@@ -151,7 +151,7 @@ public:
      * @param is_local_ids True if the entity is from the local registry, false if it is from the global registry
      * @return The struct BothParentName that include the name, local- and global entity ids
      */
-    BothParentName get_parents(entt::entity e, bool is_local_ids = false);
+    ParentsName get_parents(entt::entity e, bool is_local_ids = false);
 
     void update(float dt) override;
 

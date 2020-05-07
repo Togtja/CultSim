@@ -311,10 +311,10 @@ struct Relationship
     /** Below used for family tree: */
 
     /** Mother Ids for Global and Relationship Ids */
-    system::ParentEntityIds mom{entt::null, entt::null};
+    system::EntityIds mom{entt::null, entt::null};
 
     /** Father Ids for Global and Relationship Ids */
-    system::ParentEntityIds dad{entt::null, entt::null};
+    system::EntityIds dad{entt::null, entt::null};
 
     /** old_id is entt id for context registry */
     entt::entity old_id{entt::null};

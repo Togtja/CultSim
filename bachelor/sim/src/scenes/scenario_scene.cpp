@@ -1314,7 +1314,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     if (relship)
     {
         const auto parents =
-            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::BothParentName>();
+            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::ParentsName>();
 
         if (parents.mom.ids.relationship != entt::null)
         {
