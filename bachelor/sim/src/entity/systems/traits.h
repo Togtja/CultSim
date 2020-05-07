@@ -4,7 +4,9 @@
 
 namespace cs::system
 {
-/** TODO: Documentation */
+/**
+ * The trait system handles assigning traits
+ */
 class Traits : public ISystem
 {
 public:
