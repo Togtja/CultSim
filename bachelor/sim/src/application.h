@@ -25,13 +25,16 @@ private:
      */
     Window m_window{};
 
-    /** TODO: Explain variables: */
+    /** The Lua state used throughout the application */
     sol::state m_lua{};
 
+    /** Holds the preferences set by the user */
     PreferenceManager m_preferences{m_window, m_lua.lua_state()};
 
+    /** Manages the current state / scene the application is in */
     SceneManager m_scene_manager{};
 
+    /** Should the application keep running */
     bool m_running{true};
 
 public:
@@ -47,23 +50,22 @@ private:
     void handle_input();
 
     /**
-     * TODO: Document
+     * Ticks the application at a fixed time step
      *
-     * @param dt
+     * @param dt The delta time since last frame
      */
     void update(float dt);
 
     /**
-     * TODO: Document
-     *
+     * Call the renderer and make it draw to screen
      */
     void draw();
 
     /**
-     * TODO: Document
+     * Initialize the application and required subsystems
      *
-     * @param args
-     * @return true
+     * @param args The program arguments
+     * @return True if successful
      */
     bool init(const std::vector<char*>& args);
 
@@ -71,21 +73,21 @@ private:
      * Initialize PhysFS' filesystem
      *
      * @param args Command line arguments to the program
-     * @return true
+     * @return True if successful
      */
     bool init_physfs(std::vector<char*> args);
 
     /**
-     * TODO: Document
+     * Initialize key bindings and input management
      *
-     * @return true
+     * @return True if successful
      */
     bool init_input();
 
     /**
-     * TODO: Document
+     * Initialize and bind most application wide Lua functions and types
      *
-     * @return true
+     * @return True if successful
      */
     bool init_lua();
 
@@ -95,9 +97,9 @@ private:
     bool init_gl();
 
     /**
-     * TODO: Document
+     * Load the preferences
      *
-     * @return true
+     * @return True if successful
      */
     bool init_preferences();
 
@@ -107,32 +109,28 @@ private:
     bool init_imgui();
 
     /**
-     * TODO: Document
+     * Shutdown all subsystems
      *
      */
     void deinit();
 
     /**
-     * TODO: Document
-     *
+     * Save preferences to file and close
      */
     void deinit_preferences();
 
     /**
-     * TODO: Document
-     *
+     * Shutdown the imgui context
      */
     void deinit_imgui();
 
     /**
-     * TODO: Document
-     *
+     * Close the window and clean up GL state
      */
     void deinit_gl();
 
     /**
-     * TODO: Document
-     *
+     * Deinitialize the Filesystem
      */
     void deinit_physfs();
 
