@@ -12,6 +12,9 @@ namespace cs::gfx
 class Camera
 {
 private:
+    static inline constexpr float s_projection_size_x = 640.f;
+    static inline constexpr float s_projection_size_y = 360.f;
+
     /** Current camera position */
     glm::vec3 m_pos = {0.f, 0.f, 0.f};
 
