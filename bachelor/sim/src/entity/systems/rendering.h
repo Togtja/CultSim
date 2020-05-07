@@ -6,12 +6,12 @@
 
 namespace cs::system
 {
-/** TODO: Documentation */
+/**
+ * System for calling the renderer with all entities that have drawable components
+ */
 class Rendering : public ISystem
 {
 private:
-    gfx::SpriteTextureID m_shadow_texture{};
-
     gfx::Camera m_camera{};
 
 public:
