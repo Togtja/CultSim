@@ -125,8 +125,6 @@ void Relationship::delete_father(const event::EntityDeleted& event)
 
 void Relationship::add_relationship_table(const event::EntitySpawned& event)
 {
-    spdlog::critical("I have spawned!");
-
     auto view = m_context.registry->view<component::Relationship>();
     if (auto relship_c = m_context.registry->try_get<component::Relationship>(event.entity); relship_c)
     {
