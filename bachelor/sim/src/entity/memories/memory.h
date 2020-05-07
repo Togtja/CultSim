@@ -4,7 +4,7 @@
 
 namespace cs::memory
 {
-/** TODO: Add Documentation */
+/** A interface baseclass used to create different forms of Memories which will be used by the memory system */
 struct IMemory
 {
     ETag m_tags{};
