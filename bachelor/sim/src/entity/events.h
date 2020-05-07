@@ -85,7 +85,7 @@ struct CreatedMemory
 
 struct EntitySpawned
 {
-    std::string_view name{};
+    std::string_view entity_type{};
     entt::entity entity{};
     glm::vec2 position{};
 };

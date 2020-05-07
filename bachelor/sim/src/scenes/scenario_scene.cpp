@@ -8,6 +8,7 @@
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
 #include "entity/effect.h"
+#include "entity/events.h"
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
@@ -777,14 +778,22 @@ void ScenarioScene::bind_scenario_lua_functions()
     });
 
     /** Spawn entity functions */
-    cultsim.set_function("spawn", [this](const std::string& entity_name) {
-        const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
-        return spawn_entity(m_registry, m_context->lua_state, final_path);
+    cultsim.set_function("spawn", [this](const std::string& entity_type) {
+        const auto& final_path = m_scenario.script_path + "/entities/" + entity_type + ".lua";
+
+        const auto e = spawn_entity(m_registry, m_context->lua_state, final_path);
+
+        m_dispatcher.enqueue<event::EntitySpawned>(event::EntitySpawned{entity_type, e});
+        return e;
     });
 
-    cultsim.set_function("spawn_at", [this](const std::string& entity_name, glm::vec2 position) {
-        const auto& final_path = m_scenario.script_path + "/entities/" + entity_name + ".lua";
-        return spawn_entity(m_registry, m_context->lua_state, final_path, position);
+    cultsim.set_function("spawn_at", [this](const std::string& entity_type, glm::vec2 position) {
+        const auto& final_path = m_scenario.script_path + "/entities/" + entity_type + ".lua";
+
+        const auto e = spawn_entity(m_registry, m_context->lua_state, final_path, position);
+
+        m_dispatcher.enqueue<event::EntitySpawned>(event::EntitySpawned{entity_type, e, position});
+        return e;
     });
 
     /** Destroy entity */
@@ -1279,7 +1288,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     if (relship)
     {
         const auto parents =
-            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::BothParentName>();
+            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::ParentsName>();
 
         if (parents.mom.ids.relationship != entt::null)
         {
