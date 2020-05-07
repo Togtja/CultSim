@@ -17,10 +17,6 @@ private:
 public:
     using ISystem::ISystem;
 
-    void initialize() override;
-
-    void deinitialize() override;
-
     void update(float dt) override;
 
     ISystem* clone() override;
