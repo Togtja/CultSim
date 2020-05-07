@@ -8,6 +8,7 @@
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
+/** TODO: Rename loadsenario_scene.cpp to loadscenario_scene.cpp */
 namespace cs
 {
 void LoadScenarioScene::on_enter()
@@ -28,6 +29,7 @@ void LoadScenarioScene::on_exit()
     input::get_input().remove_context(input::EKeyContext::LoadScenario);
 }
 
+/** TODO: Expose seed to Lua */
 bool LoadScenarioScene::update(float dt)
 {
     /** Shows the popup to select scenario (TODO: Lua-fi) */
@@ -36,8 +38,8 @@ bool LoadScenarioScene::update(float dt)
         ImGui::CaptureKeyboardFromApp(false);
         ImGui::InputText("Seed", m_seed, s_seed_length - 1);
 
-        auto&& scenarios = fs::list_directory("script/scenarios/");
-        for (auto&& scenario : scenarios)
+        const auto& scenarios = fs::list_directory("script/scenarios/");
+        for (const auto& scenario : scenarios)
         {
             if (fs::is_directory("script/scenarios/" + scenario))
             {

@@ -46,7 +46,16 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/system.h
 
         ${CMAKE_CURRENT_LIST_DIR}/timer.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/timer.h
+        ${CMAKE_CURRENT_LIST_DIR}/timer.h         
+        
+        ${CMAKE_CURRENT_LIST_DIR}/goal.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/goal.h
+        
+        ${CMAKE_CURRENT_LIST_DIR}/gob.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/gob.h
+                
+        ${CMAKE_CURRENT_LIST_DIR}/gobbas.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/gobbas.h
         
         ${CMAKE_CURRENT_LIST_DIR}/traits.cpp
         ${CMAKE_CURRENT_LIST_DIR}/traits.h

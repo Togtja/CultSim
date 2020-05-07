@@ -23,15 +23,16 @@ private:
     /**
      * @warning Do not use until initialized
      */
-    Window m_window;
+    Window m_window{};
 
+    /** TODO: Explain variables: */
     sol::state m_lua{};
 
     PreferenceManager m_preferences{m_window, m_lua.lua_state()};
 
     SceneManager m_scene_manager{};
 
-    bool m_running = true;
+    bool m_running{true};
 
 public:
     /**
@@ -45,21 +46,47 @@ private:
      */
     void handle_input();
 
+    /**
+     * TODO: Document
+     *
+     * @param dt
+     */
     void update(float dt);
 
+    /**
+     * TODO: Document
+     *
+     */
     void draw();
 
+    /**
+     * TODO: Document
+     *
+     * @param args
+     * @return true
+     */
     bool init(const std::vector<char*>& args);
 
     /**
      * Initialize PhysFS' filesystem
      *
      * @param args Command line arguments to the program
+     * @return true
      */
     bool init_physfs(std::vector<char*> args);
 
+    /**
+     * TODO: Document
+     *
+     * @return true
+     */
     bool init_input();
 
+    /**
+     * TODO: Document
+     *
+     * @return true
+     */
     bool init_lua();
 
     /**
@@ -67,6 +94,11 @@ private:
      */
     bool init_gl();
 
+    /**
+     * TODO: Document
+     *
+     * @return true
+     */
     bool init_preferences();
 
     /**
@@ -74,14 +106,34 @@ private:
      */
     bool init_imgui();
 
+    /**
+     * TODO: Document
+     *
+     */
     void deinit();
 
+    /**
+     * TODO: Document
+     *
+     */
     void deinit_preferences();
 
+    /**
+     * TODO: Document
+     *
+     */
     void deinit_imgui();
 
+    /**
+     * TODO: Document
+     *
+     */
     void deinit_gl();
 
+    /**
+     * TODO: Document
+     *
+     */
     void deinit_physfs();
 
     /**

@@ -12,18 +12,19 @@ namespace cs::system
 {
 void Requirement::initialize()
 {
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Requirement::remove_requirements>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Requirement::remove_requirements>(*this);
 }
 
 void Requirement::deinitialize()
 {
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Requirement::remove_requirements>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Requirement::remove_requirements>(*this);
 }
 
+/** TODO: Make requirements into their own functions */
 void Requirement::update(float dt)
 {
     CS_AUTOTIMER(Requirement System);
-
+    /** TODO: Expose Locationrequirements to lua more */
     auto view_loc = m_context.registry->view<component::LocationRequirement, component::Movement, component::Position>();
     view_loc.each([dt, this](const entt::entity e,
                              component::LocationRequirement& locationreqs,
@@ -39,7 +40,7 @@ void Requirement::update(float dt)
             ai::find_path_astar(pos.position, locationreqs.desired_position, mov.desired_position, m_context.scenario->bounds);
         }
 
-        // If we do not get closer to our target for an amount specified by max_time we fail the requirement
+        /** If we do not get closer to our target for an amount specified by max_time we fail the requirement */
         auto distance = 0.f;
         for (int i = 1; i < mov.desired_position.size(); i++)
         {
@@ -74,7 +75,7 @@ void Requirement::update(float dt)
             }
         }
 
-        // If we are not seeing the entity we are looking for
+        /** If we are not seeing the entity we are looking for */
         if (m_context.registry->try_get<component::VisionRequirement>(e))
         {
             m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Vision, ""});
@@ -87,6 +88,7 @@ void Requirement::update(float dt)
                                               component::Vision,
                                               component::Position,
                                               component::Movement>();
+
     view_find.each([dt, this](const entt::entity e,
                               component::FindRequirement& findreqs,
                               component::Strategy& strategies,
@@ -100,9 +102,9 @@ void Requirement::update(float dt)
             m_context.registry->remove<component::FindRequirement>(e);
         }
 
-        for (auto& entity : vision.seen)
+        for (const auto entity : vision.seen)
         {
-            if (!m_context.registry->valid(entity) || !m_context.registry->has<component::Position>(entity))
+            if (!m_context.registry->valid(entity))
             {
                 continue;
             }
@@ -138,7 +140,7 @@ void Requirement::update(float dt)
         {
             for (auto& memory_container : memories->memory_container)
             {
-                // Find a container matching our tag
+                /** Find a container matching our tag */
                 if (((memory_container.memory_tags & findreqs.tags) == findreqs.tags) &&
                     memory_container.memory_tags & TAG_Location && !memory_container.memory_storage.empty())
                 {
@@ -160,6 +162,7 @@ void Requirement::update(float dt)
                             res->m_number_of_entities = 0.f;
                             mov.desired_position.clear();
                         }
+
                         break;
                     }
                 }
@@ -180,7 +183,7 @@ void Requirement::update(float dt)
 
         else if (mov.desired_position.empty())
         {
-            // If this is the first run and we have no memories so our desired position is not set
+            /** If this is the first run and we have no memories so our desired position is not set */
             if (findreqs.desired_position == glm::vec3{0.f, 0.f, 0.f})
             {
                 findreqs.desired_position =
@@ -188,6 +191,7 @@ void Requirement::update(float dt)
                               m_context.rng->uniform(-m_context.scenario->bounds.y, m_context.scenario->bounds.y),
                               0.f);
             }
+
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position, m_context.scenario->bounds);
         }
     });
@@ -215,6 +219,7 @@ void Requirement::update(float dt)
                 return;
             }
         }
+
         m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Inventory});
         m_context.registry->remove<component::InventoryRequirement>(e);
     });
@@ -224,11 +229,13 @@ ISystem* Requirement::clone()
 {
     return new Requirement(m_context);
 }
-void Requirement::remove_requirements(const event::DeleteEntity& event)
+
+void Requirement::remove_requirements(const event::EntityDeleted& event)
 {
     m_context.registry->remove_if_exists<component::FindRequirement,
                                          component::LocationRequirement,
                                          component::TagRequirement,
-                                         component::VisionRequirement>(event.entity);
+                                         component::VisionRequirement,
+                                         component::InventoryRequirement>(event.entity);
 }
 } // namespace cs::system

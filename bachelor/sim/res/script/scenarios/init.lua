@@ -4,4 +4,5 @@
 actions = {}
 needs = {}
 strategies = {}
+goals = {}
 scenario = nil

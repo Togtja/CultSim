@@ -1,4 +1,5 @@
 #include "health.h"
+#include "common_helpers.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/events.h"
@@ -35,8 +36,7 @@ void Health::update(float dt)
             return;
         }
 
-            health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
-
+        health.health = std::clamp(health.health + dt * health.tickdown_rate * 0.1f, 0.f, 100.f);
     });
 
     auto age_view = m_context.registry->view<component::Age>();
@@ -46,9 +46,9 @@ void Health::update(float dt)
 
         if (m_timer > 1.f)
         {
-            m_timer           = 0.f;
-            auto death_chance = pow(sigmoid(pow(age.current_age, 2) / pow(age.average_life_expectancy, 2)), 20);
-            auto death_roll   = m_context.rng->trigger(death_chance);
+            m_timer                 = 0.f;
+            const auto death_chance = pow(sigmoid(pow(age.current_age, 2) / pow(age.average_life_expectancy, 2)), 20);
+            const auto death_roll   = m_context.rng->trigger(death_chance);
             if (death_roll && dt != 0)
             {
                 spdlog::get("agent")->warn(

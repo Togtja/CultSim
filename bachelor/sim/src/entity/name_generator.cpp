@@ -17,7 +17,11 @@ void NameGenerator::initialize(sol::table name_table)
 
 NameGenerator::Name NameGenerator::generate(const std::string& ethnicity, bool male, RandomEngine& rng)
 {
-    const auto& nameref = (male ? m_names.at(ethnicity).male_names : m_names.at(ethnicity).female_names);
-    return {rng.pick(nameref), rng.pick(m_names.at(ethnicity).surnames)};
+    if (male)
+    {
+        return {rng.pick(m_names.at(ethnicity).male_names), rng.pick(m_names.at(ethnicity).surnames)};
+    }
+
+    return {rng.pick(m_names.at(ethnicity).female_names), rng.pick(m_names.at(ethnicity).surnames)};
 }
 } // namespace cs

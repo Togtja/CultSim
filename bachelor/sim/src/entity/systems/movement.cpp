@@ -13,9 +13,10 @@
 
 namespace cs::system
 {
+/** TODO: Fix out of bounds functions */
 bool fix_out_of_bounds(glm::vec3& pos, const glm::vec2& bounds)
 {
-    /**Handle wrapping */
+    /** Handle wrapping */
     bool wrap = false;
     if (pos.x < -bounds.x)
     {
@@ -46,6 +47,7 @@ bool out_of_bounds(const glm::vec3& pos, const glm::vec2& bounds)
     return fix_out_of_bounds(cpy, bounds);
 }
 
+/** TODO: Add comments */
 void Movement::update(float dt)
 {
     CS_AUTOTIMER(Movement System);
@@ -65,7 +67,7 @@ void Movement::update(float dt)
                 return;
             }
 
-            for (auto other : vis.seen)
+            for (const auto other : vis.seen)
             {
                 if (!(registry.get<component::Tags>(other).tags & TAG_Avoidable))
                 {
@@ -165,7 +167,7 @@ void Movement::update_imgui()
     }
 
     auto view = m_context.registry->view<component::Movement, component::Position>();
-    view.each([this](entt::entity e, component::Movement& mov, component::Position& pos) {
+    view.each([this](entt::entity e, const component::Movement& mov, const component::Position& pos) {
         if (draw_direction)
         {
             gfx::get_renderer().debug().draw_line(pos.position,
@@ -188,15 +190,15 @@ void Movement::update_imgui()
                 auto src        = mov.desired_position[i];
                 auto bounds     = m_context.scenario->bounds; // ai::world_to_grid(m_context.scenario->bounds, 32) * 32;
                 glm::vec3 color = {0.f, 1.f, 1.f};
-                // TODO: Fix issue with multi wrapping, and/or refactor the entire thing
+                /** TODO: Fix issue with multi wrapping, and/or refactor the entire thing */
                 if (out_of_bounds(dst, bounds) && !out_of_bounds(src, bounds))
                 {
                     color = {0.f, 1.f, 0.f};
                     gfx::get_renderer().debug().draw_line(src, dst, color);
 
                     gfx::get_renderer().debug().draw_circle(src, 3, {1.f, 0.f, 0.f});
-                    // Draw indication we are leaving map
-                    // gfx::get_renderer().debug().draw_line(src, dst, color);
+                    /** Draw indication we are leaving map */
+                    /** gfx::get_renderer().debug().draw_line(src, dst, color); */
                     for (int j = i - 1; j > 2; --j)
                     {
                         auto newsrc = ai::world_to_grid_bound(mov.desired_position[j], SIM_GRID_SIZE, bounds) * SIM_GRID_SIZE;

@@ -8,6 +8,7 @@ void Renderer::clear()
 {
     m_sprite_renderer.clear();
     m_debug_renderer.clear();
+    m_raymarch_renderer.clear();
 }
 
 void Renderer::display()
@@ -44,14 +45,14 @@ SpriteRenderer& Renderer::sprite()
     return m_sprite_renderer;
 }
 
+const SpriteRenderer& Renderer::sprite() const
+{
+    return m_sprite_renderer;
+}
+
 RaymarchingRenderer& Renderer::raymarch()
 {
     return m_raymarch_renderer;
-}
-
-void Renderer::set_render_mode(ERenderingMode mode)
-{
-    m_mode = mode;
 }
 
 const RaymarchingRenderer& Renderer::raymarch() const
@@ -59,9 +60,9 @@ const RaymarchingRenderer& Renderer::raymarch() const
     return m_raymarch_renderer;
 }
 
-const SpriteRenderer& Renderer::sprite() const
+void Renderer::set_render_mode(ERenderingMode mode)
 {
-    return m_sprite_renderer;
+    m_mode = mode;
 }
 
 void Renderer::set_camera_position(const glm::vec3& pos)

@@ -67,6 +67,16 @@ void bind_dataonly(sol::state_view lua)
                                           &NameGenerator::Name::first,
                                           "last",
                                           &NameGenerator::Name::last);
+
+    lua.new_usertype<system::BothParentName>("Parents", "mom", &system::BothParentName::mom, "dad", &system::BothParentName::dad);
+
+    lua.new_usertype<system::ParentName>("Parent", "name", &system::ParentName::name, "ids", &system::ParentName::ids);
+
+    lua.new_usertype<system::ParentEntityIds>("ParentIds",
+                                              "global",
+                                              &system::ParentEntityIds::global,
+                                              "relationship",
+                                              &system::ParentEntityIds::relationship);
 }
 
 void bind_components(sol::state_view lua)
@@ -91,6 +101,54 @@ void bind_components(sol::state_view lua)
                                &ai::Need::decay_multi,
                                "weight_func",
                                &ai::Need::weight_func);
+
+    lua.new_usertype<gob::Goal>("Goal",
+                                "name",
+                                &gob::Goal::m_name,
+                                "tags",
+                                &gob::Goal::m_tags,
+                                "age",
+                                &gob::Goal::m_age,
+                                "weight_function",
+                                &gob::Goal::m_weight_function,
+                                "change_over_time",
+                                &gob::Goal::m_change_over_time,
+                                "get_discontentment",
+                                &gob::Goal::m_get_discontentment);
+
+    lua.new_usertype<gob::ActionSequence>("ActionSequence",
+                                          "name",
+                                          &gob::ActionSequence::m_name,
+                                          "tags",
+                                          &gob::ActionSequence::m_tags,
+                                          "current_action",
+                                          &gob::ActionSequence::current_action,
+                                          "actions",
+                                          &gob::ActionSequence::m_actions,
+                                          /*"run_actions",
+                                          &gob::ActionSequence::m_run_actions,*/
+                                          "get_duration",
+                                          &gob::ActionSequence::m_get_duration,
+                                          "get_goal_change",
+                                          &gob::ActionSequence::m_get_goal_change);
+
+    lua.new_usertype<gob::Action>("GobAction",
+                                  "name",
+                                  &gob::Action::name,
+                                  "tags",
+                                  &gob::Action::tags,
+                                  "required_time",
+                                  &gob::Action::m_required_time,
+                                  "success_chance",
+                                  &gob::Action::m_success_chance,
+                                  "flags",
+                                  &gob::Action::m_flags,
+                                  "action",
+                                  &gob::Action::m_action,
+                                  "get_goal_change",
+                                  &gob::Action::m_get_goal_change,
+                                  "get_duration",
+                                  &gob::Action::m_get_duration);
 
     lua.new_usertype<action::Action>("Action",
                                      "name",
@@ -136,9 +194,17 @@ void bind_components(sol::state_view lua)
                                           "speed",
                                           &component::Movement::speed,
                                           "speed_multi",
-                                          &component::Movement::speed_multi);
+                                          &component::Movement::speed_multi,
+                                          "desired_position",
+                                          &component::Movement::desired_position);
 
-    lua.new_usertype<component::Vision>("VisionComponent", "radius", &component::Vision::radius, "fov", &component::Vision::fov);
+    lua.new_usertype<component::Vision>("VisionComponent",
+                                        "seen",
+                                        &component::Vision::seen,
+                                        "radius",
+                                        &component::Vision::radius,
+                                        "fov",
+                                        &component::Vision::fov);
 
     lua.new_usertype<component::Hearing>("HearingComponent", "radius", &component::Hearing::radius);
     lua.new_usertype<component::Smell>("SmellComponent", "radius", &component::Smell::radius);
@@ -171,6 +237,10 @@ void bind_components(sol::state_view lua)
                                       "name",
                                       &component::Name::name);
 
+    lua.new_usertype<component::Action>("ActionComponent", "actions", &component::Action::actions);
+
+    lua.new_usertype<component::Goal>("GoalComponent", "goals", &component::Goal::goals);
+
     lua.new_usertype<component::detail::Trait>("Trait",
                                                "name",
                                                &component::detail::Trait::name,
@@ -191,22 +261,7 @@ void bind_components(sol::state_view lua)
                                                "affect",
                                                &component::detail::Trait::affect,
                                                "unaffect",
-                                               &component::detail::Trait::remove_affect);
-
-    /** Entity registry, we only expose a limited number of functions here */
-    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
-
-    /** Bind View */
-    lua.new_usertype<entt::runtime_view>("View",
-                                         sol::no_constructor,
-                                         "empty",
-                                         &entt::runtime_view::empty,
-                                         "size",
-                                         &entt::runtime_view::size,
-                                         "each",
-                                         &entt::runtime_view::each<sol::function>,
-                                         "contains",
-                                         &entt::runtime_view::contains);
+                                               &component::detail::Trait::unaffect);
 }
 
 void bind_systems(sol::state_view lua)
@@ -325,6 +380,21 @@ void bind_utils(sol::state_view lua)
     /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
      * float. */
     lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
+
+    /** Entity registry, we only expose a limited number of functions here */
+    lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);
+
+    /** Bind View */
+    lua.new_usertype<entt::runtime_view>("View",
+                                         sol::no_constructor,
+                                         "empty",
+                                         &entt::runtime_view::empty,
+                                         "size",
+                                         &entt::runtime_view::size,
+                                         "each",
+                                         &entt::runtime_view::each<sol::function>,
+                                         "contains",
+                                         &entt::runtime_view::contains);
 }
 
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description)
@@ -333,12 +403,11 @@ int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_e
     if (maybe_exception)
     {
         const auto& ex = *maybe_exception;
-        logger->critical("Lua exception thrown: [[[{}]]]", ex.what());
+        logger->critical("Lua exception thrown: {}", ex.what());
     }
     else
     {
-        logger->critical("Lua error thrown: [[[{}]]]", std::string_view(description.data(), description.size()));
-        std::cout << std::endl;
+        logger->critical("Lua error thrown: {}", std::string_view(description.data(), description.size()));
     }
 
     return sol::stack::push(L, description);

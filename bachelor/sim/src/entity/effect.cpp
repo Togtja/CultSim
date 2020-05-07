@@ -4,17 +4,17 @@ namespace cs::effect
 {
 void affect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : traits.acquired_traits)
+    for (const auto& trait : traits.acquired_traits)
     {
-        i.affect(e);
+        trait.affect(e);
     }
 }
 
 void unaffect_traits(entt::entity e, const component::Traits& traits)
 {
-    for (const auto& i : traits.acquired_traits)
+    for (const auto& trait : traits.acquired_traits)
     {
-        i.remove_affect(e);
+        trait.unaffect(e);
     }
 }
 } // namespace cs::effect

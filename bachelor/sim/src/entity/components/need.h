@@ -4,12 +4,14 @@
 #include <functional>
 #include <string>
 #include <variant>
-#include <vector>
 
 namespace cs::ai
 {
+/** TODO: Add documentation */
+
 struct Need
 {
+    using WeightFunction = std::variant<sol::function, std::function<float(const Need&)>>;
     std::string name{};
 
     float weight{};
@@ -22,13 +24,13 @@ struct Need
 
     ETag tags{};
 
-    std::variant<sol::function, std::function<float(const Need&)>> weight_func = [](const ai::Need& local) {
+    WeightFunction weight_func = [](const ai::Need& local) {
         return (100 / (local.status + 1)) * local.weight * local.weight_multi;
     };
 
-    // Is only used with traits
-    float weight_multi = 1.f;
-    float decay_multi  = 1.f;
+    /** Is only used with traits */
+    float weight_multi{1.f};
+    float decay_multi{1.f};
 };
 
 inline bool operator<(Need const& lhs, Need const& rhs)
@@ -86,6 +88,6 @@ inline bool operator==(Need const& lhs, Need const& rhs)
 
 inline bool operator!=(Need const& lhs, Need const& rhs)
 {
-    return lhs.name != rhs.name;
+    return !(lhs == rhs);
 }
 } // namespace cs::ai

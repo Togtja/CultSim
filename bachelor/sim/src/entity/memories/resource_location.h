@@ -5,6 +5,9 @@
 
 namespace cs::memory
 {
+/** TODO: Add Documentation */
+/** TODO: Consider Variants */
+
 class ResourceLocation : public IMemory
 {
 public:

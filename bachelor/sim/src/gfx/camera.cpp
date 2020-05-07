@@ -20,6 +20,7 @@ glm::mat4 Camera::get_view_matrix() const
     return glm::translate(glm::mat4(1.f), m_pos);
 }
 
+/** TODO: Make magic numbers into constants */
 glm::mat4 Camera::get_view_projection_matrix() const
 {
     return glm::ortho(m_pos.z * -640.f + m_pos.x,
@@ -55,11 +56,6 @@ void Camera::move(glm::vec3 delta)
 void Camera::zoom(float zoom)
 {
     m_pos.z = std::clamp(m_pos.z + (zoom * m_speed), 0.2f, 50.f);
-}
-
-void Camera::set_speed(float speed)
-{
-    m_speed = std::clamp(speed, 0.0001f, 0.1f);
 }
 
 void Camera::set_boundaries(glm::vec2 bounds)

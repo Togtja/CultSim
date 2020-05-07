@@ -4,10 +4,13 @@
 #include <memory>
 
 #include <entt/fwd.hpp>
+#include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
 namespace cs::event
 {
+/** TODO: Add some brief documentation */
+
 /**
  * Event for when entities have arrived at their move to destination
  */
@@ -30,7 +33,7 @@ struct SensedEntity
     entt::entity entity{};
 };
 
-struct NeedCritical
+struct NeedBecameCritical
 {
     entt::entity entity{};
 
@@ -87,12 +90,12 @@ struct EntitySpawned
     glm::vec2 position{};
 };
 
-struct DeleteEntity
+struct EntityDeleted
 {
     entt::entity entity{};
 };
 
-struct PickedUpEntity
+struct EntityPickedUp
 {
     entt::entity owner{};
 
@@ -101,7 +104,7 @@ struct PickedUpEntity
     ETag tags{};
 };
 
-struct BornEntity
+struct EntityBorn
 {
     entt::entity new_born{};
 };

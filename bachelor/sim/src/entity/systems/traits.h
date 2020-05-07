@@ -4,6 +4,7 @@
 
 namespace cs::system
 {
+/** TODO: Documentation */
 class Traits : public ISystem
 {
 public:

@@ -16,8 +16,8 @@ namespace cs
 class Window
 {
 private:
-    SDL_Window* m_window    = nullptr;
-    SDL_GLContext m_context = nullptr;
+    SDL_Window* m_window{nullptr};
+    SDL_GLContext m_context{nullptr};
 
 public:
     Window& operator=(const Window& other) = delete;

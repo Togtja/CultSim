@@ -4,6 +4,7 @@
 
 namespace cs::system
 {
+/** TODO: Documentation */
 class Memory : public ISystem
 {
 private:
@@ -20,6 +21,7 @@ public:
 
     ISystem* clone() override;
 
+private:
     void update_memories(const event::CreatedMemory& event);
 };
 } // namespace cs::system
