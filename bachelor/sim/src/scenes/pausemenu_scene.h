@@ -4,6 +4,7 @@
 
 namespace cs
 {
+/** TODO: Documentation */
 class PauseMenuScene : public IScene
 {
 public:

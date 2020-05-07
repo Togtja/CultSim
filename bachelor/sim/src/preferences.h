@@ -10,9 +10,9 @@
 #include <variant>
 #include <vector>
 
-#include "robin_hood.h"
 #include <entt/signal/sigh.hpp>
 #include <glm/vec2.hpp>
+#include <robin_hood.h>
 #include <sol/state_view.hpp>
 
 namespace cs
@@ -48,16 +48,19 @@ Overloaded(Ts...)->Overloaded<Ts...>;
 class PreferenceManager
 {
 private:
+    /** The strings for different languages */
     Locale m_locale;
 
     /** Application window */
     Window& m_window;
 
+    /** Current Lua state */
     sol::state_view m_lua;
 
     /** Window resolution */
     Preference m_resolution{"Resolution", "The resolution of your game window", glm::ivec2{1280, 720}};
 
+    /** Fullscreen or not */
     Preference m_fullscreen{"Fullscreen", "Should the window be fullscreen or windowed", false};
 
     /** Localization language */
@@ -70,10 +73,21 @@ private:
     entt::sigh<void(const Preference&, const Preference&)> m_preference_changed{};
 
 public:
+    /**
+     * Sink for subscribing to preference changes
+     *
+     * The first parameter is the old value of the preference, and the second one is the new preference value
+     */
+    entt::sink<void(const Preference&, const Preference&)> on_preference_changed{m_preference_changed};
+
+public:
     explicit PreferenceManager(Window& window, sol::state_view lua_state);
     explicit PreferenceManager(Window& window, sol::state_view lua_state, std::string_view from_file);
 
-    void show_debug_ui();
+    /**
+     * Creates and show a preference UI
+     */
+    void show_ui();
 
     /**
      * Initialize and load preferences
@@ -86,22 +100,45 @@ public:
     void deinit();
 
     /**
-     * Sink for subscribing to preference changes
+     * Get the resolution of the application
      *
-     * The first parameter is the old value of the preference, and the second one is the new preference value
+     * @return The resolution of the application
      */
-    entt::sink<void(const Preference&, const Preference&)> on_preference_changed{m_preference_changed};
-
     [[nodiscard]] const Preference& get_resolution() const;
 
+    /**
+     * Set the resolution of the application
+     *
+     * @param resolution
+     */
     void set_resolution(const glm::ivec2& resolution);
 
+    /**
+     * Get the fullscreen mode of the application
+     *
+     * @return The fullscreen mode of the application
+     */
     [[nodiscard]] const Preference& get_fullscreen() const;
 
+    /**
+     * Set the fullscreen mode of the application
+     *
+     * @param fullscreen
+     */
     void set_fullscreen(bool fullscreen);
 
+    /**
+     * Get the language of the application
+     *
+     * @return The language of the application
+     */
     [[nodiscard]] const Preference& get_language() const;
 
+    /**
+     * Set the language of the application
+     *
+     * @param language
+     */
     void set_language(std::string_view language);
 
     /**

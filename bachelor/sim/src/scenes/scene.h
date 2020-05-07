@@ -7,7 +7,7 @@ struct ApplicationContext;
 class IScene
 {
 protected:
-    ApplicationContext* m_context = nullptr;
+    ApplicationContext* m_context{nullptr};
 
 public:
     IScene()                        = default;

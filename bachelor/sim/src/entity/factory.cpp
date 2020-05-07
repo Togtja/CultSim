@@ -27,6 +27,8 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"InventoryComponent", spawn_inventory_component},
                           {"TraitComponent", spawn_trait_component},
                           {"NameComponent", spawn_name_component},
+                          {"ActionComponent", spawn_action_component},
+                          {"GoalComponent", spawn_goal_component},
                           {"RelationshipComponent", spawn_relationship_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
@@ -121,6 +123,80 @@ bool spawn_tag_component(entt::entity e, entt::registry& reg, sol::table table)
     return true;
 }
 
+bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& actions                      = reg.assign_or_replace<component::Action>(e);
+    const auto& action_sequence_tables = table["actions"].get_or<std::vector<sol::table>>({});
+    for (const auto& action_sequence_table : action_sequence_tables)
+    {
+        auto action_sequence = gob::ActionSequence{
+            action_sequence_table["name"].get<std::string>(),
+            action_sequence_table["tags"].get<ETag>(),
+        };
+
+        for (const auto& action_table : action_sequence_table["actions"].get_or<std::vector<sol::table>>({}))
+        {
+            auto action = gob::Action{action_table["name"].get<std::string>(),
+                                      action_table["tags"].get<ETag>(),
+                                      action_table["required_time"].get<float>(),
+                                      action_table["success_chance"].get<float>(),
+                                      action_table["flags"].get<uint32_t>(),
+                                      action_table["action"].get<sol::function>(),
+                                      action_table["get_goal_change"].get<sol::function>()};
+
+            if (action_table["get_duration"].get_type() == sol::type::function)
+            {
+                action.m_get_duration = action_table["get_duration"].get<sol::function>();
+            }
+
+            action_sequence.m_actions.push_back(action);
+        }
+
+        if (action_sequence_table["run_actions"].get_type() == sol::type::function)
+        {
+            action_sequence.m_run_actions = action_sequence_table["run_actions"].get<sol::function>();
+        }
+
+        if (action_sequence_table["get_goal_change"].get_type() == sol::type::function)
+        {
+            action_sequence.m_get_goal_change = action_sequence_table["get_goal_change"].get<sol::function>();
+        }
+
+        if (action_sequence_table["get_duration"].get_type() == sol::type::function)
+        {
+            action_sequence.m_get_duration = action_sequence_table["get_duration"].get<sol::function>();
+        }
+
+        actions.actions.push_back(action_sequence);
+    }
+    return true;
+}
+
+bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    auto& goal_comp   = reg.assign_or_replace<component::Goal>(e);
+    const auto& goals = table["goals"].get_or<std::vector<sol::table>>({});
+    for (const auto& goal_table : goals)
+    {
+        auto goal =
+            gob::Goal{goal_table["name"].get<std::string>(), goal_table["tags"].get<ETag>(), goal_table["age"].get<float>()};
+        if (goal_table["weight_function"].get_type() == sol::type::function)
+        {
+            goal.m_weight_function = goal_table["weight_function"].get<sol::function>();
+        }
+        if (goal_table["change_over_time"].get_type() == sol::type::function)
+        {
+            goal.m_change_over_time = goal_table["change_over_time"].get<sol::function>();
+        }
+        if (goal_table["get_discontentment"].get_type() == sol::type::function)
+        {
+            goal.m_get_discontentment = goal_table["get_discontentment"].get<sol::function>();
+        }
+        goal_comp.goals.push_back(goal);
+    }
+    return true;
+}
+
 bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& need = reg.assign_or_replace<component::Need>(e);
@@ -204,7 +280,7 @@ bool spawn_reproduction_component(entt::entity e, entt::registry& reg, sol::tabl
         repl.gestation_deviation      = table["gestation_deviation"].get<float>();
     }
     return true;
-} // namespace detail
+}
 
 bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table table)
 {
@@ -218,6 +294,7 @@ bool spawn_strategy_component(entt::entity e, entt::registry& reg, sol::table ta
         strategy.name        = strategy_table["name"].get<std::string>();
         strategy.tags        = strategy_table["tags"].get<ETag>();
         strategy.target_tags = strategy_table["target_tags"].get<ETag>();
+
         /** Get the actions for this strategy */
         const auto& actions = strategy_table["actions"].get_or<std::vector<sol::table>>({});
         for (const auto& action_table : actions)
@@ -302,10 +379,10 @@ bool spawn_inventory_component(entt::entity e, entt::registry& reg, sol::table t
 component::detail::Trait get_trait(sol::table traits)
 {
     component::detail::Trait trait;
-    trait.name          = traits["name"];
-    trait.desc          = traits["desc"];
-    trait.affect        = traits["affect"];
-    trait.remove_affect = traits["unaffect"];
+    trait.name     = traits["name"];
+    trait.desc     = traits["desc"];
+    trait.affect   = traits["affect"];
+    trait.unaffect = traits["unaffect"];
 
     if (traits["can_inherit"].get_type() == sol::type::boolean)
     {
@@ -331,8 +408,8 @@ component::detail::Trait get_trait(sol::table traits)
     }
     else
     {
-        // Give a default function/bool
-        spdlog::warn("No attain condition");
+        /** TODO: Create default function */
+        spdlog::get("lua")->warn("No attain condition");
     }
 
     if (traits["lose_condition"].get_type() == sol::type::function)
@@ -341,8 +418,8 @@ component::detail::Trait get_trait(sol::table traits)
     }
     else
     {
-        // Give a default function/bool
-        spdlog::warn("No lose condition");
+        /** TODO: Create default function */
+        spdlog::get("lua")->warn("No lose condition");
     }
     return trait;
 }
@@ -350,7 +427,7 @@ component::detail::Trait get_trait(sol::table traits)
 bool spawn_trait_component(entt::entity e, entt::registry& reg, sol::table table)
 {
     auto& trait_comp = reg.assign_or_replace<component::Traits>(e);
-    // TODO: Assign the traits that the component has as default
+    /** TODO: Assign the traits that the component has as default */
     const auto& available_default = table["start_traits"].get_or<std::vector<sol::table>>({});
     for (const auto& traits : available_default)
     {
@@ -381,6 +458,7 @@ bool spawn_relationship_component(entt::entity e, entt::registry& reg, sol::tabl
 
     return true;
 }
+
 } // namespace detail
 
 entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_view entity, glm::vec2 position)
@@ -388,6 +466,7 @@ entt::entity spawn_entity(entt::registry& reg, sol::state_view lua, std::string_
     auto out = spawn_entity(reg, lua, entity);
 
     /** Set position if it has one */
+
     if (auto* pos = reg.try_get<component::Position>(out); pos)
     {
         pos->position = glm::vec3(position, 0.f);

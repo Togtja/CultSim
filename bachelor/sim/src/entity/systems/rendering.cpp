@@ -8,19 +8,13 @@
 #include <array>
 #include <numeric>
 
-#include "gfx/ImGUI/imgui.h"
+#include <gfx/ImGUI/imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
 namespace cs::system
 {
-Rendering::Rendering(SystemContext context) : ISystem(context)
-{
-    /** Submit sprites to renderer, for each layer */
-    m_shadow_texture              = gfx::get_renderer().sprite().get_texture("sprites/shadow_c.png");
-    m_shadow_texture.material_idx = MATERIAL_IDX_NOSPEC;
-}
-
+/** TODO: Remove Keybinding & initialization/deinitialization */
 void Rendering::initialize()
 {
     auto& handler = input::get_input();

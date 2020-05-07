@@ -9,6 +9,7 @@
 
 namespace cs::lua
 {
+/** TODO: Add some documentation about the struct */
 struct Scenario
 {
     std::string name{};
@@ -22,7 +23,7 @@ struct Scenario
     std::vector<sol::object> systems{};
 
     /** How often this scenario should sample data */
-    float sampling_rate = 1.f;
+    float sampling_rate{1.0f};
 
     /** Called on startup */
     sol::function init;

@@ -2,10 +2,10 @@
 
 #include <cstdint>
 
+#include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
 
 namespace cs::gfx
 {
@@ -29,6 +29,7 @@ struct SpriteTextureID
     /** Index into material array to use for this sprite */
     uint16_t material_idx : 3;
 
+    /** TODO: Document beneath */
     uint8_t bigrees{0};
 
     uint8_t scale{10};
@@ -44,10 +45,10 @@ struct SpriteTextureID
  */
 struct Material
 {
-    float diffuse  = 1.f;
-    float specular = 0.5f;
-    float gloss    = 50.f;
-    float emissive = 0.f;
+    float diffuse{1.f};
+    float specular{0.5f};
+    float gloss{50.f};
+    float emissive{0.f};
 };
 
 /**

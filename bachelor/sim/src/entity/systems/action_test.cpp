@@ -6,7 +6,7 @@
 
 #include <random>
 
-#include "doctest/doctest.h"
+#include <doctest/doctest.h>
 #include <spdlog/spdlog.h>
 
 TEST_CASE("Test case for regular action system setup")

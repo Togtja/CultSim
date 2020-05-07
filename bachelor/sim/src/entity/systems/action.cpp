@@ -1,9 +1,9 @@
 #include "action.h"
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
+#include "random_engine.h"
 
-#include <random>
-
+#include <entt/signal/dispatcher.hpp>
 #include <spdlog/spdlog.h>
 
 namespace cs::system
@@ -11,15 +11,15 @@ namespace cs::system
 void Action::initialize()
 {
     m_context.dispatcher->sink<event::RequirementFailure>().connect<&Action::abort_strategy>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Action::delete_target>(*this);
-    m_context.dispatcher->sink<event::PickedUpEntity>().connect<&Action::picked_up_entity>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Action::delete_target>(*this);
+    m_context.dispatcher->sink<event::EntityPickedUp>().connect<&Action::picked_up_entity>(*this);
 }
 
 void Action::deinitialize()
 {
     m_context.dispatcher->sink<event::RequirementFailure>().disconnect<&Action::abort_strategy>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Action::delete_target>(*this);
-    m_context.dispatcher->sink<event::PickedUpEntity>().connect<&Action::picked_up_entity>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Action::delete_target>(*this);
+    m_context.dispatcher->sink<event::EntityPickedUp>().disconnect<&Action::picked_up_entity>(*this);
 }
 
 void Action::update(float dt)
@@ -47,7 +47,7 @@ void Action::update(float dt)
             return;
         }
 
-        // for the first action initialize the requirements when we first start to work
+        /** for the first action initialize the requirements when we first start to work */
         if (strategy.working_on_action == 0)
         {
             strategy.working_on_action++;
@@ -116,7 +116,7 @@ void Action::update(float dt)
                         strategies.staged_strategies.clear();
                         return;
                     }
-                    action                = &strategy.actions[(strategy.actions.size() - strategy.working_on_action)];
+                    action                = &strategy.actions[strategy.actions.size() - strategy.working_on_action];
                     strategy.requirements = action->requirements;
                 }
 
@@ -144,12 +144,12 @@ void Action::abort_strategy(const event::RequirementFailure& event)
         return;
     }
 
-    auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
     if (event.error != "")
     {
         spdlog::get("agent")->error("We got an error from Requirement: {} ; {}", tag_to_string(event.requirement), event.error);
     }
 
+    auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);
     if (strategies)
     {
         auto& strategy = strategies->staged_strategies.back();
@@ -165,7 +165,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
     }
 }
 
-void Action::delete_target(const event::DeleteEntity& event)
+void Action::delete_target(const event::EntityDeleted& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {
@@ -175,8 +175,6 @@ void Action::delete_target(const event::DeleteEntity& event)
             {
                 if (action.target == event.entity)
                 {
-                    // TEMP
-                    // TODO: write proper syntax for action.abort
                     if (action.abort.valid() && m_context.registry->valid(action.target))
                     {
                         action.abort(e, action.target);
@@ -190,7 +188,7 @@ void Action::delete_target(const event::DeleteEntity& event)
     });
 }
 
-void Action::picked_up_entity(const event::PickedUpEntity& event)
+void Action::picked_up_entity(const event::EntityPickedUp& event)
 {
     auto view = m_context.registry->view<component::Strategy>();
     view.each([this, event](entt::entity e, component::Strategy& strat) {

@@ -31,7 +31,6 @@ public:
     ISystem* clone() override;
 
     /**
-     *
      * Go through a list of possible strategies and filters out those that can help in mitigating our pressing needs.
      * Also adds a desirability, and sorts our available strategies accordingly
      *

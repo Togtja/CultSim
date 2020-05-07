@@ -20,8 +20,8 @@
 #include <gfx/ImGUI/imgui_impl_sdl.h>
 
 /** Header font for ImGui purposes */
-ImFont* g_header_font = nullptr;
-ImFont* g_light_font  = nullptr;
+ImFont* g_header_font{nullptr};
+ImFont* g_light_font{nullptr};
 
 namespace cs
 {
@@ -98,7 +98,7 @@ void Application::update(float dt)
     input::get_input().handle_live_input(dt);
     ImGui::Text("Lua memory: %.2f Kb", m_lua.memory_used() / 1024.f);
     m_scene_manager.update(dt);
-    m_preferences.show_debug_ui();
+    m_preferences.show_ui();
     AutoTimer::show_debug_ui();
 }
 
@@ -136,7 +136,7 @@ bool Application::init_input()
 {
     input::ContextHandler& inputs = input::get_input();
 
-    // Load the bindings from a keybinding preference file
+    /** Load the bindings from a keybinding preference file */
     inputs.load_binding_from_file(m_lua.lua_state());
     inputs.fast_bind_key(input::EKeyContext::DefaultContext, SDL_SCANCODE_ESCAPE, input::EAction::Quit, [this] {
         m_running = false;
@@ -255,7 +255,7 @@ bool Application::init_imgui()
     memcpy(font_memory_2, font_file.data(), font_file.size());
     memcpy(font_memory_3, light_font_file.data(), light_font_file.size());
 
-    /** Give font ot ImGui (do not free above memory! ImGui does it) */
+    /** Give font to ImGui (do not free above memory! ImGui does it) */
     io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory), 14, 14);
     g_header_font = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_2), 20, 20);
     g_light_font  = io.Fonts->AddFontFromMemoryTTF(reinterpret_cast<void*>(font_memory_3), 16, 16);
@@ -314,7 +314,7 @@ bool Application::init_imgui()
     colors[ImGuiCol_ModalWindowDimBg]      = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     colors[ImGuiCol_TableHeaderBg]         = ImVec4(0.39f, 0.10f, 0.35f, 0.78f);
 
-    // Set up Platform & renderer Bindings
+    /** Set up Platform & renderer Bindings */
     ImGui_ImplSDL2_InitForOpenGL(m_window.get(), m_window.get_context());
     ImGui_ImplOpenGL45_Init();
 

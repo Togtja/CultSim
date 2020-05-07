@@ -21,6 +21,7 @@ struct SystemContext
     sol::state_view* lua_state{nullptr};
 };
 
+/** TODO: Documentation */
 class ISystem
 {
 protected:
@@ -54,9 +55,11 @@ public:
      */
     virtual void deinitialize(){};
 
+    /** TODO: Give definition what these two are supposed to do */
     virtual void update(float dt) = 0;
 
     virtual void update_imgui(){};
+
     /**
      * Implement in subclasses to create clones of a system
      *

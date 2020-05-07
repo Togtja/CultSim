@@ -15,7 +15,7 @@ constexpr int PROGRAM_VERSION_MAJOR     = @PROJECT_VERSION_MAJOR@;
 constexpr int PROGRAM_VERSION_MINOR     = @PROJECT_VERSION_MINOR@;
 constexpr int PROGRAM_VERSION_PATCH     = @PROJECT_VERSION_PATCH@;
 
-constexpr int DEBUG_MAX_LINES = 1'000'000;
+constexpr int DEBUG_MAX_SHAPES = 1'000'000;
 constexpr int SIM_MAX_AGENTS = 1'000'000;
 constexpr int SIM_GRID_SIZE = 32;
 

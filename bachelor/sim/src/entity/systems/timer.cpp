@@ -16,7 +16,7 @@ void Timer::update(float dt)
             /** on_complete - can either be lua or cpp function */
             if (timer.on_complete.index() == 0)
             {
-                std::get<component::Timer::OnCompleteFunction>(timer.on_complete)(e, *m_context.registry);
+                std::get<std::function<void(entt::entity, entt::registry&)>>(timer.on_complete)(e, *m_context.registry);
             }
             else
             {

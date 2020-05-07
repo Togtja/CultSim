@@ -25,8 +25,8 @@ Relationship& Relationship::operator=(const Relationship& other)
 
 void Relationship::initialize()
 {
-    m_context.dispatcher->sink<event::BornEntity>().connect<&Relationship::new_child_to_reg>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().connect<&Relationship::delete_father>(*this);
+    m_context.dispatcher->sink<event::EntityBorn>().connect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().connect<&Relationship::delete_father>(*this);
 
     sol::table cultsim = (*m_context.lua_state)["cultsim"];
     cultsim.set_function("get_friendship",
@@ -36,14 +36,17 @@ void Relationship::initialize()
     cultsim.set_function("add_friendship", [this](entt::entity e, entt::entity other, uint8_t amount) -> void {
         add_friendship(e, other, amount);
     });
+
     cultsim.set_function("add_romance",
                          [this](entt::entity e, entt::entity other, uint8_t amount) -> void { add_romance(e, other, amount); });
+
+    cultsim.set_function("get_parents", [this](entt::entity e) { return get_parents(e); });
 };
 
 void Relationship::deinitialize()
 {
-    m_context.dispatcher->sink<event::BornEntity>().disconnect<&Relationship::new_child_to_reg>(*this);
-    m_context.dispatcher->sink<event::DeleteEntity>().disconnect<&Relationship::delete_father>(*this);
+    m_context.dispatcher->sink<event::EntityBorn>().disconnect<&Relationship::new_child_to_reg>(*this);
+    m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Relationship::delete_father>(*this);
 }
 
 entt::entity Relationship::add_to_reg(const entt::entity e)
@@ -58,7 +61,7 @@ entt::entity Relationship::add_to_reg(const entt::entity e)
     return new_e;
 }
 
-void Relationship::new_child_to_reg(const event::BornEntity& event)
+void Relationship::new_child_to_reg(const event::EntityBorn& event)
 {
     auto new_entt = m_parents_reg.create();
 
@@ -66,43 +69,45 @@ void Relationship::new_child_to_reg(const event::BornEntity& event)
     m_parents_reg.assign<component::Name>(new_entt, name_c.entity_type, name_c.name);
 
     auto relship_comp = m_context.registry->get<component::Relationship>(event.new_born);
-    if (relship_comp.mom.global_registry_id != entt::null && relship_comp.dad.global_registry_id != entt::null)
+    if (relship_comp.mom.global != entt::null && relship_comp.dad.global != entt::null)
     {
         component::Relationship fam{};
-        fam.old_id                 = event.new_born;
-        fam.mom.global_registry_id = relship_comp.mom.global_registry_id;
-        fam.dad.global_registry_id = relship_comp.dad.global_registry_id;
+        fam.old_id     = event.new_born;
+        fam.mom.global = relship_comp.mom.global;
+        fam.dad.global = relship_comp.dad.global;
 
         auto view = m_parents_reg.view<component::Relationship>();
         view.each([&fam](entt::entity e, const component::Relationship& relship_comp_parent) {
-            if (relship_comp_parent.old_id == fam.mom.global_registry_id)
+            if (relship_comp_parent.old_id == fam.mom.global)
             {
-                // Set my relationship component to have my parents relationship registry ID/entt
-                fam.mom.relationship_registry_id = e;
+                /** Set my relationship component to have my parents relationship registry ID/entt */
+                fam.mom.relationship = e;
             }
-            if (relship_comp_parent.old_id == fam.dad.global_registry_id)
+            if (relship_comp_parent.old_id == fam.dad.global)
             {
-                fam.dad.relationship_registry_id = e;
+                fam.dad.relationship = e;
             }
         });
-        if (fam.mom.relationship_registry_id == entt::null)
+
+        if (fam.mom.relationship == entt::null)
         {
-            // Mom is a first gen
-            auto mom_entt                    = add_to_reg(fam.mom.global_registry_id);
-            fam.mom.relationship_registry_id = mom_entt;
+            /** Mom is a first gen */
+            auto mom_entt        = add_to_reg(fam.mom.global);
+            fam.mom.relationship = mom_entt;
         }
-        // Make sure dad is still valid, could have died during pregnancy
-        if (fam.dad.relationship_registry_id == entt::null && m_context.registry->valid(fam.dad.global_registry_id))
+
+        /** Make sure dad is still valid, could have died during pregnancy */
+        if (fam.dad.relationship == entt::null && m_context.registry->valid(fam.dad.global))
         {
-            // Dad is a first gen
-            auto dad_entt                    = add_to_reg(fam.dad.global_registry_id);
-            fam.dad.relationship_registry_id = dad_entt;
+            /** Dad is a first gen */
+            auto dad_entt        = add_to_reg(fam.dad.global);
+            fam.dad.relationship = dad_entt;
         }
         m_parents_reg.assign<component::Relationship>(new_entt, fam);
     }
 }
 
-void Relationship::delete_father(const event::DeleteEntity& event)
+void Relationship::delete_father(const event::EntityDeleted& event)
 {
     auto view = m_context.registry->view<component::Pregnancy, component::Name, component::Relationship>();
     view.each(
@@ -124,17 +129,17 @@ void Relationship::add_relationship_table(entt::entity e)
     view.each([this, e, relship_c](entt::entity e2, const component::Relationship& relationship) {
         if (e == e2)
         {
-            // First 8 bits is friendship, last 8 bits is romance
+            /** First 8 bits is friendship, last 8 bits is romance */
             add_friendship(e, e2, relationship.self_friend);
             add_romance(e, e2, relationship.self_romance);
             return;
         }
-        // TODO: for family add better relationship
-        // What I feel for others
+        /** TODO: for family add better relationship */
+        /** What I feel for others */
         add_friendship(e, e2, relship_c.default_friend);
         add_romance(e, e2, relship_c.default_romance);
 
-        // What others feel for me
+        /** What others feel for me */
         add_friendship(e2, e, relationship.default_friend);
         add_romance(e2, e, relationship.default_romance);
     });
@@ -144,6 +149,7 @@ uint8_t Relationship::get_friendship(entt::entity e, entt::entity other)
 {
     return (m_rel_table[e][other] >> 8);
 }
+
 void Relationship::add_friendship(entt::entity e, entt::entity other, uint8_t amount)
 {
     uint8_t friend_lvl = m_rel_table[e][other] >> 8;
@@ -183,53 +189,50 @@ void Relationship::add_romance(entt::entity e, entt::entity other, uint8_t amoun
     }
 }
 
-BothParentName Relationship::get_parent(entt::entity e, bool is_local_ids)
+BothParentName Relationship::get_parents(entt::entity e, bool is_local_ids)
 {
     BothParentName ret;
     if (is_local_ids)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(e);
-        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
-        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
+        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship);
+        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship);
         ret.mom.name    = par1_name.name;
         ret.dad.name    = par2_name.name;
         ret.mom.ids     = rel.mom;
         ret.dad.ids     = rel.dad;
         return ret;
     }
+
     auto view = m_parents_reg.view<component::Relationship>();
-    for (auto&& ent : view)
+    for (auto ent : view)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(ent);
         if (rel.old_id == e)
         {
-            if (m_parents_reg.valid(rel.mom.relationship_registry_id) && m_parents_reg.valid(rel.dad.relationship_registry_id))
+            auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship);
+            auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship);
+
+            if (par1_name.name.empty())
             {
-                auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship_registry_id);
-                auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship_registry_id);
-                if (par1_name.name.empty())
-                {
-                    par1_name.name = par1_name.entity_type;
-                }
-                if (par2_name.name.empty())
-                {
-                    par2_name.name = par2_name.entity_type;
-                }
-                ret.mom.name = par1_name.name;
-                ret.dad.name = par2_name.name;
-                ret.mom.ids  = rel.mom;
-                ret.dad.ids  = rel.dad;
-                return ret;
+                par1_name.name = par1_name.entity_type;
             }
-            else
+            if (par2_name.name.empty())
             {
-                // The parents are First spawners
+                par2_name.name = par2_name.entity_type;
             }
+
+            ret.mom.name = par1_name.name;
+            ret.dad.name = par2_name.name;
+            ret.mom.ids  = rel.mom;
+            ret.dad.ids  = rel.dad;
+            return ret;
         }
     }
     return ret;
 }
 
+/** TODO: Replace with registry on construct event to remove need for per frame runs*/
 void Relationship::update(float dt)
 {
     CS_AUTOTIMER(Relationship System);

@@ -11,14 +11,14 @@ namespace cs
 PreferenceScene::PreferenceScene()
 {
     m_key_map = input::get_input().get_input_map();
-    for (auto&& [context, action_h] : m_key_map)
+    for (const auto& [context, action_h] : m_key_map)
     {
         m_display_map[context];
-        for (auto&& [key, action] : action_h.get_key_binding())
+        for (const auto& [key, action] : action_h.get_key_binding())
         {
             m_display_map[context].emplace_back(std::pair(SDL_GetScancodeName(key), action));
         }
-        for (auto&& [btn, action] : action_h.get_mouse_binding())
+        for (const auto& [btn, action] : action_h.get_mouse_binding())
         {
             m_display_map[context].emplace_back(std::pair(input::mouse_to_string(btn), action));
         }
@@ -36,7 +36,7 @@ void PreferenceScene::on_exit()
 
 bool PreferenceScene::update(float dt)
 {
-    key_binding();
+    show_keybinding_ui();
     quit_btn();
     return false;
 }
@@ -46,10 +46,10 @@ bool PreferenceScene::draw()
     return false;
 }
 
-void PreferenceScene::key_binding()
+void PreferenceScene::show_keybinding_ui()
 {
     // Set window size and position
-    auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    const auto res = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
     ImGui::SetNextWindowPos(glm::vec2(res.x / 2.f, res.y / 2.f - 100), 0, {.5f, .5f});
     ImGui::SetNextWindowSize({res.x / 1.5f, res.y / 1.5f});
 
@@ -65,7 +65,7 @@ void PreferenceScene::key_binding()
         cs_auto_table_headers();
 
         int i = 0;
-        for (auto&& [key, action] : action_h)
+        for (const auto& [key, action] : action_h)
         {
             ImGui::TableNextCell();
             if (ImGui::Button(key.c_str()))
@@ -89,7 +89,7 @@ void PreferenceScene::key_binding()
             i++;
         }
 
-        // Does not look good with new line when empty action_h
+        /** Does not look good with new line when empty action_h */
         if (!action_h.empty())
         {
             ImGui::NewLine();
@@ -101,7 +101,8 @@ void PreferenceScene::key_binding()
             ImGui::OpenPopup(fmt::format("Select Action##{}", context).c_str());
         }
 
-        // Used to open binding popup
+        /** TODO: Extract to function */
+        /** Used to open binding popup */
         bool open_up = false;
         if (ImGui::BeginPopupModal(fmt::format("Select Action##{}", context).c_str(),
                                    nullptr,
@@ -121,13 +122,13 @@ void PreferenceScene::key_binding()
 
             ImGui::EndPopup();
         }
-
         if (open_up)
         {
             ImGui::OpenPopup(fmt::format("Change Binding##{}", context).c_str());
             open_up = false;
         }
 
+        /** TODO: Extract to function */
         if (ImGui::BeginPopupModal(fmt::format("Change Binding##{}", context).c_str(),
                                    nullptr,
                                    ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
@@ -152,25 +153,26 @@ void PreferenceScene::key_binding()
 
             if (n_key != SDL_SCANCODE_UNKNOWN)
             {
-                // Remove what ever old binding was there
+                /** Remove what ever old binding was there */
                 m_key_map.at(context).unbind_key(n_key);
 
-                // The binding it a replacemnt
+                /** The binding it a replacement */
                 if (m_bind_index >= 0 && m_bind_index < m_display_map[context].size())
                 {
                     auto old_key_s = m_display_map[context][m_bind_index].first;
                     m_bind_action  = m_display_map[context][m_bind_index].second;
 
-                    // Find if that key has been used before
+                    /** Find if that key has been used before */
                     auto&& it = std::find_if(m_display_map[context].begin(),
                                              m_display_map[context].end(),
                                              [n_key](const auto& p) { return p.first == SDL_GetScancodeName(n_key); });
 
-                    // If a binding with the key already exist, Flip the actions
+                    /** If a binding with the key already exist, Flip the actions */
                     if (it != m_display_map[context].end())
                     {
                         m_display_map[context][m_bind_index].first = (*it).first;
-                        // The old key get the n_key's old action
+
+                        /** The old key get the n_key's old action */
                         auto scan_c = SDL_GetScancodeFromName(old_key_s.c_str());
                         if (scan_c != SDL_SCANCODE_UNKNOWN)
                         {
@@ -187,17 +189,17 @@ void PreferenceScene::key_binding()
                         m_display_map[context][m_bind_index] = std::pair(SDL_GetScancodeName(n_key), m_bind_action);
                     }
 
-                    // bind the action to a new key
+                    /** Bind the action to a new key */
                     m_key_map.at(context).bind_key(n_key, m_bind_action);
                 }
-                // The bindings is a new binding
+                /** The binding is a new binding */
                 else if (m_bind_index == m_display_map[context].size())
                 {
                     auto&& it = std::find_if(m_display_map[context].begin(),
                                              m_display_map[context].end(),
                                              [n_key](const auto& p) { return p.first == SDL_GetScancodeName(n_key); });
 
-                    // If a binding with the key already exist, remove it
+                    /** If a binding with the key already exist, remove it */
                     if (it != m_display_map[context].end())
                     {
                         m_display_map[context].erase(it);
@@ -215,23 +217,24 @@ void PreferenceScene::key_binding()
             {
                 m_key_map.at(context).unbind_btn(bind_mouse);
 
-                // The binding it a replacemnt
+                /** The binding is a replacemnt */
                 if (m_bind_index >= 0 && m_bind_index < m_display_map[context].size())
                 {
                     auto old_key_s = m_display_map[context][m_bind_index].first;
                     m_bind_action  = m_display_map[context][m_bind_index].second;
 
-                    // Find if that key has been used before
+                    /** Find if that key has been used before */
                     auto&& it =
                         std::find_if(m_display_map[context].begin(), m_display_map[context].end(), [bind_mouse](const auto& p) {
                             return p.first == input::mouse_to_string(bind_mouse);
                         });
 
-                    // If a binding with the key already exist, Flip the actions
+                    /** If a binding with the key already exist, flip the actions */
                     if (it != m_display_map[context].end())
                     {
                         m_display_map[context][m_bind_index].first = (*it).first;
-                        // The old key get the bind_mouse's old action
+
+                        /** The old key get the bind_mouse's old action */
                         auto scan_c = SDL_GetScancodeFromName(old_key_s.c_str());
                         if (scan_c != SDL_SCANCODE_UNKNOWN)
                         {
@@ -248,10 +251,10 @@ void PreferenceScene::key_binding()
                         m_display_map[context][m_bind_index] = std::pair(input::mouse_to_string(bind_mouse), m_bind_action);
                     }
 
-                    // bind the action to a new key
+                    /** Bind the action to a new key */
                     m_key_map.at(context).bind_btn(bind_mouse, m_bind_action);
                 }
-                // The bindings is a new binding
+                /** The bindings is a new binding */
                 else if (m_bind_index == m_display_map[context].size())
                 {
                     auto&& it =
@@ -259,7 +262,7 @@ void PreferenceScene::key_binding()
                             return p.first == input::mouse_to_string(bind_mouse);
                         });
 
-                    // If a binding with the key already exist, remove it
+                    /** If a binding with the key already exist, remove it */
                     if (it != m_display_map[context].end())
                     {
                         m_display_map[context].erase(it);

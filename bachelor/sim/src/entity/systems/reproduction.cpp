@@ -14,12 +14,13 @@ void Reproduction::update(float dt)
     view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
         if (auto age = m_context.registry->try_get<component::Age>(e); age && repr.has_fertility)
         {
-            // Can not reproduce after end of fertility
+            /** Can not reproduce after end of fertility */
             if (age->current_age > repr.end_fertility || age->current_age < repr.start_fertility)
             {
                 repr.fertility = 0;
                 return;
             }
+
             auto age_fertile = age->current_age - repr.peak_fertility;
             if (age_fertile < 0)
             {
@@ -30,12 +31,14 @@ void Reproduction::update(float dt)
                 repr.fertility = (1.f - (age_fertile / repr.end_fertility));
             }
         }
+
         if (repr.fertility < 0)
         {
             repr.fertility = 0;
         }
     });
-    // Children that will be spawned
+
+    /** Children that will be spawned */
     std::vector<Child> children;
 
     auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
@@ -52,16 +55,14 @@ void Reproduction::update(float dt)
                                      glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
                 if (repr.lays_eggs)
                 {
-                    children.push_back(
-                        Child{repr.egg_type, new_pos, true, parent_name, {preg.parents.first, preg.parents.second}});
+                    children.push_back(Child{repr.egg_type, new_pos, true, parent_name, preg.parents});
                 }
                 else
                 {
                     if (preg.is_egg)
                     {
-                        auto egg_pos = m_context.registry->get<component::Position>(e).position;
-                        children.push_back(
-                            Child{parent_name, egg_pos, false, parent_name, {preg.parents.first, preg.parents.second}});
+                        const auto egg_pos = m_context.registry->get<component::Position>(e).position;
+                        children.push_back(Child{parent_name, egg_pos, false, parent_name, preg.parents});
                     }
                     else
                     {
@@ -69,12 +70,14 @@ void Reproduction::update(float dt)
                     }
                 }
             }
+
             repr.number_of_children += preg.children_in_pregnancy;
             if (!preg.is_egg && m_context.registry->valid(preg.parents.second))
             {
                 auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.second);
                 f_preg.number_of_children += preg.children_in_pregnancy;
             }
+
             if (preg.is_egg)
             {
                 m_context.registry->assign_or_replace<component::Delete>(e);
@@ -83,9 +86,9 @@ void Reproduction::update(float dt)
         }
     });
 
-    for (auto&& child : children)
+    for (const auto& child : children)
     {
-        auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
+        const auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
 
         if (child.is_egg)
         {
@@ -107,69 +110,67 @@ void Reproduction::update(float dt)
             {
                 egg_hatching.gestation_period = egg_time.average_gestation_period;
             }
-            // Makes sure the eggs spawn the parent type
+
+            /** Makes sure the eggs spawn the parent type */
             m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
             return;
         }
-        m_context.dispatcher->enqueue<event::BornEntity>(event::BornEntity{child_e});
-        // TODO: Figure out if this is redundant
-        if (auto age = m_context.registry->try_get<component::Age>(child_e); age)
-        {
-            age->current_age = 0;
-        }
+        m_context.dispatcher->enqueue<event::EntityBorn>(event::EntityBorn{child_e});
 
         if (auto traits = m_context.registry->try_get<component::Traits>(child_e); traits)
         {
-            // Check if we can mutate something
-            for (auto&& i : traits->attainable_traits)
+            /** Check if we can mutate something */
+            for (const auto& trait : traits->attainable_traits)
             {
-                if (i.can_mutate && m_context.rng->trigger(i.mutation_chance))
+                if (trait.can_mutate && m_context.rng->trigger(trait.mutation_chance))
                 {
-                    traits->acquired_traits.push_back(i);
+                    traits->acquired_traits.push_back(trait);
                 }
             }
-            // Tries to inherit mom's acquired traits
-            if (m_context.registry->valid(child.parents.first))
+
+            /** TODO: Extract to function */
+            /** Tries to inherit mom's acquired traits */
+            if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
             {
-                if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
+                for (const auto& trait : mom_traits->acquired_traits)
                 {
-                    for (auto&& i : mom_traits->acquired_traits)
+                    if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
                     {
-                        if (i.can_inherit && m_context.rng->trigger(i.inherit_chance))
-                        {
-                            traits->acquired_traits.push_back(i);
-                        }
+                        traits->acquired_traits.push_back(trait);
                     }
                 }
             }
 
             if (m_context.registry->valid(child.parents.second))
             {
-                // Tries to inherit dad's acquired traits
+                /** Tries to inherit dad's acquired traits */
                 if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
                 {
-                    for (auto&& i : dad_traits->acquired_traits)
+                    for (const auto& trait : dad_traits->acquired_traits)
                     {
-                        if (i.can_inherit && m_context.rng->trigger(i.inherit_chance))
+                        if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
                         {
-                            traits->acquired_traits.push_back(i);
+                            traits->acquired_traits.push_back(trait);
                         }
                     }
                 }
             }
-            // Make our list unique
-            auto it = std::unique(traits->acquired_traits.begin(), traits->acquired_traits.end());
-            traits->acquired_traits.resize(std::distance(traits->acquired_traits.begin(), it));
-            // Run the effect of the acquired traits
+
+            /** Make our list unique */
+            const auto it = std::unique(traits->acquired_traits.begin(), traits->acquired_traits.end());
+            traits->acquired_traits.erase(it, traits->acquired_traits.end());
+
+            /** Run the effect of the acquired traits */
             effect::affect_traits(child_e, *traits);
         }
+
         if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
         {
-            rel_c->mom.global_registry_id = child.parents.first;
-            rel_c->dad.global_registry_id = child.parents.second;
+            rel_c->mom.global = child.parents.first;
+            rel_c->dad.global = child.parents.second;
         }
     }
-} // namespace cs::system
+}
 
 ISystem* Reproduction::clone()
 {

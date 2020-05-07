@@ -7,7 +7,7 @@
 namespace cs
 {
 struct Preference;
-
+/** TODO: Documentation */
 class MainMenuScene : public IScene
 {
 private:

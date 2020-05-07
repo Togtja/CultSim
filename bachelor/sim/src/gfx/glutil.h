@@ -14,9 +14,9 @@ namespace cs::gfx
  */
 struct LoadedTexture
 {
-    int width                   = 0u;
-    int height                  = 0u;
-    std::vector<uint8_t> pixels = {};
+    int width{0u};
+    int height{0u};
+    std::vector<uint8_t> pixels{};
 };
 
 struct ShaderFile
@@ -99,15 +99,14 @@ std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset,
  */
 void create_debug_callback();
 
-/**
- * \todo
- */
+/** TODO: Documentation */
 template<typename Container>
 constexpr typename Container::size_type size_bytes(const Container& container)
 {
     return container.size() * sizeof(typename Container::value_type);
 }
 
+/** TODO: Documentation */
 template<typename... Ts>
 std::vector<uint8_t> combine_buffers(const std::vector<Ts>&... vecs)
 {
@@ -116,7 +115,7 @@ std::vector<uint8_t> combine_buffers(const std::vector<Ts>&... vecs)
     uint32_t offset = 0u;
     std::vector<uint8_t> out((0u + ... + size_bytes(vecs)));
 
-    auto append = [&](auto& vec) {
+    const auto append = [&](auto& vec) {
         std::memcpy(out.data() + offset, vec.data(), size_bytes(vec));
         offset += size_bytes(vec);
     };

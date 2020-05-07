@@ -1,4 +1,5 @@
 #include "scenario_scene.h"
+#include "ai/path_finding.h"
 #include "common_helpers.h"
 #include "constants.h"
 #include "debug/native_collectors.h"
@@ -11,12 +12,12 @@
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
 #include "entity/systems/health.h"
+#include "entity/systems/lua_system.h"
 #include "entity/systems/mitigation.h"
 #include "entity/systems/movement.h"
 #include "entity/systems/need.h"
 #include "entity/systems/relationship.h"
 #include "entity/systems/rendering.h"
-#include "entity/systems/lua_system.h"
 #include "entity/systems/reproduction.h"
 #include "entity/systems/requirement.h"
 #include "entity/systems/sensor.h"
@@ -61,18 +62,6 @@ void ScenarioScene::initialize_simulation()
     m_registry.set<EntitySelectionHelper>();
     m_registry.set<RandomEngine*>(&m_rng);
 
-    /** If there are any default Traits, run their affects and add them*/
-    auto per_view = m_registry.view<component::Traits>();
-    per_view.each([](entt::entity e, component::Traits& per) {
-        // Add default traits to acquired traits
-        for (auto&& i : per.start_traits)
-        {
-            per.acquired_traits.push_back(i);
-        }
-        // Run their affects
-        effect::affect_traits(e, per);
-    });
-
     /** TODO: Read in data samplers from Lua */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
@@ -114,6 +103,20 @@ void ScenarioScene::initialize_simulation()
     /** Call lua init function for this scenario */
     m_scenario.init();
 
+    /** If there are any default Traits, run their affects and add them */
+    auto per_view = m_registry.view<component::Traits>();
+    per_view.each([](entt::entity e, component::Traits& traits) {
+        /** Add default traits to acquired traits */
+        for (const auto& trait : traits.start_traits)
+        {
+            traits.acquired_traits.push_back(trait);
+        }
+
+        /** Run their effects */
+        effect::affect_traits(e, traits);
+    });
+
+    /** TODO: Make rendering optional */
     /** Enforce the use of a rendering system */
     m_draw_systems.emplace_back(
         new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
@@ -128,8 +131,8 @@ void ScenarioScene::clean_simulation()
     m_data_collector.save_to_file(m_scenario.name + "_data", true);
 
     m_registry.clear();
-    m_simtime   = 0.f;
-    m_timescale = 1.f;
+    m_simtime   = 0.0;
+    m_timescale = 1;
     m_data_collector.clear();
     m_notifications.clear();
 
@@ -185,6 +188,7 @@ bool ScenarioScene::update(float dt)
     b_tex.scale        = 100;
     b_tex.material_idx = MATERIAL_IDX_NOSPEC;
 
+    /** TODO: Make this work */
     /** Draw background crudely */
     for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
     {
@@ -194,7 +198,6 @@ bool ScenarioScene::update(float dt)
         }
     }
 
-    // TODO : Move to input action response
     update_entity_hover();
 
     setup_docking_ui();
@@ -225,9 +228,9 @@ bool ScenarioScene::update(float dt)
         }
 
         /** Deal with long running tasks, then events */
+        m_scenario.update(dt);
         m_scheduler.update(dt);
         m_dispatcher.update();
-        m_scenario.update(dt);
     }
 
     /** Deal with ImGui updates once per tick */
@@ -240,7 +243,7 @@ bool ScenarioScene::update(float dt)
         system->update_imgui();
     }
 
-    /** It's supposed to be three of these here, do not change - not a bug */
+    /** It's supposed to be three (two?) of these here, do not change - not a bug */
     ImGui::End();
     ImGui::End();
 
@@ -303,7 +306,6 @@ void ScenarioScene::bind_actions_for_scene()
         }
         const auto& pos_comp = m_registry.get<component::Position>(select_helper.selected_entity);
 
-        // TODO: Steal UE4 FInterpretTo
         const auto pos =
             glm::mix(gfx::get_renderer().get_camera_position2d(), glm::vec2{pos_comp.position.x, pos_comp.position.y}, 10.f * dt);
 
@@ -345,6 +347,7 @@ void ScenarioScene::bind_actions_for_scene()
     });
 }
 
+/** TODO: Add all events that should be accessible through Lua */
 void ScenarioScene::bind_available_lua_events()
 {
     m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
@@ -372,7 +375,10 @@ void ScenarioScene::bind_scenario_lua_functions()
     component["trait"]        = entt::type_info<component::Traits>::id();
     component["inventory"]    = entt::type_info<component::Inventory>::id();
     component["name"]         = entt::type_info<component::Name>::id();
+    component["action"]       = entt::type_info<component::Action>::id();
+    component["goal"]         = entt::type_info<component::Goal>::id();
 
+/** TODO: Think about making this a loop or something */
 #define REGISTER_LUA_COMPONENT(N) component["lua" #N] = entt::type_info<component::LuaComponent<N>>::id()
     REGISTER_LUA_COMPONENT(1);
     REGISTER_LUA_COMPONENT(2);
@@ -392,6 +398,7 @@ void ScenarioScene::bind_scenario_lua_functions()
     REGISTER_LUA_COMPONENT(16);
 #undef REGISTER_LUA_COMPONENT
 
+    /** TODO: Move these functions into their own file */
     /** Get component from Lua */
     sol::table cultsim = lua.create_table("cultsim");
     cultsim.set_function("get_component", [this](sol::this_state s, entt::entity e, uint32_t id) -> sol::object {
@@ -556,6 +563,28 @@ void ScenarioScene::bind_scenario_lua_functions()
                     return sol::nil;
                 }
                 break;
+            case entt::type_info<component::Action>::id():
+                if (m_registry.try_get<component::Action>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Action>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
+            case entt::type_info<component::Goal>::id():
+                if (m_registry.try_get<component::Goal>(e))
+                {
+                    return sol::make_object(s, &m_registry.get<component::Goal>(e));
+                }
+                else
+                {
+                    spdlog::critical("target [{}] does not have that component [{}]", e, id);
+                    return sol::nil;
+                }
+                break;
             default:
                 spdlog::critical("can not find the component [{}] you are looking for", id);
                 return sol::nil;
@@ -589,6 +618,19 @@ void ScenarioScene::bind_scenario_lua_functions()
                              return sol::nil;
                          });
 
+    cultsim.set_function("get_goal",
+                         [](sol::this_state s, const sol::object& goal_lua, std::string_view goal_name) -> sol::object {
+                             const auto& goal = goal_lua.as<component::Goal>();
+                             for (const auto& i : goal.goals)
+                             {
+                                 if (i.m_name == goal_name)
+                                 {
+                                     return sol::make_object(s, &i);
+                                 }
+                             }
+                             return sol::nil;
+                         });
+
     cultsim.set_function("get_acquired_traits", [this](sol::this_state s, entt::entity e) -> sol::object {
         if (auto trait = m_registry.try_get<component::Traits>(e); trait)
         {
@@ -597,7 +639,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_acquired_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_acquired_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -621,7 +663,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         return sol::nil;
     });
 
-    cultsim.set_function("add_attainable_trait", [this](sol::this_state s, entt::entity e, sol::table sol_trait) -> void {
+    cultsim.set_function("add_attainable_trait", [this](entt::entity e, sol::table sol_trait) -> void {
         if (auto trait_c = m_registry.try_get<component::Traits>(e); trait_c)
         {
             const auto& trait = detail::get_trait(sol_trait);
@@ -637,6 +679,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         spdlog::get("lua")->warn("add_attainable_trait: the entity argument does not have the trait component");
     });
 
+    /** TODO: Add all components to all functions */
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
@@ -650,12 +693,14 @@ void ScenarioScene::bind_scenario_lua_functions()
             case entt::type_info<component::Strategy>::id(): m_registry.remove_if_exists<component::Strategy>(e); break;
             case entt::type_info<component::Health>::id(): m_registry.remove_if_exists<component::Health>(e); break;
             case entt::type_info<component::Memory>::id(): m_registry.remove_if_exists<component::Memory>(e); break;
+            case entt::type_info<component::Action>::id(): m_registry.remove_if_exists<component::Action>(e); break;
+            case entt::type_info<component::Goal>::id(): m_registry.remove_if_exists<component::Goal>(e); break;
             case entt::type_info<component::Traits>::id():
-                if (auto per = m_registry.try_get<component::Traits>(e); per)
+                if (auto traits = m_registry.try_get<component::Traits>(e); traits)
                 {
-                    effect::unaffect_traits(e, *per);
+                    effect::unaffect_traits(e, *traits);
+                    m_registry.remove<component::Traits>(e);
                 };
-                m_registry.remove_if_exists<component::Traits>(e);
                 break;
             case entt::type_info<component::Inventory>::id(): m_registry.remove_if_exists<component::Inventory>(e); break;
             default: break;
@@ -687,6 +732,10 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return sol::make_object(s, m_registry.assign_or_replace<component::Memory>(e));
             case entt::type_info<component::Inventory>::id():
                 return sol::make_object(s, m_registry.assign_or_replace<component::Inventory>(e));
+            case entt::type_info<component::Action>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Action>(e));
+            case entt::type_info<component::Goal>::id():
+                return sol::make_object(s, m_registry.assign_or_replace<component::Goal>(e));
             default: return sol::nil;
         }
     });
@@ -711,7 +760,7 @@ void ScenarioScene::bind_scenario_lua_functions()
             if (inventory->size < inventory->max_size)
             {
                 auto tags = m_registry.try_get<component::Tags>(target);
-                m_dispatcher.enqueue<event::PickedUpEntity>(event::PickedUpEntity{owner, target, tags->tags});
+                m_dispatcher.enqueue<event::EntityPickedUp>(event::EntityPickedUp{owner, target, tags->tags});
                 tags->tags = ETag(tags->tags | TAG_Inventory);
                 inventory->contents.push_back(target);
             }
@@ -767,18 +816,65 @@ void ScenarioScene::bind_scenario_lua_functions()
 
     /** Destroy entity */
     cultsim.set_function("kill", [this](entt::entity e) {
-        if (e == entt::null)
+        if (!m_registry.valid(e))
         {
-            spdlog::get("agent")->critical("trying to kill a null agent");
+            spdlog::get("agent")->critical("trying to kill an invalid agent");
             return;
         }
+
         m_registry.assign<component::Delete>(e);
-        auto tags = m_registry.try_get<component::Tags>(e);
-        if (tags)
+        if (auto tags = m_registry.try_get<component::Tags>(e); tags)
         {
             tags->tags = static_cast<ETag>(tags->tags | ETag::TAG_Delete);
         }
     });
+
+    /** Move to position */
+    cultsim.set_function("move_to", [this](entt::entity e, glm::vec3 goal) {
+        auto&& [movement, position] = m_registry.try_get<component::Movement, component::Position>(e);
+        if (movement && position)
+        {
+            if (!ai::find_path_astar(position->position, goal, movement->desired_position, m_scenario.bounds))
+            {
+                spdlog::get("agent")->debug("could not create path to target");
+            };
+        }
+    });
+
+    cultsim.set_function("distance", [](glm::vec3 a, glm::vec3 b) { return glm::distance(a, b); });
+
+    cultsim.set_function("entity_distance", [this](sol::this_state s, entt::entity a, entt::entity b) -> sol::object {
+        const auto pos_a = m_registry.try_get<component::Position>(a);
+        const auto pos_b = m_registry.try_get<component::Position>(b);
+        if (pos_a && pos_b)
+        {
+            return sol::make_object(s, glm::distance(pos_a->position, pos_b->position));
+        }
+        return sol::nil;
+    });
+
+    cultsim.set_function("has_tags", [this](entt::entity e, ETag tags) {
+        if (auto t_comp = m_registry.try_get<component::Tags>(e); t_comp)
+        {
+            return (t_comp->tags & tags) == tags;
+        }
+
+        spdlog::get("default")->error("The entity does not have a tag component.");
+        return false;
+    });
+
+    cultsim.set_function("set_tags", [this](entt::entity e, ETag tags) {
+        if (auto t_comp = m_registry.try_get<component::Tags>(e); t_comp)
+        {
+            t_comp->tags = ETag(t_comp->tags | tags);
+        }
+        spdlog::get("default")->error("The entity does not have a tag component.");
+        return false;
+    });
+
+    cultsim.set_function("has_set_flags", [](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
+
+    cultsim.set_function("set_flags", [](gob::Action& action, uint32_t flags) { action.m_flags |= flags; });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });
@@ -794,15 +890,16 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             if (!m_rng.trigger(rc_m->fertility) || !m_rng.trigger(rc_f->fertility))
             {
-                // N0 pregnancy
+                /** No pregnancy */
                 return;
             }
             if (auto* again = m_registry.try_get<component::Pregnancy>(mother); again)
             {
-                // Can't get pregnant twice
+                /** Can't get pregnant twice */
                 return;
             }
             cs::component::Pregnancy* preg;
+            /** TODO: Make function */
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
                 preg = &m_registry.assign<component::Pregnancy>(mother);
@@ -844,10 +941,11 @@ void ScenarioScene::bind_scenario_lua_functions()
                 {
                     preg->gestation_period = rc_f->average_gestation_period;
                 }
-                // Here the incubator is the dad
+                /** Here the incubator is the dad */
                 preg->parents.second = mother;
                 preg->parents.first  = father;
             }
+
             if (preg->children_in_pregnancy < 1)
             {
                 preg->children_in_pregnancy = 1;
@@ -907,7 +1005,7 @@ void ScenarioScene::draw_scenario_information_ui()
     ImGui::Spacing();
     ImGui::TextColored({0.0, 0.749, 1., 1.}, "FPS: %5.1f", ImGui::GetIO().Framerate);
     ImGui::SameLine();
-    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.view<component::Tags>().size()));
+    ImGui::TextColored({0.0, 0.98, 0.604, 1.0}, "Entities: %u", static_cast<uint32_t>(m_registry.size()));
     ImGui::SameLine();
     if (m_paused)
     {
@@ -1015,8 +1113,11 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [needs, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
-        m_registry.try_get<component::Need,
+    const auto& [name, needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
+        m_registry.try_get<component::Name,
+                           component::Need,
+                           component::Goal,
+                           component::Action,
                            component::Health,
                            component::Strategy,
                            component::Reproduction,
@@ -1031,8 +1132,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
     ImGui::Begin("Agent Information");
 
-    auto name = m_registry.try_get<component::Name>(selection_info.selected_entity);
-    if (name && name->name != "")
+    if (name && !name->name.empty())
     {
         auto text = fmt::format("{} [ID: {}]", name->name, static_cast<int64_t>(selection_info.selected_entity));
         ImGui::Text("%s", text.c_str());
@@ -1057,22 +1157,16 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (reproduction)
     {
-        if (preg && preg->is_egg)
-        {
-            ImGui::Text("I am hatching an egg");
-        }
-        else
-        {
-            ImGui::Text("I am a %s, and I have %d children.",
-                        (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
-                        reproduction->number_of_children);
-        }
+        ImGui::Text("I am a %s, and I have %d children.",
+                    (reproduction->sex == component::Reproduction::ESex::Male ? "Male" : "Female"),
+                    reproduction->number_of_children);
     }
 
     if (preg)
     {
         if (preg->is_egg)
         {
+            ImGui::Text("I am an egg");
             ImGui::ProgressBar(preg->time_since_start / preg->gestation_period, {-1, 0}, "Hatching");
         }
         else
@@ -1113,7 +1207,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
             ImGui::TableSetupColumn("Needs:");
             ImGui::TableSetupColumn("Status:");
 
-            // Non-clickable headers
+            /** Non-clickable headers */
             cs_auto_table_headers();
 
             for (const auto& need : needs->needs)
@@ -1124,6 +1218,57 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("%3.1f", need.status);
             }
             ImGui::EndTable();
+        }
+    }
+
+    if (goal)
+    {
+        if (ImGui::BeginTable("Entity Goals", 2))
+        {
+            ImGui::TableSetupColumn("Goals:");
+            ImGui::TableSetupColumn("Weight:");
+
+            /** Non-clickable headers */
+            cs_auto_table_headers();
+
+            for (const auto& goal_t : goal->goals)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text("%s", goal_t.m_name.c_str());
+                ImGui::TableNextCell();
+                if (goal_t.m_weight_function.index() == 0)
+                {
+                    ImGui::Text("%3.1f", std::get<sol::function>(goal_t.m_weight_function)(goal_t).get<float>());
+                }
+                else
+                {
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.m_weight_function)());
+                }
+            }
+            ImGui::EndTable();
+        }
+    }
+
+    if (action)
+    {
+        if (action->current_action_sequence.m_name.empty())
+        {
+            ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
+            if (action->current_action_sequence.current_action.name.empty())
+            {
+                int action_index = 0;
+                for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
+                {
+                    if (action->current_action_sequence.m_actions[i] == action->current_action_sequence.current_action)
+                    {
+                        action_index = i;
+                    }
+                }
+                ImGui::Text("Current Action: %s (Action %d out of %zu)",
+                            action->current_action_sequence.current_action.name.c_str(),
+                            action_index + 1,
+                            action->current_action_sequence.m_actions.size());
+            }
         }
     }
 
@@ -1159,31 +1304,26 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (relship)
     {
-        system::Relationship* test;
-        for (auto&& system : m_active_systems)
-        {
-            const auto rel = dynamic_cast<system::Relationship*>(system.get());
-            if (rel)
-            {
-                const auto parents = rel->get_parent(selection_info.selected_entity);
-                if (parents.mom.ids.relationship_registry_id != entt::null)
-                {
-                    ImGui::Text("My Mom is %s (%d)", parents.mom.name.c_str(), parents.mom.ids.global_registry_id);
-                }
-                else
-                {
-                    ImGui::Text("My Mom is the Simulation");
-                }
-                if (parents.dad.ids.relationship_registry_id != entt::null)
-                {
-                    ImGui::Text("My Dad is %s (%d)", parents.dad.name.c_str(), parents.dad.ids.global_registry_id);
-                }
+        const auto parents =
+            m_context->lua_state["cultsim"]["get_parents"](selection_info.selected_entity).get<system::BothParentName>();
 
-                else
-                {
-                    ImGui::Text("My Dad is the Simulation");
-                }
-            }
+        if (parents.mom.ids.relationship != entt::null)
+        {
+            ImGui::Text("My Mom is %s (%u)", parents.mom.name.c_str(), static_cast<uint32_t>(parents.mom.ids.global));
+        }
+        else
+        {
+            ImGui::Text("My Mom is the Simulation");
+        }
+
+        if (parents.dad.ids.relationship != entt::null)
+        {
+            ImGui::Text("My Dad is %s (%u)", parents.dad.name.c_str(), static_cast<uint32_t>(parents.dad.ids.global));
+        }
+
+        else
+        {
+            ImGui::Text("My Dad is the Simulation");
         }
     }
 
@@ -1217,12 +1357,6 @@ void ScenarioScene::update_entity_hover()
     {
         m_registry.assign<entt::tag<"hovered"_hs>>(selection_helper.hovered_entity);
     }
-
-    ImGui::Text("Screen: %d | %d", cursor_pos.x, cursor_pos.y);
-    ImGui::Text("World: %.2f | %.2f | %.2f", world_pos.x, world_pos.y, world_pos.z);
-    ImGui::Text("Hovering: %u | Selected: %u",
-                static_cast<uint32_t>(selection_helper.hovered_entity),
-                static_cast<uint32_t>(selection_helper.selected_entity));
 }
 
 void ScenarioScene::handle_preference_changed(const Preference& before, const Preference& after)

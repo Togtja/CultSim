@@ -3,15 +3,15 @@
 #include "filesystem/filesystem.h"
 #include "l10n/lang_manager.h"
 
-
 #include <algorithm>
+#include <utility>
 
 #include <gfx/ImGUI/imgui.h>
 
-#include <utility>
-
 namespace cs
 {
+/** TODO: Add comments?*/
+
 void LocaleEditor::init(sol::state_view lua)
 {
     auto locales = fs::list_directory("l10n");
@@ -37,6 +37,8 @@ void LocaleEditor::init(sol::state_view lua)
         }
     }
 }
+
+/** TODO: Add Comments? */
 
 void LocaleEditor::show()
 {
