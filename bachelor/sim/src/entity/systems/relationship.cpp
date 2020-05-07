@@ -346,11 +346,6 @@ bool Relationship::is_family(entt::entity me, entt::entity other, unsigned gen, 
     return false;
 }
 
-bool Relationship::is_family_local(entt::entity me, entt::entity other, unsigned gen)
-{
-    return false;
-}
-
 void Relationship::update(float dt)
 {
 }
