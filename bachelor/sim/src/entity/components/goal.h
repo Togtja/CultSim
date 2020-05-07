@@ -9,8 +9,8 @@
 
 namespace cs::gob
 {
-/** TODO: Write Documentation*/
 /** TODO: Rename all names*/
+
 /**
  * A Goal is an abstract concept representing a entities desire to fullfill a certain need, which is used by the Goal system
  *

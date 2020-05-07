@@ -7,8 +7,6 @@
 
 namespace cs::ai
 {
-/** TODO: Add documentation */
-
 /**
  * A need represents the desire of an entity to do something, or more precisely, to fullfill a craving
  *
