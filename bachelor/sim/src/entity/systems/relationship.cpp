@@ -46,10 +46,10 @@ void Relationship::initialize()
 
     cultsim.set_function("get_children", [this](entt::entity e) { return get_children(e); });
 
-    cultsim.set_function("is_family", [this](entt::entity e, entt::entity other) -> bool { is_family(e, other); });
+    cultsim.set_function("is_family", [this](entt::entity e, entt::entity other) -> bool { return is_family(e, other); });
 
     cultsim.set_function("is_family_gen",
-                         [this](entt::entity e, entt::entity other, unsigned gen) -> bool { is_family(e, other, gen); });
+                         [this](entt::entity e, entt::entity other, unsigned gen) -> bool { return is_family(e, other, gen); });
 };
 
 void Relationship::deinitialize()
