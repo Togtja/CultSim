@@ -40,13 +40,12 @@ void bind_systems(sol::state_view lua);
 void bind_utils(sol::state_view lua);
 
 /**
- * Custom exception handler for our lua state
- * TODO: Documentation:
+ * Custom exception and error handler for our lua state
  *
  * @param L The lua state
- * @param maybe_exception
- * @param description
- * @return int
+ * @param maybe_exception Container for what could be an exception or just a lua error
+ * @param description The description of the error or exception
+ * @return int Stack index or error message
  */
 int exception_handler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description);
 } // namespace cs::lua
