@@ -147,11 +147,41 @@ public:
     /**
      * Get the name and ids of an entity's parents
      *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
      * @param e The entity you want to get the parents of
      * @param is_local_ids True if the entity is from the local registry, false if it is from the global registry
      * @return The struct BothParentName that include the name, local- and global entity ids
      */
-    ParentsName get_parents(entt::entity e, bool is_local_ids = false);
+    ParentsName get_parents(entt::entity e, bool is_local_id = false);
+
+    /**
+     * Get the entity's children as a vector of EntityNameAndIds
+     *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
+     * @param e The entity you want to get the children of
+     * @param is_local_id True if the entity is from the local registry, false if it is from the global registry
+     * @return A vector of the children's name and ids
+     */
+    std::vector<EntityNameAndIds> get_children(entt::entity e, bool is_local_id = false);
+
+    /**
+     * Check if someone is related to you within n generations
+     *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
+     * @note Gen is generations, so if you set it to 1 it will find your parents and your children.
+     * Set it to 2, and it will find your parents and children and their parents and children. Aka Siblings, grand parents and
+     * grand-children. Set it to 3 and it will find your parents and children and their parents and children and their parent and
+     * children, giving you aunts and uncles. Set it to 4 you will get cousin as well.
+     *
+     * @warning higher gen number exponentially increases compute time
+     *
+     * @param me The entity that is you
+     * @param other The entity you want to see if you are related too
+     * @param gen How distant family members you want to check (Default is 3 generations, see note)
+     * @param is_local_ids True if the entity is from the local registry, false if it is from the global registry
+     * @return True if the other entity is related to you within the set range, otherwise false
+     */
+    bool is_family(entt::entity me, entt::entity other, unsigned gen = 3, bool is_local_id = false);
 
     void update(float dt) override;
 
