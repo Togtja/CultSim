@@ -2,7 +2,7 @@
 #include "common_helpers.h"
 #include "editor_scene.h"
 #include "entity/scenario.h"
-#include "loadsenario_scene.h"
+#include "loadscenario_scene.h"
 #include "preference_scene.h"
 #include "preferences.h"
 #include "scenario_scene.h"

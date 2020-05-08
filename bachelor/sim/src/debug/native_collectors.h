@@ -91,7 +91,7 @@ public:
 
     float execute() override
     {
-        return m_data["execute"]();
+        return m_data["execute"](m_data).get<float>();
     }
 
     std::string_view get_name() override
