@@ -10,13 +10,12 @@ namespace cs
 {
 static void set_children_in_pregnancy(entt::registry& reg,
                                       RandomEngine& rng,
-                                      component::Pregnancy& preg,
                                       component::Reproduction& incubator,
                                       component::Reproduction& non_incubator,
                                       entt::entity incubator_e,
                                       entt::entity non_incubator_e)
 {
-    preg = reg.assign<component::Pregnancy>(incubator_e);
+    component::Pregnancy& preg = reg.assign<component::Pregnancy>(incubator_e);
     if (incubator.children_deviation > 0)
     {
         preg.children_in_pregnancy = std::round(rng.normal(incubator.mean_children_pp, incubator.children_deviation));
@@ -36,6 +35,11 @@ static void set_children_in_pregnancy(entt::registry& reg,
     }
     preg.parents.incubator     = incubator_e;
     preg.parents.non_incubator = non_incubator_e;
+
+    if (preg.children_in_pregnancy < 1)
+    {
+        preg.children_in_pregnancy = 1;
+    }
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
@@ -561,19 +565,13 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return;
             }
 
-            component::Pregnancy preg;
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
-                set_children_in_pregnancy(m_registry, m_rng, preg, *rc_m, *rc_f, mother, father);
+                set_children_in_pregnancy(m_registry, m_rng, *rc_m, *rc_f, mother, father);
             }
             else
             {
-                set_children_in_pregnancy(m_registry, m_rng, preg, *rc_f, *rc_m, father, mother);
-            }
-
-            if (preg.children_in_pregnancy < 1)
-            {
-                preg.children_in_pregnancy = 1;
+                set_children_in_pregnancy(m_registry, m_rng, *rc_f, *rc_m, father, mother);
             }
         }
     });
