@@ -8,7 +8,6 @@
 
 namespace cs::system
 {
-/** TODO: Documentation */
 /**
  * The Memory system creates new memories, keeps the list of memories sorted, and deletes old irrelevant memories
  *
@@ -63,8 +62,10 @@ private:
     /**
      * update_memories is triggered by outside systems to add new memories
      *
-     * When the system recieves a CreatedMemory event it will use the memory stored in the event tho either create a new memory or
+     * When the system receives a CreatedMemory event it will use the memory stored in the event tho either create a new memory or
      * update an existing one, based on how far away from the location of other memories we are.
+     *
+     * @param event The event that triggers the function
      */
     void update_memories(const event::CreatedMemory& event);
 };
