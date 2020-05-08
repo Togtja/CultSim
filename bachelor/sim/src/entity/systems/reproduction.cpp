@@ -123,7 +123,7 @@ void Reproduction::spawn_children(const std::vector<Child>& children)
             egg_time.lays_eggs = false;
 
             egg_hatching.children_in_pregnancy = 1;
-            egg_hatching.parents.first         = child.parents.first;
+            egg_hatching.parents.incubator     = child.parents.;
             egg_hatching.parents.second        = child.parents.second;
             egg_hatching.is_egg                = true;
 
@@ -155,12 +155,12 @@ void Reproduction::spawn_children(const std::vector<Child>& children)
             }
 
             /** Tries to inherit mom's acquired traits */
-            inherit_traits(*traits, child.parents.first);
+            inherit_traits(*traits, child.parents.incubator);
 
-            if (m_context.registry->valid(child.parents.second))
+            if (m_context.registry->valid(child.parents.non_incubator))
             {
                 /** Tries to inherit dad's acquired traits */
-                inherit_traits(*traits, child.parents.second);
+                inherit_traits(*traits, child.parents.non_incubator);
             }
 
             /** Make our list unique */
@@ -173,8 +173,8 @@ void Reproduction::spawn_children(const std::vector<Child>& children)
 
         if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
         {
-            rel_c->mom.global = child.parents.first;
-            rel_c->dad.global = child.parents.second;
+            rel_c->mom.global = child.parents.incubator;
+            rel_c->dad.global = child.parents.non_incubator;
         }
     }
 }

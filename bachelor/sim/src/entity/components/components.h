@@ -310,17 +310,20 @@ struct Name
     std::string name{};
 };
 
-/** TODO: Make stuff into struct to differentiate between mother and father */
 /** Component which keeps track of a pregnancy */
 struct Pregnancy
 {
-    using ParentsPair = std::pair<entt::entity, entt::entity>;
+    struct Parents
+    {
+        entt::entity incubator;
+        entt::entity non_incubator;
+    };
 
     float time_since_start{};
     float gestation_period{};
 
     /** First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad) */
-    ParentsPair parents{entt::null, entt::null};
+    Parents parents{entt::null, entt::null};
 
     uint16_t children_in_pregnancy{};
 
