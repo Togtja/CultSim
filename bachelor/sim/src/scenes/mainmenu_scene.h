@@ -6,8 +6,12 @@
 
 namespace cs
 {
+/** Fwd declaration */
 struct Preference;
-/** TODO: Documentation */
+
+/**
+ * Scene that acts as the main entry point to the program and let users start simulations or change preferences
+ */
 class MainMenuScene : public IScene
 {
 private:
@@ -27,6 +31,7 @@ public:
     bool draw() override;
 
 private:
+    /** Handle event for resolution changes to keep menu centered */
     void handle_size_changed(const Preference& before, const Preference& after);
 };
 } // namespace cs

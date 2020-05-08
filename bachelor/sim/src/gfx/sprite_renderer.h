@@ -12,7 +12,9 @@
 
 namespace cs::gfx
 {
-/** TODO: Documentation */
+/**
+ * Organizes resources and draw calls related to sprite rendering
+ */
 class SpriteRenderer
 {
 private:
@@ -21,6 +23,7 @@ private:
 
     Camera& m_camera;
 
+    /** Vertex array describing layout for all sprites */
     uint32_t m_vao{};
 
     /** Template VBO */
@@ -87,14 +90,23 @@ public:
     SpriteTextureID get_texture(const std::string& rpath, const std::string& nrpath = {});
 
 private:
+    /**
+     * Increment the texture ID so the next loaded texture get's a unique one
+     *
+     * @return True if there are room for more textures, false if we are full
+     */
     bool increment_next_texture_id();
 
+    /** Initialize VBO's and the VAO */
     void init_vbo_and_vao();
 
+    /** Load and compile the shader */
     void init_shader();
 
+    /** Load and prepare color + normal textures */
     void init_texture_slots();
 
+    /** Init uniform buffer objects */
     void init_ubos();
 };
 

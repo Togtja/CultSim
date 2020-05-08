@@ -42,35 +42,33 @@ struct EntitySelectionHelper
     entt::entity selected_entity{entt::null};
 };
 /**
- * TODO: Document
+ * Count number of set bits in a uint
  *
- * @param x
- * @return unsigned
+ * @param i The integer to count
+ * @return The number of set bits in the integer
  */
-unsigned count_set_bits(uint64_t x);
+unsigned count_set_bits(uint64_t i);
 
 /**
- * TODO: Document
+ * Check if two positions are within the threshold of each other
  *
- * @param pos
- * @param pos2
- * @param threshold
- * @return true
- * @return false
+ * @param pos The first position
+ * @param pos2 The second position
+ * @param threshold The distance within which the two positions are considered close enough
+ * @return True if pos and pos2 are close enough to each other
  */
 bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold);
 
 /**
- * TODO: Document
+ * Computes the sigmoid function of x
  *
- * @param x
- * @return float
+ * @param i The number to compute on
+ * @return float The sigmoid
  */
-float sigmoid(const float x);
+float sigmoid(const float i);
 
 /**
- * TODO: Document
- *
+ * Creates headers for ImGui tables like ImGui::AutoTableHeaders, except with non-clickable or hoverable cells
  */
 void cs_auto_table_headers();
 } // namespace cs
