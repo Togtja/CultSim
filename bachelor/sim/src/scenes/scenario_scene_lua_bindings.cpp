@@ -282,7 +282,7 @@ void ScenarioScene::bind_scenario_lua_functions()
                              const auto& goal = goal_lua.as<component::Goal>();
                              for (const auto& i : goal.goals)
                              {
-                                 if (i.m_name == goal_name)
+                                 if (i.name == goal_name)
                                  {
                                      return sol::make_object(s, &i);
                                  }

@@ -9,8 +9,6 @@
 
 namespace cs::gob
 {
-/** TODO: Rename all names*/
-
 /**
  * A Goal is an abstract concept representing a entities desire to fullfill a certain need, which is used by the Goal system
  *
@@ -23,19 +21,20 @@ struct Goal
     using WeightFunction = std::variant<sol::function, std::function<float()>>;
     using GoalFunction   = std::variant<sol::function, std::function<float(const float)>>;
 
-    std::string m_name{};
-    ETag m_tags{};
+    std::string name{};
+
+    ETag tags{};
 
     /** How long the goal has existed for without being fullfilled. Successfully fullfilling the goal resets this to 0 */
-    float m_age{};
+    float age{};
 
     /**
      * weight_function returns how the weight of the goal. This may be user implemented via lua
      *
      * @return The weight of the goal. This is equal to age by default
      */
-    WeightFunction m_weight_function = [this]() {
-        return m_age;
+    WeightFunction weight_function = [this]() {
+        return age;
     };
 
     /**
@@ -45,7 +44,7 @@ struct Goal
      *
      * @return The change in weight over the period of time send in. By default this is equal to time spent
      */
-    GoalFunction m_change_over_time = [this](const float dt) {
+    GoalFunction change_over_time = [this](const float dt) {
         return dt;
     };
 
@@ -56,7 +55,7 @@ struct Goal
      *
      * @return How dissatisfying the new value is for this goal. Default is the value squared.
      */
-    GoalFunction m_get_discontentment = [this](const float new_value) {
+    GoalFunction get_discontentment = [this](const float new_value) {
         return pow(new_value, 2.f);
     };
 };

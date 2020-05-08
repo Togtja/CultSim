@@ -2,9 +2,9 @@
 #include "common_helpers.h"
 #include "filesystem/filesystem.h"
 #include "input/input_handler.h"
+#include "preferences.h"
 #include "scenario_scene.h"
 #include "scene_manager.h"
-#include "preferences.h"
 
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>

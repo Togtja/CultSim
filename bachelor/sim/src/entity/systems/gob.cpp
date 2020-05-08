@@ -42,13 +42,13 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
     for (auto goal : goals)
     {
         auto value = 0.f;
-        if (goal.m_weight_function.index() == 0)
+        if (goal.weight_function.index() == 0)
         {
-            value += std::get<sol::function>(goal.m_weight_function)(goal).get<float>();
+            value += std::get<sol::function>(goal.weight_function)(goal).get<float>();
         }
         else
         {
-            value += std::get<std::function<float()>>(goal.m_weight_function)();
+            value += std::get<std::function<float()>>(goal.weight_function)();
         }
 
         if (action.m_get_goal_change.index() == 0)
@@ -72,22 +72,22 @@ float GOB::calculate_discontentment(entt::entity e, const gob::ActionSequence& a
                 std::get<std::function<float(const gob::ActionSequence&, entt::entity)>>(action.m_get_duration)(action, e);
         }
 
-        if (goal.m_change_over_time.index() == 0)
+        if (goal.change_over_time.index() == 0)
         {
-            value += std::get<sol::function>(goal.m_change_over_time)(goal, time_value).get<float>();
+            value += std::get<sol::function>(goal.change_over_time)(goal, time_value).get<float>();
         }
         else
         {
-            value += std::get<std::function<float(const float)>>(goal.m_change_over_time)(time_value);
+            value += std::get<std::function<float(const float)>>(goal.change_over_time)(time_value);
         }
 
-        if (goal.m_get_discontentment.index() == 0)
+        if (goal.get_discontentment.index() == 0)
         {
-            discontentment += std::get<sol::function>(goal.m_get_discontentment)(value).get<float>();
+            discontentment += std::get<sol::function>(goal.get_discontentment)(value).get<float>();
         }
         else
         {
-            discontentment += std::get<std::function<float(const float)>>(goal.m_get_discontentment)(value);
+            discontentment += std::get<std::function<float(const float)>>(goal.get_discontentment)(value);
         }
     }
     return discontentment;

@@ -109,17 +109,17 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<gob::Goal>("Goal",
                                 "name",
-                                &gob::Goal::m_name,
+                                &gob::Goal::name,
                                 "tags",
-                                &gob::Goal::m_tags,
+                                &gob::Goal::tags,
                                 "age",
-                                &gob::Goal::m_age,
+                                &gob::Goal::age,
                                 "weight_function",
-                                &gob::Goal::m_weight_function,
+                                &gob::Goal::weight_function,
                                 "change_over_time",
-                                &gob::Goal::m_change_over_time,
+                                &gob::Goal::change_over_time,
                                 "get_discontentment",
-                                &gob::Goal::m_get_discontentment);
+                                &gob::Goal::get_discontentment);
 
     lua.new_usertype<gob::ActionSequence>("ActionSequence",
                                           "name",

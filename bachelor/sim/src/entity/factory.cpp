@@ -150,7 +150,7 @@ bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table tabl
                 action.m_get_duration = action_table["get_duration"].get<sol::function>();
             }
 
-            action_sequence.m_actions.push_back(action);
+            action_sequence.actions.push_back(action);
         }
 
         if (action_sequence_table["run_actions"].get_type() == sol::type::function)
@@ -183,15 +183,15 @@ bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table)
             gob::Goal{goal_table["name"].get<std::string>(), goal_table["tags"].get<ETag>(), goal_table["age"].get<float>()};
         if (goal_table["weight_function"].get_type() == sol::type::function)
         {
-            goal.m_weight_function = goal_table["weight_function"].get<sol::function>();
+            goal.weight_function = goal_table["weight_function"].get<sol::function>();
         }
         if (goal_table["change_over_time"].get_type() == sol::type::function)
         {
-            goal.m_change_over_time = goal_table["change_over_time"].get<sol::function>();
+            goal.change_over_time = goal_table["change_over_time"].get<sol::function>();
         }
         if (goal_table["get_discontentment"].get_type() == sol::type::function)
         {
-            goal.m_get_discontentment = goal_table["get_discontentment"].get<sol::function>();
+            goal.get_discontentment = goal_table["get_discontentment"].get<sol::function>();
         }
         goal_comp.goals.push_back(goal);
     }

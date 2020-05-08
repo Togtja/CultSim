@@ -18,7 +18,7 @@ void Reproduction::update(float dt)
 
         if (preg.time_since_start >= preg.gestation_period)
         {
-            const auto parent_name = m_context.registry->get<component::Meta>(e).name;
+            const auto parent_name = m_context.registry->get<component::Meta>(e).entity_path;
 
             for (int i = 0; i < preg.children_in_pregnancy; i++)
             {
@@ -138,7 +138,7 @@ void Reproduction::spawn_children(const std::vector<Child>& children)
             }
 
             /** Makes sure the eggs spawn the parent type */
-            m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
+            m_context.registry->get<component::Meta>(child_e).entity_path = child.parent_type;
             return;
         }
         m_context.dispatcher->enqueue<event::EntityBorn>(event::EntityBorn{child_e});
