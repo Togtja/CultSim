@@ -89,6 +89,8 @@ void bind_components(sol::state_view lua)
                                &ai::Need::weight,
                                "status",
                                &ai::Need::status,
+                               "treshhold",
+                               &ai::Need::threshhold,
                                "decay_rate",
                                &ai::Need::decay_rate,
                                "vitality",

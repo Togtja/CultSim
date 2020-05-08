@@ -26,6 +26,9 @@ struct Need
     /** What the current status of the need is ranging from 1 (fullfilled) to 0 (unfullfilled) */
     float status{};
 
+    /** The threshhold at which the need will be added to vital needs */
+    float threshhold{};
+
     /** How much fullfillment a need looses every second */
     float decay_rate{};
 
