@@ -304,7 +304,6 @@ void ScenarioScene::bind_scenario_lua_functions()
         spdlog::get("lua")->warn("add_attainable_trait: the entity argument does not have the trait component");
     });
 
-    /** TODO: Add all components to all functions */
     cultsim.set_function("remove_component", [this](entt::entity e, uint32_t id) {
         switch (id)
         {
@@ -531,8 +530,9 @@ void ScenarioScene::bind_scenario_lua_functions()
                 /** Can't get pregnant twice */
                 return;
             }
+
             cs::component::Pregnancy* preg;
-            /** TODO: Make function */
+            /** TODO: Make function Tomas the reproduction sexologist */
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
                 preg = &m_registry.assign<component::Pregnancy>(mother);
