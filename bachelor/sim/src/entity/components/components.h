@@ -313,20 +313,29 @@ struct Name
 /** Component which keeps track of a pregnancy */
 struct Pregnancy
 {
+    /** Struct of who is the parents in a pregnancy*/
     struct Parents
     {
+        /** The incubator typically the mom/female */
         entt::entity incubator;
+
+        /** The non-incubator typically the dad/male */
         entt::entity non_incubator;
     };
 
+    /** Time since the start of the pregnancy */
     float time_since_start{};
+
+    /** How long the pregnancy will last */
     float gestation_period{};
 
     /** First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad) */
     Parents parents{entt::null, entt::null};
 
+    /** The amount of children in the pregnancy (aka twins etc) */
     uint16_t children_in_pregnancy{};
 
+    /** If the pregnancy it self is an egg hatching */
     bool is_egg{false};
 };
 
