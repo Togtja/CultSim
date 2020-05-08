@@ -20,7 +20,6 @@ void Requirement::deinitialize()
     m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Requirement::remove_requirements>(*this);
 }
 
-/** TODO: Make requirements into their own functions */
 void Requirement::update(float dt)
 {
     CS_AUTOTIMER(Requirement System);
