@@ -29,7 +29,7 @@ scenario.sampling_rate = 1.0;
 -- This function is called before starting the simulation, once
 scenario.init = function()
     -- Spawn Boids
-    for i=1,2 do
+    for i=1,20 do
         local boid = cultsim.spawn("boid")      
         local boid_comp = cultsim.get_component(boid, component.lua1)  
         boid_comp.velocity.x = random:uniform(-1.0, 1.0)
