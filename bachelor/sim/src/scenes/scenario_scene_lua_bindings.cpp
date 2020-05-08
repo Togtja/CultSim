@@ -534,9 +534,9 @@ void ScenarioScene::bind_scenario_lua_functions()
         return false;
     });
 
-    cultsim.set_function("has_set_flags", [](gob::Action& action, uint32_t flags) { return (action.m_flags & flags) == flags; });
+    cultsim.set_function("has_set_flags", [](gob::Action& action, uint32_t flags) { return (action.flags & flags) == flags; });
 
-    cultsim.set_function("set_flags", [](gob::Action& action, uint32_t flags) { action.m_flags |= flags; });
+    cultsim.set_function("set_flags", [](gob::Action& action, uint32_t flags) { action.flags |= flags; });
 
     /** Check entity validity */
     cultsim.set_function("is_valid", [this](entt::entity e) { return m_registry.valid(e); });

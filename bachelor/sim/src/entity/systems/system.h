@@ -61,9 +61,18 @@ public:
      */
     virtual void deinitialize(){};
 
-    /** TODO: Give definition what these two are supposed to do */
+    /**
+     * Called every tick of the simulation to let individual systems update and apply behaviour
+     *
+     * @note Not implementing this function is likely an error, but doesn't have to be
+     *
+     * @param dt Delta time since last frame
+     */
     virtual void update(float dt) = 0;
 
+    /**
+     * Override in derived if you need to draw any GUI for the system to configure it
+     */
     virtual void update_imgui(){};
 
     /**

@@ -13,8 +13,6 @@
 
 namespace cs::gob
 {
-/** TODO: Change variable names*/
-
 /**
  * ActionSequence is a Container which holds a series of actions to be executed sequentially
  *
@@ -32,13 +30,17 @@ struct ActionSequence
     using DurationFunction   = std::variant<sol::function, std::function<float(const ActionSequence&, entt::entity e)>>;
 
 public:
-    std::string m_name{};
-    ETag m_tags{};
+    /** Name of the sequence */
+    std::string name{};
+
+    /** Tags associated with this action sequence */
+    ETag tags{};
 
     /** The action currently being executed */
     Action current_action;
 
-    std::vector<Action> m_actions{};
+    /** Actions that are a part of this action sequence */
+    std::vector<Action> actions{};
 
     /**
      * run_actions runs every frame to execute the current action, and upon completion move on to the next action.
@@ -60,23 +62,23 @@ public:
         auto& self = *pself;
 
         /**As long as we have not completed our action, keep working on it*/
-        const auto finished = self.current_action.m_action(self.current_action, e, *error);
+        const auto finished = self.current_action.action(self.current_action, e, *error);
 
         /**We cannot complete the action*/
         if (!error->empty())
         {
-            if (self.current_action == self.m_actions.back())
+            if (self.current_action == self.actions.back())
             {
                 return false;
             }
             else
             {
-                for (int i = self.m_actions.size() - 1; i >= 0; i--)
+                for (int i = self.actions.size() - 1; i >= 0; i--)
                 {
-                    if (self.m_actions[i] == self.current_action)
+                    if (self.actions[i] == self.current_action)
                     {
-                        self.current_action.m_flags = 0;
-                        self.current_action         = self.m_actions[i + 1];
+                        self.current_action.flags = 0;
+                        self.current_action       = self.actions[i + 1];
                     }
                 }
                 error->clear();
@@ -86,11 +88,11 @@ public:
         /**We have completed the action*/
         else if (finished)
         {
-            if (self.current_action == self.m_actions.front())
+            if (self.current_action == self.actions.front())
             {
                 return true;
             }
-            const auto itr      = std::find(self.m_actions.rbegin(), self.m_actions.rend(), self.current_action);
+            const auto itr      = std::find(self.actions.rbegin(), self.actions.rend(), self.current_action);
             self.current_action = *(itr + 1);
         }
         return false;
@@ -111,9 +113,9 @@ public:
      */
     GoalChangeFunction m_get_goal_change = [](const ActionSequence& action_sequence, const Goal& goal) {
         float result = 0;
-        for (const auto& action : action_sequence.m_actions)
+        for (const auto& action : action_sequence.actions)
         {
-            result += action.m_get_goal_change(goal).get<float>();
+            result += action.get_goal_change(goal).get<float>();
         }
         return result;
     };
@@ -132,7 +134,7 @@ public:
      */
     DurationFunction m_get_duration = [](const ActionSequence& action_sequence, const entt::entity e) {
         float result = 0.0;
-        for (const auto& action : action_sequence.m_actions)
+        for (const auto& action : action_sequence.actions)
         {
             if (action.m_get_duration.index() == 0)
             {

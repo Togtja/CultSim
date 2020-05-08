@@ -10,7 +10,7 @@ void GOB::update(float dt)
 
     auto view = m_context.registry->view<component::Goal, component::Action>();
     view.each([this](entt::entity e, const component::Goal& goal, component::Action& action) {
-        if (action.current_action_sequence.m_name.empty())
+        if (action.current_action_sequence.name.empty())
         {
             auto best_action = action.actions[0];
             auto best_value  = calculate_discontentment(e, action.actions[0], goal.goals);
@@ -25,7 +25,7 @@ void GOB::update(float dt)
             }
 
             action.current_action_sequence                = best_action;
-            action.current_action_sequence.current_action = action.current_action_sequence.m_actions.back();
+            action.current_action_sequence.current_action = action.current_action_sequence.actions.back();
         }
     });
 }
