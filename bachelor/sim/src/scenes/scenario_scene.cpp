@@ -43,13 +43,16 @@ extern ImFont* g_light_font;
 
 namespace cs
 {
-ScenarioScene::ScenarioScene(std::string_view scenario, uint32_t random_seed) : m_rng(RandomEngine(random_seed))
+ScenarioScene::ScenarioScene(std::string_view scenario, const lua::ScenarioLoadPreferences& preferences) :
+    m_scenario_preferences(preferences)
 {
     m_scenario.script_path = scenario;
 }
 
 void ScenarioScene::initialize_simulation()
 {
+    m_rng = RandomEngine(m_scenario_preferences.seed);
+
     /** Run all initialization functions from Lua and required once for this scenario */
     bind_actions_for_scene();
     bind_available_lua_events();
@@ -70,7 +73,6 @@ void ScenarioScene::initialize_simulation()
         m_data_collector.add_collector<debug::LuaCollector>(lua_collector);
     }
 
-    /** TODO: Figure out a way to add these conditionally from load scenario scene */
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
     m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
     m_data_collector.add_collector<debug::CollectorMouse>(true, m_resolution);
@@ -123,11 +125,13 @@ void ScenarioScene::initialize_simulation()
         effect::affect_traits(e, traits);
     });
 
-    /** TODO: Make rendering optional */
-    /** Enforce the use of a rendering system */
-    m_draw_systems.emplace_back(
-        new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
-    m_draw_systems.back()->initialize();
+    /** Render only if enabled */
+    if (m_scenario_preferences.enable_rendering)
+    {
+        m_draw_systems.emplace_back(
+            new system::Rendering(system::SystemContext{&m_registry, &m_dispatcher, &m_rng, &m_scenario, &m_mt_executor}));
+        m_draw_systems.back()->initialize();
+    }
 
     /** Notify the scenario is loaded */
     m_dispatcher.enqueue<event::ScenarioLoaded>();
@@ -358,7 +362,17 @@ void ScenarioScene::bind_actions_for_scene()
 void ScenarioScene::bind_available_lua_events()
 {
     m_lua_ebinder = {{"ArrivedAtDestination", &lua_binder<event::ArrivedAtDestination>},
-                     {"ScenarioLoaded", &lua_binder<event::ScenarioLoaded>}};
+                     {"ScenarioLoaded", &lua_binder<event::ScenarioLoaded>},
+                     {"SensedEntity", &lua_binder<event::SensedEntity>},
+                     {"NeedBecameCritical", &lua_binder<event::NeedBecameCritical>},
+                     {"NeedNoLongerCritical", &lua_binder<event::NeedNoLongerCritical>},
+                     {"SwitchNeedContext", &lua_binder<event::SwitchNeedContext>},
+                     {"FinishedRequirement", &lua_binder<event::FinishedRequirement>},
+                     {"RequirementFailure", &lua_binder<event::RequirementFailure>},
+                     {"CreatedMemory", &lua_binder<event::CreatedMemory>},
+                     {"EntityDeleted", &lua_binder<event::EntityDeleted>},
+                     {"EntitySpawned", &lua_binder<event::EntitySpawned>},
+                     {"EntityBorn", &lua_binder<event::EntityBorn>}};
 }
 
 void ScenarioScene::bind_scenario_lua_functions()

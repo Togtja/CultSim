@@ -28,30 +28,37 @@ void LoadScenarioScene::on_exit()
     input::get_input().remove_context(input::EKeyContext::LoadScenario);
 }
 
-/** TODO: Expose seed to Lua */
 bool LoadScenarioScene::update(float dt)
 {
-    /** Shows the popup to select scenario (TODO: Lua-fi) */
+    /** Shows the popup to select scenario */
     if (ImGui::BeginPopupModal("Select##Scenario", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
     {
         ImGui::CaptureKeyboardFromApp(false);
-        ImGui::InputText("Seed", m_seed, s_seed_length - 1);
+
+        if (ImGui::TreeNode("Load Options"))
+        {
+            ImGui::TextColored({0.6, 0.6, 0.6, 1.0}, "Random Seed");
+            ImGui::InputText("##SeedSlider", m_seed, s_seed_length - 1);
+            ImGui::Checkbox("Enable rendering", &m_enable_rendering);
+        }
 
         const auto& scenarios = fs::list_directory("script/scenarios/");
         for (const auto& scenario : scenarios)
         {
             if (fs::is_directory("script/scenarios/" + scenario))
             {
-                if (ImGui::Button(scenario.c_str(), {150, 50}))
+                if (ImGui::Button(scenario.c_str(), {280, 30}))
                 {
-                    m_context->scene_manager->push<ScenarioScene>(fmt::format("script/scenarios/{}", scenario),
-                                                                  entt::hashed_string(m_seed).value());
+                    m_context->scene_manager->push<ScenarioScene>(
+                        fmt::format("script/scenarios/{}", scenario),
+                        lua::ScenarioLoadPreferences{entt::hashed_string(m_seed).value(), m_enable_rendering});
                 }
             }
         }
 
         /** Exit the loading screen */
-        if (ImGui::Button("Cancel", {150, 25}))
+        ImGui::Separator();
+        if (ImGui::Button("Cancel", {280, 30}))
         {
             m_context->scene_manager->pop();
         }

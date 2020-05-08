@@ -16,6 +16,9 @@ private:
     /** The seed in a string / human readable format */
     char m_seed[s_seed_length];
 
+    /** True if we should enable rendering while running the simulation */
+    bool m_enable_rendering = true;
+
 public:
     void on_enter() override;
 
