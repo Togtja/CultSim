@@ -12,7 +12,7 @@ void Goal::update(float dt)
     view.each([dt](component::Goal& goal) {
         for (auto& current_goal : goal.goals)
         {
-            current_goal.m_age += dt;
+            current_goal.age += dt;
         }
 
         /** Puts the most pressing goal in the back */
@@ -20,22 +20,22 @@ void Goal::update(float dt)
             float lhs_v = 0;
             float rhs_v = 0;
 
-            if (lhs.m_weight_function.index() == 0)
+            if (lhs.weight_function.index() == 0)
             {
-                lhs_v = std::get<sol::function>(lhs.m_weight_function)(lhs).get<float>();
+                lhs_v = std::get<sol::function>(lhs.weight_function)(lhs).get<float>();
             }
             else
             {
-                lhs_v = std::get<std::function<float()>>(lhs.m_weight_function)();
+                lhs_v = std::get<std::function<float()>>(lhs.weight_function)();
             }
 
-            if (rhs.m_weight_function.index() == 0)
+            if (rhs.weight_function.index() == 0)
             {
-                rhs_v = std::get<sol::function>(rhs.m_weight_function)(rhs).get<float>();
+                rhs_v = std::get<sol::function>(rhs.weight_function)(rhs).get<float>();
             }
             else
             {
-                rhs_v = std::get<std::function<float()>>(rhs.m_weight_function)();
+                rhs_v = std::get<std::function<float()>>(rhs.weight_function)();
             }
 
             return lhs_v < rhs_v;

@@ -54,7 +54,7 @@ struct Movement
 /** Component which holds the name of the file containing the information about the entity */
 struct Meta
 {
-    std::string name{};
+    std::string entity_path{};
 };
 
 /** Component which holds data needed for rendering a sprite onto a quad */
