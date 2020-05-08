@@ -67,6 +67,19 @@ void bind_dataonly(sol::state_view lua)
                                           &NameGenerator::Name::first,
                                           "last",
                                           &NameGenerator::Name::last);
+    lua.new_usertype<system::ParentsName>("Parents", "mom", &system::ParentsName::mom, "dad", &system::ParentsName::dad);
+
+    lua.new_usertype<system::EntityNameAndIds>("Parent",
+                                               "name",
+                                               &system::EntityNameAndIds::name,
+                                               "ids",
+                                               &system::EntityNameAndIds::ids);
+
+    lua.new_usertype<system::EntityIds>("ParentIds",
+                                        "global",
+                                        &system::EntityIds::global,
+                                        "relationship",
+                                        &system::EntityIds::relationship);
 }
 
 void bind_components(sol::state_view lua)

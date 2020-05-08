@@ -248,7 +248,6 @@ actions.reproduce = {
     time_to_complete = 5.0,
     success_chance = 0.9,
     success = function(owner, target)
-        log.debug(owner.." succeeded to have sex with " .. target)
 
         if not (cultsim.is_valid(owner) and cultsim.is_valid(target)) then 
             return

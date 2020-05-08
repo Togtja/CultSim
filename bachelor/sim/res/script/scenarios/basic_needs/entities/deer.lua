@@ -55,5 +55,14 @@ entity = {
     NameComponent = 
     {
      entity_type = "Deer"
-	}
+    },
+    TraitComponent = {
+        -- Other parts of lua code may add and remove a trait(s)
+        -- However this is what all the "Deers" would start with
+        start_traits = {{trait = traits.fast, chance = 0.7}, traits.slow_digestion},
+        -- Obtainable traits
+        attainable_traits = {traits.slow_digestion, traits.random_mutation, traits.fast}
+    },
+
+    RelationshipComponent = {}
 }

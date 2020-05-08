@@ -1,6 +1,5 @@
 #include "reproduction.h"
 #include "debug/auto_timer.h"
-#include "entity/components/components.h"
 #include "entity/effect.h"
 #include "entity/factory.h"
 
@@ -10,36 +9,8 @@ void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(Reproduction System);
 
-    auto view = m_context.registry->view<component::Reproduction>();
-    view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
-        if (auto age = m_context.registry->try_get<component::Age>(e); age && repr.has_fertility)
-        {
-            /** Can not reproduce after end of fertility */
-            if (age->current_age > repr.end_fertility || age->current_age < repr.start_fertility)
-            {
-                repr.fertility = 0;
-                return;
-            }
-
-            auto age_fertile = age->current_age - repr.peak_fertility;
-            if (age_fertile < 0)
-            {
-                repr.fertility = (1.f + (age_fertile / repr.end_fertility));
-            }
-            else
-            {
-                repr.fertility = (1.f - (age_fertile / repr.end_fertility));
-            }
-        }
-
-        if (repr.fertility < 0)
-        {
-            repr.fertility = 0;
-        }
-    });
-
     /** Children that will be spawned */
-    std::vector<Child> children;
+    std::vector<Child> children{};
 
     auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
     preg_view.each([this, dt, &preg_view, &children](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
@@ -86,6 +57,61 @@ void Reproduction::update(float dt)
         }
     });
 
+    spawn_children(children);
+}
+
+ISystem* Reproduction::clone()
+{
+    return new Reproduction(m_context);
+}
+
+void Reproduction::inherit_traits(component::Traits& traits, entt::entity from)
+{
+    if (auto mom_traits = m_context.registry->try_get<component::Traits>(from); mom_traits)
+    {
+        for (const auto& trait : mom_traits->acquired_traits)
+        {
+            if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
+            {
+                traits.acquired_traits.push_back(trait);
+            }
+        }
+    }
+}
+
+void Reproduction::update_fertility()
+{
+    auto view = m_context.registry->view<component::Reproduction>();
+    view.each([this](const entt::entity e, component::Reproduction& repr) {
+        if (auto age = m_context.registry->try_get<component::Age>(e); age && repr.has_fertility)
+        {
+            /** Can not reproduce after end of fertility */
+            if (age->current_age > repr.end_fertility || age->current_age < repr.start_fertility)
+            {
+                repr.fertility = 0;
+                return;
+            }
+
+            auto age_fertile = age->current_age - repr.peak_fertility;
+            if (age_fertile < 0)
+            {
+                repr.fertility = (1.f + (age_fertile / repr.end_fertility));
+            }
+            else
+            {
+                repr.fertility = (1.f - (age_fertile / repr.end_fertility));
+            }
+        }
+
+        if (repr.fertility < 0)
+        {
+            repr.fertility = 0;
+        }
+    });
+}
+
+void Reproduction::spawn_children(const std::vector<Child>& children)
+{
     for (const auto& child : children)
     {
         const auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
@@ -128,32 +154,13 @@ void Reproduction::update(float dt)
                 }
             }
 
-            /** TODO: Extract to function */
             /** Tries to inherit mom's acquired traits */
-            if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
-            {
-                for (const auto& trait : mom_traits->acquired_traits)
-                {
-                    if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
-                    {
-                        traits->acquired_traits.push_back(trait);
-                    }
-                }
-            }
+            inherit_traits(*traits, child.parents.first);
 
             if (m_context.registry->valid(child.parents.second))
             {
                 /** Tries to inherit dad's acquired traits */
-                if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
-                {
-                    for (const auto& trait : dad_traits->acquired_traits)
-                    {
-                        if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
-                        {
-                            traits->acquired_traits.push_back(trait);
-                        }
-                    }
-                }
+                inherit_traits(*traits, child.parents.second);
             }
 
             /** Make our list unique */
@@ -171,10 +178,4 @@ void Reproduction::update(float dt)
         }
     }
 }
-
-ISystem* Reproduction::clone()
-{
-    return new Reproduction(m_context);
-}
-
 } // namespace cs::system

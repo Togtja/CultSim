@@ -9,6 +9,8 @@ namespace cs::system
  */
 class Traits : public ISystem
 {
+    static inline constexpr int s_chunk_size{128};
+
 public:
     using ISystem::ISystem;
 
