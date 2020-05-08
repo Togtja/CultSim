@@ -62,7 +62,7 @@ public:
         auto& self = *pself;
 
         /**As long as we have not completed our action, keep working on it*/
-        const auto finished = self.current_action.m_action(self.current_action, e, *error);
+        const auto finished = self.current_action.action(self.current_action, e, *error);
 
         /**We cannot complete the action*/
         if (!error->empty())
@@ -77,8 +77,8 @@ public:
                 {
                     if (self.actions[i] == self.current_action)
                     {
-                        self.current_action.m_flags = 0;
-                        self.current_action         = self.actions[i + 1];
+                        self.current_action.flags = 0;
+                        self.current_action       = self.actions[i + 1];
                     }
                 }
                 error->clear();
@@ -115,7 +115,7 @@ public:
         float result = 0;
         for (const auto& action : action_sequence.actions)
         {
-            result += action.m_get_goal_change(goal).get<float>();
+            result += action.get_goal_change(goal).get<float>();
         }
         return result;
     };
