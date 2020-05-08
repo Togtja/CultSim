@@ -5,7 +5,7 @@
 
 namespace cs::memory
 {
-/** TODO: Consider Variants */
+/** TODO: Consider Variants if we have time */
 
 /** ResourceLocations are subtypes of Memory which concern themselves with storing positions that the entity found resources in */
 class ResourceLocation : public IMemory

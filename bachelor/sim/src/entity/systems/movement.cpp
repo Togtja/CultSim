@@ -14,7 +14,6 @@
 
 namespace cs::system
 {
-/** TODO: Fix out of bounds functions */
 bool fix_out_of_bounds(glm::vec3& pos, const glm::vec2& bounds)
 {
     /** Handle wrapping */
