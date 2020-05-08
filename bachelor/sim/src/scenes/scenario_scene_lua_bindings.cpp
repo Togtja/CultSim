@@ -562,7 +562,6 @@ void ScenarioScene::bind_scenario_lua_functions()
             }
 
             component::Pregnancy preg;
-            /** TODO: Make function Tomas the reproduction sexologist */
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
                 set_children_in_pregnancy(m_registry, m_rng, preg, *rc_m, *rc_f, mother, father);
