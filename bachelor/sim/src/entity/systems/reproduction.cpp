@@ -43,9 +43,9 @@ void Reproduction::update(float dt)
             }
 
             repr.number_of_children += preg.children_in_pregnancy;
-            if (!preg.is_egg && m_context.registry->valid(preg.parents.second))
+            if (!preg.is_egg && m_context.registry->valid(preg.parents.non_incubator))
             {
-                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.second);
+                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.non_incubator);
                 f_preg.number_of_children += preg.children_in_pregnancy;
             }
 
@@ -123,8 +123,8 @@ void Reproduction::spawn_children(const std::vector<Child>& children)
             egg_time.lays_eggs = false;
 
             egg_hatching.children_in_pregnancy = 1;
-            egg_hatching.parents.incubator     = child.parents.;
-            egg_hatching.parents.second        = child.parents.second;
+            egg_hatching.parents.incubator     = child.parents.incubator;
+            egg_hatching.parents.non_incubator = child.parents.non_incubator;
             egg_hatching.is_egg                = true;
 
             if (egg_time.gestation_deviation > 0)
