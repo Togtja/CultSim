@@ -93,7 +93,7 @@ struct Need
     std::vector<ai::Need> leisure_needs{};
 };
 
-/** Component which holds information pertaining to the entities ability to percieve other entities around it */
+/** Component which holds information pertaining to the entities ability to perceive other entities around it */
 struct Vision
 {
     /** Vector of entities that the entity is able to see currently */
@@ -103,7 +103,7 @@ struct Vision
     float radius{};
 
     /** TODO: Implement this */
-    /** The angle at which an entity is able to percieve entities ahead of itself */
+    /** The angle at which an entity is able to perceive entities ahead of itself */
     uint8_t fov{};
 };
 
@@ -144,7 +144,7 @@ struct Health
 {
     float health{};
 
-    /** How much health ticks down each second for each need that is unfullfilled */
+    /** How much health ticks down each second for each need that is unfulfilled */
     float tickdown_rate{};
 
     /** Each need that has one of the tags described below lowers the health of the entity if it drops to 0 */
@@ -162,7 +162,7 @@ struct Age
 {
     float current_age{};
 
-    /** The average age an entity will reach before dying of old age. Deaths of old age will occur somehwere around this number */
+    /** The average age an entity will reach before dying of old age. Deaths of old age will occur somewhere around this number */
     float average_life_expectancy{};
 };
 
@@ -197,7 +197,7 @@ struct LocationRequirement
     float elapsed_time{};
 };
 
-/** Component which aids in the fullfilment of visionrequirements by holding the tags the target entity needs to have*/
+/** Component which aids in the fulfillment of visionrequirements by holding the tags the target entity needs to have*/
 struct VisionRequirement
 {
     /** The vision requirement will be completed if we can see an entity that has these tags */
@@ -365,7 +365,7 @@ struct Trait
 {
     /** The name of the trait */
     std::string name;
-    /** A short descriptiopn of the trait */
+    /** A short description of the trait */
     std::string desc;
 
     /**
