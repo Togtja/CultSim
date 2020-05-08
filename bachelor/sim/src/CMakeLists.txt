@@ -28,6 +28,6 @@ target_sources(
 
 # Configure file with CMake Variables
 configure_file(
-    ${CMAKE_CURRENT_LIST_DIR}/constants.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/constants.h
+        ${CMAKE_CURRENT_LIST_DIR}/constants.h.in
+        ${CMAKE_CURRENT_BINARY_DIR}/constants.h
 )

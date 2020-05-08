@@ -67,16 +67,19 @@ void bind_dataonly(sol::state_view lua)
                                           &NameGenerator::Name::first,
                                           "last",
                                           &NameGenerator::Name::last);
+    lua.new_usertype<system::ParentsName>("Parents", "mom", &system::ParentsName::mom, "dad", &system::ParentsName::dad);
 
-    lua.new_usertype<system::BothParentName>("Parents", "mom", &system::BothParentName::mom, "dad", &system::BothParentName::dad);
+    lua.new_usertype<system::EntityNameAndIds>("Parent",
+                                               "name",
+                                               &system::EntityNameAndIds::name,
+                                               "ids",
+                                               &system::EntityNameAndIds::ids);
 
-    lua.new_usertype<system::ParentName>("Parent", "name", &system::ParentName::name, "ids", &system::ParentName::ids);
-
-    lua.new_usertype<system::ParentEntityIds>("ParentIds",
-                                              "global",
-                                              &system::ParentEntityIds::global,
-                                              "relationship",
-                                              &system::ParentEntityIds::relationship);
+    lua.new_usertype<system::EntityIds>("ParentIds",
+                                        "global",
+                                        &system::EntityIds::global,
+                                        "relationship",
+                                        &system::EntityIds::relationship);
 }
 
 void bind_components(sol::state_view lua)
@@ -89,6 +92,8 @@ void bind_components(sol::state_view lua)
                                &ai::Need::weight,
                                "status",
                                &ai::Need::status,
+                               "treshhold",
+                               &ai::Need::threshhold,
                                "decay_rate",
                                &ai::Need::decay_rate,
                                "vitality",
@@ -104,27 +109,27 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<gob::Goal>("Goal",
                                 "name",
-                                &gob::Goal::m_name,
+                                &gob::Goal::name,
                                 "tags",
-                                &gob::Goal::m_tags,
+                                &gob::Goal::tags,
                                 "age",
-                                &gob::Goal::m_age,
+                                &gob::Goal::age,
                                 "weight_function",
-                                &gob::Goal::m_weight_function,
+                                &gob::Goal::weight_function,
                                 "change_over_time",
-                                &gob::Goal::m_change_over_time,
+                                &gob::Goal::change_over_time,
                                 "get_discontentment",
-                                &gob::Goal::m_get_discontentment);
+                                &gob::Goal::get_discontentment);
 
     lua.new_usertype<gob::ActionSequence>("ActionSequence",
                                           "name",
-                                          &gob::ActionSequence::m_name,
+                                          &gob::ActionSequence::name,
                                           "tags",
-                                          &gob::ActionSequence::m_tags,
+                                          &gob::ActionSequence::tags,
                                           "current_action",
                                           &gob::ActionSequence::current_action,
                                           "actions",
-                                          &gob::ActionSequence::m_actions,
+                                          &gob::ActionSequence::actions,
                                           /*"run_actions",
                                           &gob::ActionSequence::m_run_actions,*/
                                           "get_duration",
@@ -138,15 +143,15 @@ void bind_components(sol::state_view lua)
                                   "tags",
                                   &gob::Action::tags,
                                   "required_time",
-                                  &gob::Action::m_required_time,
+                                  &gob::Action::required_time,
                                   "success_chance",
-                                  &gob::Action::m_success_chance,
+                                  &gob::Action::success_chance,
                                   "flags",
-                                  &gob::Action::m_flags,
+                                  &gob::Action::flags,
                                   "action",
-                                  &gob::Action::m_action,
+                                  &gob::Action::action,
                                   "get_goal_change",
-                                  &gob::Action::m_get_goal_change,
+                                  &gob::Action::get_goal_change,
                                   "get_duration",
                                   &gob::Action::m_get_duration);
 
@@ -284,6 +289,8 @@ void bind_systems(sol::state_view lua)
                                &Scenario::systems,
                                "bounds",
                                &Scenario::bounds,
+                               "data_collectors",
+                               &Scenario::data_collectors,
                                "sampling_rate",
                                &Scenario::sampling_rate,
                                "init",
@@ -380,6 +387,8 @@ void bind_utils(sol::state_view lua)
     /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
      * float. */
     lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
+
+    sol::table data_collector_table = lua.create_table("native_collectors");
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);

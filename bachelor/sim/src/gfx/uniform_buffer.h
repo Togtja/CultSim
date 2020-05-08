@@ -2,8 +2,8 @@
 #include "glutil.h"
 
 #include <array>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 #include <glad/glad.h>
 

@@ -89,4 +89,4 @@ public:
      */
     unsigned build();
 };
-} // namespace cs
+} // namespace cs::gfx

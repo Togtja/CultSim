@@ -10,9 +10,9 @@
 namespace cs::system
 {
 /**
- * Keeps track of their ids in the diffrent registry
+ * Keeps track of the entity ids in the diffrent registry
  */
-struct ParentEntityIds
+struct EntityIds
 {
     /** Entity id from the scenario scene registry */
     entt::entity global{entt::null};
@@ -22,12 +22,12 @@ struct ParentEntityIds
 };
 
 /**
- * Keeps the parent's name (if any), and it's set of IDs
+ * Keeps the entity's name (if any), and it's set of IDs
  */
-struct ParentName
+struct EntityNameAndIds
 {
     /** ids for the global and relationship registry ids */
-    ParentEntityIds ids{};
+    EntityIds ids{};
 
     /** name for it's name, if no name it will default to the name components type */
     std::string name{};
@@ -36,10 +36,10 @@ struct ParentName
 /**
  * Just a pair of the mom and dad (Both Parents), to keep both name and their Ids
  */
-struct BothParentName
+struct ParentsName
 {
-    ParentName mom{};
-    ParentName dad{};
+    EntityNameAndIds mom{};
+    EntityNameAndIds dad{};
 };
 
 class Relationship : public ISystem
@@ -102,9 +102,9 @@ public:
      * The first 8 bits represent friendship, the last 8 bits romantic intrest. However they do not <i>need</i>
      * to represent this, the users themself can decide what it should represent
      *
-     * @param e entity you want to add a relationship table to
+     * @param event The spawn event that triggers when a new entity is spawned
      */
-    void add_relationship_table(entt::entity e);
+    void add_relationship_table(const event::EntitySpawned& event);
 
     /**
      * Get the friendship value between e to other that goes from 0 to 255
@@ -147,11 +147,41 @@ public:
     /**
      * Get the name and ids of an entity's parents
      *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
      * @param e The entity you want to get the parents of
      * @param is_local_ids True if the entity is from the local registry, false if it is from the global registry
      * @return The struct BothParentName that include the name, local- and global entity ids
      */
-    BothParentName get_parents(entt::entity e, bool is_local_ids = false);
+    ParentsName get_parents(entt::entity e, bool is_local_id = false);
+
+    /**
+     * Get the entity's children as a vector of EntityNameAndIds
+     *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
+     * @param e The entity you want to get the children of
+     * @param is_local_id True if the entity is from the local registry, false if it is from the global registry
+     * @return A vector of the children's name and ids
+     */
+    std::vector<EntityNameAndIds> get_children(entt::entity e, bool is_local_id = false);
+
+    /**
+     * Check if someone is related to you within n generations
+     *
+     * @note Assumes entity ids are from the context registry and not the local relationship registry, unless specified otherwise
+     * @note Gen is generations, so if you set it to 1 it will find your parents and your children.
+     * Set it to 2, and it will find your parents and children and their parents and children. Aka Siblings, grand parents and
+     * grand-children. Set it to 3 and it will find your parents and children and their parents and children and their parent and
+     * children, giving you aunts and uncles. Set it to 4 you will get cousin as well.
+     *
+     * @warning higher gen number exponentially increases compute time
+     *
+     * @param me The entity that is you
+     * @param other The entity you want to see if you are related too
+     * @param gen How distant family members you want to check (Default is 3 generations, see note)
+     * @param is_local_ids True if the entity is from the local registry, false if it is from the global registry
+     * @return True if the other entity is related to you within the set range, otherwise false
+     */
+    bool is_family(entt::entity me, entt::entity other, unsigned gen = 3, bool is_local_id = false);
 
     void update(float dt) override;
 

@@ -4,7 +4,7 @@
 
 namespace cs
 {
-/** TODO: Documentation */
+/** Scene that let users take organizational actions such as quitting Kduring a simulation */
 class PauseMenuScene : public IScene
 {
 public:

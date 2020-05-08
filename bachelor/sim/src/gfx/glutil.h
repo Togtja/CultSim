@@ -99,14 +99,26 @@ std::vector<LoadedTexture> load_texture_partitioned(const char* fp, int xoffset,
  */
 void create_debug_callback();
 
-/** TODO: Documentation */
+/**
+ * Get the size of a container in bytes
+ *
+ * @tparam Container The type of the container
+ * @param container The container to get the size of
+ * @return Size of the container in bytes
+ */
 template<typename Container>
 constexpr typename Container::size_type size_bytes(const Container& container)
 {
     return container.size() * sizeof(typename Container::value_type);
 }
 
-/** TODO: Documentation */
+/**
+ * Combine two or more vectors into a single vector of bytes
+ *
+ * @tparam Ts The types of the data the various vectors are holding
+ * @param vecs Arbitrary number of vectors to combine
+ * @return A vector of bytes containing the data from all the vecs. The first vector passed in will be first in the output too
+ */
 template<typename... Ts>
 std::vector<uint8_t> combine_buffers(const std::vector<Ts>&... vecs)
 {

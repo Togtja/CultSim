@@ -7,9 +7,6 @@
 #include <entt/entity/entity.hpp>
 #include <sol/function.hpp>
 
-/** TODO: Potentially merge with components/actions.h */
-/** TODO: Add documentation */
-
 namespace cs::action
 {
 /**

@@ -4,26 +4,26 @@
 
 namespace cs
 {
-unsigned count_set_bits(uint64_t x)
+unsigned count_set_bits(uint64_t i)
 {
     unsigned sum{};
-    while (x != 0)
+    while (i != 0)
     {
-        sum += x & 1u;
-        x >>= 1u;
+        sum += i & 1u;
+        i >>= 1u;
     }
     return sum;
 }
 
 bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
 {
-    glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
+    const glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
     return boolvec.x && boolvec.y;
 }
 
-float sigmoid(const float x)
+float sigmoid(const float i)
 {
-    return exp(x) / (exp(x) + 1.f);
+    return exp(i) / (exp(i) + 1.f);
 }
 
 void cs_auto_table_headers()

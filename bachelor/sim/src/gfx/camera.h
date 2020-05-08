@@ -6,13 +6,23 @@
 
 namespace cs::gfx
 {
-/** TODO: Documentation (set/get & class) */
+/**
+ * A camera in the 2D or 3D world
+ */
 class Camera
 {
 private:
-    glm::vec3 m_pos    = {0.f, 0.f, 0.f};
+    static inline constexpr float s_projection_size_x = 640.f;
+    static inline constexpr float s_projection_size_y = 360.f;
+
+    /** Current camera position */
+    glm::vec3 m_pos = {0.f, 0.f, 0.f};
+
+    /** Current bounds that affect this camera */
     glm::vec2 m_bounds = {200.f, 200.f};
-    float m_speed      = 10.f;
+
+    /** Zoom speed of camera */
+    float m_zoom_speed = 10.f;
 
 public:
     Camera() = default;

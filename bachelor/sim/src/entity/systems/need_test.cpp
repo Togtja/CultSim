@@ -11,7 +11,7 @@ TEST_CASE("testing the needs system initialization")
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
@@ -41,7 +41,7 @@ TEST_CASE("testing the needs system update function")
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
@@ -96,7 +96,7 @@ TEST_CASE("Testing outliers for dt")
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Food};
 
     test_registry.assign<cs::component::Need>(agent, std::vector<cs::ai::Need>({need}), std::vector<cs::ai::Need>({}));
 
@@ -139,10 +139,10 @@ TEST_CASE("pressing needs are correctly updated")
     cs::RandomEngine rng{};
 
     auto agent         = test_registry.create();
-    cs::ai::Need need1 = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
-    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 4.f, 100.f, 1.f, 1.f, cs::TAG_Drink};
-    cs::ai::Need need3 = {static_cast<std::string>("sad"), 1.f, 100.f, 1.f, 1.f, cs::TAG_Joy};
-    cs::ai::Need need4 = {static_cast<std::string>("tired"), 2.f, 100.f, 1.f, 1.f, cs::TAG_Sleep};
+    cs::ai::Need need1 = {static_cast<std::string>("hunger"), 3.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need2 = {static_cast<std::string>("thirst"), 4.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Drink};
+    cs::ai::Need need3 = {static_cast<std::string>("sad"), 1.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Joy};
+    cs::ai::Need need4 = {static_cast<std::string>("tired"), 2.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Sleep};
     test_registry.assign<cs::component::Need>(agent,
                                               std::vector<cs::ai::Need>({need1, need2, need3, need4}),
                                               std::vector<cs::ai::Need>({}));

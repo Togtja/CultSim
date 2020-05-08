@@ -21,7 +21,13 @@ struct SystemContext
     sol::state_view* lua_state{nullptr};
 };
 
-/** TODO: Documentation */
+/**
+ * Interface for all behavior systems in CultSim
+ *
+ * This interface is used for systems that add behavior to components. The system part of an ECS. They provide a convenient way to
+ * separate systems in smaller chunks that perform their own initialization and logic. Systems should be independent of each
+ * other, but by adding more of them, emergent behavior will naturally appear, which is the power of it all.
+ */
 class ISystem
 {
 protected:
@@ -55,9 +61,18 @@ public:
      */
     virtual void deinitialize(){};
 
-    /** TODO: Give definition what these two are supposed to do */
+    /**
+     * Called every tick of the simulation to let individual systems update and apply behaviour
+     *
+     * @note Not implementing this function is likely an error, but doesn't have to be
+     *
+     * @param dt Delta time since last frame
+     */
     virtual void update(float dt) = 0;
 
+    /**
+     * Override in derived if you need to draw any GUI for the system to configure it
+     */
     virtual void update_imgui(){};
 
     /**

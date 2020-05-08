@@ -1,6 +1,5 @@
 #include "reproduction.h"
 #include "debug/auto_timer.h"
-#include "entity/components/components.h"
 #include "entity/effect.h"
 #include "entity/factory.h"
 
@@ -10,8 +9,80 @@ void Reproduction::update(float dt)
 {
     CS_AUTOTIMER(Reproduction System);
 
+    /** Children that will be spawned */
+    std::vector<Child> children{};
+
+    auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
+    preg_view.each([this, dt, &preg_view, &children](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
+        preg.time_since_start += dt;
+
+        if (preg.time_since_start >= preg.gestation_period)
+        {
+            const auto parent_name = m_context.registry->get<component::Meta>(e).entity_path;
+
+            for (int i = 0; i < preg.children_in_pregnancy; i++)
+            {
+                const auto new_pos = m_context.registry->get<component::Position>(e).position +
+                                     glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
+                if (repr.lays_eggs)
+                {
+                    children.push_back(Child{repr.egg_type, new_pos, true, parent_name, preg.parents});
+                }
+                else
+                {
+                    if (preg.is_egg)
+                    {
+                        const auto egg_pos = m_context.registry->get<component::Position>(e).position;
+                        children.push_back(Child{parent_name, egg_pos, false, parent_name, preg.parents});
+                    }
+                    else
+                    {
+                        children.push_back(Child{parent_name, new_pos, false, parent_name, preg.parents});
+                    }
+                }
+            }
+
+            repr.number_of_children += preg.children_in_pregnancy;
+            if (!preg.is_egg && m_context.registry->valid(preg.parents.non_incubator))
+            {
+                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.non_incubator);
+                f_preg.number_of_children += preg.children_in_pregnancy;
+            }
+
+            if (preg.is_egg)
+            {
+                m_context.registry->assign_or_replace<component::Delete>(e);
+            }
+            m_context.registry->remove<component::Pregnancy>(e);
+        }
+    });
+
+    spawn_children(children);
+}
+
+ISystem* Reproduction::clone()
+{
+    return new Reproduction(m_context);
+}
+
+void Reproduction::inherit_traits(component::Traits& traits, entt::entity from)
+{
+    if (auto mom_traits = m_context.registry->try_get<component::Traits>(from); mom_traits)
+    {
+        for (const auto& trait : mom_traits->acquired_traits)
+        {
+            if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
+            {
+                traits.acquired_traits.push_back(trait);
+            }
+        }
+    }
+}
+
+void Reproduction::update_fertility()
+{
     auto view = m_context.registry->view<component::Reproduction>();
-    view.each([dt, this](const entt::entity e, component::Reproduction& repr) {
+    view.each([this](const entt::entity e, component::Reproduction& repr) {
         if (auto age = m_context.registry->try_get<component::Age>(e); age && repr.has_fertility)
         {
             /** Can not reproduce after end of fertility */
@@ -37,55 +108,10 @@ void Reproduction::update(float dt)
             repr.fertility = 0;
         }
     });
+}
 
-    /** Children that will be spawned */
-    std::vector<Child> children;
-
-    auto preg_view = m_context.registry->view<component::Reproduction, component::Pregnancy>();
-    preg_view.each([this, dt, &preg_view, &children](entt::entity e, component::Reproduction& repr, component::Pregnancy& preg) {
-        preg.time_since_start += dt;
-
-        if (preg.time_since_start >= preg.gestation_period)
-        {
-            const auto parent_name = m_context.registry->get<component::Meta>(e).name;
-
-            for (int i = 0; i < preg.children_in_pregnancy; i++)
-            {
-                const auto new_pos = m_context.registry->get<component::Position>(e).position +
-                                     glm::vec3(m_context.rng->uniform(-20.f, 20.f), m_context.rng->uniform(-20.f, 20.f), 0.f);
-                if (repr.lays_eggs)
-                {
-                    children.push_back(Child{repr.egg_type, new_pos, true, parent_name, preg.parents});
-                }
-                else
-                {
-                    if (preg.is_egg)
-                    {
-                        const auto egg_pos = m_context.registry->get<component::Position>(e).position;
-                        children.push_back(Child{parent_name, egg_pos, false, parent_name, preg.parents});
-                    }
-                    else
-                    {
-                        children.push_back(Child{parent_name, new_pos, false, parent_name, preg.parents});
-                    }
-                }
-            }
-
-            repr.number_of_children += preg.children_in_pregnancy;
-            if (!preg.is_egg && m_context.registry->valid(preg.parents.second))
-            {
-                auto& f_preg = m_context.registry->get<component::Reproduction>(preg.parents.second);
-                f_preg.number_of_children += preg.children_in_pregnancy;
-            }
-
-            if (preg.is_egg)
-            {
-                m_context.registry->assign_or_replace<component::Delete>(e);
-            }
-            m_context.registry->remove<component::Pregnancy>(e);
-        }
-    });
-
+void Reproduction::spawn_children(const std::vector<Child>& children)
+{
     for (const auto& child : children)
     {
         const auto child_e = spawn_entity(*m_context.registry, *m_context.lua_state, child.type, child.position);
@@ -97,8 +123,8 @@ void Reproduction::update(float dt)
             egg_time.lays_eggs = false;
 
             egg_hatching.children_in_pregnancy = 1;
-            egg_hatching.parents.first         = child.parents.first;
-            egg_hatching.parents.second        = child.parents.second;
+            egg_hatching.parents.incubator     = child.parents.incubator;
+            egg_hatching.parents.non_incubator = child.parents.non_incubator;
             egg_hatching.is_egg                = true;
 
             if (egg_time.gestation_deviation > 0)
@@ -112,7 +138,7 @@ void Reproduction::update(float dt)
             }
 
             /** Makes sure the eggs spawn the parent type */
-            m_context.registry->get<component::Meta>(child_e).name = child.parent_type;
+            m_context.registry->get<component::Meta>(child_e).entity_path = child.parent_type;
             return;
         }
         m_context.dispatcher->enqueue<event::EntityBorn>(event::EntityBorn{child_e});
@@ -128,32 +154,13 @@ void Reproduction::update(float dt)
                 }
             }
 
-            /** TODO: Extract to function */
             /** Tries to inherit mom's acquired traits */
-            if (auto mom_traits = m_context.registry->try_get<component::Traits>(child.parents.first); mom_traits)
-            {
-                for (const auto& trait : mom_traits->acquired_traits)
-                {
-                    if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
-                    {
-                        traits->acquired_traits.push_back(trait);
-                    }
-                }
-            }
+            inherit_traits(*traits, child.parents.incubator);
 
-            if (m_context.registry->valid(child.parents.second))
+            if (m_context.registry->valid(child.parents.non_incubator))
             {
                 /** Tries to inherit dad's acquired traits */
-                if (auto dad_traits = m_context.registry->try_get<component::Traits>(child.parents.second); dad_traits)
-                {
-                    for (const auto& trait : dad_traits->acquired_traits)
-                    {
-                        if (trait.can_inherit && m_context.rng->trigger(trait.inherit_chance))
-                        {
-                            traits->acquired_traits.push_back(trait);
-                        }
-                    }
-                }
+                inherit_traits(*traits, child.parents.non_incubator);
             }
 
             /** Make our list unique */
@@ -166,15 +173,9 @@ void Reproduction::update(float dt)
 
         if (auto rel_c = m_context.registry->try_get<component::Relationship>(child_e); rel_c)
         {
-            rel_c->mom.global = child.parents.first;
-            rel_c->dad.global = child.parents.second;
+            rel_c->mom.global = child.parents.incubator;
+            rel_c->dad.global = child.parents.non_incubator;
         }
     }
 }
-
-ISystem* Reproduction::clone()
-{
-    return new Reproduction(m_context);
-}
-
 } // namespace cs::system

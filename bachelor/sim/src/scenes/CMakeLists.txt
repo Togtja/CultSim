@@ -20,6 +20,7 @@ target_sources(
 
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/scenario_scene.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/scenario_scene_lua_bindings.cpp
 
         ${CMAKE_CURRENT_LIST_DIR}/mainmenu_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/mainmenu_scene.cpp
@@ -27,6 +28,6 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/editor_scene.h
         ${CMAKE_CURRENT_LIST_DIR}/editor_scene.cpp
 
-        ${CMAKE_CURRENT_LIST_DIR}/loadsenario_scene.h
-        ${CMAKE_CURRENT_LIST_DIR}/loadsenario_scene.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/loadscenario_scene.h
+        ${CMAKE_CURRENT_LIST_DIR}/loadscenario_scene.cpp
 )

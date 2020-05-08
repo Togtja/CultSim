@@ -29,9 +29,10 @@ struct SpriteTextureID
     /** Index into material array to use for this sprite */
     uint16_t material_idx : 3;
 
-    /** TODO: Document beneath */
+    /** Rotation of sprite in bigrees, mapping 0-360 into 0-255 */
     uint8_t bigrees{0};
 
+    /** Scale of sprite from 0-255 */
     uint8_t scale{10};
 
     operator uint32_t()
@@ -90,6 +91,9 @@ struct PrimitiveVertex
     glm::vec3 color{};
 };
 
+/**
+ * Vertex layout used by circles and rectangles in the DebugRenderer
+ */
 struct DebugInstanceVertex
 {
     glm::vec3 offset{};
@@ -97,6 +101,9 @@ struct DebugInstanceVertex
     glm::vec3 color{};
 };
 
+/**
+ * UBO layout for matrices
+ */
 struct MatrixData
 {
     glm::mat4 view_matrix;
@@ -112,8 +119,12 @@ struct ProgramInformation
     float _pad1;
 };
 
+/**
+ * Describes a 3D sphere
+ */
 struct SphereShape
 {
+    /** Position of the sphere, but the radius is stored in the w component */
     glm::vec4 position;
 };
 
