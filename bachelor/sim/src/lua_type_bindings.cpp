@@ -274,6 +274,8 @@ void bind_systems(sol::state_view lua)
                                &Scenario::systems,
                                "bounds",
                                &Scenario::bounds,
+                               "data_collectors",
+                               &Scenario::data_collectors,
                                "sampling_rate",
                                &Scenario::sampling_rate,
                                "init",
@@ -370,6 +372,8 @@ void bind_utils(sol::state_view lua)
     /** Lua users need to create one of these and fill them with a table that contains at least an execute function returning
      * float. */
     lua.new_usertype<debug::LuaCollector>("DataCollector", sol::constructors<debug::LuaCollector(std::string, sol::table)>());
+
+    sol::table data_collector_table = lua.create_table("native_collectors");
 
     /** Entity registry, we only expose a limited number of functions here */
     lua.new_usertype<entt::registry>("Registry", "valid", &entt::registry::valid);

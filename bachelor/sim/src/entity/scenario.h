@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug/native_collectors.h"
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -28,6 +30,9 @@ struct Scenario
 
     /** Initially active systems */
     std::vector<sol::object> systems{};
+
+    /** Data collectors from Lua */
+    std::vector<debug::LuaCollector> data_collectors{};
 
     /** How often this scenario should sample data */
     float sampling_rate{1.0f};
