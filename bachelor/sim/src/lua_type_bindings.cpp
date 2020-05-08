@@ -123,13 +123,13 @@ void bind_components(sol::state_view lua)
 
     lua.new_usertype<gob::ActionSequence>("ActionSequence",
                                           "name",
-                                          &gob::ActionSequence::m_name,
+                                          &gob::ActionSequence::name,
                                           "tags",
-                                          &gob::ActionSequence::m_tags,
+                                          &gob::ActionSequence::tags,
                                           "current_action",
                                           &gob::ActionSequence::current_action,
                                           "actions",
-                                          &gob::ActionSequence::m_actions,
+                                          &gob::ActionSequence::actions,
                                           /*"run_actions",
                                           &gob::ActionSequence::m_run_actions,*/
                                           "get_duration",
