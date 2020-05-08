@@ -99,20 +99,20 @@ void Relationship::new_child_to_reg(const event::EntityBorn& event)
             }
         });
 
+        /** If Mom is a first gen i.e spawned by the Simulation */
         if (fam.mom.relationship == entt::null)
         {
-            /** Mom is a first gen */
             auto mom_entt        = add_to_reg(fam.mom.global);
             fam.mom.relationship = mom_entt;
         }
 
-        /** Make sure dad is still valid, could have died during pregnancy */
+        /** If dad is a first gen i.e spawned by the Simulation and still alive (valid in global)*/
         if (fam.dad.relationship == entt::null && m_context.registry->valid(fam.dad.global))
         {
-            /** Dad is a first gen */
             auto dad_entt        = add_to_reg(fam.dad.global);
             fam.dad.relationship = dad_entt;
         }
+
         m_parents_reg.assign<component::Relationship>(new_entt, fam);
 
         /** Add me as a child to my parents*/
@@ -210,15 +210,25 @@ void Relationship::add_romance(entt::entity e, entt::entity other, uint8_t amoun
 ParentsName Relationship::get_parents(entt::entity e, bool is_local_id)
 {
     ParentsName ret;
+
+    /** Default it to be the Simulation until proven otherwise */
+    ret.mom.name = "The Simulation";
+    ret.dad.name = "The Simulation";
     if (is_local_id)
     {
         const auto& rel = m_parents_reg.get<component::Relationship>(e);
-        auto par1_name  = m_parents_reg.get<component::Name>(rel.mom.relationship);
-        auto par2_name  = m_parents_reg.get<component::Name>(rel.dad.relationship);
-        ret.mom.name    = par1_name.name;
-        ret.dad.name    = par2_name.name;
-        ret.mom.ids     = rel.mom;
-        ret.dad.ids     = rel.dad;
+        if (rel.mom.relationship != entt::null)
+        {
+            ret.mom.name = m_parents_reg.get<component::Name>(rel.mom.relationship).name;
+        }
+
+        if (rel.dad.relationship != entt::null)
+        {
+            ret.dad.name = m_parents_reg.get<component::Name>(rel.dad.relationship).name;
+        }
+
+        ret.mom.ids = rel.mom;
+        ret.dad.ids = rel.dad;
         return ret;
     }
 
@@ -228,22 +238,18 @@ ParentsName Relationship::get_parents(entt::entity e, bool is_local_id)
         const auto& rel = m_parents_reg.get<component::Relationship>(ent);
         if (rel.old_id == e)
         {
-            auto& par1_name = m_parents_reg.get<component::Name>(rel.mom.relationship);
-            auto& par2_name = m_parents_reg.get<component::Name>(rel.dad.relationship);
-
-            if (par1_name.name.empty())
+            if (rel.mom.relationship != entt::null)
             {
-                par1_name.name = par1_name.entity_type;
-            }
-            if (par2_name.name.empty())
-            {
-                par2_name.name = par2_name.entity_type;
+                ret.mom.name = m_parents_reg.get<component::Name>(rel.mom.relationship).name;
             }
 
-            ret.mom.name = par1_name.name;
-            ret.dad.name = par2_name.name;
-            ret.mom.ids  = rel.mom;
-            ret.dad.ids  = rel.dad;
+            if (rel.dad.relationship != entt::null)
+            {
+                ret.dad.name = m_parents_reg.get<component::Name>(rel.dad.relationship).name;
+            }
+
+            ret.mom.ids = rel.mom;
+            ret.dad.ids = rel.dad;
             return ret;
         }
     }
