@@ -28,7 +28,8 @@ void DataCollector::sample()
 
 void DataCollector::set_sampling_rate(float seconds)
 {
-    m_sampling_rate = seconds;
+    m_sampling_rate     = seconds;
+    m_time_since_sample = seconds;
 }
 
 void DataCollector::update(float dt)
