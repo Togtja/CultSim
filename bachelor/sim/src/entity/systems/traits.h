@@ -4,9 +4,13 @@
 
 namespace cs::system
 {
-/** TODO: Documentation */
+/**
+ * The trait system handles assigning traits
+ */
 class Traits : public ISystem
 {
+    static inline constexpr int s_chunk_size{128};
+
 public:
     using ISystem::ISystem;
 

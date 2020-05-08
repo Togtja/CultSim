@@ -4,11 +4,13 @@
 #include <vector>
 namespace cs::memory
 {
-/** TODO: Add more Documentation */
+/** Containers are simple container structures for vectors of memories, keeping track of the tags of the memories in the vector */
 struct Container
 {
 public:
     ETag memory_tags{};
+
+    /** Vector of memories. The type of these can be anything that inherits from IMemory */
     std::vector<std::unique_ptr<IMemory>> memory_storage{};
 
     Container() = default;

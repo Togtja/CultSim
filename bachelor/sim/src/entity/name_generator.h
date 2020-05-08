@@ -9,6 +9,9 @@ namespace cs
 {
 class RandomEngine;
 
+/**
+ * Simple class for generating names based on ethnicities
+ */
 class NameGenerator
 {
 private:

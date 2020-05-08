@@ -128,7 +128,6 @@ bool SpriteRenderer::increment_next_texture_id()
     return true;
 }
 
-/** TODO: Use combine_buffers */
 void SpriteRenderer::init_vbo_and_vao()
 {
     glCreateBuffers(1, &m_vbo);
@@ -176,16 +175,10 @@ void SpriteRenderer::init_vbo_and_vao()
                 .build();
 }
 
-/** TODO: change to fcreate_program */
 void SpriteRenderer::init_shader()
 {
     /** Init Shader */
-    const auto vertex_shader = fcompile_shader("shader/sprite.vert", GL_VERTEX_SHADER);
-    const auto frag_shader   = fcompile_shader("shader/sprite.frag", GL_FRAGMENT_SHADER);
-    m_shader                 = create_program({vertex_shader, frag_shader});
-    glDeleteShader(vertex_shader);
-    glDeleteShader(frag_shader);
-    glUseProgram(m_shader);
+    m_shader = fcreate_program({{"shader/sprite.vert", GL_VERTEX_SHADER}, {"shader/sprite.frag", GL_FRAGMENT_SHADER}});
 }
 
 void SpriteRenderer::init_texture_slots()
@@ -201,8 +194,6 @@ void SpriteRenderer::init_texture_slots()
         glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-        /** TODO: Fix Hard coded texture size and layers */
         glTextureStorage3D(tex, 1, GL_RGBA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32);
     }
     glBindTextures(0, num_textures, m_color_texture_handles.data());
@@ -217,7 +208,7 @@ void SpriteRenderer::init_texture_slots()
         glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 
-        /** TODO: Fix Hard coded texture size and layers */
+        /** The color of a neutral normal map */
         const uint8_t color_data[] = {128, 128, 255, 255};
         glTextureStorage3D(tex, 1, GL_RGBA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32);
         glClearTexSubImage(tex, 0, 0, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, 32, GL_RGBA, GL_UNSIGNED_BYTE, color_data);

@@ -18,14 +18,21 @@ scenario.systems = {
     "DeletionSystem",
 }
 
+-- Contains what data you would like to sample
+scenario.data_collectors = {
+    data_collectors.velocity_collector
+}
+
 -- Decides how many seconds between each data sample taken in this scenario. IE: (also accuracy / granularity of graphs and output)
-scenario.sampling_rate = 5.0;
+scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
 scenario.init = function()
     -- Spawn Boids
-    for i=1,10 do
-        local boid = cultsim.spawn("boid")        
+    for i=1,20 do
+        local boid = cultsim.spawn("boid")      
+        local boid_comp = cultsim.get_component(boid, component.lua1)  
+        boid_comp.velocity.x = random:uniform(-1.0, 1.0)
     end
 end
 

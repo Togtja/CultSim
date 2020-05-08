@@ -29,11 +29,11 @@ private:
     /** Samples */
     std::vector<std::vector<float>> m_samples{};
 
-    /** Time since sample */
-    float m_time_since_sample{0.f};
-
     /** How often we sample */
     float m_sampling_rate = {0.f};
+
+    /** Time since sample */
+    float m_time_since_sample{0.f};
 
 public:
     DataCollector() = default;

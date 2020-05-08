@@ -72,7 +72,6 @@ std::string_view CollectorNeed::get_name()
     return m_need_name;
 }
 
-/** TODO: Add Locales*/
 CollectorMouse::CollectorMouse(bool x_axis, glm::ivec2 resolution) : m_x_axis(x_axis), m_resolution(resolution)
 {
     if (x_axis)

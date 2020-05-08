@@ -20,13 +20,12 @@ glm::mat4 Camera::get_view_matrix() const
     return glm::translate(glm::mat4(1.f), m_pos);
 }
 
-/** TODO: Make magic numbers into constants */
 glm::mat4 Camera::get_view_projection_matrix() const
 {
-    return glm::ortho(m_pos.z * -640.f + m_pos.x,
-                      m_pos.z * 640.f + m_pos.x,
-                      m_pos.z * -360.f + m_pos.y,
-                      m_pos.z * 360.f + m_pos.y);
+    return glm::ortho(m_pos.z * -s_projection_size_x + m_pos.x,
+                      m_pos.z * s_projection_size_x + m_pos.x,
+                      m_pos.z * -s_projection_size_y + m_pos.y,
+                      m_pos.z * s_projection_size_y + m_pos.y);
 }
 
 void Camera::set_position_2d(glm::vec2 position)
@@ -55,7 +54,7 @@ void Camera::move(glm::vec3 delta)
 
 void Camera::zoom(float zoom)
 {
-    m_pos.z = std::clamp(m_pos.z + (zoom * m_speed), 0.2f, 50.f);
+    m_pos.z = std::clamp(m_pos.z + (zoom * m_zoom_speed), 0.2f, 50.f);
 }
 
 void Camera::set_boundaries(glm::vec2 bounds)

@@ -7,8 +7,9 @@
 
 namespace cs::debug
 {
-/** TODO: Document these two as well */
-
+/**
+ * Checks for number of entities with a HealthComponent and assumes that to be living entities
+ */
 class CollectorLivingEntities : public DataCollector::Command
 {
 private:
@@ -21,6 +22,9 @@ public:
     std::string_view get_name() override;
 };
 
+/**
+ * Collects the average health of all entities through the HealthComponent
+ */
 class CollectorAverageHealth : public DataCollector::Command
 {
 private:
@@ -87,7 +91,7 @@ public:
 
     float execute() override
     {
-        return m_data["execute"]();
+        return m_data["execute"](m_data).get<float>();
     }
 
     std::string_view get_name() override

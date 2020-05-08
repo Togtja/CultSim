@@ -15,7 +15,7 @@ TEST_CASE("Test case for regular action system setup")
     cs::RandomEngine rng{};
 
     auto agent        = test_registry.create();
-    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 1.f, 1.f, cs::TAG_Food};
+    cs::ai::Need need = {static_cast<std::string>("hunger"), 3.f, 100.f, 50.f, 1.f, 1.f, cs::TAG_Food};
     cs::action::Action action{static_cast<std::string>("eat"), cs::TAG_Find, 5.f, 0.f, {}, {}, {}, {}};
 
     cs::ai::Strategy strategy = {static_cast<std::string>("eat food"),

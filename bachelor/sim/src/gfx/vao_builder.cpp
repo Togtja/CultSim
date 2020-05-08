@@ -63,4 +63,4 @@ unsigned VaoBuilder::build()
     m_vao    = 0u;
     return tmp;
 }
-} // namespace cs
+} // namespace cs::gfx

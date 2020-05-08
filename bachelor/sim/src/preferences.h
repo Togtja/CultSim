@@ -37,7 +37,7 @@ struct Overloaded : Ts...
     using Ts::operator()...;
 };
 template<class... Ts>
-Overloaded(Ts...)->Overloaded<Ts...>;
+Overloaded(Ts...) -> Overloaded<Ts...>;
 
 /**
  * General store and management for changing preferences in the application

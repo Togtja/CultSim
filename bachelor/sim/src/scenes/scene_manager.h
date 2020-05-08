@@ -40,11 +40,13 @@ private:
         Command(std::unique_ptr<IScene> scene, ECommandType type) : new_scene(std::move(scene)), command_type(type){};
     };
 
-    /** TODO: Document member variables */
+    /** Current stack of scenes managed by the scene manager */
     std::vector<std::unique_ptr<IScene>> m_scenestack{};
 
+    /** Commands to alter the scene stack that have not been run yet */
     std::vector<Command> m_pending_commands{};
 
+    /** The context we exist in */
     ApplicationContext* m_context{nullptr};
 
 public:

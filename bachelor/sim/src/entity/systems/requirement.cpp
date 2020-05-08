@@ -20,11 +20,37 @@ void Requirement::deinitialize()
     m_context.dispatcher->sink<event::EntityDeleted>().disconnect<&Requirement::remove_requirements>(*this);
 }
 
-/** TODO: Make requirements into their own functions */
 void Requirement::update(float dt)
 {
     CS_AUTOTIMER(Requirement System);
     /** TODO: Expose Locationrequirements to lua more */
+    goto_location(dt);
+
+    look_for_target(dt);
+
+    find_target(dt);
+
+    add_tag(dt);
+
+    check_inventory(dt);
+}
+
+ISystem* Requirement::clone()
+{
+    return new Requirement(m_context);
+}
+
+void Requirement::remove_requirements(const event::EntityDeleted& event)
+{
+    m_context.registry->remove_if_exists<component::FindRequirement,
+                                         component::LocationRequirement,
+                                         component::TagRequirement,
+                                         component::VisionRequirement,
+                                         component::InventoryRequirement>(event.entity);
+}
+
+void Requirement::goto_location(float dt)
+{
     auto view_loc = m_context.registry->view<component::LocationRequirement, component::Movement, component::Position>();
     view_loc.each([dt, this](const entt::entity e,
                              component::LocationRequirement& locationreqs,
@@ -62,7 +88,10 @@ void Requirement::update(float dt)
             }
         }
     });
+}
 
+void Requirement::look_for_target(float dt)
+{
     auto view_vis = m_context.registry->view<component::VisionRequirement, component::Vision>();
     view_vis.each([this](const entt::entity e, const component::VisionRequirement& visionreqs, const component::Vision& vision) {
         for (auto& entity : vision.seen)
@@ -82,7 +111,10 @@ void Requirement::update(float dt)
             m_context.registry->remove_if_exists<component::VisionRequirement>(e);
         }
     });
+}
 
+void Requirement::find_target(float dt)
+{
     auto view_find = m_context.registry->view<component::FindRequirement,
                                               component::Strategy,
                                               component::Vision,
@@ -195,47 +227,42 @@ void Requirement::update(float dt)
             ai::find_path_astar(pos.position, findreqs.desired_position, mov.desired_position, m_context.scenario->bounds);
         }
     });
+}
 
+void Requirement::add_tag(float dt)
+{
     auto view_tag = m_context.registry->view<component::TagRequirement, component::Tags>();
     view_tag.each([this](const entt::entity e, const component::TagRequirement& tagreqs, component::Tags& tags) {
         tags.tags = ETag(tags.tags | tagreqs.tags);
         m_context.registry->remove<component::TagRequirement>(e);
         m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Tag});
     });
+}
 
+void Requirement::check_inventory(float dt)
+{
     auto view_inventory = m_context.registry->view<component::InventoryRequirement, component::Inventory, component::Strategy>();
     view_inventory.each([this](const entt::entity e,
                                const component::InventoryRequirement& invreqs,
                                const component::Inventory& inv,
                                component::Strategy& strat) {
-        for (auto content : inv.contents)
+        if ((inv.tags & invreqs.tags) == invreqs.tags)
         {
-            if (auto tags = m_context.registry->try_get<component::Tags>(content);
-                tags && ((tags->tags & invreqs.tags) == invreqs.tags))
+            for (auto content : inv.contents)
             {
-                strat.staged_strategies.back().actions.back().target = content;
-                m_context.registry->remove<component::InventoryRequirement>(e);
-                m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Inventory});
-                return;
+                if (auto tags = m_context.registry->try_get<component::Tags>(content);
+                    tags && ((tags->tags & invreqs.tags) == invreqs.tags))
+                {
+                    strat.staged_strategies.back().actions.back().target = content;
+                    m_context.registry->remove<component::InventoryRequirement>(e);
+                    m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Inventory});
+                    return;
+                }
             }
         }
 
         m_context.dispatcher->enqueue<event::RequirementFailure>(event::RequirementFailure{e, TAG_Inventory});
         m_context.registry->remove<component::InventoryRequirement>(e);
     });
-}
-
-ISystem* Requirement::clone()
-{
-    return new Requirement(m_context);
-}
-
-void Requirement::remove_requirements(const event::EntityDeleted& event)
-{
-    m_context.registry->remove_if_exists<component::FindRequirement,
-                                         component::LocationRequirement,
-                                         component::TagRequirement,
-                                         component::VisionRequirement,
-                                         component::InventoryRequirement>(event.entity);
 }
 } // namespace cs::system

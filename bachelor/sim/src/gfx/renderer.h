@@ -9,31 +9,43 @@
 
 namespace cs::gfx
 {
+/**
+ * Describes what mode we are rendering in
+ */
 enum class ERenderingMode
 {
     Render_2D,
     Render_3D
 };
 
-/** TODO: Documentation */
+/**
+ * The renderer is a Singleton that acts as an accessor and wrapper around the more specialized renderers available in CultSim
+ */
 class Renderer
 {
 private:
+    /** The active camera for both the 2D and 3D world */
     Camera m_camera{};
 
+    /** Renderer for debug shapes */
     DebugRenderer m_debug_renderer;
 
+    /** Renderer for sprites and 2D */
     SpriteRenderer m_sprite_renderer;
 
+    /** Renderer for 3D world, very primitive */
     RaymarchingRenderer m_raymarch_renderer;
 
+    /** Uniform for view and projection matrices, used by multiple renderers */
     UniformBuffer<MatrixData> m_matrix_ubo{};
 
+    /** Uniform for information about the program, such as resolution and cursor position */
     UniformBuffer<ProgramInformation> m_programinfo_ubo{};
 
     /** Sunlight environment UBO */
     UniformBuffer<Environment> m_env_ubo{};
 
+    /** Current rendering mode */
     ERenderingMode m_mode = ERenderingMode::Render_2D;
 
 public:
@@ -80,21 +92,69 @@ public:
     [[nodiscard]] RaymarchingRenderer& raymarch();
     [[nodiscard]] const RaymarchingRenderer& raymarch() const;
 
+    /**
+     * Set the rendering mode
+     *
+     * @param mode The new rendering mode
+     */
     void set_render_mode(ERenderingMode mode);
 
+    /**
+     * Set the camera position
+     *
+     * @param pos A new position in 3D world space
+     */
     void set_camera_position(const glm::vec3& pos);
 
+    /**
+     * Move the camera by a given delta instantly
+     *
+     * @param delta How much to move the camera
+     */
     void move_camera(glm::vec3 delta);
 
+    /**
+     * Set the camera position on the XY plane
+     *
+     * @param position The new position on the XY plane
+     */
     void set_camera_position_2d(glm::vec2 position);
+
+    /**
+     * Get the camera position on the XY plane
+     *
+     * @return The camera position on the XY plane
+     */
     glm::vec2 get_camera_position2d();
 
+    /**
+     * Set the camera bounds
+     *
+     * @param bounds The bounds on the XY plane
+     */
     void set_camera_bounds(glm::vec2 bounds);
 
+    /**
+     * Update the program information so the renderer can use it
+     *
+     * @param runtime How long since the program or relevant part of the program has started
+     * @param cursorpos The current mouse position
+     * @param resolution The current screen resolution
+     */
     void update_program_info(float runtime, glm::vec2 cursorpos, glm::vec2 resolution);
 
+    /**
+     * Set the sun direction in the environment for 2D and 3D
+     *
+     * @param dir The new sun direction, should be normalized
+     */
     void set_sun_direction(glm::vec3 dir);
 
+    /**
+     * Set the sun color in the 2D and 3D environment
+     *
+     * @param col The new environment color
+     */
     void set_sun_color(glm::vec4 col);
 
     /**
