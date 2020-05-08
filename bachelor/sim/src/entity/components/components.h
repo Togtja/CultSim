@@ -363,20 +363,39 @@ namespace detail
 /** Component which defines a single trait */
 struct Trait
 {
+    /** The name of the trait */
     std::string name;
+    /** A short descriptiopn of the trait */
     std::string desc;
 
+    /**
+     * A boolean for whether  the trait can be inheritied by their parents
+     * It needs the Reproduction system to work
+     */
     bool can_inherit{false};
+
+    /** The probability of inhereting */
     float inherit_chance{1.0f};
 
+    /**
+     * Boolean for if you can randomly get this trait when you het born
+     * It needs the Reproduction system to work
+     */
     bool can_mutate{false};
+
+    /** The probability of randomly getting this trait */
     float mutation_chance{0.0001f};
 
-    /** TODO: Comment these **/
+    /** Lua/user defined function that return a bool for if the agent attained the trait */
     sol::function attain;
+
+    /** Lua/user defined function that return a bool for if the agent lost the trait */
     sol::function lose;
 
+    /** Lua/user defined function that describes how the trait affects the agent */
     sol::function affect;
+
+    /** Lua/user defined function that describes how the trait affects the agent after losing it*/
     sol::function unaffect;
 
     bool operator==(Trait trait)
