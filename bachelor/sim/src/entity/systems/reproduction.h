@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entity/components/components.h"
 #include "system.h"
 
 #include <string>
@@ -29,5 +30,10 @@ public:
     void update(float dt) override;
 
     ISystem* clone() override;
+
+private:
+    void inherit_traits(component::Traits& traits, entt::entity from);
+    void update_fertility();
+    void spawn_children(const std::vector<Child>& children);
 };
 } // namespace cs::system
