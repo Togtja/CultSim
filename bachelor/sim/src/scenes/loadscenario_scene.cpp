@@ -4,6 +4,7 @@
 #include "input/input_handler.h"
 #include "scenario_scene.h"
 #include "scene_manager.h"
+#include "preferences.h"
 
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
@@ -12,7 +13,6 @@ namespace cs
 {
 void LoadScenarioScene::on_enter()
 {
-    ImGui::OpenPopup("Select##Scenario");
     input::get_input().add_context(input::EKeyContext::LoadScenario, true);
 
     RandomEngine temp_rng{};
@@ -28,35 +28,47 @@ void LoadScenarioScene::on_exit()
     input::get_input().remove_context(input::EKeyContext::LoadScenario);
 }
 
-/** TODO: Expose seed to Lua */
 bool LoadScenarioScene::update(float dt)
 {
-    /** Shows the popup to select scenario (TODO: Lua-fi) */
-    if (ImGui::BeginPopupModal("Select##Scenario", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove))
-    {
-        ImGui::CaptureKeyboardFromApp(false);
-        ImGui::InputText("Seed", m_seed, s_seed_length - 1);
+    /** Shows the popup to select scenario */
+    ImGui::SetNextWindowSize({300.f, 500.f});
+    glm::ivec2 resolution = std::get<glm::ivec2>(m_context->preferences->get_resolution().value);
+    ImGui::SetNextWindowPos(glm::vec2(resolution) / 2.f, 0, {0.5f, 0.25f});
 
-        const auto& scenarios = fs::list_directory("script/scenarios/");
-        for (const auto& scenario : scenarios)
+    ImGui::Begin("Select", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+    ImGui::CaptureKeyboardFromApp(false);
+
+    /** Show load options */
+    if (ImGui::TreeNode("Load Options"))
+    {
+        ImGui::TextColored({0.6, 0.6, 0.6, 1.0}, "Random Seed");
+        ImGui::InputText("##SeedSlider", m_seed, s_seed_length - 1);
+        ImGui::Checkbox("Enable rendering", &m_enable_rendering);
+        ImGui::TreePop();
+    }
+
+    const auto& scenarios = fs::list_directory("script/scenarios/");
+    for (const auto& scenario : scenarios)
+    {
+        if (fs::is_directory("script/scenarios/" + scenario))
         {
-            if (fs::is_directory("script/scenarios/" + scenario))
+            if (ImGui::Button(scenario.c_str(), {280, 30}))
             {
-                if (ImGui::Button(scenario.c_str(), {150, 50}))
-                {
-                    m_context->scene_manager->push<ScenarioScene>(fmt::format("script/scenarios/{}", scenario),
-                                                                  entt::hashed_string(m_seed).value());
-                }
+                m_context->scene_manager->push<ScenarioScene>(
+                    fmt::format("script/scenarios/{}", scenario),
+                    lua::ScenarioLoadPreferences{entt::hashed_string(m_seed).value(), m_enable_rendering});
             }
         }
-
-        /** Exit the loading screen */
-        if (ImGui::Button("Cancel", {150, 25}))
-        {
-            m_context->scene_manager->pop();
-        }
-        ImGui::EndPopup();
     }
+
+    /** Exit the loading screen */
+    ImGui::Separator();
+    if (ImGui::Button("Cancel", {280, 30}))
+    {
+        m_context->scene_manager->pop();
+    }
+
+    ImGui::End();
     return false;
 }
 

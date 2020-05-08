@@ -74,6 +74,9 @@ private:
     /** Name generator used for scenario */
     NameGenerator m_name_generator{};
 
+    /** Scenario Preferences */
+    lua::ScenarioLoadPreferences m_scenario_preferences{};
+
     /** Keep track of screen resolution */
     glm::vec2 m_resolution{};
 
@@ -87,7 +90,7 @@ private:
     bool m_paused{false};
 
 public:
-    explicit ScenarioScene(std::string_view scenario, uint32_t random_seed);
+    explicit ScenarioScene(std::string_view scenario, const lua::ScenarioLoadPreferences& preferences);
 
     /** Scene Interface */
     void on_enter() override;

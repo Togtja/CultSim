@@ -51,6 +51,16 @@ struct Scenario
 };
 
 /**
+ * Load preferences for loading a scenario
+ */
+struct ScenarioLoadPreferences
+{
+    uint32_t seed{};
+
+    bool enable_rendering{};
+};
+
+/**
  * Load a scenario from file using default parameters
  *
  * @param lua The lua state to load with
