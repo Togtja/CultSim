@@ -19,7 +19,6 @@ void Memory::deinitialize()
     m_context.dispatcher->sink<event::CreatedMemory>().disconnect<&Memory::update_memories>(*this);
 }
 
-/** TODO: Move stuff into functions */
 void Memory::update(float dt)
 {
     CS_AUTOTIMER(Memory System);
