@@ -2,50 +2,63 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 
+#include <taskflow/taskflow.hpp>
+
 namespace cs::system
 {
 void Traits::update(float dt)
 {
     CS_AUTOTIMER(Traits System);
+
     auto view = m_context.registry->view<component::Traits>();
-    view.each([this](entt::entity e, component::Traits& traits) {
-        /** Trying to get traits */
-        for (const auto& trait : traits.attainable_traits)
-        {
-            /** As long as the attainable trait is not already acquired */
-            const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), trait);
-            if (it == traits.acquired_traits.end())
+
+    tf::Taskflow taskflow{};
+    taskflow.parallel_for(
+        view.begin(),
+        view.end(),
+        [this, &view](entt::entity e) {
+            auto& traits = view.get<component::Traits>(e);
+
+            /** Trying to get traits */
+            for (const auto& trait : traits.attainable_traits)
             {
-                /* Check if we satisfy the user typed requirement */
-                if (trait.attain(e))
+                /** As long as the attainable trait is not already acquired */
+                const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), trait);
+                if (it == traits.acquired_traits.end())
                 {
-                    trait.affect(e);
-                    traits.acquired_traits.push_back(trait);
+                    /* Check if we satisfy the user typed requirement */
+                    if (trait.attain(e))
+                    {
+                        trait.affect(e);
+                        traits.acquired_traits.push_back(trait);
+                    }
                 }
             }
-        }
 
-        /* Add traits to be deleted (to avoid deleting in loop) */
-        std::vector<component::detail::Trait> to_delete;
-        for (const auto& trait : traits.acquired_traits)
-        {
-            if (trait.lose(e))
+            /* Add traits to be deleted (to avoid deleting in loop) */
+            std::vector<component::detail::Trait> to_delete;
+            for (const auto& trait : traits.acquired_traits)
             {
-                trait.unaffect(e);
-                to_delete.push_back(trait);
+                if (trait.lose(e))
+                {
+                    trait.unaffect(e);
+                    to_delete.push_back(trait);
+                }
             }
-        }
 
-        /* Delete the traits we found */
-        for (const auto& trait : to_delete)
-        {
-            const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), trait);
-            if (it != traits.acquired_traits.end())
+            /* Delete the traits we found */
+            for (const auto& trait : to_delete)
             {
-                traits.acquired_traits.erase(it);
+                const auto& it = std::find(traits.acquired_traits.begin(), traits.acquired_traits.end(), trait);
+                if (it != traits.acquired_traits.end())
+                {
+                    traits.acquired_traits.erase(it);
+                }
             }
-        }
-    });
+        },
+        s_chunk_size);
+
+    m_context.executor->run(taskflow).get();
 }
 
 ISystem* Traits::clone()
