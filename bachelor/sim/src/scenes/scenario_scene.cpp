@@ -195,20 +195,6 @@ void ScenarioScene::on_exit()
 
 bool ScenarioScene::update(float dt)
 {
-    static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
-    b_tex.scale        = 100;
-    b_tex.material_idx = MATERIAL_IDX_NOSPEC;
-
-    /** TODO: Make this work */
-    /** Draw background crudely */
-    for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
-    {
-        for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
-        {
-            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.05f, 0.15f, 0.0f), b_tex);
-        }
-    }
-
     update_entity_hover();
 
     setup_docking_ui();
@@ -268,6 +254,18 @@ bool ScenarioScene::update(float dt)
 
 bool ScenarioScene::draw()
 {
+    /** Draw background crudely */
+    static auto b_tex  = gfx::get_renderer().sprite().get_texture("sprites/background_c.png");
+    b_tex.scale        = 100;
+    b_tex.material_idx = MATERIAL_IDX_NOSPEC;
+    for (int i = -m_scenario.bounds.x / 100; i <= m_scenario.bounds.x / 100; i++)
+    {
+        for (int j = -m_scenario.bounds.y / 100; j <= m_scenario.bounds.y / 100; j++)
+        {
+            gfx::get_renderer().sprite().draw(glm::vec3(i * 100.f, j * 100.f, 0.f), glm::vec3(0.15f, 0.15f, 0.15f), b_tex);
+        }
+    }
+
     for (const auto& system : m_draw_systems)
     {
         /** Pass 0, since draw systems don't need time */
