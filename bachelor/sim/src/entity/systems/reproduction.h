@@ -33,7 +33,7 @@ class Reproduction : public ISystem
         std::string parent_type{};
 
         /** Entity ids of who the parents was */
-        std::pair<entt::entity, entt::entity> parents{entt::null, entt::null};
+        component::Pregnancy::Parents parents{entt::null, entt::null};
     };
 
 public:

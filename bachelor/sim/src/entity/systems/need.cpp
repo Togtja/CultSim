@@ -24,7 +24,7 @@ void Need::update(float dt)
             {
                 found->status = need.status;
                 /** Remove it if it should not be there */
-                if (found->status > 50.f)
+                if (found->status > need.threshhold)
                 {
                     needs.vital_needs.erase(found);
                     m_context.dispatcher->enqueue<event::NeedNoLongerCritical>(
@@ -41,8 +41,7 @@ void Need::update(float dt)
             else
             {
                 /** Add it if it should be there */
-                /** TODO: Make needs have a threshhold variable the user can set */
-                if (need.status <= 50.f)
+                if (need.status <= need.threshhold)
                 {
                     /** If vital needs are empty before adding this one */
                     if (needs.vital_needs.empty())

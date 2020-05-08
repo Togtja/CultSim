@@ -210,6 +210,7 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
         auto need_struct = ai::Need{need_table["name"].get<std::string>(),
                                     need_table["weight"].get<float>(),
                                     need_table["status"].get<float>(),
+                                    need_table["threshhold"].get<float>(),
                                     need_table["decay_rate"].get<float>(),
                                     need_table["vitality"].get<float>(),
                                     need_table["tags"].get<ETag>()};
@@ -226,6 +227,7 @@ bool spawn_need_component(entt::entity e, entt::registry& reg, sol::table table)
         need.leisure_needs.push_back(ai::Need{need_table["name"].get<std::string>(),
                                               need_table["weight"].get<float>(),
                                               need_table["status"].get<float>(),
+                                              need_table["threshhold"].get<float>(),
                                               need_table["decay_rate"].get<float>(),
                                               need_table["vitality"].get<float>(),
                                               need_table["tags"].get<ETag>()});

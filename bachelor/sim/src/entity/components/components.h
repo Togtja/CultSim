@@ -310,20 +310,32 @@ struct Name
     std::string name{};
 };
 
-/** TODO: Make stuff into struct to differentiate between mother and father */
 /** Component which keeps track of a pregnancy */
 struct Pregnancy
 {
-    using ParentsPair = std::pair<entt::entity, entt::entity>;
+    /** Struct of who is the parents in a pregnancy*/
+    struct Parents
+    {
+        /** The incubator typically the mom/female */
+        entt::entity incubator;
 
+        /** The non-incubator typically the dad/male */
+        entt::entity non_incubator;
+    };
+
+    /** Time since the start of the pregnancy */
     float time_since_start{};
+
+    /** How long the pregnancy will last */
     float gestation_period{};
 
     /** First in the incubator, then second is other parent (In Humans: first is Mom, second is Dad) */
-    ParentsPair parents{entt::null, entt::null};
+    Parents parents{entt::null, entt::null};
 
+    /** The amount of children in the pregnancy (aka twins etc) */
     uint16_t children_in_pregnancy{};
 
+    /** If the pregnancy it self is an egg hatching */
     bool is_egg{false};
 };
 
@@ -351,20 +363,39 @@ namespace detail
 /** Component which defines a single trait */
 struct Trait
 {
+    /** The name of the trait */
     std::string name;
+    /** A short descriptiopn of the trait */
     std::string desc;
 
+    /**
+     * A boolean for whether  the trait can be inheritied by their parents
+     * It needs the Reproduction system to work
+     */
     bool can_inherit{false};
+
+    /** The probability of inhereting */
     float inherit_chance{1.0f};
 
+    /**
+     * Boolean for if you can randomly get this trait when you het born
+     * It needs the Reproduction system to work
+     */
     bool can_mutate{false};
+
+    /** The probability of randomly getting this trait */
     float mutation_chance{0.0001f};
 
-    /** TODO: Comment these **/
+    /** Lua/user defined function that return a bool for if the agent attained the trait */
     sol::function attain;
+
+    /** Lua/user defined function that return a bool for if the agent lost the trait */
     sol::function lose;
 
+    /** Lua/user defined function that describes how the trait affects the agent */
     sol::function affect;
+
+    /** Lua/user defined function that describes how the trait affects the agent after losing it*/
     sol::function unaffect;
 
     bool operator==(Trait trait)

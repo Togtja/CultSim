@@ -11,7 +11,6 @@
 namespace cs::gob
 {
 /** TODO: Fix naming of variables*/
-/** TODO: More Documentation*/
 
 /**
  * The new Actions, which differ slightly from the old implementation in their increased flexibility

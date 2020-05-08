@@ -41,10 +41,25 @@ public:
 
     bool draw() override;
 
+private:
     /** Show the UI for key bindings */
     void show_keybinding_ui();
 
     /** Quit back to the previous menu */
     void go_back();
+
+    /**
+     * Displays the avaliable action you can bind a key to  given a context
+     *
+     * @param context The context ro extract your action options
+     */
+    void display_select_action_ui(input::EKeyContext context);
+
+    /**
+     * Dispays the "press a key" screen, where you press a key and the binding will be change to that key
+     *
+     * @param context The context to which this new key to binding mapping will be
+     */
+    void display_change_bindings_ui(input::EKeyContext context);
 };
 } // namespace cs

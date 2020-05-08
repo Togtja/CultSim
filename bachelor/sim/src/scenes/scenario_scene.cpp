@@ -7,8 +7,8 @@
 #include "entity/components/components.h"
 #include "entity/components/need.h"
 #include "entity/components/tags.h"
-#include "entity/events.h"
 #include "entity/effect.h"
+#include "entity/events.h"
 #include "entity/factory.h"
 #include "entity/memories/resource_location.h"
 #include "entity/systems/action.h"
@@ -29,6 +29,7 @@
 #include "random_engine.h"
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
+
 
 #include <algorithm>
 #include <functional>

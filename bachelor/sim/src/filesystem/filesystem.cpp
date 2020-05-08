@@ -195,20 +195,25 @@ bool copy_file(std::string_view rpath_old, std::string_view rpath_new, bool over
         spdlog::get("filesystem")->info("successfully copied file");
         return true;
     }
+
     /** At this point a new file should have failed to be created,
      * if it has been created we delete to restore fs state */
-    /** TODO: Fix override permissions / restore file system */
-    if (exists(rpath_new))
+    if (exists(rpath_new) && !overwrite_existing)
     {
         if (!delete_file(rpath_new))
         {
             spdlog::get("filesystem")->error("fail to delete new file during failed copy");
         }
     }
-    else
+    else if (!overwrite_existing)
     {
         spdlog::get("filesystem")->error("fail to create new file");
     }
+    else
+    {
+        spdlog::get("filesystem")->error("fail to overwrite file with correct amount of bytes");
+    }
+
     return false;
 }
 

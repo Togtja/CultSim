@@ -10,24 +10,28 @@
 
 namespace cs
 {
-/** TODO: Add comments?*/
-
 void LocaleEditor::init(sol::state_view lua)
 {
+    /** Get the diffrent locales */
     auto locales = fs::list_directory("l10n");
     for (const auto& str : locales)
     {
+        /** Read each of them and get the lua script/table*/
         auto script_file = fs::read_file("l10n/" + str);
         lua.script(script_file);
         sol::table locale = lua["locale"];
 
         m_locales.push_back(str);
+
+        /** For each key -> string pair of the lua locale table: */
         for (auto&& [k, v] : locale)
         {
+            /** Add it to the translation map */
             m_translations[k.as<std::string>()].push_back(v.as<std::string>());
         }
     }
 
+    /** Add enough space/memory for UI editing */
     for (auto&& [k, v] : m_translations)
     {
         v.resize(m_locales.size());
@@ -37,8 +41,6 @@ void LocaleEditor::init(sol::state_view lua)
         }
     }
 }
-
-/** TODO: Add Comments? */
 
 void LocaleEditor::show()
 {
