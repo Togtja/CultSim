@@ -253,8 +253,10 @@ ParentsName Relationship::get_parents(entt::entity e, bool is_local_id)
             return ret;
         }
     }
-
-    spdlog::get("agent")->info("could not find the specified entity {} when getting parents", e);
+    if (!view.empty())
+    {
+        spdlog::get("agent")->info("could not find the specified entity {} when getting parents", e);
+    }
     return ret;
 }
 
@@ -291,7 +293,10 @@ std::vector<EntityNameAndIds> Relationship::get_children(entt::entity e, bool is
             return ret;
         }
     }
-    spdlog::get("agent")->info("could not find the specified entity {} when getting children", e);
+    if (!view.empty())
+    {
+        spdlog::get("agent")->info("could not find the specified entity {} when getting children", e);
+    }
     return ret;
 }
 
@@ -307,8 +312,16 @@ bool Relationship::is_family(entt::entity me, entt::entity other, unsigned gen, 
     /** Add children and parents to the to_check */
     to_check         = get_children(me, is_local_id);
     const auto rel_e = get_parents(me, is_local_id);
-    to_check.emplace_back(rel_e.dad);
-    to_check.emplace_back(rel_e.mom);
+
+    if (rel_e.dad.ids.relationship != entt::null)
+    {
+        to_check.emplace_back(rel_e.dad);
+    }
+
+    if (rel_e.mom.ids.relationship != entt::null)
+    {
+        to_check.emplace_back(rel_e.mom);
+    }
 
     while (!to_check.empty())
     {
