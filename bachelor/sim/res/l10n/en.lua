@@ -4,9 +4,5 @@ locale = {
     hello = "Hello World",
     key_press = "Key",
     key_action = "Action",
-    key_new_binding = "Add new binding",
-    
-
-
-    
+    key_new_binding = "Add new binding"
 }
