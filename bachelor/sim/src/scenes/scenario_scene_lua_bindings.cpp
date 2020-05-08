@@ -1,8 +1,8 @@
-#include "scenario_scene.h"
-#include "entity/components/components.h"
-#include "entity/factory.h"
-#include "entity/effect.h"
 #include "ai/path_finding.h"
+#include "entity/components/components.h"
+#include "entity/effect.h"
+#include "entity/factory.h"
+#include "scenario_scene.h"
 
 #include <spdlog/spdlog.h>
 

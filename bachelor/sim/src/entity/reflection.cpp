@@ -94,7 +94,6 @@ void reflect_systems()
     entt::meta<system::GOBBAS>().alias("GOBBASystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Traits>().alias("TraitsSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
     entt::meta<system::Relationship>().alias("RelationshipSystem"_hs).ctor<system::SystemContext>().base<system::ISystem>();
-
 }
 
 } // namespace cs::meta

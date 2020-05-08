@@ -30,7 +30,6 @@
 #include "scene_manager.h"
 #include "scenes/pausemenu_scene.h"
 
-
 #include <algorithm>
 #include <functional>
 #include <memory>
@@ -647,15 +646,15 @@ void ScenarioScene::draw_selected_entity_information_ui()
             for (const auto& goal_t : goal->goals)
             {
                 ImGui::TableNextCell();
-                ImGui::Text("%s", goal_t.m_name.c_str());
+                ImGui::Text("%s", goal_t.name.c_str());
                 ImGui::TableNextCell();
-                if (goal_t.m_weight_function.index() == 0)
+                if (goal_t.weight_function.index() == 0)
                 {
-                    ImGui::Text("%3.1f", std::get<sol::function>(goal_t.m_weight_function)(goal_t).get<float>());
+                    ImGui::Text("%3.1f", std::get<sol::function>(goal_t.weight_function)(goal_t).get<float>());
                 }
                 else
                 {
-                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.m_weight_function)());
+                    ImGui::Text("%3.1f", std::get<std::function<float()>>(goal_t.weight_function)());
                 }
             }
             ImGui::EndTable();
@@ -664,15 +663,15 @@ void ScenarioScene::draw_selected_entity_information_ui()
 
     if (action)
     {
-        if (action->current_action_sequence.m_name.empty())
+        if (action->current_action_sequence.name.empty())
         {
-            ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.m_name.c_str());
+            ImGui::Text("Current Action Sequence: %s", action->current_action_sequence.name.c_str());
             if (action->current_action_sequence.current_action.name.empty())
             {
                 int action_index = 0;
-                for (int i = action->current_action_sequence.m_actions.size() - 1; i >= 0; i--)
+                for (int i = action->current_action_sequence.actions.size() - 1; i >= 0; i--)
                 {
-                    if (action->current_action_sequence.m_actions[i] == action->current_action_sequence.current_action)
+                    if (action->current_action_sequence.actions[i] == action->current_action_sequence.current_action)
                     {
                         action_index = i;
                     }
@@ -680,7 +679,7 @@ void ScenarioScene::draw_selected_entity_information_ui()
                 ImGui::Text("Current Action: %s (Action %d out of %zu)",
                             action->current_action_sequence.current_action.name.c_str(),
                             action_index + 1,
-                            action->current_action_sequence.m_actions.size());
+                            action->current_action_sequence.actions.size());
             }
         }
     }
