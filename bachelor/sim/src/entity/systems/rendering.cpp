@@ -14,22 +14,6 @@
 
 namespace cs::system
 {
-/** TODO: Remove Keybinding & initialization/deinitialization */
-void Rendering::initialize()
-{
-    auto& handler = input::get_input();
-    handler.add_context(input::EKeyContext::RenderingSystem);
-    handler.fast_bind_key(input::EKeyContext::RenderingSystem,
-                          SDL_SCANCODE_R,
-                          input::EAction::ReloadShaders,
-                          [&r = gfx::get_renderer().raymarch()] { r.reload(); });
-}
-
-void Rendering::deinitialize()
-{
-    input::get_input().remove_context(input::EKeyContext::RenderingSystem);
-}
-
 void Rendering::update(float dt)
 {
     CS_AUTOTIMER(Rendering System);
@@ -82,14 +66,18 @@ void Rendering::update_imgui()
     static glm::vec3 light_dir{.8f, .4f, .2f};
     static glm::vec3 light_col{7.f, 5.f, 3.f};
 
-    if (ImGui::DragFloat3("Sun Direction", (float*)&light_dir, 0.01f, -1.f, 1.f))
+    if (ImGui::TreeNode("Environment"))
     {
-        gfx::get_renderer().set_sun_direction(light_dir);
-    }
+        if (ImGui::DragFloat3("Sun Direction", (float*)&light_dir, 0.01f, -1.f, 1.f))
+        {
+            gfx::get_renderer().set_sun_direction(light_dir);
+        }
 
-    if (ImGui::ColorEdit3("Sun Color", (float*)&light_col, ImGuiColorEditFlags_HDR))
-    {
-        gfx::get_renderer().set_sun_color({light_col, 1.f});
+        if (ImGui::ColorEdit3("Sun Color", (float*)&light_col, ImGuiColorEditFlags_HDR))
+        {
+            gfx::get_renderer().set_sun_color({light_col, 1.f});
+        }
+        ImGui::TreePop();
     }
 }
 } // namespace cs::system

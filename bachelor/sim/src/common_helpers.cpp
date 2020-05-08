@@ -17,7 +17,7 @@ unsigned count_set_bits(uint64_t i)
 
 bool close_enough(glm::vec2 pos, glm::vec2 pos2, float threshold)
 {
-    glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
+    const glm::bvec2 boolvec = glm::epsilonEqual(pos, pos2, glm::vec2(threshold));
     return boolvec.x && boolvec.y;
 }
 

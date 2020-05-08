@@ -1,5 +1,7 @@
 #pragma once
 
+#include "debug/native_collectors.h"
+
 #include <string>
 #include <string_view>
 #include <vector>
@@ -9,11 +11,18 @@
 
 namespace cs::lua
 {
-/** TODO: Add some documentation about the struct */
+/**
+ * Contains information about a single scenario and the data it needs to run as intended by the developer
+ */
 struct Scenario
 {
+    /** Scenario name */
     std::string name{};
+
+    /** A small description of the scenario, shown during sim */
     std::string description{};
+
+    /** The path to the folder used to load the scenario */
     std::string script_path{};
 
     /** Scenario Bounds */
@@ -21,6 +30,9 @@ struct Scenario
 
     /** Initially active systems */
     std::vector<sol::object> systems{};
+
+    /** Data collectors from Lua */
+    std::vector<debug::LuaCollector> data_collectors{};
 
     /** How often this scenario should sample data */
     float sampling_rate{1.0f};

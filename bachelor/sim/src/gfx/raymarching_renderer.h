@@ -7,7 +7,11 @@
 
 namespace cs::gfx
 {
-/** TODO: Documentation */
+/**
+ * A simplified spher tracing / ray marching renderer to do the job of 3D visualization within CultSim
+ *
+ * @note Currently in a proof of concept mode until further notice
+ */
 class RaymarchingRenderer
 {
 private:
@@ -17,8 +21,10 @@ private:
     /** Active shader */
     uint32_t m_shader;
 
+    /** VBO to hold the spheres we are drawing */
     uint32_t m_sphere_buffer;
 
+    /** The CPU-side sphere data before flushing to the VBO */
     std::vector<SphereShape> m_spheres{};
 
 public:
@@ -26,6 +32,9 @@ public:
 
     ~RaymarchingRenderer() noexcept;
 
+    /**
+     * Clear all spheres from the renderer so we can submit new ones
+     */
     void clear();
 
     /**

@@ -47,7 +47,9 @@ public:
     std::tuple<std::vector<PrimitiveVertex>, std::vector<unsigned>> generate_outline() override;
 };
 
-/** TODO: Documentation */
+/**
+ * Implementation of IPrimitive that generates a rectangle quad
+ */
 class PrimitiveQuad : public IPrimitive
 {
 private:

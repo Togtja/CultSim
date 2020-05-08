@@ -63,8 +63,14 @@ void ScenarioScene::initialize_simulation()
     m_registry.set<EntitySelectionHelper>();
     m_registry.set<RandomEngine*>(&m_rng);
 
-    /** TODO: Read in data samplers from Lua */
+    /** Add lua data collectors */
     m_data_collector.set_sampling_rate(m_scenario.sampling_rate);
+    for (const auto& lua_collector : m_scenario.data_collectors)
+    {
+        m_data_collector.add_collector<debug::LuaCollector>(lua_collector);
+    }
+
+    /** TODO: Figure out a way to add these conditionally from load scenario scene */
     m_data_collector.add_collector<debug::CollectorLivingEntities>(m_registry);
     m_data_collector.add_collector<debug::CollectorAverageHealth>(m_registry);
     m_data_collector.add_collector<debug::CollectorMouse>(true, m_resolution);

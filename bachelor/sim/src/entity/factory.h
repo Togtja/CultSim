@@ -15,7 +15,18 @@ namespace detail
 {
 component::detail::Trait get_trait(sol::table traits);
 
-/** TODO: High level explanation of what these do */
+/**
+ * Spawn a component from Lua
+ *
+ * This chunk of spawner functions are factory functions for individual components that handle reading in the data from Lua and
+ * creating the respective C++ types from that data, and assigning it to their respective entities. Used by the spawn_entity
+ * function. This doc applies equally to all spawn_*_component functions.
+ *
+ * @param e The entity to spawn a component for
+ * @param reg The registry used for assigning components
+ * @param table The lua data table containing information to spawn the particular component
+ * @return True if the component was parsed successfully
+ */
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_movement_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_sprite_component(entt::entity e, entt::registry& reg, sol::table table);

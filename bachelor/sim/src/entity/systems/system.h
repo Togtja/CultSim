@@ -21,7 +21,13 @@ struct SystemContext
     sol::state_view* lua_state{nullptr};
 };
 
-/** TODO: Documentation */
+/**
+ * Interface for all behavior systems in CultSim
+ *
+ * This interface is used for systems that add behavior to components. The system part of an ECS. They provide a convenient way to
+ * separate systems in smaller chunks that perform their own initialization and logic. Systems should be independent of each
+ * other, but by adding more of them, emergent behavior will naturally appear, which is the power of it all.
+ */
 class ISystem
 {
 protected:

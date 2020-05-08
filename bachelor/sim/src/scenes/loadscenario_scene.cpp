@@ -1,4 +1,4 @@
-#include "loadsenario_scene.h"
+#include "loadscenario_scene.h"
 #include "common_helpers.h"
 #include "filesystem/filesystem.h"
 #include "input/input_handler.h"
@@ -8,7 +8,6 @@
 #include <gfx/ImGUI/imgui.h>
 #include <spdlog/spdlog.h>
 
-/** TODO: Rename loadsenario_scene.cpp to loadscenario_scene.cpp */
 namespace cs
 {
 void LoadScenarioScene::on_enter()
