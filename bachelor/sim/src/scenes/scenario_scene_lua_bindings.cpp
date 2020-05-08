@@ -8,6 +8,36 @@
 
 namespace cs
 {
+static void set_children_in_pregnancy(entt::registry& reg,
+                                      RandomEngine& rng,
+                                      component::Pregnancy& preg,
+                                      component::Reproduction& incubator,
+                                      component::Reproduction& non_incubator,
+                                      entt::entity incubator_e,
+                                      entt::entity non_incubator_e)
+{
+    preg = reg.assign<component::Pregnancy>(incubator_e);
+    if (incubator.children_deviation > 0)
+    {
+        preg.children_in_pregnancy = std::round(rng.normal(incubator.mean_children_pp, incubator.children_deviation));
+    }
+    else
+    {
+        preg.children_in_pregnancy = non_incubator.mean_children_pp;
+    }
+
+    if (incubator.gestation_deviation > 0)
+    {
+        preg.gestation_period = std::round(rng.normal(incubator.average_gestation_period, incubator.gestation_deviation));
+    }
+    else
+    {
+        preg.gestation_period = incubator.average_gestation_period;
+    }
+    preg.parents.incubator     = incubator_e;
+    preg.parents.non_incubator = non_incubator_e;
+}
+
 void ScenarioScene::bind_scenario_lua_functions()
 {
     /** Helpful to make following code shorter and more readable, copying is fine here, it's just a pointer */
@@ -531,58 +561,19 @@ void ScenarioScene::bind_scenario_lua_functions()
                 return;
             }
 
-            cs::component::Pregnancy* preg;
-            /** TODO: Make function Tomas the reproduction sexologist */
+            component::Pregnancy preg;
             if (rc_f->incubator == component::Reproduction::ESex::Female)
             {
-                preg = &m_registry.assign<component::Pregnancy>(mother);
-                if (rc_m->children_deviation > 0)
-                {
-                    preg->children_in_pregnancy = std::round(m_rng.normal(rc_m->mean_children_pp, rc_m->children_deviation));
-                }
-                else
-                {
-                    preg->children_in_pregnancy = rc_f->mean_children_pp;
-                }
-                if (rc_m->gestation_deviation > 0)
-                {
-                    preg->gestation_period = std::round(m_rng.normal(rc_m->average_gestation_period, rc_m->gestation_deviation));
-                }
-                else
-                {
-                    preg->gestation_period = rc_m->average_gestation_period;
-                }
-                preg->parents.first  = mother;
-                preg->parents.second = father;
+                set_children_in_pregnancy(m_registry, m_rng, preg, *rc_m, *rc_f, mother, father);
             }
             else
             {
-                preg = &m_registry.assign<component::Pregnancy>(father);
-                if (rc_f->children_deviation > 0)
-                {
-                    preg->children_in_pregnancy = m_rng.normal(rc_f->mean_children_pp, rc_f->children_deviation);
-                }
-                else
-                {
-                    preg->children_in_pregnancy = rc_f->mean_children_pp;
-                }
-                if (rc_f->gestation_deviation > 0)
-                {
-                    preg->gestation_period = m_rng.normal(rc_f->average_gestation_period, rc_f->gestation_deviation);
-                }
-                else
-                {
-                    preg->gestation_period = rc_f->average_gestation_period;
-                }
-
-                /** Here the incubator is the dad */
-                preg->parents.second = mother;
-                preg->parents.first  = father;
+                set_children_in_pregnancy(m_registry, m_rng, preg, *rc_f, *rc_m, father, mother);
             }
 
-            if (preg->children_in_pregnancy < 1)
+            if (preg.children_in_pregnancy < 1)
             {
-                preg->children_in_pregnancy = 1;
+                preg.children_in_pregnancy = 1;
             }
         }
     });
