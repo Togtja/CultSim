@@ -84,7 +84,7 @@ void Action::update(float dt)
             }
             if (strategy.requirements & ~TAG_None)
             {
-                spdlog::warn("Unhandled requirement {}", tag_to_string(strategy.requirements));
+                spdlog::warn("unhandled requirement {}", tag_to_string(strategy.requirements));
             }
             strategy.requirements = TAG_None;
         }
