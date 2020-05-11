@@ -525,7 +525,7 @@ void ScenarioScene::bind_scenario_lua_functions()
             return (t_comp->tags & tags) == tags;
         }
 
-        spdlog::get("default")->error("The entity does not have a tag component.");
+        spdlog::get("default")->error("the entity does not have a tag component.");
         return false;
     });
 
@@ -534,7 +534,7 @@ void ScenarioScene::bind_scenario_lua_functions()
         {
             t_comp->tags = ETag(t_comp->tags | tags);
         }
-        spdlog::get("default")->error("The entity does not have a tag component.");
+        spdlog::get("default")->error("the entity does not have a tag component.");
         return false;
     });
 

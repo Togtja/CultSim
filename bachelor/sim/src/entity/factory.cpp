@@ -412,7 +412,7 @@ component::detail::Trait get_trait(sol::table traits)
     else
     {
         /** TODO: Create default function */
-        spdlog::get("lua")->warn("No attain condition");
+        spdlog::get("lua")->warn("no attain condition");
     }
 
     if (traits["lose_condition"].get_type() == sol::type::function)
@@ -422,7 +422,7 @@ component::detail::Trait get_trait(sol::table traits)
     else
     {
         /** TODO: Create default function */
-        spdlog::get("lua")->warn("No lose condition");
+        spdlog::get("lua")->warn("no lose condition");
     }
     return trait;
 }

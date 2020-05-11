@@ -146,7 +146,7 @@ void Action::abort_strategy(const event::RequirementFailure& event)
 
     if (event.error != "")
     {
-        spdlog::get("agent")->error("We got an error from Requirement: {} ; {}", tag_to_string(event.requirement), event.error);
+        spdlog::get("agent")->error("we got an error from Requirement: {} ; {}", tag_to_string(event.requirement), event.error);
     }
 
     auto strategies = m_context.registry->try_get<component::Strategy>(event.entity);

@@ -46,7 +46,7 @@ void Mitigation::update(float dt)
             {
                 if (!(add_strategies(strategies, needs.vital_needs.front(), tags)))
                 {
-                    spdlog::get("agent")->warn("Unable to add actions to fix need {}", needs.vital_needs[0].name);
+                    spdlog::get("agent")->warn("unable to add actions to fix need {}", needs.vital_needs[0].name);
                 }
             }
         }
@@ -59,7 +59,7 @@ void Mitigation::update(float dt)
                         needs.leisure_needs[m_context.rng->uniform(0, static_cast<int>((needs.leisure_needs.size() - 1)))],
                         tags)))
                 {
-                    spdlog::get("agent")->warn("Unable to add actions to satisfy leisure need");
+                    spdlog::get("agent")->warn("unable to add actions to satisfy leisure need");
                 }
             }
         }
