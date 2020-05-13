@@ -81,6 +81,21 @@ you want a real world connection to these rules.
 For this scenario, we are going to use the old action system to make agents go looking for water, which is bundled as part of the
 native tools (written in C++) and systems shipping with CultSim.
 
+Creating the folders
+++++++++++++++++++++
+
+First of all, we need to create a new folder to hold our scenario data. In fact, three folders and a Lua script! So to begin, assuming we use
+the paths mentioned before as our root folders, we want to create:
+
+ 1. A folder called :code:`script` in the root
+ 2. Inside this folder, we will create a folder called :code:`water_blobs`, which will hold all scenario data
+ 3. And inside the :code:`water_blobs` folder, we create a folder called :code:`entities`, which will hold - shockingly - our entities
+ 4. Now for the file, we will create :code:`water_blobs.lua` inside the :code:`water_blobs` folder.
+
+The reason we need a :code:`script` folder is because all our scenarios need to live inside this folder to be discovered by CultSim. Next, we need a folder
+for our particular scenario, to keep the data and files separated from other scenarios. The :code:`entities` folder inside the scenario is where CultSim expects
+to find spawnable entities, so we need this folder as well. Finally, the :code:`.lua` file does not need to have the same name as the parent folder, but it's
+a convention used by CultSim creators, so we will do so. Another common name is :code:`scenario.lua`. This file will contain the description of what we are creating!
 
 Lua API Reference
 -----------------
