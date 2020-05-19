@@ -1,4 +1,10 @@
 py = require 'python'
+py.execute("import sys; sys.path.append('D:/_Programming/NTNU_Bachelor/bachelor/bachelor/sim/res/script/scenarios/RL_AI/')")
+ai = py.import 'ai_logic'
+ai_move = ai.MoveAction()
+ai_actions = ai.AIActions
+ai_states = ai.AIStates
+
 -- Create the scenario that will be loaded
 scenario = Scenario:new()
 
@@ -15,8 +21,10 @@ scenario.bounds = Vec2:new(100.0, 100.0)
 scenario.systems = {
     "SensorSystem",
     "MovementSystem",
+    "NeedSystem",
     "HealthSystem",
     "TimerSystem",
+    lua_systems.move_system,
     "DeletionSystem",
 }
 
@@ -32,9 +40,35 @@ scenario.sampling_rate = 1.0;
 
 -- This function is called before starting the simulation, once
 scenario.init = function()
+    -- local inspect = require 'inspect'
+
+    log.debug(ai.hello())
+    ai_move.set_bounds(100,100)
+    local foods = {}
+    local po = ai.ItemMeta(0, ai.Vec2(69,69), 420)
+
+
+    table.insert(foods, ai.ItemMeta(69, ai.Vec2(69,69), 420))
+    table.insert(foods, ai.ItemMeta(420, ai.Vec2(69,69), 421))
+    table.insert(foods, ai.ItemMeta(34, ai.Vec2(69,69), 422))
+
+    local a1 = ai.QBrain()
+    local env = ai.Environment(ai.Vec2(69,69), 0,foods)
+    if env == nil then
+        log.critical("I am NIL envimorment")
+    end
+
+    log.critical("The env is (" .. env.my_loc.x .. ", " .. env.my_loc.y ..")")
+
+    local a = a1.get_action(env) 
+    if a ~= nil then
+        log.debug("action = " .. a.action)
+    end
+    
+
     -- Spawn Boids
-    for i=1,10 do
-        local boid = cultsim.spawn("r_learners")      
+    for i=1,2 do
+        local ai_peeps = cultsim.spawn("r_learners")      
     end
     
     for i=1,3 do
