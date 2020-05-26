@@ -32,6 +32,7 @@ void GOBBAS::update(float dt)
         if (error != "")
         {
             spdlog::get("agent")->error(error);
+            action.current_action_sequence = {};
         }
     });
 }

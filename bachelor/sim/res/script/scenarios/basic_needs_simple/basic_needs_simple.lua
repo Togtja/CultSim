@@ -2,10 +2,10 @@
 scenario = Scenario:new()
 
 -- Give the scenario a name
-scenario.name = "Basic Goals"
+scenario.name = "Basic Needs"
 
 -- Describe the scenario with a sensible amount of text
-scenario.description = "Observe as your agents walk around in a forest looking for food. Now with extra GOB"
+scenario.description = "Observe as your agents walk around in a forest looking for food."
 
 -- The bounds of the level on the X and Y in both directions based on the center 200,200 means the total world is 400,400 with 200 units on both sides of 0,0
 scenario.bounds = Vec2:new(500.0, 500.0)
@@ -13,9 +13,10 @@ scenario.bounds = Vec2:new(500.0, 500.0)
 -- Declare all systems that should be active initially
 scenario.systems = {
     "SensorSystem",
-    "GoalSystem",
-    "GOBSystem",
-    "GOBBASystem",
+    "NeedSystem",
+    "MitigationSystem",
+    "ActionSystem",
+    "RequirementSystem",
     "TimerSystem",
     "MovementSystem",
     "DeletionSystem"
@@ -58,3 +59,4 @@ scenario.draw = function() end
 
 -- This function is called before finishing the scenario
 scenario.shutdown = function() end
+
