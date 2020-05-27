@@ -1,3 +1,6 @@
+[![pipeline status](https://git.gvk.idi.ntnu.no/bachelor/2020/group-107/bachelor/badges/master/pipeline.svg)](https://git.gvk.idi.ntnu.no/bachelor/2020/group-107/bachelor/commits/master) [![coverage report](https://git.gvk.idi.ntnu.no/bachelor/2020/group-107/bachelor/badges/master/coverage.svg)](https://git.gvk.idi.ntnu.no/bachelor/2020/group-107/bachelor/commits/master)
+
+
 # CultSim
 
 CultSim comes from Culture and Simulation and not “Cult” as in Worship, although both Cult and Culture come from the same Etymology of Cultivate (Cultus in Latin).
