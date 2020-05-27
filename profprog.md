@@ -362,7 +362,7 @@ So the Context handler then holds a mapping of all the context to an Action Hand
 
 I believe the way this is modeled is one of the better ways to create a customizable key binding, as the end-user can decide what button does what action in any given context. However there is a downside to this, one is that it can be a bit confusing, and maybe a bit hard to keep track of. It could also be a bit over-engineered, in the sense that many users might not even need this functionality. However, I believed it to be a very good system based on the requirements we made for the Input Handler.
 
-The code itself has good documentation on what the functions do. However, the documentation inside the function is minimal, because it's not to hard to understand what the code does. When we asked for a conde review by Simon, he stated that it was not necessary to write a bunch of comments of what each if or else statement did, as it was understood based on the context, and variable names.
+The code itself has good documentation on what the functions do. However, the documentation inside the function is minimal, because it's not too hard to understand what the code does. When we asked for a code review by Simon, he stated that it was not necessary to write a bunch of comments of what each if or else statement did, as it was understood based on the context, and variable names.
 
 
 
