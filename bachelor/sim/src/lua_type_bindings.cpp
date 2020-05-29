@@ -8,6 +8,7 @@
 #include "entity/scenario.h"
 #include "entity/systems/lua_system.h"
 #include "input/input_handler.h"
+#include "gfx/renderer.h"
 #include "preferences.h"
 #include "random_engine.h"
 

@@ -30,6 +30,7 @@ static robin_hood::unordered_map<std::string, std::function<bool(entt::entity, e
                           {"LuaComponent", spawn_lua_component},
                           {"ActionComponent", spawn_action_component},
                           {"GoalComponent", spawn_goal_component},
+                          {"Sphere3DComponent", spawn_sphere_component},
                           {"RelationshipComponent", spawn_relationship_component}};
 
 bool spawn_position_component(entt::entity e, entt::registry& reg, sol::table table)
@@ -484,6 +485,12 @@ bool spawn_lua_component(entt::entity e, entt::registry& reg, sol::table table)
         default: return false; break;
     }
 
+    return true;
+}
+
+bool spawn_sphere_component(entt::entity e, entt::registry& reg, sol::table table)
+{
+    reg.assign<component::Sphere3D>(e, table["radius"].get<float>());
     return true;
 }
 
