@@ -198,6 +198,18 @@ bool ScenarioScene::update(float dt)
     update_entity_hover();
 
     setup_docking_ui();
+
+    /** Console input */
+    ImGui::Begin("Code injection");
+    static char buf[1024];
+    ImGui::InputTextMultiline("Lua Code", buf, 1024);
+    if (ImGui::Button("Execute Code"))
+    {
+        m_context->lua_state.script(buf);
+        spdlog::get("lua")->warn("!!! executed custom Lua code! the simulation is no longer deterministic !!!");
+    }
+    ImGui::End();
+
     ImGui::Begin(m_scenario.name.c_str(), nullptr, ImGuiWindowFlags_NoTitleBar);
     draw_scenario_information_ui();
     draw_time_control_ui();
