@@ -117,6 +117,8 @@ bool ActionHandler::handle_input(const SDL_Scancode scancode)
 
 bool ActionHandler::handle_live_input(const float dt)
 {
+    const auto& io = ImGui::GetIO();
+
     /**
      * Used to make sure we break from stack after a key is found in a context
      * The other handles can just return, however this one needs to loop through all the keys
@@ -126,7 +128,7 @@ bool ActionHandler::handle_live_input(const float dt)
     const auto key_state = SDL_GetKeyboardState(nullptr);
     for (auto&& [k, a] : m_key_binding)
     {
-        if (key_state[k])
+        if (key_state[k] && !io.WantTextInput && !io.WantCaptureKeyboard)
         {
             if (has_live_action(a))
             {
