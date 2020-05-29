@@ -35,6 +35,8 @@ public:
 
     void update(float dt) override;
 
+    void update_imgui() override;
+
     ISystem* clone() override;
 
 private:
