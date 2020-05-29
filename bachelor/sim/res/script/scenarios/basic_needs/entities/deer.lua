@@ -46,7 +46,7 @@ entity = {
     MemoryComponent = {
         max_memories = 10,
         max_retention_time = 1000.0,
-        allowed_memories = { ETag.Food | ETag.Location, ETag.Drink | ETag.Location },
+        allowed_memories = { ETag.Food | ETag.Consume | ETag.Location, ETag.Drink | ETag.Consume | ETag.Location }
     },
     AgeComponent = 
     {
