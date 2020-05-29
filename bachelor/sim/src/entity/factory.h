@@ -47,6 +47,7 @@ bool spawn_name_component(entt::entity e, entt::registry& reg, sol::table table)
 bool spawn_lua_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_action_component(entt::entity e, entt::registry& reg, sol::table table);
 bool spawn_goal_component(entt::entity e, entt::registry& reg, sol::table table);
+bool spawn_sphere_component(entt::entity e, entt::registry& reg, sol::table table);
 } // namespace detail
 
 /**
