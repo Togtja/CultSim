@@ -36,7 +36,7 @@ scenario.init = function()
     cultsim.connect("ScenarioLoaded", function(event) log.info("Scenario loaded.") end)
 
     -- Spawn 100 Deer
-    for i=1,100 do
+    for i=1,600 do
         local deer = cultsim.spawn("deer")
 
         -- -- Randomly distribute starting needs of agents around 75, with a std deviation of 25
