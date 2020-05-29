@@ -20,13 +20,13 @@ entity = {
         tags = ETag.Avoidable | ETag.Creature
     },
     GoalComponent = {
-     goals = {goals.eat}
+        goals = {goals.eat}
 	},
     ActionComponent = {
-     actions = {action_sequences.find_food}
+        actions = {action_sequences.find_food}
 	},
     NameComponent = 
     {
-     entity_type = "Deer"
-	}
+        entity_type = "Deer"
+    }
 }

@@ -63,6 +63,9 @@ entity = {
         -- Obtainable traits
         attainable_traits = {traits.slow_digestion, traits.random_mutation, traits.fast}
     },
-
-    RelationshipComponent = {}
+    RelationshipComponent = {},
+    Sphere3DComponent = 
+    {
+        radius = 0.05
+    }
 }

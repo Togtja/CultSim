@@ -25,6 +25,7 @@ void Rendering::update(float dt)
         sprite.texture.bigrees = glm::atan(mov.direction.y, mov.direction.x) / 3.14f * 127.5f;
     });
 
+    /** 2D Drawing */
     registry.view<component::Sprite, component::Position, entt::tag<"layer_0"_hs>>().less(
         [](const component::Sprite& sprite, const component::Position& pos) {
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
@@ -43,6 +44,12 @@ void Rendering::update(float dt)
     registry.view<component::Sprite, component::Position, entt::tag<"layer_3"_hs>>().less(
         [](const component::Sprite& sprite, const component::Position& pos) {
             gfx::get_renderer().sprite().draw(pos.position, sprite.color, sprite.texture);
+        });
+
+    /** 3D Drawing */
+    registry.view<component::Sphere3D, component::Position>().less(
+        [](const component::Sphere3D& sphere, const component::Position& pos) {
+            gfx::get_renderer().raymarch().draw_sphere(pos.position, sphere.radius);
         });
 
     /** Selected / hovered */
