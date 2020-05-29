@@ -3,6 +3,7 @@
 #include "debug/auto_timer.h"
 #include "entity/components/components.h"
 #include "entity/memories/resource_location.h"
+#include "gfx/renderer.h"
 
 #include <glm/glm.hpp>
 #include <taskflow/taskflow.hpp>
@@ -42,15 +43,19 @@ void Memory::update(float dt)
                     if (registry->valid(entity))
                     {
                         auto entity_tags = registry->try_get<component::Tags>(entity);
-                        if (entity_tags && entity_tags->tags & container.memory_tags)
+                        if (entity_tags &&
+                            ((entity_tags->tags & container.memory_tags) == ETag(container.memory_tags & (~ETag::TAG_Location))))
                         {
                             count++;
                         }
                     }
                 }
-                auto memory = std::unique_ptr<memory::ResourceLocation>(
-                    new memory::ResourceLocation(ETag(TAG_Food | TAG_Location), location, count));
-                add_memory(e, memory.get(), container);
+                if (count != 0)
+                {
+                    auto memory = std::unique_ptr<memory::ResourceLocation>(
+                        new memory::ResourceLocation(ETag(container.memory_tags | TAG_Location), location, count));
+                    add_memory(e, memory.get(), container);
+                }
             }
         });
     }
@@ -90,6 +95,44 @@ void Memory::update(float dt)
     }
 }
 
+void Memory::update_imgui()
+{
+    static bool draw_memories = false;
+    if (ImGui::TreeNode("Memories"))
+    {
+        ImGui::Checkbox("Draw Memory Locations", &draw_memories);
+        ImGui::TreePop();
+    }
+
+    if (draw_memories)
+    {
+        auto view = m_context.registry->view<component::Memory, component::Vision>();
+        view.each([this](const component::Memory& memories, const component::Vision& vision) {
+            auto max = memories.memory_container.size();
+            for (int i = 0; i < memories.memory_container.size(); i++)
+            {
+                for (const auto& memory : memories.memory_container[i].memory_storage)
+                {
+                    auto* ResourceLocation = dynamic_cast<memory::ResourceLocation*>(memory.get());
+                    if (ResourceLocation)
+                    {
+                        glm::vec3 color{0.f, 0.f, 0.f};
+                        if (ResourceLocation->m_tags & ETag::TAG_Food)
+                        {
+                            color.r = 1.f;
+                        }
+                        else if (ResourceLocation->m_tags & ETag::TAG_Drink)
+                        {
+                            color.g = 1.f;
+                        }
+                        gfx::get_renderer().debug().draw_circle(ResourceLocation->m_location, vision.radius, color);
+                    }
+                }
+            }
+        });
+    }
+}
+
 ISystem* Memory::clone()
 {
     return new Memory(m_context);
@@ -100,9 +143,10 @@ void Memory::add_memory(entt::entity e, memory::IMemory* memory, memory::Contain
     auto duplicate = false;
     for (auto& old_memory : container.memory_storage)
     {
-        auto* o_res = dynamic_cast<memory::ResourceLocation*>(old_memory.get());
-        auto* n_res = dynamic_cast<memory::ResourceLocation*>(memory);
-        if (o_res && close_enough(o_res->m_location, n_res->m_location, 20.f))
+        auto vis_rad = m_context.registry->try_get<component::Vision>(e)->radius;
+        auto* o_res  = dynamic_cast<memory::ResourceLocation*>(old_memory.get());
+        auto* n_res  = dynamic_cast<memory::ResourceLocation*>(memory);
+        if (o_res && n_res && close_enough(o_res->m_location, n_res->m_location, vis_rad))
         {
             o_res->m_number_of_entities  = n_res->m_number_of_entities;
             o_res->m_time_since_creation = 0.f;
@@ -141,18 +185,6 @@ void Memory::sort_memories(entt::entity e, memory::Container& container)
                       cost_lhs += res_lhs->m_time_since_creation;
                       cost_rhs += res_rhs->m_time_since_creation;
 
-                      /** Make sure that memories that have aged past retention_time are moved to the back of the
-                       list */
-                      if (res_lhs->m_time_since_creation > memory_retention_time)
-                      {
-                          cost_lhs += 1000.f;
-                      }
-
-                      if (res_rhs->m_time_since_creation > memory_retention_time)
-                      {
-                          cost_rhs += 1000.f;
-                      }
-
                       /**Make sure entities that have no entities are rated a lot lower than others */
                       if (res_lhs->m_number_of_entities == 0)
                       {
@@ -166,6 +198,8 @@ void Memory::sort_memories(entt::entity e, memory::Container& container)
 
                       return cost_lhs < cost_rhs;
                   });
+        auto res_f = dynamic_cast<memory::ResourceLocation*>(container.memory_storage.front().get());
+        auto res_b = dynamic_cast<memory::ResourceLocation*>(container.memory_storage.back().get());
     }
 }
 

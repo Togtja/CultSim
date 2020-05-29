@@ -537,20 +537,33 @@ void ScenarioScene::draw_selected_entity_information_ui()
         return;
     }
 
-    const auto& [name, needs, goal, action, health, strategy, reproduction, timer, tags, memories, preg, traits, relship] =
-        m_registry.try_get<component::Name,
-                           component::Need,
-                           component::Goal,
-                           component::Action,
-                           component::Health,
-                           component::Strategy,
-                           component::Reproduction,
-                           component::Timer,
-                           component::Tags,
-                           component::Memory,
-                           component::Pregnancy,
-                           component::Traits,
-                           component::Relationship>(selection_info.selected_entity);
+    const auto& [name,
+                 needs,
+                 goal,
+                 action,
+                 health,
+                 strategy,
+                 reproduction,
+                 timer,
+                 tags,
+                 memories,
+                 inventory,
+                 preg,
+                 traits,
+                 relship] = m_registry.try_get<component::Name,
+                                               component::Need,
+                                               component::Goal,
+                                               component::Action,
+                                               component::Health,
+                                               component::Strategy,
+                                               component::Reproduction,
+                                               component::Timer,
+                                               component::Tags,
+                                               component::Memory,
+                                               component::Inventory,
+                                               component::Pregnancy,
+                                               component::Traits,
+                                               component::Relationship>(selection_info.selected_entity);
 
     ImGui::SetNextWindowPos({250.f, 250.f}, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({400.f, 600.f}, ImGuiCond_FirstUseEver);
@@ -750,7 +763,38 @@ void ScenarioScene::draw_selected_entity_information_ui()
             ImGui::Text("My Dad is the Simulation");
         }
     }
-
+    if (memories)
+    {
+        if (ImGui::BeginTable("Memories", 2))
+        {
+            ImGui::TableSetupColumn("Memory Tags:");
+            ImGui::TableSetupColumn("Number of Memories:");
+            cs_auto_table_headers();
+            for (auto container : memories->memory_container)
+            {
+                ImGui::TableNextCell();
+                ImGui::Text("%s", tag_to_string(container.memory_tags).c_str());
+                ImGui::TableNextCell();
+                ImGui::Text("%u", container.memory_storage.size());
+            }
+            ImGui::EndTable();
+        }
+    }
+    if (inventory)
+    {
+        if (ImGui::BeginTable("Inventory", 1))
+        {
+            ImGui::TableSetupColumn("Item Tags:");
+            cs_auto_table_headers();
+            for (auto content : inventory->contents)
+            {
+                auto tags = m_registry.try_get<component::Tags>(content);
+                ImGui::TableNextCell();
+                ImGui::Text("%s", tag_to_string(tags->tags).c_str());
+            }
+            ImGui::EndTable();
+        }
+    }
     ImGui::End();
 }
 
