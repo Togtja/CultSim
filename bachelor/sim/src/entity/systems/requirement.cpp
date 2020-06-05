@@ -180,7 +180,7 @@ void Requirement::find_target(float dt)
 
                     if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                     {
-                        if (res->m_number_of_entities == 0)
+                        if (res->m_number_of_entities <= 0)
                         {
                             break;
                         }
@@ -194,7 +194,7 @@ void Requirement::find_target(float dt)
                                                 m_context.scenario->bounds);
                         }
 
-                        if (close_enough(pos.position, findreqs.desired_position, 0.2f))
+                        if (close_enough(pos.position, findreqs.desired_position, 10.f))
                         {
                             res->m_number_of_entities = 0.f;
                             mov.desired_position.clear();
