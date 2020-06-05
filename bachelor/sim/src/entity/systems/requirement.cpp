@@ -56,7 +56,7 @@ void Requirement::goto_location(float dt)
                              component::LocationRequirement& locationreqs,
                              component::Movement& mov,
                              const component::Position& pos) {
-        if (close_enough(pos.position, locationreqs.desired_position, 5.f))
+        if (close_enough(pos.position, locationreqs.desired_position, 10.f))
         {
             m_context.dispatcher->enqueue<event::FinishedRequirement>(event::FinishedRequirement{e, TAG_Location});
             m_context.registry->remove<component::LocationRequirement>(e);
@@ -180,7 +180,7 @@ void Requirement::find_target(float dt)
 
                     if (auto* res = dynamic_cast<memory::ResourceLocation*>(memory.get()); res)
                     {
-                        if (res->m_number_of_entities == 0)
+                        if (res->m_number_of_entities <= 0)
                         {
                             break;
                         }
@@ -194,7 +194,7 @@ void Requirement::find_target(float dt)
                                                 m_context.scenario->bounds);
                         }
 
-                        if (close_enough(pos.position, findreqs.desired_position, 0.2f))
+                        if (close_enough(pos.position, findreqs.desired_position, 10.f))
                         {
                             res->m_number_of_entities = 0.f;
                             mov.desired_position.clear();
