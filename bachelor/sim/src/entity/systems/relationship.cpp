@@ -132,7 +132,7 @@ void Relationship::delete_father(const event::EntityDeleted& event)
          this](entt::entity e, const component::Pregnancy& preg, const component::Name& n, const component::Relationship& r) {
             if (preg.parents.non_incubator == event.entity)
             {
-                add_to_reg(e);
+                add_to_reg(event.entity);
             }
         });
 }
