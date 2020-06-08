@@ -27,12 +27,12 @@ void GOBBAS::update(float dt)
         /** If we get an error or finish, clear our current action sequence */
         if (finished)
         {
-            action.current_action_sequence = {};
+            action.current_action_sequence = gob::ActionSequence{};
         }
         if (error != "")
         {
             spdlog::get("agent")->error(error);
-            action.current_action_sequence = {};
+            action.current_action_sequence = gob::ActionSequence{};
         }
     });
 }

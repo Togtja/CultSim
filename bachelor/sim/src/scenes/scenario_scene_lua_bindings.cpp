@@ -18,16 +18,25 @@ static void set_children_in_pregnancy(entt::registry& reg,
     component::Pregnancy& preg = reg.assign<component::Pregnancy>(incubator_e);
     if (incubator.children_deviation > 0)
     {
-        preg.children_in_pregnancy = std::round(rng.normal(incubator.mean_children_pp, incubator.children_deviation));
+        auto children = (std::round(rng.normal(incubator.mean_children_pp, incubator.children_deviation)));
+        if (children > 0)
+        {
+            preg.children_in_pregnancy = static_cast<uint16_t>(children);
+        }
+        else
+        {
+            preg.children_in_pregnancy = 1;
+        }
     }
     else
     {
-        preg.children_in_pregnancy = non_incubator.mean_children_pp;
+        preg.children_in_pregnancy = static_cast<uint16_t>(non_incubator.mean_children_pp);
     }
 
     if (incubator.gestation_deviation > 0)
     {
-        preg.gestation_period = std::round(rng.normal(incubator.average_gestation_period, incubator.gestation_deviation));
+        preg.gestation_period =
+            static_cast<float>(std::round(rng.normal(incubator.average_gestation_period, incubator.gestation_deviation)));
     }
     else
     {
@@ -35,11 +44,6 @@ static void set_children_in_pregnancy(entt::registry& reg,
     }
     preg.parents.incubator     = incubator_e;
     preg.parents.non_incubator = non_incubator_e;
-
-    if (preg.children_in_pregnancy < 1)
-    {
-        preg.children_in_pregnancy = 1;
-    }
 }
 
 void ScenarioScene::bind_scenario_lua_functions()
