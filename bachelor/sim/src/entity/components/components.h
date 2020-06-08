@@ -293,7 +293,7 @@ struct Reproduction
     float end_fertility{};
 
     /** General Pregnancy stat */
-    int mean_children_pp{1};
+    uint16_t mean_children_pp{1};
     float children_deviation{};
 
     /** Static fertility */
