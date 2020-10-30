@@ -46,7 +46,7 @@ Before you start, ensure you have the following system libraries installed (on U
 2. `cd` into the root directory where you cloned
 3. `mkdir build`
 4. `cd build`
-5. `CMake -G "Unix Makefiles" ../``
+5. `CMake -G "Unix Makefiles" ../`
 6. `make -j#` where the `#`  is the number of threads you want to compile with
  
 To run the program after building assuming you are coming right from the previous steps:
